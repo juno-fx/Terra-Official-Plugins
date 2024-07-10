@@ -1,0 +1,31 @@
+apiVersion: skaffold/v4beta6
+kind: Config
+metadata:
+  name: terra
+
+build:
+  local:
+    push: false
+  tagPolicy:
+    sha256: {}
+  artifacts:
+    - image: terra-test
+      docker:
+        dockerfile: Dockerfile
+        target: test
+
+verify:
+  # run integration tests
+  - name: terra-test
+    timeout: 60
+    container:
+      image: terra-test
+      name: terra-test
+    # target run for in the cluster
+    executionMode:
+      kubernetesCluster: {}
+
+manifests:
+  rawYaml:
+    - k8s/*
+

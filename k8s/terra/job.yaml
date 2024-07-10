@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: terra-runner
+spec:
+  backoffLimit: 1
+  activeDeadlineSeconds: 6000
+
+  template:
+    spec:
+      serviceAccountName: terra
+      restartPolicy: Never
+      nodeSelector:
+        kubernetes.io/arch: amd64
+
+      containers:
+        - name: terra-runner
+          image: terra
+          volumeMounts:
+            - name: terra
+              mountPath: /app
+
+      volumes:
+        - name: terra
+          hostPath:
+            path: /repo
+            type: Directory

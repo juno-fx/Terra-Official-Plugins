@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: terra
+spec:
+  selector:
+    app: terra
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      name: endpoint
