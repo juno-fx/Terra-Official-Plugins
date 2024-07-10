@@ -18,7 +18,7 @@ class Plugin:
     _skipload_: bool = True
     icon: str = ""
     description: str = ""
-    fields: dict = {}
+    fields: list = []
 
     def __init__(self, logger: Logger):
         """

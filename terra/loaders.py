@@ -2,14 +2,13 @@
 Loader for Terra Plugins
 """
 # std
-from typing import Dict
+from typing import Dict, List
 
 # 3rd
 from pluginlib import PluginLoader
 
 # local
 from .plugin import Plugin
-from .constants import SEARCH_PATHS
 from .logger import LOGGER
 
 
@@ -22,7 +21,7 @@ class TerraPluginLoader(PluginLoader):
         """
         Initialize the Terra Plugin Loader
         """
-        super().__init__(paths=SEARCH_PATHS, *args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.logger = LOGGER
 
     def get_plugin(self, *args, **kwargs) -> Plugin:
@@ -46,8 +45,8 @@ class TerraPluginLoader(PluginLoader):
         )
 
 
-def plugins() -> TerraPluginLoader:
+def plugins(paths: List[str]) -> TerraPluginLoader:
     """
     Load All Plugins
     """
-    return TerraPluginLoader()
+    return TerraPluginLoader(paths=paths)
