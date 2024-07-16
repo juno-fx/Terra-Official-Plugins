@@ -22,13 +22,16 @@ venv:
 	$(PIP) install --upgrade uv
 
 upgrade-uv:
-	$(VENV)/uv pip install --upgrade uv
+	@source $(VENV)/activate \
+		&& $(VENV)/uv pip install --upgrade uv
 
 install-prod: upgrade-uv
-	@$(VENV)/uv pip install -r requirements.txt
+	@source $(VENV)/activate \
+		&& $(VENV)/uv pip install -r requirements.txt
 
 install-dev: upgrade-uv
-	@$(VENV)/uv pip install -r dev-requirements.txt
+	@source $(VENV)/activate \
+		&& $(VENV)/uv pip install -r dev-requirements.txt
 
 install: venv install-dev install-prod
 
