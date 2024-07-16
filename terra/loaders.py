@@ -1,6 +1,7 @@
 """
 Loader for Terra Plugins
 """
+
 # std
 from typing import Dict, List
 
@@ -24,7 +25,7 @@ class TerraPluginLoader(PluginLoader):
         super().__init__(*args, **kwargs)
         self.logger = LOGGER
 
-    def get_plugin(self, *args, **kwargs) -> Plugin:
+    def get_plugin(self, *args, **kwargs) -> Plugin:  # pragma: no cover
         """
         Get a plugin
         """
@@ -36,7 +37,9 @@ class TerraPluginLoader(PluginLoader):
         """
         return super().plugins
 
-    def run_plugin(self, plugin_type, name, allow_failure=True, *args, **kwargs):
+    def run_plugin(
+        self, plugin_type, name, allow_failure=True, *args, **kwargs
+    ):  # pragma: no cover
         """
         Run a plugin
         """

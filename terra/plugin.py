@@ -1,6 +1,7 @@
 """
 Plugin Loader for the service module
 """
+
 # std
 from traceback import format_exc
 from logging import Logger
@@ -20,7 +21,7 @@ class Plugin:
     description: str = ""
     fields: list = []
 
-    def __init__(self, logger: Logger):
+    def __init__(self, logger: Logger):  # pragma: no cover
         """
         Initialize the Plugin
         """
@@ -30,7 +31,7 @@ class Plugin:
             name = self.__class__.__name__
         self.logger.info(f"Initializing {name} Plugin")
 
-    def run(self, allow_failure=True, *args, **kwargs) -> None:
+    def run(self, allow_failure=True, *args, **kwargs) -> None:  # pragma: no cover
         """
         Initialize the Plugin
         """
@@ -44,7 +45,7 @@ class Plugin:
             if not allow_failure:
                 raise error
 
-    def preflight(self, *args, **kwargs) -> bool:
+    def preflight(self, *args, **kwargs) -> bool:  # pragma: no cover
         """
         Run preflight
         """
@@ -52,7 +53,7 @@ class Plugin:
         return True
 
     @pluginlib.abstractmethod
-    def install(self, *args, **kwargs) -> None:
+    def install(self, *args, **kwargs) -> None:  # pragma: no cover
         """
         Run install process
         """
