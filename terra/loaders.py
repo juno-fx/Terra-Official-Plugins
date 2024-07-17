@@ -3,6 +3,7 @@ Loader for Terra Plugins
 """
 
 # std
+from glob import glob
 from typing import Dict, List
 
 # 3rd
@@ -48,8 +49,13 @@ class TerraPluginLoader(PluginLoader):
         )
 
 
-def plugins(paths: List[str]) -> TerraPluginLoader:
+def plugins(paths: List[str] = None) -> TerraPluginLoader:
     """
     Load All Plugins
     """
+    if not paths:
+        paths = []
+        for path in glob("/opt/*/plugins/"):
+            paths.append(path)
+
     return TerraPluginLoader(paths=paths)

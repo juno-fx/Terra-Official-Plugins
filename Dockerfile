@@ -33,9 +33,8 @@ RUN pip install uv \
     && rm -rfv requirements.txt \
     && apk add --no-cache zip curl git
 
-COPY plugins /opt/plugins/
-COPY tests tests
 COPY terra terra
-COPY dev_runner.py dev_runner.py
+COPY plugins /opt/official-plugins/plugins/
+COPY tests tests
 
 CMD sh tests/run_tests.sh

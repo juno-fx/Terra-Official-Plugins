@@ -1,3 +1,5 @@
+ls -la /opt/*/
+
 coverage run -m pytest --log-cli-level=INFO -x -s -vvv --durations=5 --color=yes tests/ -W ignore::DeprecationWarning
 cov_exit_code=$?
 
