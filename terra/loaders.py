@@ -54,7 +54,7 @@ def plugins(paths: List[str] = None) -> TerraPluginLoader:
     Load All Plugins
     """
     if not paths:
-        paths = []
+        paths = ["/app/Terra-Official-Plugins/plugins/"]
         for path in glob("/opt/*/plugins/"):
             paths.append(path)
 

@@ -18,6 +18,11 @@ class GitLoader(Plugin):
     _alias_ = "Git Loader"
     icon = "https://git-scm.com/images/logos/downloads/Git-Icon-1788C.png"
     description = "Clone down a repository from a Git Source"
+    fields = [
+        Plugin.field("url", "Git URL", required=True),
+        Plugin.field("ref", "Git Ref", required=True),
+        Plugin.field("destination", "Destination directory", required=True)
+    ]
 
     def preflight(self, *args, **kwargs) -> bool:
         """
@@ -36,9 +41,6 @@ class GitLoader(Plugin):
             raise ValueError("No git ref provided")
 
         if not self.destination:
-            raise ValueError("No destination directory provided")
-
-        if not os.path.exists(os.path.dirname(self.destination)):
             raise ValueError("No destination directory provided")
 
         if not self.destination.endswith("/"):

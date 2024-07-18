@@ -3,6 +3,7 @@ Plugin Loader for the service module
 """
 
 # std
+import inspect
 from traceback import format_exc
 from logging import Logger
 
@@ -19,7 +20,21 @@ class Plugin:
     _skipload_: bool = True
     icon: str = ""
     description: str = ""
-    fields: list = []
+    fields: list[dict] = []
+
+    @classmethod
+    def source(cls) -> str:
+        """
+        Create a source
+        """
+        return inspect.getfile(cls)
+
+    @staticmethod
+    def field(name: str, description: str, required: bool = False) -> dict:
+        """
+        Create a field
+        """
+        return {"name": name, "description": description, "required": required}
 
     def __init__(self, logger: Logger):  # pragma: no cover
         """

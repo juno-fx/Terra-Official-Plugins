@@ -18,6 +18,10 @@ class KdenliveInstaller(Plugin):
     _alias_ = "Kdenlive Installer"
     icon = "https://kdenlive.org/wp-content/uploads/2022/01/kdenlive-logo-blank-500px.png"
     description = "Kdenlive is an acronym for KDE Non-Linear Video Editor. It works on GNU/Linux, Windows and BSD."
+    fields = [
+        Plugin.field("url", "Download URL", required=False),
+        Plugin.field("destination", "Destination directory", required=True)
+    ]
 
     def preflight(self, *args, **kwargs) -> bool:
         """
@@ -43,7 +47,7 @@ class KdenliveInstaller(Plugin):
         scripts_directory = os.path.abspath(f"{__file__}/../scripts")
         self.logger.info(f"Loading scripts from {scripts_directory}")
         if run(
-            f"bash {scripts_directory}/kdenlive.sh {self.download_url} {self.destination}",
+            f"bash {scripts_directory}/kdenlive-installer.sh {self.download_url} {self.destination}",
             shell=True
         ).returncode != 0:
             raise RuntimeError("Failed to install kdenlive")
