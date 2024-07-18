@@ -9,17 +9,17 @@ UV="$(VENV)/uv"
 
 # env
 cluster:
-	kind create cluster --name terra-plugins --config .kind.yaml
+	@kind create cluster --name terra-plugins --config .kind.yaml
 
 down:
-	kind delete cluster --name terra-plugins
+	@kind delete cluster --name terra-plugins
 
-dev: local-test
+dev: test
 
 # development
 venv:
-	python3.12 -m venv venv
-	$(PIP) install --upgrade uv
+	@python3.12 -m venv venv
+	@$(PIP) install --upgrade uv
 
 upgrade-uv:
 	@source $(VENV)/activate \
@@ -64,7 +64,6 @@ _run_tests:
 
 	# Force load images into the cluster
 	@skaffold deploy -a build.json --load-images=true
-	# Mongo flushed...
 
 	# Launch the integration tests
 	@skaffold verify -a build.json
@@ -92,4 +91,7 @@ test:
 
 open-coverage:
 	@xdg-open htmlcov/index.html
+
+%:
+	@export TARGET="$@" && $(MAKE) --no-print-directory dev
 

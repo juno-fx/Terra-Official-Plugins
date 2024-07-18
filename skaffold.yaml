@@ -13,6 +13,8 @@ build:
       docker:
         dockerfile: Dockerfile
         target: test
+        buildArgs:
+          TARGET: "{{ .TARGET }}"
 
 verify:
   # run integration tests
@@ -23,7 +25,8 @@ verify:
       name: terra-test
     # target run for in the cluster
     executionMode:
-      kubernetesCluster: {}
+      kubernetesCluster:
+        jobManifestPath: tests/test_runner.yaml
 
 manifests:
   rawYaml:

@@ -5,3 +5,5 @@ nodes:
     extraMounts:
       - hostPath: ./
         containerPath: /repo
+      - hostPath: ./.apps
+        containerPath: /apps

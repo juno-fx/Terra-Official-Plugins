@@ -15,13 +15,19 @@ spec:
 
       containers:
         - name: terra-runner
-          image: terra
+          image: terra-test
           volumeMounts:
             - name: terra
               mountPath: /app
+            - name: apps
+              mountPath: /apps
 
       volumes:
         - name: terra
           hostPath:
             path: /repo
+            type: Directory
+        - name: apps
+          hostPath:
+            path: /apps
             type: Directory
