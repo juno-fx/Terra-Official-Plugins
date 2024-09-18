@@ -47,7 +47,7 @@ class Plugin:
         return {"name": name, "description": description, "required": required}
 
     @staticmethod
-    def checkbox(name: str, description: str, required: bool = False, options = list) -> dict:
+    def dropdown(name: str, description: str, required: bool = False, options = list) -> dict:
         """
         Create a field
         """
