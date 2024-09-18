@@ -39,6 +39,20 @@ class Plugin:
         """
         return {"name": name, "description": description, "required": required}
 
+    @staticmethod
+    def checkbox(name: str, description: str, required: bool = False) -> dict:
+        """
+        Create a field
+        """
+        return {"name": name, "description": description, "required": required}
+
+    @staticmethod
+    def checkbox(name: str, description: str, required: bool = False, options = list) -> dict:
+        """
+        Create a field
+        """
+        return {"name": name, "description": description, "required": required, "options": options}
+
     def update_metadata(self, metadata: dict) -> None:  # pragma: no cover
         """
         Update install metadata
