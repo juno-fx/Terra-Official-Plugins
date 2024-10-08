@@ -67,7 +67,7 @@ class mayaInstaller(Plugin):
         # convert rpms to debs
         if (
             run(
-                f"bash {scripts_directory}/maya_prep_files.sh  {self.destination}",
+                f"bash {scripts_directory}/maya_prep_files.sh {self.destination}",
                 shell=True,
                 check=False,
             ).returncode

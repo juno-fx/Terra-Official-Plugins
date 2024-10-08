@@ -4,6 +4,8 @@ echo "Installing Autodesk Maya..."
 echo "Install Maya Setup deps"
 apt update -y
 apt install alien dpkg-dev debhelper build-essential zlib1g-dev -y
+apt clean -y
+apt autoremove -y
 
 temp_install_dir=$2/maya_installer
 

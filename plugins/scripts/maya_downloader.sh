@@ -1,7 +1,9 @@
 # download maya from autodesk site
 
 #INSTALL DEPS
+echo "--------------------------------------------------------------"
 echo "Download Maya installer"
+echo "--------------------------------------------------------------"
 temp_install_dir=$2/maya_installer
 
 # we want to keep maya installers along the whole install process so we need to make sure we install in apps/temp dir
@@ -17,12 +19,15 @@ else
 fi
 
 # extract the installer
-tar -xvzf /tmp/mayainstaller.tgz -C $temp_install_dir
+echo "Extracting Maya installer and setup files"
+tar -xvzf /tmp/mayainstaller.tgz -C $temp_install_dir > /dev/null
 # check maya installer
 ls -la /tmp
 ls -la $temp_install_dir
 
 chmod -R 777 $temp_install_dir
-
+echo "--------------------------------------------------------------"
+echo "Extracting done."
+echo "--------------------------------------------------------------"
 # lets move to the next step
 

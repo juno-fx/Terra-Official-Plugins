@@ -3,7 +3,10 @@
 #INSTALL DEPS
 echo "Install Maya Setup deps"
 apt update -y
-apt install alien dpkg-dev debhelper build-essential zlib1g-dev -y
+add-apt-repository universe
+apt instal apt-utils -y
+apt install apt-clone -y
+apt install alien dpkg-dev debhelper build-essential zlib1g-dev -y --install-no-recommends
 
 temp_install_dir=$1/maya_installer
 
