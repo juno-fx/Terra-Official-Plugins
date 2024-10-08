@@ -22,7 +22,7 @@ ENV BRANCH=${BRANCH}
 ENV COMMIT=${COMMIT}
 ENV TARGET=${TARGET}
 
-ENV DEV_APPS_DEBUG=false
+ENV DEV_APPS_DEBUG=true
 ENV SESI_HOST='hlicense'
 ENV PYTHONPATH=/app
 ENV SIDEFX_CLIENT_ID=''
@@ -46,5 +46,7 @@ RUN pip install uv \
 COPY terra terra
 COPY plugins /opt/official-plugins/plugins/
 COPY tests tests
+
+COPY Autodesk_Maya_2025_2_ML_Linux_64bit.tgz /tmp/mayainstaller.tgz
 
 CMD sh tests/run_tests.sh

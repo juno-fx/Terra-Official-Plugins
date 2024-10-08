@@ -4,6 +4,7 @@ Installer for maya on linux systems.
 
 # std
 import os
+import time
 from subprocess import run
 from pathlib import Path
 
@@ -89,3 +90,7 @@ class mayaInstaller(Plugin):
         #     != 0
         # ):
         #     raise RuntimeError("Failed to install maya")
+
+
+
+        time.sleep(30000)

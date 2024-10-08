@@ -23,9 +23,8 @@ spec:
       hostname: maya-license-server
       containers:
         - name: maya-container-license-server
-          image: mono:latest
-          command: [ "/script/run_webservice.sh" ]
-          # command: ["sh", "-c", "tail -f /dev/null"]
+          image: rockylinux:9.3.20231119-minimal
+          command: [ "/script/run_license_server.sh" ]
           volumeMounts:
             - name: script
               mountPath: /script

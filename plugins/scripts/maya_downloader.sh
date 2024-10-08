@@ -22,10 +22,9 @@ fi
 echo "Extracting Maya installer and setup files"
 tar -xvzf /tmp/mayainstaller.tgz -C $temp_install_dir > /dev/null
 # check maya installer
-ls -la /tmp
 ls -la $temp_install_dir
-
 chmod -R 777 $temp_install_dir
+
 echo "--------------------------------------------------------------"
 echo "Extracting done."
 echo "--------------------------------------------------------------"
