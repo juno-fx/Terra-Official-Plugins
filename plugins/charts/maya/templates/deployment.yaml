@@ -1,0 +1,49 @@
+{{- if $.Values.start_service}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: maya-license-server
+  annotations:
+    linkerd.io/inject: enabled
+spec:
+  revisionHistoryLimit: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      app: maya-license-server
+  template:
+    metadata:
+      annotations:
+        linkerd.io/inject: enabled
+      labels:
+        app: maya-license-server
+    spec:
+      nodeSelector:
+        junovfx/node: service
+      hostname: maya-license-server
+      containers:
+        - name: maya-container-license-server
+          image: mono:latest
+          command: [ "/script/run_webservice.sh" ]
+          # command: ["sh", "-c", "tail -f /dev/null"]
+          volumeMounts:
+            - name: script
+              mountPath: /script
+            - name: client
+              mountPath: /apps/
+          ports:
+            - name: "endpoint"
+              containerPort: 8080
+              protocol: TCP
+            - name: "rest"
+              containerPort: 8081
+              protocol: TCP
+      volumes:
+        - name: client
+          persistentVolumeClaim:
+            claimName: {{ .Values.claim_name }}
+        - name: script
+          configMap:
+            name: maya-license-server-configmap
+            defaultMode: 0500
+{{- end}}

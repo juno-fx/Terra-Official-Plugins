@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: maya-license-server-configmap
+data:
+  run_license_server.sh: |
+    #!/bin/bash
+    echo "Starting Maya License Server"

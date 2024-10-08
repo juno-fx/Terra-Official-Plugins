@@ -51,12 +51,41 @@ class mayaInstaller(Plugin):
         """
         scripts_directory = os.path.abspath(f"{__file__}/../scripts")
         self.logger.info(f"Loading scripts from {scripts_directory}")
+
+        # download maya
         if (
             run(
-                f"bash {scripts_directory}/maya-installer.sh {self.download_url} {self.destination}",
+                f"bash {scripts_directory}/maya_downloader.sh {self.download_url} {self.destination}",
                 shell=True,
                 check=False,
             ).returncode
             != 0
         ):
             raise RuntimeError("Failed to install maya")
+
+
+        # convert rpms to debs
+        if (
+            run(
+                f"bash {scripts_directory}/maya_prep_files.sh  {self.destination}",
+                shell=True,
+                check=False,
+            ).returncode
+            != 0
+        ):
+            raise RuntimeError("Failed to install maya")
+
+        # install maya license server
+
+        # install maya app and make it portable
+
+
+        # if (
+        #     run(
+        #         f"bash {scripts_directory}/maya-installer.sh {self.download_url} {self.destination}",
+        #         shell=True,
+        #         check=False,
+        #     ).returncode
+        #     != 0
+        # ):
+        #     raise RuntimeError("Failed to install maya")
