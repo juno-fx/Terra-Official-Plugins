@@ -1,9 +1,12 @@
 echo "Installing Autodesk Maya..."
 
-temp_install_dir=/apps/maya_installer
+temp_install_dir=$2/maya_installer
 
 mkdir -p $temp_install_dir
 mkdir -p $2
+
+chmod -R 777 $temp_install_dir/
+chmod -R 777 $2
 
 cd /tmp
 
@@ -15,10 +18,13 @@ else
   wget -q -O /tmp/mayainstaller.tgz "$1"
 fi
 
-# check maya tmp
-ls -la /tmp
+chmod +x /tmp/mayainstaller.tgz
 
-tar xfvz /tmp/mayainstaller.tgz -C $temp_install_dir
+
+tar -xvf /tmp/mayainstaller.tgz -C $temp_install_dir
+
+chmod -R 777 $temp_install_dir/
+chmod -R 777 $2
 
 # check maya installer
 ls -la $temp_install_dir
