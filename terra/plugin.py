@@ -54,7 +54,7 @@ class Plugin:
 
     def update_metadata(self, metadata: dict) -> None:  # pragma: no cover
         """
-        Update install metadata
+        Update install metadata - internal method DO NOT USE outside of this plugin class!
         """
         self.logger.info(f"Updating metadata: {metadata}")
         try:
@@ -64,6 +64,7 @@ class Plugin:
 
         except ImportError:
             self.logger.error("Service module not found, running in dev mode.")
+            print("Service Metadata: ", metadata)
 
     def filter_for_strings_in_metadata(self, metadata: dict) -> dict:
         """
@@ -72,9 +73,12 @@ class Plugin:
         filtered_metadata = {}
         self.logger.info(f"Filtering metadata: {metadata}")
         for key, value in metadata.items():
+            print(f"Key: {key}, Value: {value}")
+
             if isinstance(value, str):
                 filtered_metadata[key] = value
-
+                print("Filtered Metadata: ", filtered_metadata)
+        print("Collected Filtered Metadata: ", filtered_metadata)
         return filtered_metadata
 
     def __init__(self, logger: Logger):  # pragma: no cover
@@ -82,10 +86,13 @@ class Plugin:
         Initialize the Plugin
         """
         self.logger = logger
-        name = self.__class__._alias_
-        if not name:
-            name = self.__class__.__name__
-        self.logger.info(f"Initializing {name} Plugin")
+        self.plugin_name = self.__class__._alias_
+        self.plugin_name_class = self.__class__.__name__
+        self.plugin_version = self.__class__._version_
+
+        if not self.plugin_name:
+            self.plugin_name = self.plugin_name_class
+        self.logger.info(f"Initializing {self.plugin_name} Plugin")
 
     def run(self, allow_failure=True, *args, **kwargs) -> None:  # pragma: no cover
         """
@@ -94,6 +101,7 @@ class Plugin:
         try:
             preflight = self.preflight(*args, **kwargs)
             _metadata = self.__dict__
+            print(f"_metadata: {_metadata}")
             if preflight or preflight is None:
                 self.install(*args, **kwargs)
 
