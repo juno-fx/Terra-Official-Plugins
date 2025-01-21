@@ -25,5 +25,3 @@ chmod +X create_desktop_file.py
 python3 create_desktop_file.py --app_name="vlc" --version="3.6" --latest_path="$2"/vlc.sh --categories="audio, vlc" --destination="$2" --icon="$2"/vlc.png
 echo "Desktop file created."
 chmod -R 777 "$2"
-
-cat $2/*.desktop
