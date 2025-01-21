@@ -18,13 +18,14 @@ class VlcInstaller(Plugin):
 
     _version_ = "1.0.0"
     _alias_ = "Vlc Installer"
+    _custom_metadata_ = {}
     icon = "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/assets/vlc.png?raw=true"
     description = "VideoLanClient aka VLC The Great Media Player"
     category = "Applications"
     tags = ["vlc", "video", "player", "animation"]
     fields = [
-        Plugin.field("url", "Download URL", required=False),
         Plugin.field("destination", "Destination directory", required=True),
+        Plugin.field("environment", "Environment variables", required=False),
     ]
 
     def preflight(self, *args, **kwargs) -> bool:
@@ -38,6 +39,8 @@ class VlcInstaller(Plugin):
         )
 
         self.destination = Path(kwargs.get("destination")).as_posix()
+        self.environment = kwargs.get("environment") or "env data"
+        self.executable = Path(self.destination).joinpath("vlc.sh").as_posix()
 
         # validate
         if not self.destination:

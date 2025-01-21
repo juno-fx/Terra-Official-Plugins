@@ -16,4 +16,4 @@ def test_vlc():
     handler.run_plugin(
         "Vlc Installer", allow_failure=False, destination="/apps/vlc"
     )
-    handler.remove_plugin(name="Vlc Installer", destination="/apps/vlc")
+    #handler.remove_plugin(name="Vlc Installer", destination="/apps/vlc")

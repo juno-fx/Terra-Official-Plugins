@@ -5,8 +5,7 @@ wget -q -O /tmp/vlc.appimage "$1"
 chmod +x /tmp/vlc.appimage
 cd /tmp
 ./vlc.appimage --appimage-extract > /dev/null
-ls /tmp
-ls /tmp/squashfs-root
+
 mv /tmp/squashfs-root "$2"
 
 
