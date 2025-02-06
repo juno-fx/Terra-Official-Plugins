@@ -19,16 +19,19 @@ pyenv install 3.7
 pyenv global 3.7
 echo "Python 3.7 installed ?"
 python3 --version
-# test
-pip install --upgrade pip click
+# add venv so we can still runt
+python3 -m venv $2/clarisse_venv --copies
+source $2/clarisse_venv/bin/activate
+pip install click
 
-wget -q -O /tmp/clarisse.tar.gz "$1"
-
+cd /tmp
+wget -q -O isotropix_clarisse_5.0_sp14_linux64.tar.gz "$1"
 mkdir -p $2
 
-chmod +x /tmp/clarisse.tar.gz
-tar xvf /tmp/clarisse.tar.gz -C $2
-mv clarisse "$2/"
+chmod +x /tmp/isotropix_clarisse_5.0_sp14_linux64.tar.gz
+tar xzf /tmp/isotropix_clarisse_5.0_sp14_linux64.tar.gz -C $2
+ls /tmp
+ls $2
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cp -v "$SCRIPT_DIR/clarisse.sh" "$2/"

@@ -34,7 +34,7 @@ class clarisseInstaller(Plugin):
         # store on instance
         self.download_url = kwargs.get(
             "url",
-            "https://s3.eu-central-1.wasabisys.com/juno-deps/cifx/isotropix_clarisse_5.0_sp12_linux64.tar.gz",
+            "https://s3.us-east-1.wasabisys.com/deps-repo/installers/clarisse/isotropix_clarisse_5.0_sp14_linux64.tar.gz",
         )
         self.destination = Path(kwargs.get("destination")).as_posix()
 

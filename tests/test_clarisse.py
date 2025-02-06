@@ -17,4 +17,4 @@ def test_clarisse():
         allow_failure=False,
         destination='/apps/clarisse'
     )
-    handler.remove_plugin(name="clarisse Installer", destination="/apps/clarisse")
+    #handler.remove_plugin(name="clarisse Installer", destination="/apps/clarisse")
