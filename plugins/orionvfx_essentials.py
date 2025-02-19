@@ -84,6 +84,8 @@ class OrionVFXEssentials(Plugin):
             if not data:
                 self.logger.info(f"No Install data provided for {app} Skipping install")
                 continue
+            self.logger.info(f"Preparing Install for {app}")
+            self.logger.info(data)
             response = requests.post(url=INSTALL_URL, json=data, timeout=5)
             if response.status_code != 200:
                 self.logger.info(f"Preparing {data.get('install_name')} install")
