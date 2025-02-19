@@ -57,7 +57,10 @@ class OrionVFXEssentials(Plugin):
         self.nuke_version = kwargs.get("Nuke version", "Nuke15.1v1")
         self.nuke_destination = Path(kwargs.get("Nuke destination", "/apps/nuke")).as_posix()
         self.mrv2_destination = Path(kwargs.get("Mrv2 destination", "/apps/mrv2")).as_posix()
-        self.ocio_destination = Path(kwargs.get("Mrv2 destination", "")).as_posix()
+        self.ocio_destination = None
+        ocio_destination = kwargs.get("OCIO destination")
+        if ocio_destination:
+            self.ocio_destination = Path(kwargs.get(ocio_destination)).as_posix()
 
         # validate
         if not self.nuke_destination or not self.mrv2_destination:
