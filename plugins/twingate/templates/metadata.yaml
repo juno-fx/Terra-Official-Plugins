@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: twingate-terra-metadata
+data:
+  chart: "{{ .Chart.Name }}"

@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: twingate-operator
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: twingate-operator
+  sources:
+    - repoURL: https://github.com/Twingate/kubernetes-operator
+      path: ./deploy/twingate-operator
+      targetRevision: main
+      helm:
+        releaseName: twingate-operator
+        parameters:
+          - name: "twingateOperator.apiKey"
+            value: "{{ .Values.api_key }}"
+          - name: "twingateOperator.network"
+            value: "{{ .Values.network }}"
+          - name: "twingateOperator.remoteNetworkId"
+            value: "{{ .Values.remote_network_id }}"
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+      - CreateNamespace=true

@@ -1,0 +1,16 @@
+resource_id: twingate
+name: twingate
+icon: https://play-lh.googleusercontent.com/GBhNhKgjfy6i6Ucc0hyB-79WmcV7LvKSfGSy8iStFdZSaLioKQp5rPWjqsh2YFRRZsE1
+description: Zero Trust VPN. Make sure you have all the required information from here https://github.com/Twingate/kubernetes-operator/wiki/Getting-Started.
+category: Networking
+tags: ["zero-trust", "vpn", "twingate"]
+fields:
+  - name: api_key
+    description: Twingate API Key
+    required: true
+  - name: network
+    description: Network Slug. This is in the URL of the Twingate admin console.
+    required: true
+  - name: remote_network_id
+    description: Twingate Network ID. This is in the URL of the Twingate admin console when you select a Remote Network.
+    required: true
