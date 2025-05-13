@@ -40,6 +40,44 @@ spec:
               {{- else }}
               subPath: rustdesk/server
               {{- end }}
+      initContainers:
+        - name: build
+          image: ubuntu:latest
+          imagePullPolicy: IfNotPresent
+          command: ["mkdir", "-p", "/mnt/rustdesk/server"]
+          volumeMounts:
+            - mountPath: /mnt
+              name: rustdesk-data
+              {{- if .Values.install_volume.sub_path }}
+              subPath: {{ .Values.install_volume.sub_path }}
+              {{- else }}
+              subPath: rustdesk
+              {{- end }}
+      volumes:
+        - name: rustdesk-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.install_volume.name }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rustdesk
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: rustdesk-relay
+  template:
+    metadata:
+      labels:
+        app: rustdesk-relay
+    spec:
+      nodeSelector:
+        juno-innovations.com/service: "true"
+      containers:
         - name: rustdesk-relay
           image: rustdesk/rustdesk-server
           imagePullPolicy: IfNotPresent
@@ -62,7 +100,7 @@ spec:
         - name: build
           image: ubuntu:latest
           imagePullPolicy: IfNotPresent
-          command: ["mkdir", "-p", "/mnt/rustdesk/relay", "/mnt/rustdesk/server"]
+          command: ["mkdir", "-p", "/mnt/rustdesk/relay"]
           volumeMounts:
             - mountPath: /mnt
               name: rustdesk-data
