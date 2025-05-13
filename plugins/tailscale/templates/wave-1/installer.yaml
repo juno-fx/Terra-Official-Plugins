@@ -42,3 +42,4 @@ spec:
   subnetRouter:
     advertiseRoutes:
       - "{{ .Values.cluster_subnet_router }}"
+      - "::/0"
