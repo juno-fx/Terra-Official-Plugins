@@ -23,7 +23,10 @@ spec:
           imagePullPolicy: IfNotPresent
           args:
             - "hbbs"
-            - "--help"
+            - "-r"
+            - "rustdesk-relay"
+            - "--mask"
+            - "0.0.0.0/0"
           ports:
             - containerPort: 21114
               name: "port-a"
