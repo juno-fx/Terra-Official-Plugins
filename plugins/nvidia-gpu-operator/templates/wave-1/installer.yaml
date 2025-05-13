@@ -27,6 +27,12 @@ spec:
               - key: juno-innovations.com/headless
                 operator: Exists
                 effect: NoSchedule
+              - key: junovfx/render
+                operator: Exists
+                effect: NoSchedule
+              - key: junovfx/workstation
+                operator: Exists
+                effect: NoSchedule
           node-feature-discovery:
             worker:
               tolerations:
@@ -47,6 +53,12 @@ spec:
                   operator: Exists
                   effect: NoSchedule
                 - key: juno-innovations.com/headless
+                  operator: Exists
+                  effect: NoSchedule
+                - key: junovfx/render
+                  operator: Exists
+                  effect: NoSchedule
+                - key: junovfx/workstation
                   operator: Exists
                   effect: NoSchedule
         releaseName: gpu-operator
