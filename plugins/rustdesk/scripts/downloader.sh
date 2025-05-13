@@ -14,10 +14,10 @@ chmod +x /tmp/rustdesk.AppImage
 echo "Extracting rustdesk..."
 /tmp/rustdesk.AppImage --appimage-extract > /dev/null
 cp -r -v ./squashfs-root "$2/"
-sed -i "s@ROOT_APP@$2@g" "$2/rustdesk.sh"
 cd /terra/scripts
 ls -la
 cp -v ./rustdesk.sh $2/
+sed -i "s@ROOT_APP@$2@g" "$2/rustdesk.sh"
 chmod +x "$2/rustdesk.sh"
 
 # app icon setup
