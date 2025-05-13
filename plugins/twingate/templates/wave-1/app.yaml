@@ -32,15 +32,3 @@ spec:
       allowEmpty: true
     syncOptions:
       - CreateNamespace=true
----
-apiVersion: twingate.com/v1beta
-kind: TwingateConnector
-metadata:
-  name: juno-connector
-  namespace: twingate-operator
-  annotations:
-    argocd.argoproj.io/sync-wave: "2"
-spec:
-  imagePolicy:
-    provider: dockerhub
-    schedule: "0 0 * * *"
