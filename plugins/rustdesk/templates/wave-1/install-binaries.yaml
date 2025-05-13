@@ -16,6 +16,8 @@ spec:
           env:
             - name: DOWNLOAD
               value: "true"
+            - name: URL
+              value: "{{ .Values.url }}"
             - name: MOUNT_LOCATION
               value: "{{ .Values.install_volume.container_path }}"
             - name: DESTINATION
