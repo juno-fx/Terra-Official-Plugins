@@ -1,0 +1,4 @@
+# configuration
+client_id: ""
+client_secret: ""
+cluster_subnet_router: ""
