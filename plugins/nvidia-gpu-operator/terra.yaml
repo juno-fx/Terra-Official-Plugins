@@ -6,10 +6,10 @@ category: hardware
 tags: ["gpu", "nvidia", "operator"]
 fields:
   - name: install_toolkit
-    description: "true or false". Not needed if the toolkit is preinstalled on the nodes.
+    description: true or false. Not needed if the toolkit is preinstalled on the nodes.
     required: false
   - name: install_driver
-    description: "true or false". Not needed if the driver is preinstalled on the nodes.
+    description: true or false. Not needed if the driver is preinstalled on the nodes.
     required: false
   - name: slicing_config
     description: Name of the ConfigMap to use for time-slicing configuration. The default is "time-slicing-config".
