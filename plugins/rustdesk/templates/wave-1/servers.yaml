@@ -26,10 +26,6 @@ spec:
               value: "Y"
           args:
             - "hbbs"
-            - "-r"
-            - "rustdesk-relay-0"
-            - "--mask"
-            - "0.0.0.0/0"
           ports:
             - containerPort: 21114
               name: "port-a"
