@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: gpu-operator
+  name: nvidia-gpu-operator
   namespace: argocd
 spec:
   project: default
