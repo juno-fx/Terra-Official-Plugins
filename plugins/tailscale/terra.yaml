@@ -11,6 +11,3 @@ fields:
   - name: client_secret
     description: Tailscale Client Secret.
     required: true
-  - name: cluster_subnet_router
-    description: Clusters subnet to route traffic to.
-    required: true
