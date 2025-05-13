@@ -36,3 +36,50 @@ spec:
       targetPort: 21119
       protocol: TCP
       name: "port-f"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rustdesk-np
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  type: NodePort
+  selector:
+    app: rustdesk
+  ports:
+    - port: 21114
+      targetPort: 21114
+      nodePort: 31114
+      protocol: TCP
+      name: "port-a"
+    - port: 21115
+      targetPort: 21115
+      nodePort: 31115
+      protocol: TCP
+      name: "port-b"
+    - port: 21116
+      targetPort: 21116
+      nodePort: 31116
+      protocol: TCP
+      name: "port-ca"
+    - port: 21116
+      targetPort: 21116
+      nodePort: 31116
+      protocol: UDP
+      name: "port-cb"
+    - port: 21118
+      targetPort: 21118
+      nodePort: 31118
+      protocol: TCP
+      name: "port-d"
+    - port: 21117
+      targetPort: 21117
+      nodePort: 31117
+      protocol: TCP
+      name: "port-e"
+    - port: 21119
+      targetPort: 21119
+      nodePort: 31119
+      protocol: TCP
+      name: "port-f"
