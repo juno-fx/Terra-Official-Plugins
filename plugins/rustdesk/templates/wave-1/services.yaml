@@ -28,6 +28,17 @@ spec:
       targetPort: 21118
       protocol: TCP
       name: "port-d"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rustdesk-relay
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  selector:
+    app: rustdesk-relay
+  ports:
     - port: 21117
       targetPort: 21117
       protocol: TCP
