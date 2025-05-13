@@ -23,6 +23,7 @@ spec:
           imagePullPolicy: IfNotPresent
           args:
             - "hbbs"
+            - "--help"
           ports:
             - containerPort: 21114
               name: "port-a"
