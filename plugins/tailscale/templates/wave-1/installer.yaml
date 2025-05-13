@@ -28,3 +28,17 @@ spec:
       allowEmpty: true
     syncOptions:
       - CreateNamespace=true
+---
+apiVersion: tailscale.com/v1alpha1
+kind: Connector
+metadata:
+  name: cluster-subnet-router
+  namespace: tailscale
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  hostname: cluster-subnet-router
+  exitNode: true
+  subnetRouter:
+    advertiseRoutes:
+      - "{{ .Values.cluster_subnet_router }}"
