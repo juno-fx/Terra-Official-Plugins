@@ -21,6 +21,9 @@ spec:
         - name: rustdesk-server
           image: rustdesk/rustdesk-server
           imagePullPolicy: IfNotPresent
+          env:
+            - name: ALWAYS_USE_RELAY
+              value: "Y"
           args:
             - "hbbs"
             - "-r"
