@@ -90,6 +90,7 @@ spec:
           imagePullPolicy: IfNotPresent
           args:
             - "hbbr"
+            - "--help"
           ports:
             - containerPort: 21117
               name: "port-e"
