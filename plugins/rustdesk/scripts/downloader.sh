@@ -15,6 +15,7 @@ echo "Extracting rustdesk..."
 /tmp/rustdesk.AppImage --appimage-extract > /dev/null
 cp -r -v ./squashfs-root "$2/"
 cd -
+ls -la
 cp -v ./rustdesk.sh $2/
 chmod +x "$2/rustdesk.sh"
 
