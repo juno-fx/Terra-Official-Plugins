@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: deadline10-setup-directories
+  name: rustdesk-install-binaries
   annotations:
     argocd.argoproj.io/sync-wave: "1"
     argocd.argoproj.io/hook-delete-policy: HookSucceeded
@@ -14,14 +14,12 @@ spec:
         - name: installer
           image: ubuntu:latest
           env:
-            - name: SETUP_DIRECTORIES
+            - name: DOWNLOAD
               value: "true"
             - name: MOUNT_LOCATION
               value: "{{ .Values.install_volume.container_path }}"
             - name: DESTINATION
               value: "{{ .Values.install_volume.container_path }}{{ .Values.destination }}"
-            - name: CUSTOM_PATH
-              value: "{{ .Values.custom_plugins_path }}"
           command: ["/terra/bootstrap.sh"]
           volumeMounts:
             - name: installer
@@ -41,5 +39,5 @@ spec:
             claimName: {{ .Values.install_volume.name }}
         - name: installer
           configMap:
-            name: deadline10-scripts-configmap
+            name: rustdesk-scripts-configmap
             defaultMode: 0500
