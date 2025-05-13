@@ -82,6 +82,7 @@ spec:
       labels:
         app: rustdesk-relay
     spec:
+      hostNetwork: true
       nodeSelector:
         juno-innovations.com/service: "true"
       containers:
