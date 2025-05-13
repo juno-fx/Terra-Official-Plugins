@@ -1,3 +1,3 @@
-install_toolkit: "false"
-install_driver: "false"
+install_toolkit: "true"
+install_driver: "true"
 slicing_config: "time-slicing-config"
