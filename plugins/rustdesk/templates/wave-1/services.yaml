@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: deadline-mongo
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  selector:
+    app: deadline-mongo
+  ports:
+    - port: 27017
+      targetPort: 27017
+      protocol: TCP
+      name: db-port
+
