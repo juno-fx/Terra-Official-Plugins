@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: deadline10-cleanup
+  name: {{ .Release.Name }}-cleanup
   annotations:
     argocd.argoproj.io/hook: PostDelete
     argocd.argoproj.io/hook-delete-policy: HookSucceeded
@@ -37,5 +37,5 @@ spec:
             claimName: {{ .Values.install_volume.name }}
         - name: installer
           configMap:
-            name: deadline10-scripts-configmap-cleanup
+            name: {{ .Release.Name }}-scripts-configmap-cleanup
             defaultMode: 0500

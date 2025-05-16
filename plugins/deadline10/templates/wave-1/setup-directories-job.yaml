@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: deadline10-setup-directories
+  name: {{ .Release.Name }}-setup-directories
   annotations:
     argocd.argoproj.io/sync-wave: "1"
     argocd.argoproj.io/hook-delete-policy: HookSucceeded
@@ -41,5 +41,5 @@ spec:
             claimName: {{ .Values.install_volume.name }}
         - name: installer
           configMap:
-            name: deadline10-scripts-configmap
+            name: {{ .Release.Name }}-scripts-configmap
             defaultMode: 0500
