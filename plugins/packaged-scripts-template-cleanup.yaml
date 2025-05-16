@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}-scripts-configmap-cleanup
+  name: {{ .Release.Name }}-test-scripts-configmap-cleanup
   annotations:
     argocd.argoproj.io/hook: PostDelete
 data:
