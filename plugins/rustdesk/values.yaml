@@ -1,0 +1,6 @@
+url: "https://github.com/rustdesk/rustdesk/releases/download/1.4.0/rustdesk-1.4.0-x86_64.AppImage"
+install_volume:
+  name: apps-pv-claim
+  sub_path:
+  container_path: /apps
+destination: /rustdesk

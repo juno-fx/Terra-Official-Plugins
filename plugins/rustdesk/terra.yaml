@@ -1,0 +1,18 @@
+resource_id: rustdesk
+name: RustDesk 1.4.0
+icon: https://raw.githubusercontent.com/linuxserver/docker-templates/master/linuxserver.io/img/rustdesk-logo.png
+description: The Fast Open-Source Remote Access and Support Software.
+category: VDI
+tags:
+  - remote desktop
+  - vdi
+  - rustdesk
+  - remote access
+fields:
+  - name: install_volume
+    description: The name of the install volume
+    required: true
+    type: shared-volume
+  - name: destination
+    description: Destination directory
+    required: true
