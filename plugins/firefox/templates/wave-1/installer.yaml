@@ -39,6 +39,6 @@ spec:
             claimName: {{ .Values.install_volume.name }}
         - name: installer
           configMap:
-            name: {{ .Release.Name }}-test-scripts-configmap
+            name: {{ .Release.Name }}-scripts-configmap
             defaultMode: 0500
 
