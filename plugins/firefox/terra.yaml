@@ -6,7 +6,7 @@ category: Web
 tags: ["firefox", "web", "browser"]
 fields:
   - name: destination
-    description: Destination directory
+    description: Destination directory test
     required: false
   - name: install_volume
     description: The name of the install volume
