@@ -1,6 +1,6 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: "{{ .Values.project }}-yippie-{{ .Release.Namespace }}-{{ .Values.install_name }}-terra-metadata"
+  name: "{{ .Release.Name }}-terra-metadata"
 data:
   chart: "{{ .Chart.Name }}"

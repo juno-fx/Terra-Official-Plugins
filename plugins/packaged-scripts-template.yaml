@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: PLUGIN-scripts-configmap
+  name: {{ .Release.Name }}-scripts-configmap
 data:
   bootstrap.sh: |
     #!/bin/bash
