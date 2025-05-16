@@ -12,17 +12,10 @@ fields:
     required: true
     type: shared-volume
 plugins:
-  - plugin: Git Loader
-    name: Orion Git Loader
+  - plugin: Firefox
+    name: firefox
     values:
       install_volume:
         reference: install_volume
       destination:
-        hardcoded: '/asdfasdf/asfdasdf/asdfasdf'
-  - plugin: Deadline 10
-    name: Orion Deadline 10
-    values:
-      install_volume:
-        reference: install_volume
-      url:
-        hardcoded: "asdfasdf"
+        hardcoded: '/firefox'
