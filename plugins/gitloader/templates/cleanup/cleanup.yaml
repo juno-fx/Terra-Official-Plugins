@@ -34,7 +34,7 @@ spec:
       volumes:
         - name: installer
           configMap:
-            name: gitloader-scripts-configmap-cleanup
+            name: {{ .Release.Name }}-scripts-configmap-cleanup
             defaultMode: 0500
         - name: mount
           persistentVolumeClaim:

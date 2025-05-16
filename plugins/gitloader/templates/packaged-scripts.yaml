@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: gitloader-scripts-configmap
+  name: {{ .Release.Name }}-scripts-configmap
 data:
   bootstrap.sh: |
     #!/bin/bash
@@ -19,4 +19,4 @@ data:
     cd /terra/scripts
     pwd
     ./entrypoint.sh
-  packaged_scripts.base64: "H4sIAAAAAAAAA+3Rz0/CMBQH8J37VzyH10nnVnbwRBQTEgME8WQ8jK24xq1b1s7If29BuYjcAA9+P5eXvtcfL30ma1VjTd87Ie4kQmximAj+FaNt3PHCOBGDhMdcJB4PryMeeiRO2dROZ2zaEnlpmVfLypaH98nWnKOh8zLf85fatuumVtpemeLIb2wGPIjjg/OPIvFj/oILN39+5D5+9c/n37voL5XuL1NTMCMtBZIxtaJnCjT5l7cPo+HkaebTyw3ZQmpG1FYUtO8rV7wbPS7Gk+FiPJ34riA/lCXOZGmkW6WNpa7JU7tbKO0+uiwpWNOrssxlezTv9OZayuqqSnXucq5EWVlr6e6fj2ZTf/+dLN/PbY8VMnurO7s9ee+zlWJ//bkAAAAAAAAAAAAAAAAAAAAAACf2CdCLn70AKAAA"
+  packaged_scripts.base64: "H4sIAAAAAAAAA+3RTUvDMBgH8J7zKR47r3WpfTt4GlphIN2Y8yQeujazwS4tTSru25sNB+J8uWyI+P9dQp4nb+Svi062Rg+dI+JWkkSb0U8i/n7ccfyI88gPw+Q8cLjP4yB2KDrmo3Z6bfKOyClz9e26n/p/lH7LXyjTrdtGKnOmqwPfsQk4jsMv8w+C6EP+Qcht/vzA7/jUP89/cDJcSDVc5LpiWhjyBGNySffkKXJPL2/SUXY3denhgkwlFCPqVuR1z0vbvEpv5+NsNB9PMtc2xIs0xJmotbCzvDXUt2VudhOp7EfXNXlrepSG2eqAZr3aHEtFs1rlqrQ126KibpSw58/S6cTdv6co92vbbZUonprebHdeu2wp2W9/LgAAAAAAAAAAAAAAAAAAAADAkb0CqRu/JwAoAAA="
