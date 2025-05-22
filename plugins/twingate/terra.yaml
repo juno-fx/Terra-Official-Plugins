@@ -3,7 +3,7 @@ name: twingate
 icon: https://play-lh.googleusercontent.com/GBhNhKgjfy6i6Ucc0hyB-79WmcV7LvKSfGSy8iStFdZSaLioKQp5rPWjqsh2YFRRZsE1
 description: Zero Trust VPN. Make sure you have all the required information from here https://github.com/Twingate/kubernetes-operator/wiki/Getting-Started.
 category: Networking
-tags: ["zero-trust", "vpn", "twingate"]
+tags: ["zero-trust", "vpn", "twingate", "cluster-level"]
 fields:
   - name: api_key
     description: Twingate API Key

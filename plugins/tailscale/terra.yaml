@@ -3,7 +3,7 @@ name: tailscale
 icon: https://tailscale.gallerycdn.vsassets.io/extensions/tailscale/vscode-tailscale/1.0.0/1698786256133/Microsoft.VisualStudio.Services.Icons.Default
 description: Wireguard VPN Operator powered by Tailscale. Please read the docs on how to use this system once deployed. https://tailscale.com/kb/1236/kubernetes-operator
 category: Networking
-tags: ["wireguard", "vpn", "tailscale"]
+tags: ["wireguard", "vpn", "tailscale", "cluster-level"]
 fields:
   - name: client_id
     description: Tailscale Client ID.
