@@ -3,7 +3,11 @@ name: Git Loader
 icon: https://git-scm.com/images/logos/downloads/Git-Icon-1788C.png
 description: Clone down a repository from a Git Source
 category: Utility
-tags: ["git", "loader", "repository", "clone"]
+tags:
+  - git
+  - loader
+  - repository
+  - clone
 fields:
   - name: install_volume
     description: The name of the install volume

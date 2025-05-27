@@ -3,7 +3,17 @@ name: Nuke
 icon: https://www.foundry.com/sites/default/files/2021-03/ICON_NUKE-rgb-yellow-01.png
 description: Install The Foundry's Nuke to a target directory.
 category: Compositing
-tags: ["nuke", "foundry", "compositing", "vfx", "visual effects", "color", "grading", "3d", "animation", "rendering"]
+tags:
+  - nuke
+  - foundry
+  - compositing
+  - vfx
+  - visual effects
+  - color
+  - grading
+  - 3d
+  - animation
+  - rendering
 fields:
   - name: version
     description: Version of Nuke to install. i.e. Nuke14.0v2
