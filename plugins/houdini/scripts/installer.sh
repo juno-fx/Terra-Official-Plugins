@@ -1,3 +1,6 @@
+
+set -e
+
 echo "Installing $VERSION - $DESTINATION"
 
 echo "Setting up prequesites"
@@ -15,11 +18,11 @@ python3 -m venv venv
 source venv/bin/activate
 # install pip
 apt update
-apt install python3-pip -y
-pip3 --version
+apt install python3-pip
+venv/bin/pip --version
 
-pip3 install requests
-pip3 install click
+venv/bin/pip  install requests
+venv/bin/pip  install click
 
 
 # store our current working dir
@@ -54,7 +57,7 @@ then
   cp /tmp/houdini.tar.gz $temp_folder_version/houdini.tar.gz
   chmod +x $temp_folder_version/houdini.tar.gz
 else
-  python3 "$working_dir/sidefx_downloader.py" --version $HOUDINI_VERSION --build $HOUDINI_BUILD --key $SIDEFX_CLIENT_ID --secret $SIDEFX_CLIENT_SECRET --output $temp_folder_version
+  venv/bin/python "$working_dir/sidefx_downloader.py" --version $HOUDINI_VERSION --build $HOUDINI_BUILD --key $SIDEFX_CLIENT_ID --secret $SIDEFX_CLIENT_SECRET --output $temp_folder_version
 fi
 
 echo "Extracting Houdini tar.gz"
