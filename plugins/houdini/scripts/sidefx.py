@@ -103,7 +103,7 @@ def get_access_token_and_expiry_time(
             "Authorization": u"Basic {0}".format(
                 base64.b64encode(
                     "{0}:{1}".format(
-                        client_id, client_secret_key
+                        client_id.strip(), client_secret_key.strip()
                     ).encode()
                 ).decode('utf-8')
             ),
