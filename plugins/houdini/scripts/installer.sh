@@ -28,8 +28,8 @@ build="${$VERSION##*.}"
 export SIDEFX_CLIENT_ID=$CLIENT_ID
 export SIDEFX_CLIENT_SECRET=$CLIENT_SECRET
 # same as versions
-export HOUDINI_VERSION=version
-export HOUDINI_BUILD=build
+export HOUDINI_VERSION=$version
+export HOUDINI_BUILD=$build
 export SESI_HOST="hlicense"
 export houdini_install_version="$HOUDINI_VERSION.$HOUDINI_BUILD"
 export houdini_install_dir=$DESTINATION/"$HOUDINI_VERSION.$HOUDINI_BUILD"
