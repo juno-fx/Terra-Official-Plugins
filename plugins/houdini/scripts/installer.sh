@@ -15,7 +15,8 @@ python3 -m venv venv
 source venv/bin/activate
 # install pip
 apt update
-apt install python3-pip
+apt install python3-pip -y
+pip3 --version
 
 pip3 install requests
 pip3 install click
@@ -28,8 +29,8 @@ echo $working_dir
 # split our version/build values
 echo "version"
 echo $VERSION
-version="${$VERSION%.*}"
-build="${$VERSION##*.}"
+version="${VERSION%.*}"
+build="${VERSION##*.}"
 # We need to pass export SIDEFX_CLIENT_ID=''; export SIDEFX_CLIENT_SECRET=''; export DEV_APPS_DEBUG=true to the scipt itself
 export SIDEFX_CLIENT_ID=$CLIENT_ID
 export SIDEFX_CLIENT_SECRET=$CLIENT_SECRET
