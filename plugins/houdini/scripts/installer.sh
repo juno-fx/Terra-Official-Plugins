@@ -9,9 +9,16 @@ pip3 install click
 # install wget
 apt update
 apt install -y wget
+# install unzip
 apt install -y unzip
+# install python3
+sudo apt update
+sudo apt install python3
+
 # store our current working dir
 working_dir="$PWD"
+echo "test"
+echo working_dir
 # split our version/build values
 version="${$VERSION%.*}"
 build="${$VERSION##*.}"
