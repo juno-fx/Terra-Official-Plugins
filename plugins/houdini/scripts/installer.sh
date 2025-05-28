@@ -27,7 +27,7 @@ echo "test"
 echo $working_dir
 # split our version/build values
 echo "version"
-echo "$VERSION
+echo $VERSION
 version="${$VERSION%.*}"
 build="${$VERSION##*.}"
 # We need to pass export SIDEFX_CLIENT_ID=''; export SIDEFX_CLIENT_SECRET=''; export DEV_APPS_DEBUG=true to the scipt itself
