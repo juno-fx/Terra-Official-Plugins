@@ -19,23 +19,21 @@ import sidefx
 @click.option("--key", default="None", help="Sidefx client id")
 @click.option("--secret", default="None", help="Sidefx client secret")
 @click.option("--output", default="None", help="Temp path location")
-def run_download(version=None, build=None, key=None, secret=None, output=None):
+def run_download():
     """Download a specific Houdini build from the SideFX website."""
     target_release = {
-        "version": os.environ.get("HOUDINI_VERSION", str(version)),
-        "build": os.environ.get("HOUDINI_BUILD", str(build)),
+        "version": os.environ.get("HOUDINI_VERSION"),
+        "build": os.environ.get("HOUDINI_BUILD"),
         "release": "gold",
         "platform": "linux_x86_64_gcc9.3",
         "product": "houdini",
     }
-    print("testing")
-    print(os.environ.get("SIDEFX_CLIENT_SECRET"))
+
     # This service object retrieve a token using your Application ID and secret
     service = sidefx.service(
-        access_token_url="https://www.sidefx.com/oauth2/application_token",
-        client_id=os.environ.get("SIDEFX_CLIENT_ID", key),
-        client_secret_key=os.environ.get("SIDEFX_CLIENT_SECRET", secret),
-        endpoint_url="https://www.sidefx.com/api/",
+        access_token_url="https://www.sidefx.com/oauth2/token",
+        client_id=os.environ.get("SIDEFX_CLIENT_ID"),
+        client_secret_key=os.environ.get("SIDEFX_CLIENT_SECRET"),
     )
 
     # Retrieve the daily builds list, if you want the latest production
