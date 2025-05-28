@@ -98,17 +98,14 @@ def get_access_token_and_expiry_time(
         post_data["grant_type"] = "client_credentials"
     client_id = client_id.strip()
     client_secret_key = client_secret_key.strip()
-    print('id')
-    print(client_id)
-    print('secret')
-    print(client_secret_key)
+
     response = requests.post(
         access_token_url,
         headers={
             "Authorization": u"Basic {0}".format(
                 base64.b64encode(
                     "{0}:{1}".format(
-                        client_id.strip(), client_secret_key.strip()
+                        client_id, client_secret_key
                     ).encode()
                 ).decode('utf-8')
             ),
