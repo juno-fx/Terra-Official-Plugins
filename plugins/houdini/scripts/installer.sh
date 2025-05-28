@@ -18,7 +18,7 @@ sudo apt install python3
 # store our current working dir
 working_dir="$PWD"
 echo "test"
-echo working_dir
+echo $working_dir
 # split our version/build values
 version="${$VERSION%.*}"
 build="${$VERSION##*.}"
@@ -104,7 +104,7 @@ done
 
 echo "Create Houdini Version sh file $houdini_install_version"
 
-cd working_dir
+cd $working_dir
 runner_file=$houdini_install_dir/run_houdini_"$houdini_install_version".sh
 
 cp -v $working_dir/houdini.sh $runner_file
