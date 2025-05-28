@@ -96,9 +96,6 @@ def get_access_token_and_expiry_time(
     if (access_token_url.endswith("/token") or
             access_token_url.endswith("/token/")):
         post_data["grant_type"] = "client_credentials"
-    post_data["grant_type"] = "client-credentials"
-    client_id = client_id.strip()
-    client_secret_key = client_secret_key.strip()
 
     response = requests.post(
         access_token_url,
