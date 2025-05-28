@@ -6,6 +6,10 @@ python3 -m venv venv
 source venv/bin/activate
 pip3 install requests
 pip3 install click
+# install wget
+apt update
+apt install -y wget
+apt install -y unzip
 # store our current working dir
 working_dir="$PWD"
 # split our version/build values
