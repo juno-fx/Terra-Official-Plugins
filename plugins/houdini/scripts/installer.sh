@@ -1,6 +1,7 @@
 echo "Installing $VERSION - $DESTINATION"
 
 echo "Setting up prequesites"
+apt update
 apt-get install bc -y
 # install wget
 apt update
