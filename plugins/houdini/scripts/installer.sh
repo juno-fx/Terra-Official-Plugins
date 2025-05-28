@@ -18,20 +18,19 @@ venv/bin/pip  install click
 working_dir="$PWD"
 echo "test"
 echo $working_dir
-# split our version/build values
-echo "version"
-echo $VERSION
-version="${VERSION%.*}"
-build="${VERSION##*.}"
+
 # We need to pass export SIDEFX_CLIENT_ID=''; export SIDEFX_CLIENT_SECRET=''; export DEV_APPS_DEBUG=true to the scipt itself
 export SIDEFX_CLIENT_ID=$CLIENT_ID
 export SIDEFX_CLIENT_SECRET=$CLIENT_SECRET
-# same as versions
-export HOUDINI_VERSION=$version
-export HOUDINI_BUILD=$build
+
+# split our version/build values
+echo "version"
+echo $VERSION
+export HOUDINI_VERSION="${VERSION%.*}"
+export HOUDINI_BUILD="${VERSION##*.}"
 export SESI_HOST="hlicense"
-export houdini_install_version="$HOUDINI_VERSION.$HOUDINI_BUILD"
-export houdini_install_dir=$DESTINATION/"$HOUDINI_VERSION.$HOUDINI_BUILD"
+export houdini_install_version="$VERSION"
+export houdini_install_dir="$DESTINATION/$VERSION"
 
 temp_folder="/tmp/apps_temp"
 mkdir -p $temp_folder
