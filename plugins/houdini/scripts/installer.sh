@@ -5,7 +5,7 @@ echo "Installing $VERSION - $DESTINATION"
 
 echo "Setting up prequesites"
 apt update
-apt install bc wget unzip python3 python3-pip -y
+apt install bc wget unzip python3 python3-venv python3-pip -y
 python3 -m venv venv
 source venv/bin/activate
 venv/bin/pip --version
