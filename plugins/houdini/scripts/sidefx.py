@@ -124,7 +124,8 @@ def get_access_token_and_expiry_time(access_token_url, client_id, client_secret_
     )
     if response.status_code != 200:
         print('error')
-        print(response.json())
+        print(response)
+        print(response.text)
         raise AuthorizationError(
             response.status_code,
             "{0}: {1}".format(response.status_code, _extract_traceback_from_response(response)),
