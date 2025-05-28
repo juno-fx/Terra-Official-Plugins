@@ -28,7 +28,8 @@ def run_download(version=None, build=None, key=None, secret=None, output=None):
         "platform": "linux_x86_64_gcc9.3",
         "product": "houdini",
     }
-
+    print("testing")
+    print(os.environ.get("SIDEFX_CLIENT_SECRET"))
     # This service object retrieve a token using your Application ID and secret
     service = sidefx.service(
         access_token_url="https://www.sidefx.com/oauth2/application_token",
