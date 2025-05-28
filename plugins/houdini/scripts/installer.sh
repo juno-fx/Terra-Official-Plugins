@@ -9,13 +9,13 @@ apt install -y wget
 # install unzip
 apt install -y unzip
 # install python3
-sudo apt update
-sudo apt install python3
+apt update
+apt install python3
 python3 -m venv venv
 source venv/bin/activate
 # install pip
-sudo apt update
-sudo apt install python3-pip
+apt update
+apt install python3-pip
 
 pip3 install requests
 pip3 install click
