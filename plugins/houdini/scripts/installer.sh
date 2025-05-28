@@ -96,8 +96,6 @@ echo "Create Houdini Version sh file $houdini_install_version"
 cd working_dir
 runner_file=$houdini_install_dir/run_houdini_"$houdini_install_version".sh
 
-# setup splashscreen
-cp "./assets/houdini_splashscreen.png" $houdini_install_dir/splashscreen.png
 cp -v $working_dir/houdini.sh $runner_file
 sed -i "s@ROOT_APP@$houdini_install_dir@g" $runner_file
 sed -i "s@APPVERSION@$HOUDINI_VERSION@g" $runner_file
