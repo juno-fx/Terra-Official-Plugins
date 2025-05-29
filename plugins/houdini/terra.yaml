@@ -1,6 +1,6 @@
 resource_id: houdini
 name: Houdini
-icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/houdini/scripts/assets/houdini.png
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/182-houdini-terra-plugin/plugins/houdini/scripts/assets/houdini.png
 description: Install SideFx's Houdini to a target directory.
 category: CG
 tags:
