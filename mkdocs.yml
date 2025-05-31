@@ -1,5 +1,5 @@
-site_name: Juno Innovations
-repo_url: https://github.com/juno-fx/Orion-Documentation
+site_name: Terra Plugins
+repo_url: https://github.com/juno-fx/Terra-Official-Plugins
 theme:
   icon:
     repo: fontawesome/brands/github-alt
