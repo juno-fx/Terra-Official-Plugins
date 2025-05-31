@@ -16,7 +16,6 @@ venv/bin/pip  install click
 
 # store our current working dir
 working_dir="$PWD"
-echo "test"
 echo $working_dir
 
 # We need to pass export SIDEFX_CLIENT_ID=''; export SIDEFX_CLIENT_SECRET=''; export DEV_APPS_DEBUG=true to the scipt itself
@@ -129,9 +128,4 @@ chmod -R 777 "$DESTINATION/"
 cat $DESTINATION/*.desktop
 
 chmod -R 777 $DESTINATION/
-
-# add local sesi install
-cd /tmp
-wget -q -O /tmp/sesi.zip "https://s3.eu-central-1.wasabisys.com/juno-deps/s205278.zip"
-unzip -o /tmp/sesi.zip -d $houdini_install_dir/sesi
-chmod -R 777 $houdini_install_dir/sesi
+echo "Install Complete"
