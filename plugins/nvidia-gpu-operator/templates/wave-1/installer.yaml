@@ -1,0 +1,86 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-nvidia-gpu-operator
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gpu-operator
+  sources:
+    - repoURL: https://helm.ngc.nvidia.com/nvidia
+      chart: gpu-operator
+      targetRevision: v24.9.0
+      helm:
+        values: |-
+          daemonsets:
+            tolerations:
+              - key: nvidia.com/gpu
+                operator: Exists
+                effect: NoSchedule
+              - key: CriticalAddonsOnly
+                operator: Exists
+              - key: juno-innovations.com/workstation
+                operator: Exists
+                effect: NoSchedule
+              - key: juno-innovations.com/headless
+                operator: Exists
+                effect: NoSchedule
+              - key: junovfx/render
+                operator: Exists
+                effect: NoSchedule
+              - key: junovfx/workstation
+                operator: Exists
+                effect: NoSchedule
+          node-feature-discovery:
+            worker:
+              tolerations:
+                - key: "node-role.kubernetes.io/master"
+                  operator: "Equal"
+                  value: ""
+                  effect: "NoSchedule"
+                - key: "node-role.kubernetes.io/control-plane"
+                  operator: "Equal"
+                  value: ""
+                  effect: "NoSchedule"
+                - key: nvidia.com/gpu
+                  operator: Exists
+                  effect: NoSchedule
+                - key: CriticalAddonsOnly
+                  operator: Exists
+                - key: juno-innovations.com/workstation
+                  operator: Exists
+                  effect: NoSchedule
+                - key: juno-innovations.com/headless
+                  operator: Exists
+                  effect: NoSchedule
+                - key: junovfx/render
+                  operator: Exists
+                  effect: NoSchedule
+                - key: junovfx/workstation
+                  operator: Exists
+                  effect: NoSchedule
+        releaseName: gpu-operator
+        parameters:
+          - name: "toolkit.version"
+            value: "v1.17.0-ubi8"
+          - name: "toolkit.enabled"
+            value: "{{ .Values.install_toolkit }}"
+          - name: "driver.enabled"
+            value: "{{ .Values.install_driver }}"
+          - name: "devicePlugin.config.name"
+            value: "{{ .Values.slicing_config }}"
+          - name: "devicePlugin.config.default"
+            value: "any"
+          - name: "driver.useOpenKernelModules"
+            value: "true"
+          - name: "nfd.enabled"
+            value: "true"
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+      - CreateNamespace=true
