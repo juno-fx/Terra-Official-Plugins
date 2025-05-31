@@ -1,4 +1,4 @@
-.PHONY: plugins
+.PHONY: plugins docs
 
 SHELL := /bin/bash
 
@@ -48,6 +48,10 @@ new-plugin:
 	@echo " >> Added to git << "
 	@echo " >> Plugin Location: $(shell pwd)/plugins/$(ARGS) << "
 	@echo " >> Ready to go << "
+
+# documentation
+docs:
+	.venv/bin/mkdocs serve
 
 # env
 cluster:
