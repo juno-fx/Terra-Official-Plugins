@@ -103,10 +103,15 @@ nav:
   - Welcome:
       - index.md
   - Building Plugins:
-      - repositories.md
-      - getting-started.md
-      - configuration.md
-      - workflow.md
+      - Repositories:
+        - repositories.md
+      - Development:
+        - getting-started.md
+        - configuration.md
+        - workflow.md
+        - advanced.md
+      - Community:
+        - contributing.md
   - Plugins:
     - 'plugins/*.md'
 

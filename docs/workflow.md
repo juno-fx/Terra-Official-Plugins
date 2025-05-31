@@ -1,19 +1,6 @@
-# Development Workflow
+# Workflow
 
-Terra uses ArgoCD as its backend for plugin deployment and management, allowing for a streamlined GitOps workflow. 
-In order to fully understand the development process, we need to first understand ArgoCD.
-
-## ArgoCD Overview
-
-ArgoCD is a declarative, GitOps continuous delivery tool for Kubernetes. It allows you to manage your Kubernetes 
-applications using Git repositories as the source of truth. With ArgoCD, you can define your application state in 
-Git and have ArgoCD automatically sync your Kubernetes cluster to match that state.
-
-Terra deploys its plugins on the backend as ArgoCD Application resources that are populated with the values from 
-the `terra.yaml` file in each plugin. This allows Terra to manage the high level lifecycle of the Plugin, while
-ArgoCD handles the actual deployment, management and clean up of the Kubernetes resources.
-
-## Workflow Overview
+## Overview
 
 The development workflow is designed to focus on the raw Helm Chart development and then simulate the deployment
 via a local Kubernetes cluster installed with ArgoCD. This allows developers to iterate quickly on their plugins
@@ -25,6 +12,7 @@ locally without needing to deploy to a production environment until they are rea
 4. Log in to the ArgoCD UI and see your plugin listed as an Application.
 5. Make changes to your plugin locally and push them to the remote branch.
 6. ArgoCD will automatically detect the changes and update the application in the local cluster.
+7. Repeat the process until you are satisfied with your plugin.
 
 ## Workflow Steps
 
@@ -52,15 +40,36 @@ locally without needing to deploy to a production environment until they are rea
     336LYpUVgfDeFUKb
     ```
 
+4. **Access ArgoCD UI**: Open the ArgoCD UI in your browser at `http://localhost:8080` and log in with the provided credentials.
+
+    ![argo](assets/screenshots/argocd-home.png)
+
     !!! danger "ArgoCD Sync Failure"
-        If you encounter a sync failure that states something about "failed to dial", this is likely due to 
-        a race condition where the ArgoCD server is not fully up and running before the sync is attempted. Open the 
+        If you encounter a sync failure that states something about "failed to dial", this is likely due to
+        a race condition where the ArgoCD server is not fully up and running before the sync is attempted. Open the
         cluster and restart the ArgoCD server.
 
     !!! danger "ArgoCD Sync Failure"
         If your plugin says "path not found", you need to push your changes to the remote branch before running the
         `make test` command. ArgoCD needs to see the latest changes in the remote branch to sync correctly.
 
-4. **Access ArgoCD UI**: Open the ArgoCD UI in your browser at `http://localhost:8080` and log in with the provided credentials.
+5. **Make Changes**: Make changes to your plugin locally and push them to the remote branch.
 
+6. **Automatic Sync**: ArgoCD will automatically detect the changes and update the application in the local cluster.
 
+    ![argo](assets/screenshots/argocd-my-app.png)
+
+    !!! info "Force Refresh"
+        ArgoCD will automatically refresh the application every 3 minutes. If you want to force a refresh, you can click the "Refresh" button in the ArgoCD UI.
+
+7. **Verify Changes**: You can verify the changes by checking the logs of the application or by accessing the application in the local cluster.
+
+8. **Repeat**: Continue making changes and pushing them to the remote branch. ArgoCD will keep your local cluster in sync with the latest changes.
+
+9. **Clean Up**: When you are done testing, you can clean up the local cluster by running:
+
+    <!-- termynal -->
+
+    ```shell
+    $ make down
+    ```

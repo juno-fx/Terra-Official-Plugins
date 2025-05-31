@@ -71,4 +71,34 @@ repo/
 ```
 
 
+## Helm
 
+The team behind Terra has chosen Helm as the backend for plugin development and deployment. Helm is a package manager
+for Kubernetes that allows you to define, install, and manage Kubernetes applications using Helm Charts. Juno picked
+this because it is a well-established and widely used tool in the Kubernetes ecosystem, providing a robust and
+flexible way to manage Kubernetes applications as well as open the door to the vast ecosystem of Helm Charts that Terra
+can leverage day one.
+
+The Terra team also made the decision to not to "reinvent the wheel" and instead focus on building a simple and
+intuitive interface for users to interact with Helm Charts. This means that if you know how to make a Helm Chart, you can
+make a Terra plugin. This allows developers to leverage their existing knowledge of Helm and Kubernetes to create
+plugins for Terra without needing to learn a new system or framework.
+
+This does mean that you need to know how to make a Helm Chart in order to make a Terra plugin. We do not provide a
+complete guide on how to make a Helm Chart, but we do provide some resources to help you get started. The
+[Helm Chart Template Guide](https://helm.sh/docs/chart_template_guide/getting_started/) is a great place to start,
+and the [Helm Best Practices](https://helm.sh/docs/chart_best_practices/) guide provides some additional tips and tricks
+to help you create high-quality Helm Charts.
+
+## ArgoCD Overview
+
+Terra uses ArgoCD as its backend for plugin deployment and management, allowing for a streamlined GitOps workflow.
+In order to fully understand the development process, we need to first understand ArgoCD.
+
+ArgoCD is a declarative, GitOps continuous delivery tool for Kubernetes. It allows you to manage your Kubernetes
+applications using Git repositories as the source of truth. With ArgoCD, you can define your application state in
+Git and have ArgoCD automatically sync your Kubernetes cluster to match that state.
+
+Terra deploys its plugins on the backend as ArgoCD Application resources that are populated with the values from
+the `terra.yaml` file in each plugin. This allows Terra to manage the high level lifecycle of the Plugin, while
+ArgoCD handles the actual deployment, management and clean up of the Kubernetes resources.
