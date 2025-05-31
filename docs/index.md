@@ -1,13 +1,35 @@
-<figure markdown="1">
-![Alpha Home](assets/juno.png){ width="200"}
+# Welcome
+
+<figure markdown="span">
+  ![Orion Logo](assets/logos/terra.png)
+  <figcaption>Terra Plugin System</figcaption>
 </figure>
 
-# <center>Terra Plugin System</center>
+## **Terra: Opening Up the World of Kubernetes**
 
 
-Terra is a modern, scalable, and flexible platform for creating and modifying existing Orion
-clusters. With hooks allowing for easy integration with the Orion API, Terra is designed to 
-allow for nearly unlimited customization of your Orion cluster.
+## **The Future of Digital Innovation**
 
-### <center><span style="margin-right: 50px;">[Using Plugins](using_plugins.md)</span> <span style="margin-left: 50px;">[Writing Your Own](getting_started.md)</span></center>
+Terra is a modern, scalable, and flexible platform for creating and modifying existing Juno enabled
+Kubernetes clusters. Terra opens up the entire world of Kubernetes and provides the building blocks
+to build your own custom Kubernetes environment without all the added complexity.
+
+### **Why Industry Leaders Choose Terra**
+
+- **Community Driven** — Terra is built by the community, for the community. We welcome contributions and feedback to continuously improve the platform.
+
+- **Access to Kubernetes Ecosystem** — Terra provides a simple and intuitive interface to interact with Kubernetes, allowing users to leverage the vast ecosystem of Kubernetes tools and resources.
+
+- **Helm Backend** — Terra uses Helm as its backend, enabling users to easily deploy and manage applications on Kubernetes with a familiar package management system.
+
+- **Comfortable Deployment** — Terra allows users to deploy their applications with ease, providing a comfortable and efficient deployment experience.
+
+- **Security Conscious** — Terra is designed with security in mind, ensuring that your applications and data are protected while using the platform.
+
+### **Ready for the Future**
+
+Developed by a team with over 50 years of combined industry experience, and backed by a growing community of contributors, 
+Terra is continuously evolving to enable the vast ecosystem of Kubernetes plugins and tools. Join the organizations 
+already transforming their workflows with the only platform designed to simplify and enhance your Kubernetes experience.
+
 

@@ -1,6 +1,57 @@
-.PHONY: plugins
+.PHONY: plugins docs
 
 SHELL := /bin/bash
+
+ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+$(eval $(ARGS):;@:)
+
+# workflow
+test: cluster dependencies
+	@echo " >> Deploying $(ARGS) << "
+	@helm upgrade -i terra-plugin ./tests/Application \
+		--set branch=$(shell git rev-parse --abbrev-ref HEAD),plugin=$(ARGS) \
+		--wait \
+		--timeout 5m
+	@echo
+	@echo " >> ArgoCD UI Listening << "
+	@echo "http://localhost:8080"
+	@echo
+	@echo " >> ArgoCD Admin Credentials << "
+	@echo "admin"
+	@kubectl -n argocd get secret argocd-initial-admin-secret \
+               -o jsonpath="{.data.password}" | base64 -d; echo
+	@kubectl -n argocd port-forward service/argocd-server 8080:80 > /dev/null 2>&1
+
+package:
+	@cd ./plugins/$(ARGS) \
+		&& tar -czf scripts.tar scripts \
+		&& base64 -w 0 scripts.tar > scripts.base64 \
+		&& rm -rf scripts.tar \
+		&& cp ../../template/packaged-scripts-template.yaml ./templates/packaged-scripts.yaml \
+		&& cp ../../template/packaged-scripts-template-cleanup.yaml ./templates/packaged-scripts-cleanup.yaml \
+		&& sed -i '1s/^/  packaged_scripts.base64: "/' scripts.base64 \
+		&& sed -i '1s/$$/"/' scripts.base64 \
+		&& cat scripts.base64 >> ./templates/packaged-scripts.yaml \
+		&& cat scripts.base64 >> ./templates/packaged-scripts-cleanup.yaml \
+		&& rm -rf scripts.base64
+
+new-plugin:
+	@echo " >> Building New Plugin: $(ARGS) << "
+	@mkdir -p ./plugins/$(ARGS)
+	@cp -r ./template/chart/* ./plugins/$(ARGS)/
+	@echo " >> Setting up Plugin: $(ARGS) << "
+	@sed -i 's/PLUGIN/$(ARGS)/g' ./plugins/$(ARGS)/Chart.yaml
+	@sed -i 's/PLUGIN/$(ARGS)/g' ./plugins/$(ARGS)/terra.yaml
+	@$(MAKE) --no-print-directory package $(ARGS)
+	@echo " >> New Plugin Setup << "
+	@git add ./plugins/$(ARGS)
+	@echo " >> Added to git << "
+	@echo " >> Plugin Location: $(shell pwd)/plugins/$(ARGS) << "
+	@echo " >> Ready to go << "
+
+# documentation
+docs:
+	.venv/bin/mkdocs serve
 
 # env
 cluster:
@@ -24,34 +75,12 @@ dependencies: cluster
 down:
 	@kind delete cluster --name terra-plugins
 
+
+# LEGACY
 test-%: cluster dependencies
-	@echo " >> Deploying $(subst test-,,$@) << "
-	@helm upgrade -i terra-plugin ./tests/Application \
-		--set branch=$(shell git rev-parse --abbrev-ref HEAD),plugin=$(subst test-,,$@) \
-		--wait \
-		--timeout 5m
-	@echo
-	@echo " >> ArgoCD UI Listening << "
-	@echo "http://localhost:8080"
-	@echo
-	@echo " >> ArgoCD Admin Credentials << "
-	@echo "admin"
-	@kubectl -n argocd get secret argocd-initial-admin-secret \
-               -o jsonpath="{.data.password}" | base64 -d; echo
-	@kubectl -n argocd port-forward service/argocd-server 8080:80 > /dev/null 2>&1
+	@echo "Legacy: Use 'make test $(subst test-,,$@)' instead."
+	@$(MAKE) --no-print-directory test $(subst test-,,$@)
 
 package-%:
-	@cd ./plugins/$(subst package-,,$@) \
-		&& tar -czf scripts.tar scripts \
-		&& base64 -w 0 scripts.tar > scripts.base64 \
-		&& rm -rf scripts.tar \
-		&& cp ../packaged-scripts-template.yaml ./templates/packaged-scripts.yaml \
-		&& cp ../packaged-scripts-template-cleanup.yaml ./templates/packaged-scripts-cleanup.yaml \
-		&& sed -i '1s/^/  packaged_scripts.base64: "/' scripts.base64 \
-		&& sed -i '1s/$$/"/' scripts.base64 \
-		&& cat scripts.base64 >> ./templates/packaged-scripts.yaml \
-		&& cat scripts.base64 >> ./templates/packaged-scripts-cleanup.yaml \
-		&& sed -i 's/PLUGIN/$(subst package-,,$@)/g' ./templates/packaged-scripts.yaml \
-		&& sed -i 's/PLUGIN/$(subst package-,,$@)/g' ./templates/metadata.yaml \
-		&& sed -i 's/PLUGIN/$(subst package-,,$@)/g' ./templates/packaged-scripts-cleanup.yaml \
-		&& rm -rf scripts.base64
+	@echo "Legacy: Use 'make package $(subst package-,,$@)' instead."
+	@$(MAKE) --no-print-directory package $(subst package-,,$@)

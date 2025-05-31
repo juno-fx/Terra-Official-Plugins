@@ -1,10 +1,10 @@
 <br />
 <p align="center">
-    <img src="terra-plugins.png"/>
+    <img src="docs/assets/logos/terra.png"/>
     <h3 align="center">Terra Official Plugins</h3>
     <p align="center">
-        Plugins to be used with the Juno Terra platform.
+        Opening Up the World of Kubernetes.
     </p>
 </p>
 
-[Read the Docs](https://juno-fx.github.io/Terra-Official-Plugins/)
+Read our [Official Documentation](https://juno-fx.github.io/Terra-Official-Plugins/).
