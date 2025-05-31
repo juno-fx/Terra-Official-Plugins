@@ -7,3 +7,4 @@
     </p>
 </p>
 
+Read our [Official Documentation](https://juno-fx.github.io/Terra-Official-Plugins/).

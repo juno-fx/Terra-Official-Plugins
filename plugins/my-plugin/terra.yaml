@@ -1,0 +1,7 @@
+resource_id:
+name: my-plugin
+icon:
+description:
+category:
+tags: []
+fields: []

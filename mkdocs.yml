@@ -5,8 +5,7 @@ repo_url: https://github.com/juno-fx/Terra-Official-Plugins
 repo_name: juno-fx/Terra-Official-Plugins
 
 theme:
-  icon:
-    repo: fontawesome/brands/github-alt
+  logo: assets/logos/terra.png
   # Logo is now handled in custom override
   favicon: assets/logos/favicon.ico
   name: material
@@ -46,6 +45,10 @@ theme:
 
 
 plugins:
+  - literate-nav
+  - gen-files:
+      scripts:
+        - docs/scripts/gen_plugins.py
   - search:
       separator: '[\s\-\.]'  # Better search tokenization
       lang:
@@ -99,26 +102,21 @@ markdown_extensions:
 nav:
   - Welcome:
       - index.md
-#      - using_plugins.md
-#      - getting_started.md
-#  - Using Plugins:
-#      - using_plugins.md
-#  - Software Installers:
-#      - software_installers.md
-  #  - Extensions:
-  #      - extensions.md
-  #  - Service Installers:
-  #      - service_installers.md
-#  - Bundles:
-#      - bundles.md
+  - Building Plugins:
+      - repositories.md
+      - getting-started.md
+      - configuration.md
+      - workflow.md
+  - Plugins:
+    - 'plugins/*.md'
 
 extra:
   generator: false  # Remove "Made with Material for MkDocs"
   logos:
-    dark: assets/logos/juno-logo-white.svg  # Logo for dark theme
-    light: assets/logos/juno-logo-black.svg  # Logo for light theme
-    mobile_dark: assets/logos/juno-icon-white.svg  # Optional: smaller logo for mobile
-    mobile_light: assets/logos/juno-icon-black.svg
+    dark: assets/logos/juno.png  # Logo for dark theme
+    light: assets/logos/juno.png  # Logo for light theme
+    mobile_dark: assets/logos/juno.png  # Optional: smaller logo for mobile
+    mobile_light: assets/logos/juno.png
   version:
     provider: mike  # Version management
   social:
@@ -131,9 +129,9 @@ extra:
     #- icon: fontawesome/brands/twitter
     #  link: https://twitter.com/junoinnovations
     #  name: Twitter
-    #- icon: fontawesome/brands/docker
-    #  link: https://hub.docker.com/u/junofx
-    #  name: Docker Hub
+    - icon: fontawesome/brands/docker
+      link: https://hub.docker.com/u/junoinnovations
+      name: Docker Hub
   analytics:
   #provider: google
   #property: G-XXXXXXXXXX  # Add your Google Analytics ID
