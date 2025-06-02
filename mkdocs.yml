@@ -113,7 +113,21 @@ nav:
       - Community:
         - contributing.md
   - Plugins:
-    - 'plugins/*.md'
+    - VDI:
+        - 'plugins/VDI/*.md'
+    - Web:
+        - 'plugins/Web/*.md'
+    - Networking:
+        - 'plugins/Networking/*.md'
+    - Compositing:
+        - 'plugins/Compositing/*.md'
+    - Rendering Management:
+        - 'plugins/Rendering Management/*.md'
+    - Utility:
+        - 'plugins/Utility/*.md'
+
+    - All Plugins:
+        - 'plugins/*/*.md'
 
 extra:
   generator: false  # Remove "Made with Material for MkDocs"

@@ -11,15 +11,15 @@ UI uses to display storage options, connection settings, and configuration param
 
 #### Plugin Metadata
 
-| Key         | Type             | Description                                                                             |
-|-------------|------------------|-----------------------------------------------------------------------------------------|
-| resource_id | String           | (Deprecated)                                                                            |
-| name        | String           | Release Name used to identify the install                                               |
-| icon        | String           | http(s) link to the icon image                                                          |
-| description | String           | Brief description of your plugin                                                        |
-| category    | String           | The world your plugin is a part of                                                      |
-| tags        | Array of Strings | Tags are used for searching and informing Terra what this Plugin is a part of           |
-| fields      | Array of Fields  | The UI fields you would like to have injected into your values.yaml file during install |
+| Key         | Type             | Description                                                                                                                                          |
+|-------------|------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| resource_id | String           | (Deprecated)                                                                                                                                         |
+| name        | String           | Release Name used to identify the install                                                                                                            |
+| icon        | String           | http(s) link to the icon image                                                                                                                       |
+| description | String           | Brief description of your plugin                                                                                                                     |
+| category    | String           | The world your plugin is a part of                                                                                                                   |
+| tags        | Array of Strings | Tags are used for searching and informing Terra what this Plugin is a part of. This is also where you tag a plugin for only use at the Cluster level |
+| fields      | Array of Fields  | The UI fields you would like to have injected into your values.yaml file during install                                                              |
 
 #### Field Metadata
 

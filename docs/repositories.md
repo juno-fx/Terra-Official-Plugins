@@ -26,10 +26,11 @@ plugins are safe and compatible with their environment.
 
 ### Plugins
 
-Terra repositories are added as "Sources" to Terra via its UI. A Terra repository is a Git repository that contains one 
-or more plugins. Plugins are loaded from the `plugins/` directory in the repository and every Plugin is required to have
-a valid `terra.yaml` file. Terra will automatically detect and load plugins from the repository, making them available for 
-installation and management. This is the general skeleton of a Terra repository:
+Terra repositories are added as "Sources" to Terra via its UI. You can learn more about this in the UI 
+[here](https://juno-fx.github.io/Orion-Documentation/terra/terra/). A Terra repository is a Git repository that contains 
+one or more plugins. Plugins are loaded from the `plugins/` directory in the repository and every Plugin is required to 
+have a valid `terra.yaml` file. Terra will automatically detect and load plugins from the repository, making them 
+available for installation and management.
 
 ### Bundles
 
@@ -37,6 +38,10 @@ Bundles are a way to group multiple plugins together. They are defined in the `b
 Bundles are YAML files that specify a collection of plugins and their configurations as well as potentially pinned versions 
 that are known to work together. This allows users to install multiple related plugins at once, simplifying the installation 
 process for complex applications or pipelines.
+
+### Folder Structure
+
+This is the general skeleton of a Terra repository.
 
 ```shell
 repository-name/

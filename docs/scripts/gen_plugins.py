@@ -17,6 +17,7 @@ for plugin in plugins:
     nav = mkdocs_gen_files.Nav()
     icon = None
     description = None
+    category = None
     with open(plugin, "r") as f:
         plugin_data = f.read()
         plugin_data = plugin_data.splitlines()
@@ -25,9 +26,11 @@ for plugin in plugins:
                 icon = line.replace("icon:", "").strip()
             elif line.startswith("description:"):
                 description = line.replace("description:", "").strip()
+            elif line.startswith("category:"):
+                category = line.replace("category:", "").strip()
 
     plugin_name = plugin.split('/')[1]
-    plugin_path = f"plugins/{plugin_name}.md"
+    plugin_path = f"plugins/{category}/{plugin_name}.md"
     with mkdocs_gen_files.open(plugin_path, "w") as f:
         if icon:
             print(f"![icon]({icon})" + '{width="100"}', file=f)

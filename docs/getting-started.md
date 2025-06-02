@@ -38,7 +38,7 @@ To set up your Terra plugin repository, follow these steps:
     Audited 4 packages in 1ms
     ```
 
-3. **Create Our Plugin**: Juno provides a `Makefile` that automates most of the Plugin workflow for you. Create a plugin by running:
+3. **Create Our Plugin**: Juno provides a `Makefile` target that creates the scaffolding for a new plugin. You can use it to create a new plugin:
 
     <!-- termynal -->
     
