@@ -125,7 +125,6 @@ nav:
         - 'plugins/Rendering Management/*.md'
     - Utility:
         - 'plugins/Utility/*.md'
-
     - All Plugins:
         - 'plugins/*/*.md'
 
