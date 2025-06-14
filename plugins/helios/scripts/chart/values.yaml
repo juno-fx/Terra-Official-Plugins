@@ -1,0 +1,29 @@
+name:
+user:
+token:
+htpasswd:
+repo:
+tag:
+registry:
+group:
+cpu:
+memory:
+cpuLimit: null
+memoryLimit: null
+gpu:
+idx:
+guid:
+puid:
+host:
+pullSecret:
+session:
+volumeMounts:
+  - mountPath: /.hold
+    name: hold
+volumes:
+  - name: hold
+    emptyDir: {}
+env:
+  - name: JUNO
+    value: "true"
+selector:

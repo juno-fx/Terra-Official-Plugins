@@ -1,0 +1,135 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{ .Values.name }}"
+  annotations:
+    juno-innovations.com/group: "{{ .Values.group }}"
+  labels:
+    juno-innovations.com/app: "polaris"
+    juno-innovations.com/workstation: "{{ .Values.name }}"
+    juno-innovations.com/user: "{{ .Values.user }}"
+    juno-innovations.com/token: "{{ .Values.token }}"
+    juno-innovations.com/repo: "{{ .Values.repo }}"
+    juno-innovations.com/idx: "{{ .Values.idx }}"
+    juno-innovations.com/session: "{{ .Values.session }}"
+    # comma separated list of users that can access this workstation as read only.
+    juno-innovations.com/shared: "none"
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      juno-innovations.com/workstation: "{{ .Values.name }}"
+
+  template:
+    metadata:
+      labels:
+        juno-innovations.com/app: polaris
+        juno-innovations.com/user: "{{ .Values.user }}"
+        juno-innovations.com/workstation: "{{ .Values.name }}"
+      annotations:
+        # This will block the cluster autoscaler from evicting this pod in the case
+        # it can move to a cheaper instance. This does come at a cost, but ideally
+        # this should stop from a workstation getting ripped out from under existing users.
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+
+    spec:
+      automountServiceAccountToken: false
+      hostname: "{{ .Values.name }}"
+
+      # workstation nodes will require juno-innovations.com/workstation: "true"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: juno-innovations.com/workstation
+                    operator: In
+                    values:
+                      - "true"
+                  {{- if .Values.selector }}
+                  {{- range .Values.selector }}
+                  - key: {{ .key | quote }}
+                    operator: In
+                    values:
+                      - {{ .value | quote }}
+                  {{- end }}
+                  {{- end }}
+
+      # allow for this pod to work on nodes reserved for workstations
+      tolerations:
+        - key: "juno-innovations.com/workstation"
+          operator: "Exists"
+          effect: "NoSchedule"
+
+      {{- if .Values.gpu }}
+      runtimeClassName: nvidia
+      {{- end }}
+
+      {{- if .Values.pullSecret }}
+      imagePullSecrets:
+        - name: "{{ .Values.pullSecret }}"
+      {{- end }}
+
+      containers:
+        - name: polaris
+          imagePullPolicy: IfNotPresent
+          image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
+          resources:
+            requests:
+              memory: "{{ .Values.memory }}"
+              cpu: "{{ .Values.cpu }}"
+            # gotmpl's or is a function taking 2 args - this is "X or Y or Z" translated to python
+            {{- if or (or .Values.gpu .Values.memoryLimit) .Values.cpuLimit }}
+            limits:
+            {{- if .Values.gpu }}
+              nvidia.com/gpu: "1"
+            {{- end }}
+            {{- if .Values.cpuLimit }}
+              cpu: "{{ .Values.cpuLimit }}"
+            {{- end }}
+            {{- if .Values.memoryLimit }}
+              memory: "{{ .Values.memoryLimit }}"
+            {{- end }}
+            {{- end }}
+          startupProbe:
+            httpGet:
+              path: "/polaris/{{ .Values.name }}/probe"
+              port: 3000
+            # allow for a 3 minute startup probe
+            initialDelaySeconds: 60
+            failureThreshold: 24
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: "/health"
+              port: 3000
+            failureThreshold: 24
+            periodSeconds: 5
+          ports:
+            - containerPort: 3000
+              name: viewer
+          env:
+            - name: JUNO_PROJECT
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: USER
+              value: "{{ .Values.user }}"
+            - name: HOME
+              value: "/home/{{ .Values.user }}"
+            - name: UID
+              value: "{{ .Values.puid }}"
+            - name: GID
+              value: "{{ .Values.guid }}"
+            - name: PREFIX
+              value: "/polaris/{{ .Values.name }}/"
+            {{- range .Values.env }}
+            - name: {{ .name | quote }}
+              value: {{ .value | quote }}
+            {{- end }}
+          volumeMounts:
+            {{- toYaml .Values.volumeMounts | nindent 12 }}
+      volumes:
+        {{- toYaml .Values.volumes | nindent 8 }}
