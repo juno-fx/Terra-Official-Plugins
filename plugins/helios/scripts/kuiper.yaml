@@ -1,0 +1,38 @@
+description: Helios deployment with desktop streaming
+fields:
+  - name: repo
+    description: Repository to pull the image from
+    required: true
+  - name: tag
+    description: Tag to pull the image from
+    required: true
+  - name: registry
+    description: Tag to pull the image from
+    required: true
+  - name: group
+    description: Groups that can use this workload
+    required: true
+  - name: cpu
+    description: CPU request amount
+    required: true
+    type: int
+  - name: cpuLimit
+    description: CPU limit amount
+    required: false
+    type: int
+  - name: memory
+    description: Memory request amount
+    required: true
+    type: int
+  - name: memoryLimit
+    description: Memory request amount
+    required: false
+    type: int
+  - name: gpu
+    description: Use a GPU
+    required: true
+    type: bool
+  - name: env
+    description: Key Value environment vars to pass to the container
+    required: false
+    type: env

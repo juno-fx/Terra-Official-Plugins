@@ -1,0 +1,4 @@
+apiVersion: v1
+description: Helios deployment setup
+name: helios
+version: 0.0.0
