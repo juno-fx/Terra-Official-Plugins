@@ -1,7 +1,0 @@
-# configuration
-destination: /firefox
-url: "https://github.com/srevinsaju/Firefox-Appimage/releases/download/firefox-v129.0.r20240819150008/firefox-129.0.r20240819150008-x86_64.AppImage"
-install_volume:
-  name: apps-pv-claim
-  sub_path:
-  container_path: /apps

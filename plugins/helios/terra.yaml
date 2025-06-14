@@ -1,17 +1,10 @@
-resource_id: firefox
-name: Firefox
+resource_id: helios
+name: Helios
 icon: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/firefox/scripts/assets/firefox.png?raw=true"
-description: Firefox web browser installer. This plugin installs in the /apps/firefox directory as default.
-category: Web
+description: Helios containerized workstation from Juno
+category: Workstations
 tags:
-  - firefox
-  - web
-  - browser
-fields:
-  - name: destination
-    description: Destination directory
-    required: false
-  - name: install_volume
-    description: The name of the install volume
-    required: true
-    type: shared-volume
+  - kasm
+  - vdi
+  - juno
+fields: []
