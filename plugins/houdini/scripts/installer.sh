@@ -107,8 +107,6 @@ echo "Adding desktop files"
 # app icon setup
 
 cp -v ./assets/houdini.png $DESTINATION/
-ln -svf "$INSTALL_DIR/houdinfx" "$DESTINATION/$VERSION/launch_fx"
-ln -svf "$INSTALL_DIR/houdincore" "$DESTINATION/$VERSION/launch_core"
 
 echo "[Desktop Entry]
 Version=$VERSION
