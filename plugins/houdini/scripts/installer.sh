@@ -27,17 +27,15 @@ echo "version"
 echo $VERSION
 export HOUDINI_VERSION="${VERSION%.*}"
 export HOUDINI_BUILD="${VERSION##*.}"
-export SESI_HOST="hlicense"
-export houdini_install_version="$VERSION"
-export houdini_install_dir="$DESTINATION/$VERSION"
+INSTALL_DIR="$DESTINATION/$VERSION"
 
 temp_folder="/tmp/apps_temp"
 mkdir -p $temp_folder
-mkdir -p "$temp_folder"/"$houdini_install_version"
-mkdir -p "$temp_folder"/"$houdini_install_version"/installs
-temp_folder_version="$temp_folder"/"$houdini_install_version"
+mkdir -p "$temp_folder"/"$VERSION"
+mkdir -p "$temp_folder"/"$VERSION"/installs
+temp_folder_version="$temp_folder"/"$VERSION"
 
-echo "Downloading Houdini $houdini_install_version"
+echo "Downloading Houdini $VERSION"
 if [ "$DEV_APPS_DEBUG" = true ]
 then
 	echo "Dev Apps Debug is enabled"
@@ -57,12 +55,12 @@ echo "Houdini.tar.gz extracted to $temp_folder_version/installs"
 files=( "${temp_folder_version}"/installs/*/ )
 hou_installer_folder="${files[0]}"
 
-echo "Installing Houdini... $houdini_install_dir ..."
+echo "Installing Houdini... $INSTALL_DIR ..."
 
 chmod -R 777 $DESTINATION
-mkdir -p $houdini_install_dir
-chmod -R 777 $houdini_install_dir
-echo "Houdini Install Dir: $houdini_install_dir"
+mkdir -p $INSTALL_DIR
+chmod -R 777 $INSTALL_DIR
+echo "Houdini Install Dir: $INSTALL_DIR"
 
 # get license date from file
 export $(cat $hou_installer_folder/houdini.install | grep 'LICENSE_DATE=' | tr -d '"')
@@ -72,20 +70,18 @@ echo "License Date:" $LICENSE_DATE
 mkdir -p $DESTINATION/hq_server $DESTINATION/hq_client $DESTINATION/hqueue_shared
 chmod -R 777 $DESTINATION/hq_server $DESTINATION/hq_client $DESTINATION/hqueue_shared
 
-# --install-hqueue-client --hqueue-client-dir $DESTINATION/hq_client --hqueue-server-name "hq-server" --hqueue-client-user "polaris-render-node" \
-# --install-hqueue-server --hqueue-server-dir $DESTINATION/hq_server --hqueue-shared-dir $DESTINATION/hqueue_shared --hqueue-server-port 45000 \
-echo "Running Houdini Installer for $houdini_install_version"
+echo "Running Houdini Installer for $VERSION"
 
 cd $hou_installer_folder
-./houdini.install --auto-install --install-menus --install-sidefxlabs --sidefxlabs-dir $houdini_install_dir --no-install-hfs-symlink --no-root-check \
+./houdini.install --auto-install --install-menus --install-sidefxlabs --sidefxlabs-dir $INSTALL_DIR --no-install-hfs-symlink --no-root-check \
 --no-install-bin-symlink \
---license-server-name $SESI_HOST --no-install-license --accept-EULA $LICENSE_DATE \
---make-dir $houdini_install_dir \
---install-dir $houdini_install_dir  #> $DESTINATION/houdini_install.log
+--no-install-license --accept-EULA $LICENSE_DATE \
+--make-dir $INSTALL_DIR \
+--install-dir $INSTALL_DIR  #> $DESTINATION/houdini_install.log
 
 
-# save stuff from install
-echo "Copying Houdini desktop files to $houdini_install_dir"
+# save desktop files from install
+echo "Copying Houdini desktop files to $INSTALL_DIR"
 cp -r $HOME/.local/share/applications/sesi_*.desktop $DESTINATION/
 echo "check copy desktop files"
 ls -la $DESTINATION/
@@ -94,38 +90,47 @@ ls -la $DESTINATION/
 cd $DESTINATION
 echo "Enter to $DESTINATION"
 # rewrite categories for XDG-XFCE compatibility
-
 for desktopfile in *.desktop;
 do
   echo "Cleaning up $desktopfile"
   sed -i "s@Categories=.*@Categories=X-Polaris;@g" $desktopfile
 done
 
-echo "Create Houdini Version sh file $houdini_install_version"
-
-cd $working_dir
-runner_file=$houdini_install_dir/run_houdini_"$houdini_install_version".sh
-
-cp -v $working_dir/houdini.sh $runner_file
-sed -i "s@ROOT_APP@$houdini_install_dir@g" $runner_file
-sed -i "s@APPVERSION@$HOUDINI_VERSION@g" $runner_file
-sed -i "s@APPBUILD@$HOUDINI_BUILD@g" $runner_file
-sed -i "s@APPSERVERHOST@$SESI_HOST@g" $runner_file
-chmod +x $runner_file
-
 # app icon setup
-cp "./assets/houdini.png" "$houdini_install_dir/houdini.png"
-cp "./assets/houdini.desktop" "$DESTINATION/houdini.desktop"
+cp "./assets/houdini.png" "$INSTALL_DIR/houdini.png"
 # replace our icon/exec placeholder strings with proper values
 cd $DESTINATION
 pwd
 ls -la
-sed -i -e "s@DESTINATION-PATH@$DESTINATION/houdini.sh@g" "$DESTINATION/houdini.desktop"
-sed -i -e "s@ICON-PATH@DESTINATION/houdini.png@g" "$DESTINATION/houdini.desktop"
-echo "Adding desktop file"
-echo "Desktop file created."
-chmod -R 777 "$DESTINATION/"
+
+echo "Adding desktop files"
+# app icon setup
+
+cp -v ./assets/houdini.png $DESTINATION/
+ln -svf "$INSTALL_DIR/houdinfx" "$DESTINATION/$VERSION/launch_fx"
+ln -svf "$INSTALL_DIR/houdincore" "$DESTINATION/$VERSION/launch_core"
+
+echo "[Desktop Entry]
+Version=$VERSION
+Name=Houdini FX $VERSION
+Comment=SideFX Houdini software
+Exec=vglrun -d /dev/dri/card0 $INSTALL_DIR/houdinifx
+Icon="$DESTINATION/houdini.png"
+Terminal=false
+Type=Application
+Categories=X-Polaris" >> $DESTINATION/houdinifx_$VERSION.desktop
+
+echo "[Desktop Entry]
+Version=$VERSION
+Name=Houdini Core $VERSION
+Comment=SideFX Houdini software
+Exec=vglrun -d /dev/dri/card0 $INSTALL_DIR/houdinicore
+Icon="$DESTINATION/houdini.png"
+Terminal=false
+Type=Application
+Categories=X-Polaris" >> $DESTINATION/houdinifx_$VERSION.desktop
+
 cat $DESTINATION/*.desktop
 
-chmod -R 777 $DESTINATION/
+echo "Desktop file created."
 echo "Install Complete"
