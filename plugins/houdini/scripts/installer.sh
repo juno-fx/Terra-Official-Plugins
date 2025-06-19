@@ -97,18 +97,15 @@ do
   sed -i "s@Categories=.*@Categories=X-Polaris;@g" $desktopfile
 done
 
-# app icon setup
-cd $working_dir
-cp "./assets/houdini.png" "$INSTALL_DIR/houdini.png"
-# replace our icon/exec placeholder strings with proper values
-cd $DESTINATION
-pwd
-ls -la
 
 echo "Adding desktop files"
 # app icon setup
-
+cd $working_dir
 cp -v ./assets/houdini.png $DESTINATION/
+
+cd $DESTINATION
+pwd
+ls -la
 
 echo "[Desktop Entry]
 Version=$VERSION
