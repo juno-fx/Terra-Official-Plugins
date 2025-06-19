@@ -37,5 +37,5 @@ spec:
             claimName: {{ .Values.install_volume.name }}
         - name: installer
           configMap:
-            name: firefox-scripts-configmap-cleanup
+            name: {{ .Release.Name }}-scripts-configmap-cleanup
             defaultMode: 0500
