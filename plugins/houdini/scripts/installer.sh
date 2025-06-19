@@ -57,7 +57,6 @@ hou_installer_folder="${files[0]}"
 
 echo "Installing Houdini... $INSTALL_DIR ..."
 
-chmod -R 777 $DESTINATION
 mkdir -p $INSTALL_DIR
 chmod -R 777 $INSTALL_DIR
 echo "Houdini Install Dir: $INSTALL_DIR"
