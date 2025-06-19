@@ -98,6 +98,7 @@ do
 done
 
 # app icon setup
+cd $working_dir
 cp "./assets/houdini.png" "$INSTALL_DIR/houdini.png"
 # replace our icon/exec placeholder strings with proper values
 cd $DESTINATION
