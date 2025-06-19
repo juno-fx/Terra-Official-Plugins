@@ -125,7 +125,7 @@ Exec=vglrun -d /dev/dri/card0 $INSTALL_DIR/houdinicore
 Icon="$DESTINATION/houdini.png"
 Terminal=false
 Type=Application
-Categories=X-Polaris" >> $DESTINATION/houdinifx_$VERSION.desktop
+Categories=X-Polaris" >> $DESTINATION/houdinicore_$VERSION.desktop
 
 cat $DESTINATION/*.desktop
 
