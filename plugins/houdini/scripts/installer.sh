@@ -81,13 +81,6 @@ cd $hou_installer_folder
 --install-dir $INSTALL_DIR  #> $DESTINATION/houdini_install.log
 
 
-# save desktop files from install
-echo "Copying Houdini desktop files to $INSTALL_DIR"
-cp -r $HOME/.local/share/applications/sesi_*.desktop $DESTINATION/
-echo "check copy desktop files"
-ls -la $DESTINATION/
-
-
 cd $DESTINATION
 echo "Enter to $DESTINATION"
 # rewrite categories for XDG-XFCE compatibility
