@@ -111,7 +111,7 @@ echo "[Desktop Entry]
 Version=$VERSION
 Name=Houdini FX $VERSION
 Comment=SideFX Houdini software
-Exec=vglrun -d /dev/dri/card0 $INSTALL_DIR/houdinifx
+Exec=vglrun -d /dev/dri/card0 $INSTALL_DIR/bin/houdinifx %F
 Icon="$DESTINATION/houdini.png"
 Terminal=false
 Type=Application
@@ -121,7 +121,7 @@ echo "[Desktop Entry]
 Version=$VERSION
 Name=Houdini Core $VERSION
 Comment=SideFX Houdini software
-Exec=vglrun -d /dev/dri/card0 $INSTALL_DIR/houdinicore
+Exec=vglrun -d /dev/dri/card0 $INSTALL_DIR/bin/houdinicore %F
 Icon="$DESTINATION/houdini.png"
 Terminal=false
 Type=Application
