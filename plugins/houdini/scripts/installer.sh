@@ -97,7 +97,7 @@ Exec=vglrun -d /dev/dri/card0 $INSTALL_DIR/bin/houdinifx %F
 Icon="$DESTINATION/houdini.png"
 Terminal=false
 Type=Application
-Categories=X-Polaris" >> $DESTINATION/houdinifx_$VERSION.desktop
+Categories=X-Polaris" > $DESTINATION/houdinifx_$VERSION.desktop
 
 echo "[Desktop Entry]
 Version=$VERSION
@@ -107,7 +107,7 @@ Exec=vglrun -d /dev/dri/card0 $INSTALL_DIR/bin/houdinicore %F
 Icon="$DESTINATION/houdini.png"
 Terminal=false
 Type=Application
-Categories=X-Polaris" >> $DESTINATION/houdinicore_$VERSION.desktop
+Categories=X-Polaris" > $DESTINATION/houdinicore_$VERSION.desktop
 
 # set permission for desktop files and copy over to applications dir
 chmod 644 $DESTINATION/houdinicore_$VERSION.desktop
