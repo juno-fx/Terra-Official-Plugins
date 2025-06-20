@@ -109,6 +109,13 @@ Terminal=false
 Type=Application
 Categories=X-Polaris" >> $DESTINATION/houdinicore_$VERSION.desktop
 
+# set permission for desktop files and copy over to applications dir
+chmod 644 $DESTINATION/houdinicore_$VERSION.desktop
+chmod 644 $DESTINATION/houdinifx_$VERSION.desktop
+
+cp $DESTINATION/houdinifx_$VERSION.desktop /usr/local/share/applications/
+cp $DESTINATION/houdinicore_$VERSION.desktop /usr/local/share/applications/
+
 cat $DESTINATION/*.desktop
 
 echo "Desktop file created."
