@@ -80,17 +80,6 @@ cd $hou_installer_folder
 --make-dir $INSTALL_DIR \
 --install-dir $INSTALL_DIR  #> $DESTINATION/houdini_install.log
 
-
-cd $DESTINATION
-echo "Enter to $DESTINATION"
-# rewrite categories for XDG-XFCE compatibility
-for desktopfile in *.desktop;
-do
-  echo "Cleaning up $desktopfile"
-  sed -i "s@Categories=.*@Categories=X-Polaris;@g" $desktopfile
-done
-
-
 echo "Adding desktop files"
 # app icon setup
 cd $working_dir
