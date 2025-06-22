@@ -1,6 +1,6 @@
 resource_id: helios
 name: Helios
-icon: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/firefox/scripts/assets/firefox.png?raw=true"
+icon: https://junovfx.com/dog.png
 description: Helios containerized workstation from Juno
 category: Workstations
 tags:
