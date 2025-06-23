@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: "{{ .Release.Name }}-terra-metadata"
-  annotations:
+  labels:
     kuiper.juno-innovations.com/template: "{{ .Chart.Name }}"
     kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
 data:
