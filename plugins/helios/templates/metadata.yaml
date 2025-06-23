@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: "{{ .Release.Name }}-terra-metadata"
-  labels:
+  annotations:
     kuiper.juno-innovations.com/template: "{{ .Chart.Name }}"
     kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
 data:
@@ -12,9 +12,11 @@ data:
     - name: repo
       description: Repository to pull the image from
       required: true
+      type: string
     - name: tag
       description: Tag to pull the image from
       required: true
+      type: string
     - name: registry
       description: Tag to pull the image from
       required: true
@@ -40,9 +42,17 @@ data:
     - name: gpu
       description: Use a GPU
       required: true
-      type: bool
+      type: boolean
     - name: env
       description: Key Value environment vars to pass to the container
       required: false
       type: env
-
+    - name: label
+      description: Key Value environment vars to pass to the container
+      required: true
+      type: string
+    - name: icon
+      description: Key Value environment vars to pass to the container
+      default: https://junovfx.com/dog.png
+      required: false
+      type: string
