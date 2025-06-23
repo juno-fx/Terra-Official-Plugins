@@ -1,6 +1,6 @@
 resource_id: deadline10
 name: Deadline 10
-icon: https://junovfx.com/dog.png
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/deadline10/scripts/assets/deadline10client.png
 description: AWS Thinkbox Deadline 10 render farm software for distributed computing.
 category: Rendering Management
 tags:
