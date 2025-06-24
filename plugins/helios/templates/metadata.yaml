@@ -55,3 +55,8 @@ data:
       default: https://junovfx.com/dog.png
       required: false
       type: string
+    - name: mode
+      description: Mode selection for workstation. Needs to be either interactive or headless
+      default: interactive
+      required: true
+      type: string
