@@ -3,7 +3,6 @@ kind: ConfigMap
 metadata:
   name: "{{ .Release.Name }}-terra-metadata"
   labels:
-    kuiper.juno-innovations.com/template: "{{ .Chart.Name }}"
     kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
 data:
   chart: "{{ .Release.Name }}-scripts-configmap"
