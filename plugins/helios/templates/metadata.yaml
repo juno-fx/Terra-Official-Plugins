@@ -2,8 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: "{{ .Release.Name }}-terra-metadata"
-  annotations:
-    kuiper.juno-innovations.com/template: "{{ .Chart.Name }}"
+  labels:
     kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
 data:
   chart: "{{ .Release.Name }}-scripts-configmap"
@@ -12,11 +11,13 @@ data:
     - name: repo
       description: Repository to pull the image from
       required: true
+      type: string
     - name: tag
       description: Tag to pull the image from
       required: true
+      type: string
     - name: registry
-      description: Tag to pull the image from
+      description: Registry to pull the image from
       required: true
     - name: group
       description: Groups that can use this workload
@@ -34,15 +35,28 @@ data:
       required: true
       type: int
     - name: memoryLimit
-      description: Memory request amount
+      description: Memory limit amount
       required: false
       type: int
     - name: gpu
       description: Use a GPU
       required: true
-      type: bool
+      type: boolean
     - name: env
       description: Key Value environment vars to pass to the container
       required: false
       type: env
-
+    - name: label
+      description: Label for the workstation template
+      required: true
+      type: string
+    - name: icon
+      description: Icon for workstation template
+      default: https://junovfx.com/dog.png
+      required: false
+      type: string
+    - name: mode
+      description: Mode selection for workstation. Needs to be either interactive or headless
+      default: interactive
+      required: true
+      type: string
