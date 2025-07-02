@@ -6,7 +6,7 @@ repo_name: juno-fx/Terra-Official-Plugins
 
 theme:
   logo: assets/logos/terra/terra-color-W.png  # Will need terra-light.png and terra-dark.png
-  favicon: assets/logos/Favicon/terra-icon.ico
+  favicon: assets/logos/favicon/terra-icon.ico
   icon:
     repo: fontawesome/brands/github-alt
   name: material
