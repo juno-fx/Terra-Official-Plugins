@@ -1,8 +1,8 @@
 # Welcome
 
 <span class="theme-aware-image">
-  <img src="/assets/logos/terra/terra-light.png" class="light-only" alt="Terra Logo">
-  <img src="/assets/logos/terra/terra-dark.png" class="dark-only" alt="Terra Logo">
+  <img src="assets/logos/terra/terra-light.png" class="light-only" alt="Terra Logo">
+  <img src="assets/logos/terra/terra-dark.png" class="dark-only" alt="Terra Logo">
 </span>
 
 
