@@ -1,7 +1,0 @@
-apiVersion: v1
-data:
-  auth: "{{ .Values.htpasswd }}"
-kind: Secret
-metadata:
-  name: "{{ .Values.name }}-auth"
-type: Opaque

@@ -3,17 +3,15 @@ kind: StatefulSet
 metadata:
   name: "{{ .Values.name }}"
   annotations:
-    juno-innovations.com/group: "{{ .Values.group }}"
+    # comma separated list of users that can access this workstation as read only.
+    juno-innovations.com/shared: "none"
+    juno-innovations.com/kuiper-state: "{{ .Values._kuiper }}"
   labels:
     juno-innovations.com/app: "polaris"
     juno-innovations.com/workstation: "{{ .Values.name }}"
     juno-innovations.com/user: "{{ .Values.user }}"
-    juno-innovations.com/token: "{{ .Values.token }}"
-    juno-innovations.com/repo: "{{ .Values.repo }}"
-    juno-innovations.com/idx: "{{ .Values.idx }}"
     juno-innovations.com/session: "{{ .Values.session }}"
-    # comma separated list of users that can access this workstation as read only.
-    juno-innovations.com/shared: "none"
+
 
 spec:
   replicas: 1
