@@ -1,0 +1,7 @@
+# configuration
+version: 20.5.278
+destination: /houdini
+install_volume:
+  name: apps-pv-claim
+  sub_path:
+  container_path: /apps

@@ -1,0 +1,37 @@
+resource_id: houdini
+name: Houdini
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/houdini/scripts/assets/houdini.png
+description: Install SideFx's Houdini to a target directory.
+category: CG
+tags:
+  - houdini
+  - sidefx
+  - cg
+  - vfx
+  - usd
+  - animation
+  - 3d
+  - simulation
+  - rendering
+  - effects
+  - solaris
+  - procedural
+  - l-systems
+  - modeling
+fields:
+  - name: version
+    description: Version of Houdini to install. i.e. 20.5.278
+    required: true
+  - name: destination
+    description: Destination directory
+    required: true
+  - name: client_id
+    description: SideFX Client ID
+    required: true
+  - name: client_secret
+    description: SideFX Client secret
+    required: true
+  - name: install_volume
+    description: The name of the install volume
+    required: true
+    type: shared-volume
