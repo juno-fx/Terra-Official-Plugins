@@ -3,7 +3,6 @@ site_description: Official documentation for Juno Innovations Terra - Plugin dev
 site_url: https://juno-innovations.com
 repo_url: https://github.com/juno-fx/Terra-Official-Plugins
 repo_name: juno-fx/Terra-Official-Plugins
-
 theme:
   logo: assets/logos/terra/terra-color-W.png  # Will need terra-light.png and terra-dark.png
   favicon: assets/logos/favicon/terra-icon.ico
