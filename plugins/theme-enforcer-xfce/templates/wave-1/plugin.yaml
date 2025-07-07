@@ -7,6 +7,9 @@ metadata:
 data:
   entrypoint.sh: |
     #!/bin/bash
+
+    set -e
+
     echo
     echo "Enforcing XFCE theme settings..."
     home="/home/$USER"
