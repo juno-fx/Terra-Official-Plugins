@@ -30,7 +30,7 @@ data:
     fi
 
     # delete existing xfce config files and force fallback to xdg
-    rm -rfv "$home/.config/xfce4/*"
+    rm -rfv "$home/.config/xfce4"
 
     # copy any override settings to the users home directory
     cp -rv /etc/skel/.config/* "$home/.config/"
