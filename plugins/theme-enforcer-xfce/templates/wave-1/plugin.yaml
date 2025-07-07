@@ -7,4 +7,4 @@ metadata:
 data:
   entrypoint.sh: |
     #!/bin/bash
-    echo "Example plugin..."
+    echo "$USER"
