@@ -5,6 +5,6 @@ metadata:
   labels:
     kuiper.juno-innovations.com/plugin: "true"
 data:
-  bootstrap.sh: |
+  entrypoint.sh: |
     #!/bin/bash
     echo "Example plugin..."
