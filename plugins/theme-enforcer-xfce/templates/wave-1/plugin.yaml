@@ -32,17 +32,11 @@ data:
       GID="$UID"
     fi
 
-    # delete existing xfce config files and force fallback to xdg
-    rm -rfv "$home/.config/xfce4"
+    echo "Deleting existing user xfce config files and force fallback to xdg."
+    rm -rf "$home/.config/xfce4"
 
-    # copy any override settings to the users home directory
-    cp -rv /etc/skel/.config/* "$home/.config/"
-
-    # install the xdg xfce config files
-    cp -rv /etc/xdg/xfce4 "$home/.config/"
-
-    # set ownership of the home directory to the user
-    chown -Rv "$UID:$GID" "$home/.config/xfce4"
+    echo "Pulling in default .config from the system skel directory."
+    cp -r /etc/skel/.config/* "$home/.config/"
 
     echo "XFCE theme settings enforced successfully."
     echo
