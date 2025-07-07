@@ -40,5 +40,3 @@ data:
 
     echo "XFCE theme settings enforced successfully."
     echo
-
-    exit 0
