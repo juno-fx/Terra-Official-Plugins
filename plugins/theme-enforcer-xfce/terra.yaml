@@ -2,11 +2,10 @@ resource_id: theme-enforcer-xfce
 name: theme-enforcer-xfce
 icon: https://upload.wikimedia.org/wikipedia/commons/5/5b/Xfce_logo.svg
 description: Enforce theme settings for XFCE desktop environments.
-category: desktop
+category: plugin
 tags:
     - xfce
     - theme
     - desktop
     - customization
-    - linux
 fields: []
