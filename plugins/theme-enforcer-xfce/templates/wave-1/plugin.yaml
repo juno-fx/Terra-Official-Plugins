@@ -7,4 +7,38 @@ metadata:
 data:
   entrypoint.sh: |
     #!/bin/bash
-    echo "$USER"
+    echo
+    echo "Enforcing XFCE theme settings..."
+    home="/home/$USER"
+    echo "Home directory calculated: $home"
+
+    # check if home directory exists
+    if [ ! -d "$home" ]; then
+      echo "Home directory $home does not exist. Exiting."
+      exit 0
+    fi
+    # get the UID from the environment. If not set, fail the init process
+    if [ -z "$UID" ]; then
+      echo "UID environment variable is not set. Exiting."
+      exit 1
+    fi
+
+    # get the users GID from the environment. If not set, use the UID as the GID
+    if [ -z "$GID" ]; then
+      echo "GID environment variable is not set. Using UID as GID."
+      GID="$UID"
+    fi
+
+    # delete existing xfce config files and force fallback to xdg
+    rm -rf "$home/.config/xfce4/*"
+
+    # copy any override settings to the users home directory
+    cp -r /etc/skel/.config/ "$home/.config/"
+
+    # set ownership of the home directory to the user
+    chown -R "$UID:$GID" "$home/.config/xfce4"
+
+    echo "XFCE theme settings enforced successfully."
+    echo
+
+    exit 0
