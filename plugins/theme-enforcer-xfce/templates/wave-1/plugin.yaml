@@ -39,7 +39,7 @@ data:
     cp -rv /etc/skel/.config/* "$home/.config/"
 
     # install the xdg xfce config files
-    cp -rv /etc/skel/.config/xfce4 "$home/.config/"
+    cp -rv /etc/xdg/xfce4 "$home/.config/"
 
     # set ownership of the home directory to the user
     chown -Rv "$UID:$GID" "$home/.config/xfce4"
