@@ -33,7 +33,7 @@ data:
     rm -rfv "$home/.config/xfce4/*"
 
     # copy any override settings to the users home directory
-    cp -rv /etc/skel/.config/ "$home/.config/"
+    cp -rv /etc/skel/.config/* "$home/.config/"
 
     # set ownership of the home directory to the user
     chown -Rv "$UID:$GID" "$home/.config/xfce4"
