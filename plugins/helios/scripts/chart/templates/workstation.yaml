@@ -109,6 +109,8 @@ spec:
             - containerPort: 3000
               name: viewer
           env:
+            - name: JUNO_WORKSTATION
+              value: "{{ .Values.name }}"
             - name: JUNO_PROJECT
               valueFrom:
                 fieldRef:
