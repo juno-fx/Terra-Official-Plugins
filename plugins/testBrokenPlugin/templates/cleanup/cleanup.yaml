@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-cleanup
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: installer
+          image: ubuntu:latest
+          env:
+            - name: CLEANUP
+              value: "true"
+            - name: DESTINATION
+              value: "{{ .Values.install_volume.container_path }}{{ .Values.destination }}"
+          command: ["/terra/bootstrap.sh"]
+          volumeMounts:
+            - name: installer
+              mountPath: /terra/bootstrap.sh
+              subPath: bootstrap.sh
+            - name: installer
+              mountPath: /terra/scripts.base64
+              subPath: packaged_scripts.base64
+            - name: mount
+              mountPath: {{ .Values.install_volume.container_path }}
+              {{- if .Values.install_volume.sub_path }}
+              subPath: {{ .Values.install_volume.sub_path }}
+              {{- end }}
+      volumes:
+        - name: installer
+          configMap:
+            name: {{ .Release.Name }}-scripts-configmap-cleanup
+            defaultMode: 0500
+        - name: mount
+          persistentVolumeClaim:
+            claimName: {{ .Values.install_volume.name }}

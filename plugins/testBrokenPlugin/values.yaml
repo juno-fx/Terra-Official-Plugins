@@ -1,0 +1,10 @@
+# storage mount
+install_volume:
+  name:
+  sub_path:
+  container_path:
+
+# configuration
+destination:
+ref:
+url: 

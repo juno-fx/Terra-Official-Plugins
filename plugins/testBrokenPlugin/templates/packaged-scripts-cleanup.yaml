@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-scripts-configmap-cleanup
+  annotations:
+    argocd.argoproj.io/hook: PostDelete
+data:
+  bootstrap.sh: |
+    #!/bin/bash
+    echo "Unpacking scripts..."
+    # decode base64 encoded scripts mount at /terra/scripts.base64
+    base64 -d /terra/scripts.base64 > /terra/scripts.tar.gz
+    
+    # extract scripts to /terra/scripts
+    tar -xzvf /terra/scripts.tar.gz -C /terra/
+    
+    # make scripts executable
+    chmod +x -v /terra/scripts/*.sh
+    
+    # start entrypoint.sh
+    cd /terra/scripts
+    pwd
+    ./entrypoint.sh
+  packaged_scripts.base64: "H4sIAAAAAAAAA+3RTUvDMBgH8J7zKR47r3Xp0peDp6ETBrKNOU/ioWszG+zS0qTivr3ZcCDMl8uGiP/fJeR58kb+Jm9VY03fOyHupGm8HcM05h/HPS+MuRBhEiZi4PGQJyL2KD7lo/Y6Y7OWyCsy/e26n/p/lHnPX2rbbppaaXthyiPfsQ04SaIv8xcubJc/j8MoSgfC5S8innjEj/yOT/3z/Htn/aXS/WVmSmakpUAyplb0QIEm//zqdjSc3M98erwkW0rNiNo1Be3LyjWvR3eL8WS4GE8nvmvIV2WJM1kZ6WZZY6lriszuJ0q7j64qCjb0pCxz1R7NO709lvJ6vc504WquRXlVa+nOn49mU//wnrw4rO22lTJ/rju723njs5Viv/25AAAAAAAAAAAAAAAAAAAAAAAn9gZ3P1W0ACgAAA=="
