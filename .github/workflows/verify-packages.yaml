@@ -10,11 +10,7 @@ jobs:
     container:
       image: ubuntu
     steps:
-      - name: Install dependencies
-        run: |
-          apt-get update
-          apt-get install -y make
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Verify packages
-        run: make verify
+        run: bash hack/verify.sh
