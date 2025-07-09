@@ -13,4 +13,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Verify packages
-        run: bash hack/verify.sh
+        run: |
+          ls -la
+          bash hack/verify.sh
