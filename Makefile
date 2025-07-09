@@ -25,7 +25,7 @@ test: cluster dependencies
 
 package:
 	docker run --rm -v $(shell pwd):/workspace -w /workspace \
-		alpine /bin/ash -c "apk add bash make && make _package ARGS=$(ARGS)"
+		alpine /bin/ash -c "apk add bash make tar && make _package ARGS=$(ARGS)"
 
 new-plugin:
 	@echo " >> Building New Plugin: $(ARGS) << "
@@ -43,32 +43,21 @@ new-plugin:
 
 verify:
 	docker run --rm -v $(shell pwd):/workspace -w /workspace \
-		alpine /bin/ash -c "apk add bash make && bash hack/verify.sh"
+		alpine /bin/ash -c "apk add bash make tar && bash hack/verify.sh"
 
 # wrappers
 _package:
 	@cd ./plugins/$(ARGS) && \
-	tar -czf scripts.tar scripts && \
-	sha256sum scripts.tar | awk '{print $$1}' > checksum.txt && \
-	base64 -w 0 scripts.tar > scripts.base64 && \
-	rm -f scripts.tar && \
-	cp ../../template/packaged-scripts-template.yaml ./templates/packaged-scripts.yaml && \
-	cp ../../template/packaged-scripts-template-cleanup.yaml ./templates/packaged-scripts-cleanup.yaml && \
-	\
-	# Write the base64 field with proper YAML multiline block scalar syntax to both files \
-	echo "  packaged_scripts.base64: |" >> ./templates/packaged-scripts.yaml && \
-	echo "  packaged_scripts.base64: |" >> ./templates/packaged-scripts-cleanup.yaml && \
-	\
-	# Indent base64 content by two spaces and append \
-	echo "    $$(cat scripts.base64)" >> ./templates/packaged-scripts.yaml && \
-	echo "    $$(cat scripts.base64)" >> ./templates/packaged-scripts-cleanup.yaml && \
-	\
-	# Append the checksum field with indentation and quotes \
-	echo "  packaged_scripts.checksum: \"$$(cat checksum.txt)\"" >> ./templates/packaged-scripts.yaml && \
-	echo "  packaged_scripts.checksum: \"$$(cat checksum.txt)\"" >> ./templates/packaged-scripts-cleanup.yaml && \
-	\
-	rm -f scripts.base64 checksum.txt
-
+		tar --owner=0 --group=0 -czf scripts.tar scripts && \
+		base64 -w 0 scripts.tar > scripts.base64 && \
+		rm -rf scripts.tar && \
+		cp ../../template/packaged-scripts-template.yaml ./templates/packaged-scripts.yaml && \
+		cp ../../template/packaged-scripts-template-cleanup.yaml ./templates/packaged-scripts-cleanup.yaml && \
+		sed -i '1s/^/  packaged_scripts.base64: "/' scripts.base64 && \
+		sed -i '1s/$$/"/' scripts.base64 && \
+		cat scripts.base64 >> ./templates/packaged-scripts.yaml && \
+		cat scripts.base64 >> ./templates/packaged-scripts-cleanup.yaml && \
+		rm -rf scripts.base64
 
 # documentation
 docs:

@@ -1,62 +1,67 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-repo_root="$(pwd)"
-plugins_dir="$repo_root/plugins"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PLUGINS_DIR="$REPO_ROOT/plugins"
 
-declare -A mismatched_plugins=()
+mismatches=()
+plugins_checked=()
 
-for plugin_path in "$plugins_dir"/*; do
-  plugin=$(basename "$plugin_path")
-  scripts_dir="$plugin_path/scripts"
-  if [[ ! -d "$scripts_dir" ]]; then
-    echo "Skipping plugin $plugin: no scripts directory."
-    continue
-  fi
+verify_plugin() {
+  local plugin="$1"
+  local plugin_path="$PLUGINS_DIR/$plugin"
+  local scripts_dir="${plugin_path}/scripts"
+  local templates_dir="${plugin_path}/templates"
 
-  # Create temporary tarball and compute checksum
-  tmp_tar=$(mktemp)
-  tar -czf "$tmp_tar" -C "$plugin_path" scripts
-  actual_checksum=$(sha256sum "$tmp_tar" | awk '{print $1}')
-  rm -f "$tmp_tar"
+  [[ ! -d "$scripts_dir" ]] && return
+  [[ ! -d "$templates_dir" ]] && return
 
-  for cm_file in "$plugin_path"/templates/packaged-scripts.yaml "$plugin_path"/templates/packaged-scripts-cleanup.yaml; do
-    if [[ ! -f "$cm_file" ]]; then
-      echo "Warning: ConfigMap file not found: $cm_file"
+  plugins_checked+=("$plugin")
+
+  actual_b64=$(tar --owner=0 --group=0 -czf - -C "$plugin_path" scripts | base64 -w 0)
+
+  for cm_name in "packaged-scripts.yaml" "packaged-scripts-cleanup.yaml"; do
+    local cm_path="${templates_dir}/${cm_name}"
+
+    if [[ ! -f "$cm_path" ]]; then
+      mismatches+=("$plugin (missing file: ${cm_name})")
       continue
     fi
 
-    # Extract checksum using sed and strip whitespace/newlines
-    expected_checksum=$(sed -nE 's/.*packaged_scripts\.checksum: *"([^"]+)".*/\1/p' "$cm_file" | tr -d '\r\n' || true)
+    expected_b64=$(awk -F': ' '
+      $1 ~ /^\s*packaged_scripts\.base64/ {
+        val = $2
+        gsub(/^ +/, "", val)
+        gsub(/^"/, "", val)
+        gsub(/"$/, "", val)
+        print val
+      }
+    ' "$cm_path")
 
-    if [[ -z "$expected_checksum" ]]; then
-      echo "❗ Missing checksum in $cm_file"
-      mismatched_plugins["$plugin"]=1
+    if [[ -z "$expected_b64" ]]; then
+      mismatches+=("$plugin (missing packaged_scripts.base64 key in ${cm_name})")
       continue
     fi
 
-    echo "Plugin: $plugin"
-    echo "  Checking file: $cm_file"
-    echo "  Expected checksum: $expected_checksum"
-    echo "  Actual checksum:   $actual_checksum"
-
-    if [[ "$actual_checksum" != "$expected_checksum" ]]; then
-      echo "❗ Checksum mismatch in $cm_file"
-      mismatched_plugins["$plugin"]=1
+    if [[ "$actual_b64" != "$expected_b64" ]]; then
+      mismatches+=("$plugin (mismatch in ${cm_name})")
     fi
   done
+}
+
+for plugin_path in "$PLUGINS_DIR"/*/; do
+  plugin="$(basename "$plugin_path")"
+  verify_plugin "$plugin"
 done
 
-if [[ ${#mismatched_plugins[@]} -gt 0 ]]; then
-  echo
-  echo "❌ Plugins out of sync. You can fix them by running:"
-  echo
-  for plugin in "${!mismatched_plugins[@]}"; do
-    echo "make package $plugin"
-  done | sed '$ s/ \\\\$//'
-  echo
+if [[ "${#mismatches[@]}" -gt 0 ]]; then
+  echo "❌ Plugins out of sync:"
+  for m in "${mismatches[@]}"; do
+    echo "  - $m"
+  done
+  echo "👉 Run 'make package <plugin>' to fix."
   exit 1
 else
-  echo "✅ All plugins verified successfully."
+  echo "✅ All plugins are up to date. Checked: ${#plugins_checked[@]}"
   exit 0
 fi
