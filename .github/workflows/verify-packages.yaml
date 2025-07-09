@@ -21,5 +21,5 @@ jobs:
         uses: actions/checkout@v4
       - name: Verify packages
         run: |
-          ls -la plugins/*/templates/
+          cat plugins/*/templates/packaged-scripts.yaml
           make verify
