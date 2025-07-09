@@ -39,7 +39,16 @@ verify_plugin() {
       continue
     fi
 
-    expected_b64=$(awk -F': ' '/^\s*packaged_scripts\.base64:/ {print $2}' "$cm_path" | tr -d '"')
+    # Extract base64 value using improved awk logic that trims quotes properly
+    expected_b64=$(awk -F': ' '
+      $1 ~ /^\s*packaged_scripts\.base64/ {
+        val = $2
+        gsub(/^ +/, "", val)     # strip leading spaces
+        gsub(/^"/, "", val)      # remove starting quote
+        gsub(/"$/, "", val)      # remove trailing quote
+        print val
+      }
+    ' "$cm_path")
 
     if [[ -z "$expected_b64" ]]; then
       echo "   ❗ Missing 'packaged_scripts.base64' key in $cm_path"
@@ -58,13 +67,13 @@ verify_plugin() {
   done
 }
 
-# Initial check
+# Run verification pass
 for plugin_path in "$PLUGINS_DIR"/*/; do
   plugin="$(basename "$plugin_path")"
   verify_plugin "$plugin"
 done
 
-# If --change is passed, fix and reverify
+# Change mode: fix and reverify
 if [[ "$CHANGE_MODE" == "change" && "${#mismatches[@]}" -gt 0 ]]; then
   echo
   echo "🔧 Fixing out-of-sync plugins using 'make package <plugin>'..."
@@ -77,6 +86,7 @@ if [[ "$CHANGE_MODE" == "change" && "${#mismatches[@]}" -gt 0 ]]; then
     to_fix+=("$plugin")
   done
 
+  # Clear mismatch list and re-verify those plugins
   mismatches=()
   echo
   echo "🔁 Re-verifying fixed plugins..."
