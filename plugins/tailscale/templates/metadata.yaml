@@ -4,4 +4,3 @@ metadata:
   name: {{ .Release.Name }}-terra-metadata
 data:
   chart: "{{ .Chart.Name }}"
-
