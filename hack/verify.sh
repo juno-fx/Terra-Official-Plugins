@@ -11,8 +11,8 @@ plugins_checked=()
 verify_plugin() {
   local plugin="$1"
   local plugin_path="$PLUGINS_DIR/$plugin"
-  local scripts_dir="$plugin_path/scripts"
-  local templates_dir="$plugin_path/templates"
+  local scripts_dir="${plugin_path}/scripts"
+  local templates_dir="${plugin_path}/templates"
 
   if [[ ! -d "$scripts_dir" ]]; then
     echo "⚠️  Plugin '$plugin' has no scripts/ directory, skipping."
@@ -27,15 +27,14 @@ verify_plugin() {
   echo "🔍 Checking plugin: $plugin"
   plugins_checked+=("$plugin")
 
-  # Create gzipped tar and encode to base64 (no line wrap)
   actual_b64=$(tar -czf - -C "$plugin_path" scripts | base64 -w 0)
 
   for cm_name in "packaged-scripts.yaml" "packaged-scripts-cleanup.yaml"; do
     local cm_path="${templates_dir}/${cm_name}"
-    echo "   📄 Checking configmap: $cm_name"
+    echo "   📄 ConfigMap path: $cm_path"
 
     if [[ ! -f "$cm_path" ]]; then
-      echo "   ❗ Missing file: $cm_name"
+      echo "   ❗ Missing file: $cm_path"
       mismatches+=("$plugin (missing ${cm_name})")
       continue
     fi
@@ -43,16 +42,15 @@ verify_plugin() {
     expected_b64=$(awk -F': ' '/^\s*packaged_scripts\.base64:/ {print $2}' "$cm_path" | tr -d '"')
 
     if [[ -z "$expected_b64" ]]; then
-      echo "   ❗ Missing 'packaged_scripts.base64' key in $cm_name"
+      echo "   ❗ Missing 'packaged_scripts.base64' key in $cm_path"
       mismatches+=("$plugin (missing key in ${cm_name})")
       continue
     fi
 
-    echo "     ✅ expected: ${expected_b64:0:100}..."
-    echo "     🔄 actual  : ${actual_b64:0:100}..."
-
     if [[ "$actual_b64" != "$expected_b64" ]]; then
-      echo "   ❌ MISMATCH detected in $cm_name"
+      echo "   ❌ MISMATCH detected in $cm_path"
+      echo "     🔄 actual   : ${actual_b64:0:100}..."
+      echo "     ✅ expected : ${expected_b64:0:100}..."
       mismatches+=("$plugin (mismatch in ${cm_name})")
     else
       echo "   ✅ Match"
@@ -60,26 +58,25 @@ verify_plugin() {
   done
 }
 
-# Main check pass
+# Initial check
 for plugin_path in "$PLUGINS_DIR"/*/; do
   plugin="$(basename "$plugin_path")"
   verify_plugin "$plugin"
 done
 
-# If change mode is requested and mismatches exist
+# If --change is passed, fix and reverify
 if [[ "$CHANGE_MODE" == "change" && "${#mismatches[@]}" -gt 0 ]]; then
   echo
   echo "🔧 Fixing out-of-sync plugins using 'make package <plugin>'..."
 
   to_fix=()
   for entry in "${mismatches[@]}"; do
-    plugin="${entry%% *}"  # plugin name is before the first space
+    plugin="${entry%% *}"
     echo "⚙️  Re-packaging plugin: $plugin"
     make -C "$REPO_ROOT" package ARGS="$plugin"
     to_fix+=("$plugin")
   done
 
-  # Clear mismatch list and re-verify only the plugins we just fixed
   mismatches=()
   echo
   echo "🔁 Re-verifying fixed plugins..."
