@@ -25,7 +25,7 @@ test: cluster dependencies
 
 package:
 	docker run --rm -v $(shell pwd):/workspace -w /workspace \
-		ubuntu /bin/bash -c "apt update > /dev/null && apt install make -y > /dev/null && make _package ARGS=$(ARGS)"
+		alpine /bin/ash -c "apk add bash make && make _package ARGS=$(ARGS)"
 
 new-plugin:
 	@echo " >> Building New Plugin: $(ARGS) << "
@@ -43,7 +43,7 @@ new-plugin:
 
 verify:
 	docker run --rm -v $(shell pwd):/workspace -w /workspace \
-		ubuntu /bin/bash -c "apt update > /dev/null && apt install make -y > /dev/null && bash hack/verify.sh"
+		alpine /bin/ash -c "apk add bash make && bash hack/verify.sh"
 
 # wrappers
 _package:
