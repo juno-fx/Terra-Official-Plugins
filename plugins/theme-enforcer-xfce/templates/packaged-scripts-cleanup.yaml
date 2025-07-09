@@ -21,4 +21,6 @@ data:
     cd /terra/scripts
     pwd
     ./entrypoint.sh
-  packaged_scripts.base64: "H4sIAAAAAAAAA+2SwW7CMAyGe+5TGLiO0tJmbI+w8/YCaWpotpBUcSLG28+lIKZJ4wTssH5Saynxb7v9TcrrLtAiuSE5sxKij8VK5EMsD/FEUoi8LEW15CfJi5xjAuKWQ52IFKQHSIp+igs8P1X3GOfe0NF/tMHvO6dtyKi9co/e4Meq+tX/Sqx++F/mxTKBi35ci3/u/2yyqLVd1JLaNCUMMMcUVetg+sr/JWi7gfNqwLAtWZZN03QGby3COhoDytnAWQRuDYEPj0sFjfaogvN72GlOq5FF0XZSfWADwR1yVfSetd9yQysDvzQd67DIR0ugbQYvdrjBT7ntDD7ADofa7+wjGE29sm9zLkcO9i6CkhYIceh5mlfahqfaaMuKOmrT9N/L2R7kDsltEToT+XqSGoK5kelf2zUyMjJyNb4Ac3UVlQAKAAA="
+  packaged_scripts.base64: |
+    H4sIAAAAAAAAA+2SwW7CMAyGe+5TGLiO0tJmbI+w8/YCaWpotpBUcSLG28+lIKZJ4wTssH5Saynxb7v9TcrrLtAiuSE5sxKij8VK5EMsD/FEUoi8LEW15CfJi5xjAuKWQ52IFKQHSIp+igs8P1X3GOfe0NF/tMHvO6dtyKi9co/e4Meq+tX/Sqx++F/mxTKBi35ci3/u/2yyqLVd1JLaNCUMMMcUVetg+sr/JWi7gfNqwLAtWZZN03QGby3COhoDytnAWQRuDYEPj0sFjfaogvN72GlOq5FF0XZSfWADwR1yVfSetd9yQysDvzQd67DIR0ugbQYvdrjBT7ntDD7ADofa7+wjGE29sm9zLkcO9i6CkhYIceh5mlfahqfaaMuKOmrT9N/L2R7kDsltEToT+XqSGoK5kelf2zUyMjJyNb4Ac3UVlQAKAAA=
+  packaged_scripts.checksum: "d538456831209abf68289506787b3f7e980cdb704aece60b6eba1e640095ba0e"
