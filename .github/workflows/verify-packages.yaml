@@ -1,15 +1,23 @@
 name: Verify Packages
+
 on:
   push:
 
 jobs:
-  deploy:
+  verify:
     runs-on:
-      - X64
+      - X64  # your custom self-hosted x64 runner
+    container:
+      image: ubuntu:22.04
     steps:
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y curl make git tar gzip base64
+          curl -L https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 \
+            -o /usr/local/bin/yq
+          chmod +x /usr/local/bin/yq
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Verify
-        run: |
-          ls -la
-          make verify
+      - name: Verify packages
+        run: make verify
