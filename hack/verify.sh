@@ -14,8 +14,8 @@ for plugin_path in "$plugins_dir"/*; do
     continue
   fi
 
-  # Generate base64 of tarball (gzip + tar)
-  base64_tar=$(tar -czf - -C "$plugin_path" scripts | base64 -w 0)
+  # Generate base64 of tarball (gzip + tar), and remove newlines to ensure consistent comparison
+  base64_tar=$(tar -czf - -C "$plugin_path" scripts | base64 -w 0 | tr -d '\n')
 
   for cm_file in "$plugin_path"/templates/packaged-scripts.yaml "$plugin_path"/templates/packaged-scripts-cleanup.yaml; do
     if [[ ! -f "$cm_file" ]]; then
@@ -35,8 +35,8 @@ if [[ ${#mismatched_plugins[@]} -gt 0 ]]; then
   echo "❌ Plugins out of sync. You can fix them by running:"
   echo
   for plugin in "${!mismatched_plugins[@]}"; do
-    echo "make package $plugin &&\\"
-  done | sed '$ s/ \\\\$//'  # Remove the final backslash
+    echo "make package $plugin \\"
+  done | sed '$ s/ \\\\$//'  # Remove the trailing backslash
   echo
   exit 1
 else
