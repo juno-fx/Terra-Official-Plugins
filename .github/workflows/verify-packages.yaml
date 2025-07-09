@@ -14,5 +14,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Verify packages
         run: |
+          pwd
           ls -la
           bash hack/verify.sh
