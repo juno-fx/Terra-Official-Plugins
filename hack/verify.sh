@@ -30,6 +30,9 @@ for plugin_path in "$plugins_dir"/*; do
 
     if ! grep -Fq "$base64_tar" "$cm_file"; then
       echo "❗ MISMATCH detected in $cm_file"
+      echo "---- Contents of $cm_file ----"
+      cat "$cm_file"
+      echo "---- End of $cm_file ----"
       mismatches+=("$plugin")
     fi
   done
