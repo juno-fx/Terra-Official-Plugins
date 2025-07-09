@@ -42,7 +42,7 @@ new-plugin:
 	@echo " >> Ready to go << "
 
 verify:
-	docker run --rm -it -v $(shell pwd):/workspace -w /workspace \
+	docker run --rm -v $(shell pwd):/workspace -w /workspace \
 		ubuntu /bin/bash -c "apt update > /dev/null && apt install make -y > /dev/null && bash hack/verify.sh"
 
 # wrappers
