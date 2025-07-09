@@ -10,5 +10,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          clean: 'true'
       - name: Verify packages
         run: make verify
