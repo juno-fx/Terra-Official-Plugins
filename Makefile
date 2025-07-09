@@ -1,6 +1,7 @@
-.PHONY: plugins docs
+.PHONY: plugins docs verify verify-fix
 
 SHELL := /bin/bash
+MAKEFLAGS += --no-print-directory
 
 ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
 $(eval $(ARGS):;@:)
@@ -48,6 +49,13 @@ new-plugin:
 	@echo " >> Added to git << "
 	@echo " >> Plugin Location: $(shell pwd)/plugins/$(ARGS) << "
 	@echo " >> Ready to go << "
+
+verify:
+	bash hack/verify.sh
+
+
+verify-fix:
+	bash hack/verify.sh change
 
 # documentation
 docs:
