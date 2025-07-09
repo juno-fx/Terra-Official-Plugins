@@ -1,15 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-repo_root=$(git rev-parse --show-toplevel)
+repo_root="$(pwd)"
 plugins_dir="$repo_root/plugins"
-change_mode=false
 
-if [[ "${1:-}" == "change" ]]; then
-  change_mode=true
-fi
-
-declare -a mismatches=()
+declare -A mismatched_plugins=()
 
 for plugin_path in "$plugins_dir"/*; do
   plugin=$(basename "$plugin_path")
@@ -30,38 +25,19 @@ for plugin_path in "$plugins_dir"/*; do
 
     if ! grep -Fq "$base64_tar" "$cm_file"; then
       echo "❗ MISMATCH detected in $cm_file"
-      echo "---- Contents of $cm_file ----"
-      cat "$cm_file"
-      echo "---- End of $cm_file ----"
-      mismatches+=("$plugin")
+      mismatched_plugins["$plugin"]=1
     fi
   done
-
-  # If change mode and mismatch for this plugin, fix it
-  if $change_mode && [[ " ${mismatches[*]} " == *" $plugin "* ]]; then
-    echo "🔧 Running 'make package $plugin' to fix plugin $plugin"
-    make package ARGS="$plugin"
-    # Re-generate base64_tar after fixing
-    base64_tar=$(tar -czf - -C "$plugin_path" scripts | base64 -w 0)
-    # Re-check files
-    for cm_file in "$plugin_path"/templates/packaged-scripts.yaml "$plugin_path"/templates/packaged-scripts-cleanup.yaml; do
-      if [[ ! -f "$cm_file" ]]; then
-        echo "Warning: ConfigMap file not found after fix: $cm_file"
-        continue
-      fi
-      if ! grep -Fq "$base64_tar" "$cm_file"; then
-        echo "❌ STILL MISMATCH after fix in $cm_file"
-      else
-        echo "✅ Fixed $cm_file"
-        # Remove from mismatches since fixed
-        mismatches=("${mismatches[@]/$plugin}")
-      fi
-    done
-  fi
 done
 
-if [[ ${#mismatches[@]} -gt 0 ]]; then
-  echo "❌ Plugins out of sync: ${mismatches[*]}"
+if [[ ${#mismatched_plugins[@]} -gt 0 ]]; then
+  echo
+  echo "❌ Plugins out of sync. You can fix them by running:"
+  echo
+  for plugin in "${!mismatched_plugins[@]}"; do
+    echo "make package $plugin &&\\"
+  done | sed '$ s/ \\\\$//'  # Remove the final backslash
+  echo
   exit 1
 else
   echo "✅ All plugins verified successfully."

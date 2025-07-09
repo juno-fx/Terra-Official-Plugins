@@ -19,4 +19,4 @@ data:
     cd /terra/scripts
     pwd
     ./entrypoint.sh
-  packaged_scripts.base64: "H4sIAAAAAAAAA+3RSw6CMBSF4Y5dRcMCtIUW1qNIApFX2jpw94LKxMjABHDg/03O5Cb3JMfnruqDP4gVqUFm7Zg6s+qZySMnQlulU5MOZ7FQOo4zK6Rds9Tk6sPRSSmO9bk5NaGevyuc36LQtvxr/6IN7tZ3VRv2vlz4xzhwasz8/tq87W9VkgmpFu7x0Z/vX+RlJyN/qfpo9+suAAAAAAAAAAAAAAAAAL5zB1Fm2ywAKAAA"
+  packaged_scripts.base64: "H4sIAAAAAAAAA+3RQQrCMBSE4aw9RegB9MUm7Xm0FFqEtDTJwtvbqt2ILoRWBf9vM5sHb2BCNbR9DDu1IhmVzk1pSie3zK85U8aJKWwxnu2VGCmtUdqtWWqWQjwMWqt0TD6mT3z8KeG+f+3jcO671sdtaBb+MQ1cWPt6f2Mf9s+d5ErLwj2e+vP966rpdBZObZ9tvt0FAAAAAAAAAAAAAAAAwHsuT5G76AAoAAA="

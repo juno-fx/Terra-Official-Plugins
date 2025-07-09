@@ -24,17 +24,8 @@ test: cluster dependencies
 	@kubectl -n argocd port-forward service/argocd-server 8080:80 > /dev/null 2>&1
 
 package:
-	@cd ./plugins/$(ARGS) \
-		&& tar -czf scripts.tar scripts \
-		&& base64 -w 0 scripts.tar > scripts.base64 \
-		&& rm -rf scripts.tar \
-		&& cp ../../template/packaged-scripts-template.yaml ./templates/packaged-scripts.yaml \
-		&& cp ../../template/packaged-scripts-template-cleanup.yaml ./templates/packaged-scripts-cleanup.yaml \
-		&& sed -i '1s/^/  packaged_scripts.base64: "/' scripts.base64 \
-		&& sed -i '1s/$$/"/' scripts.base64 \
-		&& cat scripts.base64 >> ./templates/packaged-scripts.yaml \
-		&& cat scripts.base64 >> ./templates/packaged-scripts-cleanup.yaml \
-		&& rm -rf scripts.base64
+	docker run --rm -v $(shell pwd):/workspace -w /workspace \
+		ubuntu /bin/bash -c "apt update > /dev/null && apt install make -y > /dev/null && make _package ARGS=$(ARGS)"
 
 new-plugin:
 	@echo " >> Building New Plugin: $(ARGS) << "
@@ -51,11 +42,22 @@ new-plugin:
 	@echo " >> Ready to go << "
 
 verify:
-	bash hack/verify.sh
+	docker run --rm -it -v $(shell pwd):/workspace -w /workspace \
+		ubuntu /bin/bash -c "apt update > /dev/null && apt install make -y > /dev/null && bash hack/verify.sh"
 
-
-verify-fix:
-	bash hack/verify.sh change
+# wrappers
+_package:
+	@cd ./plugins/$(ARGS) \
+		&& tar -czf scripts.tar scripts \
+		&& base64 -w 0 scripts.tar > scripts.base64 \
+		&& rm -rf scripts.tar \
+		&& cp ../../template/packaged-scripts-template.yaml ./templates/packaged-scripts.yaml \
+		&& cp ../../template/packaged-scripts-template-cleanup.yaml ./templates/packaged-scripts-cleanup.yaml \
+		&& sed -i '1s/^/  packaged_scripts.base64: "/' scripts.base64 \
+		&& sed -i '1s/$$/"/' scripts.base64 \
+		&& cat scripts.base64 >> ./templates/packaged-scripts.yaml \
+		&& cat scripts.base64 >> ./templates/packaged-scripts-cleanup.yaml \
+		&& rm -rf scripts.base64
 
 # documentation
 docs:

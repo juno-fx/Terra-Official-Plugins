@@ -6,20 +6,15 @@ on:
 jobs:
   verify:
     runs-on:
-      - X64  # Your custom self-hosted runner label
+      - X64
     container:
-      image: ubuntu:22.04
+      image: ubuntu
     steps:
       - name: Install dependencies
         run: |
           apt-get update
-          apt-get install -y curl make git tar gzip
-          curl -L https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 \
-            -o /usr/local/bin/yq
-          chmod +x /usr/local/bin/yq
+          apt-get install -y make
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Verify packages
-        run: |
-          cat plugins/*/templates/packaged-scripts.yaml
-          make verify
+        run: make verify
