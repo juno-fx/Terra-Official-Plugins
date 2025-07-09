@@ -11,4 +11,5 @@ jobs:
         uses: actions/checkout@v4
       - name: Verify
         run: |
+          ls -la
           make verify
