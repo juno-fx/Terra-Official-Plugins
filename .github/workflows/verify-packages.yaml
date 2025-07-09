@@ -1,0 +1,14 @@
+name: Verify Packages
+on:
+  push:
+
+jobs:
+  deploy:
+    runs-on:
+      - X64
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Verify
+        run: |
+          make verify
