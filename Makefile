@@ -47,17 +47,18 @@ verify:
 
 # wrappers
 _package:
-	@cd ./plugins/$(ARGS) && \
-		tar --owner=0 --group=0 -czf scripts.tar scripts && \
-		base64 -w 0 scripts.tar > scripts.base64 && \
-		rm -rf scripts.tar && \
-		cp ../../template/packaged-scripts-template.yaml ./templates/packaged-scripts.yaml && \
-		cp ../../template/packaged-scripts-template-cleanup.yaml ./templates/packaged-scripts-cleanup.yaml && \
-		sed -i '1s/^/  packaged_scripts.base64: "/' scripts.base64 && \
-		sed -i '1s/$$/"/' scripts.base64 && \
-		cat scripts.base64 >> ./templates/packaged-scripts.yaml && \
-		cat scripts.base64 >> ./templates/packaged-scripts-cleanup.yaml && \
-		rm -rf scripts.base64
+	@cd ./plugins/$(ARGS) \
+		&& tar --owner=0 --group=0 --mtime='1970-01-01' --sort=name -czf scripts.tar scripts \
+		&& base64 -w 0 scripts.tar > scripts.base64 \
+		&& rm -rf scripts.tar \
+		&& cp ../../template/packaged-scripts-template.yaml ./templates/packaged-scripts.yaml \
+		&& cp ../../template/packaged-scripts-template-cleanup.yaml ./templates/packaged-scripts-cleanup.yaml \
+		&& sed -i '1s/^/  packaged_scripts.base64: "/' scripts.base64 \
+		&& sed -i '1s/$$/"/' scripts.base64 \
+		&& cat scripts.base64 >> ./templates/packaged-scripts.yaml \
+		&& cat scripts.base64 >> ./templates/packaged-scripts-cleanup.yaml \
+		&& rm -rf scripts.base64
+
 
 # documentation
 docs:
