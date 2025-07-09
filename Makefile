@@ -1,4 +1,4 @@
-.PHONY: plugins docs verify verify-fix
+.PHONY: plugins docs verify
 
 SHELL := /bin/bash
 MAKEFLAGS += --no-print-directory
