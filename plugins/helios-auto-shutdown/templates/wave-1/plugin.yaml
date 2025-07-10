@@ -32,9 +32,7 @@ data:
     echo "JUNO_WORKSTATION: $JUNO_WORKSTATION"
     echo "USER: $USER"
     echo
-    pwd
-    ls -la
-    cp -v ./custom.sh /etc/helios/idle.d/custom.sh
+    cp -v /etc/helios/init.d/helios-auto-shutdown*/custom.sh /etc/helios/idle.d/custom.sh
     chmod +x /etc/helios/idle.d/custom.sh
 
     echo "Helios Auto Shutdown Plugin installed successfully."
