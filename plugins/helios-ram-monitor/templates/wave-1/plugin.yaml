@@ -9,7 +9,7 @@ data:
     #!/bin/bash
 
     # Default threshold and interval
-    THRESHOLD=${HELIOS_RAM_WARN:-2}
+    THRESHOLD=${HELIOS_RAM_WARN:-80}
     INTERVAL=${HELIOS_RAM_WARN_INTERVAL:-5}
 
     # Function to check RAM usage and send notification
