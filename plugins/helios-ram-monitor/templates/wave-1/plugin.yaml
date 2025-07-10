@@ -19,7 +19,7 @@ data:
         usage_percent=$(( used * 100 / total ))
 
         if [ "$usage_percent" -ge "$THRESHOLD" ]; then
-            notify-send -i /usr/share/themes/helios-icon-sm.png "High RAM Usage" "RAM usage is at ${usage_percent}% (Threshold: ${THRESHOLD}%)"
+            notify-send -u critical -i /usr/share/themes/helios-icon-sm.png "High RAM Usage" "RAM usage is at ${usage_percent}% (Threshold: ${THRESHOLD}%)"
         fi
     }
 
