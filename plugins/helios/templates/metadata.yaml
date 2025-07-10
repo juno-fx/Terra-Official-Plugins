@@ -8,4 +8,6 @@ data:
   chart: "{{ .Release.Name }}-scripts-configmap"
   description: "Helios deployment with desktop streaming"
   fields: |
-    []
+    - name: domain
+      description: Custom domain for the container. i.e. ".example.com". Make sure to include the starting "."
+      required: false
