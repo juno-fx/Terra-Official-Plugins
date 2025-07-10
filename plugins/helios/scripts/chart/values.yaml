@@ -22,4 +22,5 @@ env:
     value: "true"
 selector:
 plugins: []
+domain: ""
 _kuiper:

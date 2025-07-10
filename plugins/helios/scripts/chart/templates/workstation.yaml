@@ -34,7 +34,7 @@ spec:
 
     spec:
       automountServiceAccountToken: false
-      hostname: "{{ .Values.name }}"
+      hostname: "{{ .Values.name }}{{ .Values.domain }}"
 
       # workstation nodes will require juno-innovations.com/workstation: "true"
       affinity:
