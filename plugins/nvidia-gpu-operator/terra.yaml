@@ -9,11 +9,20 @@ tags:
   - operator
   - cluster-level
 fields:
+  - name: version
+    description: The version of the NVIDIA GPU Operator to install. This will default to what ever the terra repository has set. i.e. "v25.3.1"
+    required: false
   - name: install_toolkit
     description: true or false. Not needed if the toolkit is preinstalled on the nodes.
     required: false
   - name: install_driver
     description: true or false. Not needed if the driver is preinstalled on the nodes.
+    required: false
+  - name: dcgm_exporter
+    description: true or false. Enables the DCGM exporter for monitoring GPU metrics. This is not required for the GPU Operator to function, but is useful for monitoring.
+    required: false
+  - name: mig_manager
+    description: true or false. Enables the MIG manager for managing Multi-Instance GPU (MIG) configurations. This is not required for the GPU Operator to function, but is useful for managing MIG configurations.
     required: false
   - name: slicing_config
     description: Name of the ConfigMap to use for time-slicing configuration. The default is "time-slicing-config".
