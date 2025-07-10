@@ -10,7 +10,7 @@ data:
 
     set -e
 
-    curl -X "http://kuiper:8000/kuiper/$USER/shutdown/$JUNO_WORKSTATION" >> /tmp/locker.log
+    curl -X "DELETE" "http://kuiper:8000/kuiper/$USER/shutdown/$JUNO_WORKSTATION" >> /tmp/locker.log
 
   entrypoint.sh: |
     #!/bin/bash
