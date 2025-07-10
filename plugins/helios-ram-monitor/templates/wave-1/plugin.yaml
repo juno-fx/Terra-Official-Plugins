@@ -33,8 +33,25 @@ data:
     #!/bin/bash
     set -e
 
-    sed -i '/sleep[[:space:]]\+infinity/d' /etc/helios/services.d/custom.sh
-    echo "/bin/bash /etc/helios/init.d/helios-ram-monitor-1/helios-ram-monitor.sh" >> /etc/helios/services.d/custom.sh
+    # Paths
+    AUTOSTART_DIR="/etc/xdg/autostart"
+    DESKTOP_FILE="$AUTOSTART_DIR/helios-ram-monitor.desktop"
+    SCRIPT_PATH="/etc/helios/init.d/helios-ram-monitor-1/helios-ram-monitor.sh"
 
-    chmod +x /etc/helios/services.d/custom.sh
-    echo "Installed Helios RAM Monitor"
+    # Create autostart .desktop file
+    cat > "$DESKTOP_FILE" <<EOF
+    [Desktop Entry]
+    Encoding=UTF-8
+    Version=1.0
+    Type=Application
+    Name=Helios RAM Monitor
+    Comment=Monitor system RAM usage and send notifications when above threshold
+    Exec=/bin/bash $SCRIPT_PATH
+    OnlyShowIn=XFCE;
+    StartupNotify=true
+    Terminal=false
+    Hidden=false
+    EOF
+
+    chmod +x "$SCRIPT_PATH"
+    echo "Installed Helios RAM Monitor desktop autostart entry at $DESKTOP_FILE"
