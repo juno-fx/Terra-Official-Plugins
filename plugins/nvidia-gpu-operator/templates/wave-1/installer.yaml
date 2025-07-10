@@ -11,9 +11,22 @@ spec:
   sources:
     - repoURL: https://helm.ngc.nvidia.com/nvidia
       chart: gpu-operator
-      targetRevision: v24.9.0
+      targetRevision: {{ .Values.version }}
       helm:
         values: |-
+          migManager:
+            enabled: "{{ .Values.mig_manager }}"
+          dcgmExporter:
+            enabled: "{{ .Values.dcgm_exporter }}"
+          toolkit:
+            enabled: "{{ .Values.install_toolkit }}"
+          driver:
+            enabled: "{{ .Values.install_driver }}"
+            kernelModuleType: "open"
+          devicePlugin:
+            config:
+              name: "{{ .Values.slicing_config }}"
+              default: "any"
           daemonsets:
             tolerations:
               - key: nvidia.com/gpu
@@ -25,12 +38,6 @@ spec:
                 operator: Exists
                 effect: NoSchedule
               - key: juno-innovations.com/headless
-                operator: Exists
-                effect: NoSchedule
-              - key: junovfx/render
-                operator: Exists
-                effect: NoSchedule
-              - key: junovfx/workstation
                 operator: Exists
                 effect: NoSchedule
           node-feature-discovery:
@@ -55,28 +62,7 @@ spec:
                 - key: juno-innovations.com/headless
                   operator: Exists
                   effect: NoSchedule
-                - key: junovfx/render
-                  operator: Exists
-                  effect: NoSchedule
-                - key: junovfx/workstation
-                  operator: Exists
-                  effect: NoSchedule
         releaseName: gpu-operator
-        parameters:
-          - name: "toolkit.version"
-            value: "v1.17.0-ubi8"
-          - name: "toolkit.enabled"
-            value: "{{ .Values.install_toolkit }}"
-          - name: "driver.enabled"
-            value: "{{ .Values.install_driver }}"
-          - name: "devicePlugin.config.name"
-            value: "{{ .Values.slicing_config }}"
-          - name: "devicePlugin.config.default"
-            value: "any"
-          - name: "driver.useOpenKernelModules"
-            value: "true"
-          - name: "nfd.enabled"
-            value: "true"
   syncPolicy:
     automated:
       prune: true
