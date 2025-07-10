@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: helios-auto-shutdown
+  labels:
+    kuiper.juno-innovations.com/plugin: "true"
+data:
+  custom.sh: |
+    #!/bin/bash
+
+    set -e
+
+    curl -X "http://kuiper:8000/kuiper/$USER/shutdown/$JUNO_WORKSTATION" >> /tmp/locker.log
+
+  entrypoint.sh: |
+    #!/bin/bash
+
+    set -e
+
+    if [ -z "$IDLE_TIME" ]; then
+      echo
+      echo "IDLE_TIME is not set. Please set it in the workstation template."
+      echo "Plugin will not be installed."
+      echo "Exiting..."
+      echo
+      exit 0
+    fi
+
+    echo
+    echo "Installing Helios Auto Shutdown Plugin"
+    echo "IDLE_TIME: $IDLE_TIME"
+    echo "JUNO_WORKSTATION: $JUNO_WORKSTATION"
+    echo "USER: $USER"
+    echo
+
+    cp -v ./custom.sh /etc/helios/idle.d/custom.sh
+    chmod +x /etc/helios/idle.d/custom.sh
+
+    echo "Helios Auto Shutdown Plugin installed successfully."

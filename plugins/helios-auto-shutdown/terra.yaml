@@ -1,0 +1,10 @@
+resource_id: theme-enforcer-xfce
+name: helios-auto-shutdown
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios/scripts/assets/helios-icon.png
+description: Triggers auto-shutdown of Helios workstations via Kuiper when running in a Juno deployment. To set the shutdown time, use the IDLE_TIME environment variable in the workstation template.
+category: plugin
+tags:
+    - shutdown
+    - desktop
+    - customization
+fields: []
