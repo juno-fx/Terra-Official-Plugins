@@ -6,7 +6,7 @@ on:
       - plugins/**
 
 jobs:
-  verify:
+  linting:
     runs-on:
       - X64
     steps:
