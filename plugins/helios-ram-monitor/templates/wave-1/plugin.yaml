@@ -34,7 +34,7 @@ data:
     set -e
 
     sed -i '/sleep[[:space:]]\+infinity/d' /etc/helios/services.d/custom.sh
-    echo "/bin/bash /etc/helios/init.d/helios-ram-monitor-0/helios-ram-monitor.sh" >> /etc/helios/services.d/custom.sh
+    echo "/bin/bash /etc/helios/init.d/helios-ram-monitor-1/helios-ram-monitor.sh" >> /etc/helios/services.d/custom.sh
 
     chmod +x /etc/helios/services.d/custom.sh
     echo "Installed Helios RAM Monitor"
