@@ -9,7 +9,6 @@ data:
     #!/bin/bash
 
     set -e
-
     curl -X "DELETE" "http://kuiper:8000/kuiper/$USER/shutdown/$JUNO_WORKSTATION" >> /tmp/locker.log
 
   entrypoint.sh: |
