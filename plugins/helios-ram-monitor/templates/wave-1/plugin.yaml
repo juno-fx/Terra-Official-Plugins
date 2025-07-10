@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: helios-ram-monitor
+  labels:
+    kuiper.juno-innovations.com/plugin: "true"
+data:
+  helios-ram-monitor.sh: |
+    #!/bin/bash
+
+    # Default threshold and interval
+    THRESHOLD=${HELIOS_RAM_WARN:-80}
+    INTERVAL=${HELIOS_RAM_WARN_INTERVAL:-5}
+
+    # Function to check RAM usage and send notification
+    check_ram_usage() {
+        read -r _ total _ <<< "$(free -m | grep Mem)"
+        read -r _ used _ <<< "$(free -m | grep Mem)"
+        usage_percent=$(( used * 100 / total ))
+
+        if [ "$usage_percent" -ge "$THRESHOLD" ]; then
+            notify-send "⚠️ High RAM Usage" "RAM usage is at ${usage_percent}% (Threshold: ${THRESHOLD}%)"
+        fi
+    }
+
+    # Infinite loop with configurable sleep interval
+    while true; do
+        check_ram_usage
+        sleep "$INTERVAL"
+    done
+
+  entrypoint.sh: |
+    #!/bin/bash
+    set -e
+
+    echo "/bin/bash /etc/helios/init.d/helios-ram-monitor-0/helios-ram-monitor.sh" >> /etc/helios/services.d/custom.sh
+
+    chmod +x /etc/helios/services.d/custom.sh
+    echo "Installed Helios RAM Monitor"
