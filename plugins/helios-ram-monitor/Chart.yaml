@@ -1,3 +1,4 @@
 apiVersion: v1
 name: helios-ram-monitor
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios/scripts/assets/helios-icon.png
 version: 0.0.1
