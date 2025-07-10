@@ -1,0 +1,18 @@
+name: Verify Linting
+
+on:
+  push:
+    paths:
+      - plugins/**
+
+jobs:
+  verify:
+    runs-on:
+      - X64
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          clean: 'true'
+      - name: Verify linting
+        run: make lint

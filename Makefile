@@ -45,6 +45,9 @@ verify:
 	docker run --rm -v $(shell pwd):/workspace -w /workspace \
 		alpine /bin/ash -c "apk add bash make tar && bash hack/verify.sh"
 
+lint:
+	bash hack/lint.sh
+
 # wrappers
 _package:
 	@cd ./plugins/$(ARGS) \

@@ -1,3 +1,4 @@
 apiVersion: v1
 name: tailscale
 version: 0.0.1
+icon: https://tailscale.gallerycdn.vsassets.io/extensions/tailscale/vscode-tailscale/1.0.0/1698786256133/Microsoft.VisualStudio.Services.Icons.Default

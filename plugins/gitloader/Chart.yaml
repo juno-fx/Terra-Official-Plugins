@@ -1,3 +1,4 @@
 apiVersion: v1
 name: gitloader
 version: 0.0.1
+icon: https://git-scm.com/images/logos/downloads/Git-Icon-1788C.png

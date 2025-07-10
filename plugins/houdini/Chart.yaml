@@ -1,3 +1,4 @@
 apiVersion: v1
 name: houdini
 version: 0.0.1
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/houdini/scripts/assets/houdini.png

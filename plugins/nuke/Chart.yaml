@@ -1,3 +1,4 @@
 apiVersion: v1
 name: nuke
 version: 0.0.1
+icon: https://www.foundry.com/sites/default/files/2021-03/ICON_NUKE-rgb-yellow-01.png
