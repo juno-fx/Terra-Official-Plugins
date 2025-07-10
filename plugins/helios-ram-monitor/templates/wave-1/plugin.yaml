@@ -33,25 +33,33 @@ data:
     #!/bin/bash
     set -e
 
-    # Paths
+    # Define paths
+    SRC_SCRIPT="/etc/helios/init.d/helios-ram-monitor-1/helios-ram-monitor.sh"
+    DEST_SCRIPT="/opt/helios/helios-ram-monitor.sh"
     AUTOSTART_DIR="/etc/xdg/autostart"
     DESKTOP_FILE="$AUTOSTART_DIR/helios-ram-monitor.desktop"
-    SCRIPT_PATH="/etc/helios/init.d/helios-ram-monitor-1/helios-ram-monitor.sh"
 
-    # Create autostart .desktop file
+    # Ensure destination directory exists
+    mkdir -p /opt/helios
+
+    # Copy the RAM monitor script to a writable location
+    cp "$SRC_SCRIPT" "$DEST_SCRIPT"
+    chmod +x "$DEST_SCRIPT"
+
+    # Create .desktop file for XFCE autostart
     cat > "$DESKTOP_FILE" <<EOF
     [Desktop Entry]
     Encoding=UTF-8
     Version=1.0
     Type=Application
     Name=Helios RAM Monitor
-    Comment=Monitor system RAM usage and send notifications when above threshold
-    Exec=/bin/bash $SCRIPT_PATH
+    Comment=Monitor RAM usage and send alerts
+    Exec=/bin/bash $DEST_SCRIPT
     OnlyShowIn=XFCE;
     StartupNotify=true
     Terminal=false
     Hidden=false
     EOF
 
-    chmod +x "$SCRIPT_PATH"
-    echo "Installed Helios RAM Monitor desktop autostart entry at $DESKTOP_FILE"
+    echo "Installed Helios RAM Monitor: script copied to $DEST_SCRIPT and autostart entry created at $DESKTOP_FILE"
+
