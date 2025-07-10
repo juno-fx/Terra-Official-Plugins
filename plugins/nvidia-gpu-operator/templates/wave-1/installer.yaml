@@ -22,7 +22,7 @@ spec:
             enabled: "{{ .Values.install_toolkit }}"
           driver:
             enabled: "{{ .Values.install_driver }}"
-            kernelModuleType: "open"
+            kernelModuleType: "proprietary"
           devicePlugin:
             config:
               name: "{{ .Values.slicing_config }}"
