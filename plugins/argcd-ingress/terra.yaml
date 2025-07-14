@@ -8,6 +8,7 @@ tags:
   - ingress
   - infrastructure
   - ingress-nginx
+  - cluster-level
 fields:
   - name: host
     description: Connection URL. i.e. `argocd.example.com`. Keep in mind you must set up a DNS record for this host to point to your cluster's ingress controller.
