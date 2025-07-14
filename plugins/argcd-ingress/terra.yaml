@@ -1,0 +1,14 @@
+resource_id:
+name: argcd-ingress
+icon:
+description: Sets up the ingress for your ArgoCD instance.
+category: infrastructure
+tags:
+  - argocd
+  - ingress
+  - infrastructure
+  - ingress-nginx
+fields:
+  - name: host
+    description: Connection URL. i.e. `argocd.example.com`. Keep in mind you must set up a DNS record for this host to point to your cluster's ingress controller.
+    required: true
