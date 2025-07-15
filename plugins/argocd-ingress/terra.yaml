@@ -1,4 +1,4 @@
-resource_id: argcd-ingress
+resource_id: argocd-ingress
 name: ArgoCD Ingress
 icon: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/argocd-ingress/assets/logo.png?raw=true"
 description: Sets up the ingress for your ArgoCD instance.
