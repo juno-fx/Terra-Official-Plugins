@@ -24,7 +24,7 @@ spec:
           livenessProbe:
             httpGet:
               scheme: HTTP
-              path: /
+              path: "/{{ .Release.Namespace }}/node-red/"
               port: 1880
             initialDelaySeconds: 30
             timeoutSeconds: 30
