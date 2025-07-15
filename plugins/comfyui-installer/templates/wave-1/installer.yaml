@@ -12,20 +12,12 @@ spec:
       restartPolicy: Never
       containers:
         - name: installer
-          image: ubuntu:latest
+          image: python:3.12
           env:
             - name: INSTALL
               value: "true"
             - name: DESTINATION
               value: "{{ .Values.install_volume.container_path }}{{ .Values.destination }}"
-            - name: VERSION
-              value: "{{ .Values.version }}"
-            - name: BUILD
-              value: "{{ .Values.version }}"
-            - name: CLIENT_ID
-              value: "{{ .Values.client_id }}"
-            - name: CLIENT_SECRET
-              value: "{{ .Values.client_secret }}"
           command: [ "/terra/bootstrap.sh" ]
           volumeMounts:
             - name: installer
