@@ -25,7 +25,7 @@ if [ -n "$INSTALL" ]; then
   if [ -d "comfyui" ]; then
     echo "ComfyUI directory already exists. Updating..."
     cd comfyui
-    git pull origin main
+    git pull origin master
   else
     echo "Cloning ComfyUI repository..."
     git clone https://github.com/comfyanonymous/ComfyUI.git --depth 1 comfyui
