@@ -34,7 +34,14 @@ if [ -n "$INSTALL" ]; then
 
   # prepare the python environment
   pip install uv
-  uv venv
+
+  # create the virtual environment if it doesn't exist
+  if [ ! -d ".venv" ]; then
+    echo "Creating virtual environment..."
+    uv venv .venv
+  else
+    echo "Virtual environment already exists."
+  fi
   source .venv/bin/activate
   uv pip install --no-cache -r requirements.txt
   ls -la
