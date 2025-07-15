@@ -17,7 +17,7 @@ spec:
             - name: INSTALL
               value: "true"
             - name: DESTINATION
-              value: "{{ .Values.install_volume.container_path }}{{ .Values.destination }}"
+              value: "{{ .Values.install_volume.container_path }}/{{ .Values.destination }}"
           command: [ "/terra/bootstrap.sh" ]
           volumeMounts:
             - name: installer
