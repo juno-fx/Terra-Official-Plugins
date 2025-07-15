@@ -10,10 +10,10 @@ tags:
   - image-generation
   - diffusion
   - cluster-level
-fields: []
-#  - name: destination
-#    description: Destination directory
-#    required: true
+fields:
+  - name: destination
+    description: Destination directory
+    required: true
 #  - name: install_volume
 #    description: The name of the install volume
 #    required: true
