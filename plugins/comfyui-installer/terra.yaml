@@ -1,0 +1,19 @@
+resource_id: comfyui-installer
+name: ComfyUI Installer
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/comfyui/assets/logo.png
+description: Install ComfyUI to shared storage.
+category: AI
+tags:
+  - comfyui
+  - machine-learning
+  - ai
+  - image-generation
+  - diffusion
+fields:
+  - name: destination
+    description: Destination directory
+    required: true
+  - name: install_volume
+    description: The name of the install volume
+    required: true
+    type: shared-volume
