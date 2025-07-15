@@ -1,0 +1,20 @@
+resource_id: comfyui
+name: comfyui
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/comfyui/assets/logo.png
+description: Install ComfyUI, a user-friendly interface for Stable Diffusion and other AI models, to a target directory.
+category: AI
+tags:
+  - comfyui
+  - machine-learning
+  - ai
+  - image-generation
+  - diffusion
+  - cluster-level
+fields:
+  - name: destination
+    description: Destination directory
+    required: true
+  - name: install_volume
+    description: The name of the install volume
+    required: true
+    type: shared-volume
