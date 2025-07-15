@@ -34,10 +34,10 @@ if [ -n "$INSTALL" ]; then
   pip install uv
 
   # create the virtual environment if it doesn't exist
-  rm -rf .venv
+  uv python install -f -r -i py_install
   if [ ! -d ".venv" ]; then
     echo "Creating virtual environment..."
-    uv venv .venv
+    uv venv .venv -p "$DESTINATION/comfyui/py_install/*/bin/python"
   else
     echo "Virtual environment already exists."
   fi
