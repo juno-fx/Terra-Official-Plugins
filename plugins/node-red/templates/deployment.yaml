@@ -30,9 +30,11 @@ spec:
               mountPath: /data/settings.js
               subPath: settings.js
             - name: mount
-              mountPath: "{{ .Values.install_volume.container_path }}{{ .Values.destination }}"
+              mountPath: /data
               {{- if .Values.install_volume.sub_path }}
-              subPath: {{ .Values.install_volume.sub_path }}
+              subPath: {{ .Values.install_volume.sub_path }}{{ .Values.destination }}
+              {{- else }}
+              subPath: {{ .Values.destination }}
               {{- end }}
       volumes:
         - name: mount
