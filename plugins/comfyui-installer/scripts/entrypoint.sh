@@ -36,6 +36,7 @@ if [ -n "$INSTALL" ]; then
   pip install uv
 
   # create the virtual environment if it doesn't exist
+  ls -la
   if [ ! -d ".venv" ]; then
     echo "Creating virtual environment..."
     uv venv .venv
