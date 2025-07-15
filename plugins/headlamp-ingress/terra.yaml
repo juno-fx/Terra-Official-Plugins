@@ -1,0 +1,16 @@
+resource_id: headlamp-ingress
+name: Headlamp Ingress
+icon: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/headlamp/assets/logo.png?raw=true"
+description: Sets up the ingress for your Headlamp.
+category: infrastructure
+tags:
+  - dashboard
+  - kubernetes
+  - web-interface
+  - management
+  - monitoring
+  - admin
+fields:
+  - name: host
+    description: Connection URL. i.e. `headlamp.example.com`. Keep in mind you must set up a DNS record for this host to point to your cluster's ingress controller.
+    required: true
