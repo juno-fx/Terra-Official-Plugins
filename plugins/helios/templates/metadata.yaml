@@ -11,3 +11,4 @@ data:
     - name: domain
       description: Custom domain for the container. i.e. ".example.com". Make sure to include the starting "."
       required: false
+      type: string
