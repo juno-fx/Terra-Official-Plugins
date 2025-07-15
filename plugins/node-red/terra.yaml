@@ -1,0 +1,17 @@
+resource_id: node-red
+name: Node Red
+icon: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/node-red/assets/logo.png?raw=true"
+description: Installs Node Red flow runner on your cluster.
+category: workflow
+tags:
+  - node-red
+  - workflow
+  - infrastructure
+  - automation
+fields:
+  - name: host
+    description: Connection URL. i.e. `node-red.example.com`. Keep in mind you must set up a DNS record for this host to point to your cluster's ingress controller.
+    required: true
+  - name: version
+    description: Tag of the Node Red image to use. Defaults to `latest`.
+    required: false

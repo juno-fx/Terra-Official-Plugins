@@ -1,0 +1,28 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: node-red
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: node-red
+  template:
+    metadata:
+      labels:
+        k8s-app: node-red
+    spec:
+      containers:
+        - name: node-red
+          image: "nodered/node-red:{{ .Values.version }}"
+          ports:
+            - containerPort: 1880
+          livenessProbe:
+            httpGet:
+              scheme: HTTP
+              path: /
+              port: 1880
+            initialDelaySeconds: 30
+            timeoutSeconds: 30
+      nodeSelector:
+        'kubernetes.io/os': linux
