@@ -36,7 +36,7 @@ if [ -n "$INSTALL" ]; then
   pip install uv
 
   # create the virtual environment if it doesn't exist
-  rm -rfv .venv
+  rm -rf .venv
   if [ ! -d ".venv" ]; then
     echo "Creating virtual environment..."
     uv venv .venv
@@ -55,7 +55,7 @@ if [ -n "$INSTALL" ]; then
   echo ".venv/bin/python main.py --listen 0.0.0.0" >> run_comfyui.sh
 
   # allow the outputs, models, custom_nodes, and input directories to have write permissions
-  chmod -R 777 "$DESTINATION/comfyui/outputs"
+  chmod -R 777 "$DESTINATION/comfyui/output"
   chmod -R 777 "$DESTINATION/comfyui/models"
   chmod -R 777 "$DESTINATION/comfyui/custom_nodes"
   chmod -R 777 "$DESTINATION/comfyui/input"
