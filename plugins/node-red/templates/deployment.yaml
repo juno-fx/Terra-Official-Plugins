@@ -1,8 +1,9 @@
-kind: Deployment
+kind: StatefulSet
 apiVersion: apps/v1
 metadata:
   name: node-red
 spec:
+  serviceName: node-red-ss
   replicas: 1
   selector:
     matchLabels:
@@ -24,5 +25,13 @@ spec:
               port: 1880
             initialDelaySeconds: 30
             timeoutSeconds: 30
+          volumeMounts:
+            - name: settings
+              mountPath: /data/settings.js
+              subPath: settings.js
+      volumes:
+        - name: settings
+          configMap:
+            name: node-red-settings
       nodeSelector:
         'kubernetes.io/os': linux
