@@ -18,8 +18,6 @@ if [ -n "$INSTALL" ]; then
   # cd to the destination directory
   mkdir -p "$DESTINATION"
   cd "$DESTINATION"
-  pwd
-  ls -la
 
   # clone the repository if it doesn't exist. If it does exist, cd into it and update it
   if [ -d "comfyui" ]; then
@@ -45,7 +43,6 @@ if [ -n "$INSTALL" ]; then
   fi
   source .venv/bin/activate
   uv pip install --no-cache -r requirements.txt
-  ls -la
 
   # step up a directory and create a bash script that will cd to the absolute path of the
   # destination directory plus the comfyui directory and run .venv/bin/python main.py --listen 0.0.0.0
