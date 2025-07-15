@@ -36,7 +36,8 @@ if [ -n "$INSTALL" ]; then
   pip install uv
   uv venv
   source .venv/bin/activate
-  uv pip install -r requirements.txt
+  uv pip install --no-cache -r requirements.txt
+  ls -la
 
   # step up a directory and create a bash script that will cd to the absolute path of the
   # destination directory plus the comfyui directory and run .venv/bin/python main.py --listen 0.0.0.0
