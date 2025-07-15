@@ -16,6 +16,7 @@ if [ -n "$INSTALL" ]; then
   apt install -y git
 
   # cd to the destination directory
+  mkdir -p "$DESTINATION"
   cd "$DESTINATION"
 
   # clone the repository if it doesn't exist. If it does exist, cd into it and update it
