@@ -29,7 +29,15 @@ spec:
             - name: settings
               mountPath: /data/settings.js
               subPath: settings.js
+            - name: mount
+              mountPath: "{{ .Values.install_volume.container_path }}{{ .Values.destination }}"
+              {{- if .Values.install_volume.sub_path }}
+              subPath: {{ .Values.install_volume.sub_path }}
+              {{- end }}
       volumes:
+        - name: mount
+          persistentVolumeClaim:
+            claimName: {{ .Values.install_volume.name }}
         - name: settings
           configMap:
             name: node-red-settings

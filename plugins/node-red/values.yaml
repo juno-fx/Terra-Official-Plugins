@@ -1,8 +1,8 @@
 # configuration
 host:
 version: "latest"
-#destination: /node-red
-#install_volume:
-#  name: apps-pv-claim
-#  sub_path:
-#  container_path: /apps
+destination: /node-red
+install_volume:
+  name: apps-pv-claim
+  sub_path:
+  container_path: /apps

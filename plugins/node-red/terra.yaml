@@ -15,3 +15,10 @@ fields:
   - name: version
     description: Tag of the Node Red image to use. Defaults to `latest`.
     required: false
+  - name: destination
+    description: Destination directory
+    required: true
+  - name: install_volume
+    description: The name of the install volume
+    required: true
+    type: shared-volume
