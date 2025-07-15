@@ -8,7 +8,4 @@ tags:
   - vdi
   - juno
   - cluster-level
-fields:
-  - name: domain
-    description: Custom domain override. For example, `.example.com`. Make sure to include the leading dot.
-    required: false
+fields: []
