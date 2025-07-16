@@ -89,8 +89,8 @@ spec:
             {{- end }}
           startupProbe:
             httpGet:
-              path: "/"
-              port: 8188
+              path: "/polaris/{{ .Values.name }}/probe"
+              port: 3000
             initialDelaySeconds: 2 # helios boots very fast
             failureThreshold: 60  # start up totals 2 * 60 = 2 mins
             periodSeconds: 2
@@ -120,6 +120,8 @@ spec:
               value: "{{ .Values.puid }}"
             - name: GID
               value: "{{ .Values.guid }}"
+            - name: PREFIX
+              value: "/polaris/{{ .Values.name }}/"
             - name: COMFYUI  # let the plugin know we are COMFYUI
               value: "true"
             - name: IDLE_TIME
