@@ -36,6 +36,7 @@ if [ -n "$INSTALL" ]; then
   # install python to the system
   uv python install -f -r -i py_install 3.12
   cd py_install
+  rm -rf *
   mv cpython* cpython
   cd ../
 
