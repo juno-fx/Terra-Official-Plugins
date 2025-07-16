@@ -74,6 +74,7 @@ if [ -n "$INSTALL" ]; then
 
   # check if the ComfyUI-Distributed directory exists, if it does, skip cloning
   rm -rfv ComfyUI-Distributed
+  ls -la
   echo "Cloning ComfyUI-Distributed repository..."
   git clone https://github.com/robertvoy/ComfyUI-Distributed.git
   sed -i 's/window\.location\.origin/window.location.href/g' ComfyUI-Distributed/web/gpupanel.js
