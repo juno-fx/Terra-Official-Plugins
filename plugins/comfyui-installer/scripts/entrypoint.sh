@@ -36,10 +36,10 @@ if [ -n "$INSTALL" ]; then
   # install python to the system
   uv python install -f -r -i py_install 3.12
   cd py_install
-  rm -rfv *
+  rm -rf *
   # Find the directory that starts with "cpython-" and rename it to "python"
   for d in cpython-*; do
-    [ -d "$d" ] && mv "$d" python && break
+    [ -d "$d" ] && mv -v "$d" python && break
   done
   cd ../
 
