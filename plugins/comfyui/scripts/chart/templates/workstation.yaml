@@ -89,15 +89,15 @@ spec:
             {{- end }}
           startupProbe:
             httpGet:
-              path: "/polaris/{{ .Values.name }}/probe"
-              port: 3000
+              path: "/"
+              port: 8188
             initialDelaySeconds: 2 # helios boots very fast
             failureThreshold: 60  # start up totals 2 * 60 = 2 mins
             periodSeconds: 2
           livenessProbe:
             httpGet:
-              path: "/health"
-              port: 3000
+              path: "/"
+              port: 8188
             failureThreshold: 24
             periodSeconds: 5
           ports:

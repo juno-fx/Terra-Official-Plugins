@@ -55,6 +55,10 @@ if [ -n "$INSTALL" ]; then
   echo ".venv/bin/python main.py --listen 0.0.0.0" >> run_comfyui.sh
 
   # allow the outputs, models, custom_nodes, and input directories to have write permissions
+  mkdir -p "$DESTINATION/comfyui/user"
+  mkdir -p "$DESTINATION/comfyui/temp"
+  chmod -R 777 "$DESTINATION/comfyui/user"
+  chmod -R 777 "$DESTINATION/comfyui/temp"
   chmod -R 777 "$DESTINATION/comfyui/output"
   chmod -R 777 "$DESTINATION/comfyui/models"
   chmod -R 777 "$DESTINATION/comfyui/custom_nodes"
