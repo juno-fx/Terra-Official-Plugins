@@ -79,6 +79,7 @@ if [ -n "$INSTALL" ]; then
     echo "Cloning ComfyUI-Distributed repository..."
     git clone https://github.com/robertvoy/ComfyUI-Distributed.git
   fi
+  sed -i 's/window\.location\.origin/window.location.href/g' ComfyUI-Distributed/web/gpupanel.js
   cd ../
 
   # allow the outputs, models, custom_nodes, and input directories to have write permissions
