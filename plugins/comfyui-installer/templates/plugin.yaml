@@ -9,6 +9,12 @@ data:
     #!/bin/bash
     set -e
 
+    # check if the COMFYUI environment variable is set. If not notify we are skipping.
+    if [ -z "$COMFYUI" ]; then
+      echo "COMFYUI environment variable is not set. Skipping ComfyUI installation."
+      exit 0
+    fi
+
     # Define paths
     AUTOSTART_DIR="/etc/xdg/autostart"
     DESKTOP_FILE="$AUTOSTART_DIR/comfyui.desktop"
