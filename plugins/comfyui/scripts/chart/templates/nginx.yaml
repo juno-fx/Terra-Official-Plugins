@@ -5,6 +5,13 @@ metadata:
   labels:
     kuiper.juno-innovations.com/plugin: "true"
 data:
+  entrypoint.sh: |
+    #!/bin/bash
+    set -e
+
+    cp -v /tmp/nginx.conf /opt/helios/nginx.conf
+
+    echo "Nginx override configuration copied to /opt/helios/nginx.conf"
   nginx.conf: |
     events {}
     http {

@@ -130,7 +130,10 @@ spec:
             {{- end }}
           volumeMounts:
             - name: nginx
-              mountPath: /opt/helios/nginx.conf
+              mountPath: "/etc/helios/init.d/nginx/entrypoint.sh"
+              subPath: entrypoint.sh
+            - name: nginx
+              mountPath: /tmp/nginx.conf
               subPath: nginx.conf
             {{- if .Values.volumeMounts }}
             {{- toYaml .Values.volumeMounts | nindent 12 }}
