@@ -50,7 +50,7 @@ if [ -n "$INSTALL" ]; then
   # install comfyui manger
   cd custom_nodes
   git clone https://github.com/ltdrdata/ComfyUI-Manager comfyui-manager
-  uv pip install --no-cache -r custom_nodes/comfyui-manager/requirements.txt
+  uv pip install --no-cache -r comfyui-manager/requirements.txt
   cd ..
 
   # allow the outputs, models, custom_nodes, and input directories to have write permissions
