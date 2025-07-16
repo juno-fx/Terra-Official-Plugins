@@ -21,7 +21,7 @@ data:
     Type=Application
     Name=ComfyUI
     Comment=Start ComfyUI
-    Exec=/bin/bash {{ .Values.install_volume.container_path }}/{{ .Values.destination }}/run_comfyui.sh
+    Exec=/bin/bash {{ .Values.install_volume.container_path }}/{{ .Values.destination }}/run_comfyui.sh > /var/log/nginx/comfyui.log
     OnlyShowIn=XFCE;
     StartupNotify=true
     Terminal=true
