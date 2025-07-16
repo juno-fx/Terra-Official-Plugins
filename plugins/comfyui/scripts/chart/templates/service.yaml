@@ -17,8 +17,8 @@ spec:
     - port: 8189
       targetPort: 8189
       protocol: TCP
-      name: comfyui-worker-a
+      name: worker-a
     - port: 8189
       targetPort: 8190
       protocol: TCP
-      name: comfyui-worker-b
+      name: worker-b

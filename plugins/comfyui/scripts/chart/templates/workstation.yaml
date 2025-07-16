@@ -106,9 +106,9 @@ spec:
             - containerPort: 8188
               name: comfyui
             - containerPort: 8189
-              name: comfyui-worker-a
+              name: worker-a
             - containerPort: 8190
-              name: comfyui-worker-b
+              name: worker-b
           env:
             - name: JUNO_WORKSTATION
               value: "{{ .Values.name }}"
