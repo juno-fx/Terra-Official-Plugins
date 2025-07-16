@@ -146,7 +146,7 @@ spec:
         - name: nginx
           configMap:
             name: "{{ .Values.name }}"
-            defaultMode: 7777
+            defaultMode: 0777
         {{- if .Values.volumeMounts }}
         {{- toYaml .Values.volumes | nindent 8 }}
         {{- end }}
