@@ -34,7 +34,13 @@ if [ -n "$INSTALL" ]; then
   pip install uv
 
   # install python to the system
-  uv python install -f -r -i py_install 3.12.11
+  # if $DESTINATION/comfyui/py_install/cpython-3.12.11-linux-x86_64-gnu does not exist, then install it
+  if [ ! -d "$DESTINATION/comfyui/py_install/cpython-3.12.11-linux-x86_64-gnu" ]; then
+    echo "Installing Python 3.12.11..."
+    uv python install -f -r -i py_install 3.12.11
+  else
+    echo "Python 3.12.11 already installed."
+  fi
 
   # create the virtual environment if it doesn't exist
   if [ ! -d ".venv" ]; then
