@@ -49,9 +49,17 @@ if [ -n "$INSTALL" ]; then
 
   # install comfyui manger
   cd custom_nodes
-  git clone https://github.com/ltdrdata/ComfyUI-Manager comfyui-manager
-  uv pip install --no-cache -r comfyui-manager/requirements.txt
-  cd ..
+  # check if the ComfyUI-Manager directory exists, if it does, skip cloning
+  if [ -d "comfyui-manager" ]; then
+    echo "ComfyUI-Manager directory already exists..."
+  else
+    echo "Cloning ComfyUI-Manager repository..."
+    git clone https://github.com/ltdrdata/ComfyUI-Manager comfyui-manager
+  fi
+  cd comfyui-manager
+  git pull origin main
+  uv pip install --no-cache -r requirements.txt
+  cd ../../
 
   # allow the outputs, models, custom_nodes, and input directories to have write permissions
   mkdir -p "$DESTINATION/comfyui/user"
