@@ -35,9 +35,11 @@ if [ -n "$INSTALL" ]; then
 
   # create the virtual environment if it doesn't exist
   uv python install -f -r -i py_install 3.12
+  cd py_install
+  mv cpython* cpython
   if [ ! -d ".venv" ]; then
     echo "Creating virtual environment..."
-    uv venv .venv -p "$DESTINATION/comfyui/py_install/*/bin/python"
+    uv venv .venv -p "$DESTINATION/comfyui/py_install/cpython/bin/python"
   else
     echo "Virtual environment already exists."
   fi
