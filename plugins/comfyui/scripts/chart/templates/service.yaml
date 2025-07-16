@@ -6,10 +6,6 @@ spec:
   selector:
     juno-innovations.com/workstation: "{{ .Values.name }}"
   ports:
-    - port: 8188
-      targetPort: 8188
-      protocol: TCP
-      name: gui
     - port: 3000
       targetPort: 3000
       protocol: TCP

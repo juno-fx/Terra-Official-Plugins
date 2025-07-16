@@ -89,20 +89,18 @@ spec:
             {{- end }}
           startupProbe:
             httpGet:
-              path: "/"
-              port: 8188
+              path: "/polaris/{{ .Values.name }}/probe"
+              port: 3000
             initialDelaySeconds: 2 # helios boots very fast
             failureThreshold: 60  # start up totals 2 * 60 = 2 mins
             periodSeconds: 2
           livenessProbe:
             httpGet:
-              path: "/"
-              port: 8188
+              path: "/health"
+              port: 3000
             failureThreshold: 24
             periodSeconds: 5
           ports:
-            - containerPort: 8188
-              name: gui
             - containerPort: 3000
               name: viewer
           env:
@@ -131,6 +129,9 @@ spec:
               value: {{ .value | quote }}
             {{- end }}
           volumeMounts:
+            - name: nginx
+              mountPath: /opt/helios/nginx.conf
+              subPath: nginx.conf
             {{- if .Values.volumeMounts }}
             {{- toYaml .Values.volumeMounts | nindent 12 }}
             {{- end }}
@@ -142,6 +143,10 @@ spec:
             {{- end }}
             {{- end }}
       volumes:
+        - name: nginx
+          configMap:
+            name: "{{ .Values.name }}"
+            defaultMode: 7777
         {{- if .Values.volumeMounts }}
         {{- toYaml .Values.volumes | nindent 8 }}
         {{- end }}
