@@ -10,3 +10,15 @@ spec:
       targetPort: 3000
       protocol: TCP
       name: viewer
+    - port: 8188
+      targetPort: 8188
+      protocol: TCP
+      name: confyui
+    - port: 8189
+      targetPort: 8189
+      protocol: TCP
+      name: comfyui-worker-a
+    - port: 8189
+      targetPort: 8190
+      protocol: TCP
+      name: comfyui-worker-b

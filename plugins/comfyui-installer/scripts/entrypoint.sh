@@ -49,6 +49,7 @@ if [ -n "$INSTALL" ]; then
 
   # install comfyui manger
   cd custom_nodes
+
   # check if the ComfyUI-Manager directory exists, if it does, skip cloning
   if [ -d "comfyui-manager" ]; then
     echo "ComfyUI-Manager directory already exists..."
@@ -59,7 +60,18 @@ if [ -n "$INSTALL" ]; then
   cd comfyui-manager
   git pull origin main
   uv pip install --no-cache -r requirements.txt
-  cd ../../
+  cd ../
+
+  # install comfyui distributed
+
+  # check if the ComfyUI-Distributed directory exists, if it does, skip cloning
+  if [ -d "ComfyUI-Distributed" ]; then
+    echo "ComfyUI-Distributed directory already exists..."
+  else
+    echo "Cloning ComfyUI-Distributed repository..."
+    git clone https://github.com/robertvoy/ComfyUI-Distributed.git
+  fi
+  cd ../
 
   # allow the outputs, models, custom_nodes, and input directories to have write permissions
   mkdir -p "$DESTINATION/comfyui/user"
@@ -76,7 +88,7 @@ if [ -n "$INSTALL" ]; then
   cd ..
   echo "#!/bin/bash" > run_comfyui.sh
   echo "cd \"$DESTINATION/comfyui\"" >> run_comfyui.sh
-  echo ".venv/bin/python main.py --listen 0.0.0.0" >> run_comfyui.sh
+  echo ".venv/bin/python main.py --listen 0.0.0.0 --enable-cors-header" >> run_comfyui.sh
 
   # make the script executable
   chmod +x run_comfyui.sh
