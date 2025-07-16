@@ -73,12 +73,9 @@ if [ -n "$INSTALL" ]; then
   # install comfyui distributed
 
   # check if the ComfyUI-Distributed directory exists, if it does, skip cloning
-  if [ -d "ComfyUI-Distributed" ]; then
-    echo "ComfyUI-Distributed directory already exists..."
-  else
-    echo "Cloning ComfyUI-Distributed repository..."
-    git clone https://github.com/robertvoy/ComfyUI-Distributed.git
-  fi
+  rm -rfv ComfyUI-Distributed
+  echo "Cloning ComfyUI-Distributed repository..."
+  git clone https://github.com/robertvoy/ComfyUI-Distributed.git
   sed -i 's/window\.location\.origin/window.location.href/g' ComfyUI-Distributed/web/gpupanel.js
   sed -i 's|const url = `http://${host}:${worker.port}/prompt`;|const url = `${window.location.origin}/polaris/${host}/prompt`;|g' ComfyUI-Distributed/web/gpupanel.js
   cd ../
@@ -96,6 +93,7 @@ if [ -n "$INSTALL" ]; then
   # step up a directory and create a bash script that will cd to the absolute path of the
   # destination directory plus the comfyui directory and run .venv/bin/python main.py --listen 0.0.0.0
   cd ..
+  rm -rfv run_comfyui.sh
   echo "#!/bin/bash" > run_comfyui.sh
   echo "cd \"$DESTINATION/comfyui\"" >> run_comfyui.sh
   echo ".venv/bin/python main.py --listen 0.0.0.0 --enable-cors-header" >> run_comfyui.sh
