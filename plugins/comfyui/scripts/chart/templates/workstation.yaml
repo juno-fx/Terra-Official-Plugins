@@ -79,7 +79,6 @@ spec:
               memory: "{{ .Values.memory }}"
               cpu: "{{ .Values.cpu }}"
             # gotmpl's or is a function taking 2 args - this is "X or Y or Z" translated to python
-            {{- if or .Values.memoryLimit .Values.cpuLimit }}
             limits:
               nvidia.com/gpu: "1"
             {{- if .Values.cpuLimit }}
@@ -87,7 +86,6 @@ spec:
             {{- end }}
             {{- if .Values.memoryLimit }}
               memory: "{{ .Values.memoryLimit }}"
-            {{- end }}
             {{- end }}
           startupProbe:
             httpGet:
