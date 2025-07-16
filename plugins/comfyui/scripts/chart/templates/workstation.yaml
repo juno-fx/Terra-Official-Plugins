@@ -120,6 +120,10 @@ spec:
               value: "{{ .Values.puid }}"
             - name: GID
               value: "{{ .Values.guid }}"
+            - name: COMFYUI  # let the plugin know we are COMFYUI
+              value: "true"
+            - name: IDLE_TIME
+              value: "99999999" # never let this machine auto shutdown
             {{- range .Values.env }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}

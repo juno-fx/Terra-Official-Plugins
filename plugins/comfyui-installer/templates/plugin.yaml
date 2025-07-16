@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: comfyui-plugin
+  labels:
+    kuiper.juno-innovations.com/plugin: "true"
+data:
+  entrypoint.sh: |
+    #!/bin/bash
+    set -e
+
+    # Define paths
+    AUTOSTART_DIR="/etc/xdg/autostart"
+    DESKTOP_FILE="$AUTOSTART_DIR/comfyui.desktop"
+
+    # Create .desktop file for XFCE autostart
+    cat > "$DESKTOP_FILE" <<EOF
+    [Desktop Entry]
+    Encoding=UTF-8
+    Version=1.0
+    Type=Application
+    Name=ComfyUI
+    Comment=Start ComfyUI
+    Exec=/bin/bash {{ .Values.install_volume.container_path }}/{{ .Values.destination }}/run_comfyui.sh
+    OnlyShowIn=XFCE;
+    StartupNotify=true
+    Terminal=true
+    Hidden=false
+    EOF
+
+    echo "Installed ComfyUI: script copied and autostart entry created at $DESKTOP_FILE"
+
