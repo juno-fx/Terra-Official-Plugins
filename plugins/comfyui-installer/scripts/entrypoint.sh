@@ -47,13 +47,6 @@ if [ -n "$INSTALL" ]; then
   source .venv/bin/activate
   uv pip install --no-cache -r requirements.txt
 
-  # step up a directory and create a bash script that will cd to the absolute path of the
-  # destination directory plus the comfyui directory and run .venv/bin/python main.py --listen 0.0.0.0
-  cd ..
-  echo "#!/bin/bash" > run_comfyui.sh
-  echo "cd \"$DESTINATION/comfyui\"" >> run_comfyui.sh
-  echo ".venv/bin/python main.py --listen 0.0.0.0" >> run_comfyui.sh
-
   # install comfyui manger
   cd custom_nodes
   git clone https://github.com/ltdrdata/ComfyUI-Manager comfyui-manager
@@ -69,6 +62,13 @@ if [ -n "$INSTALL" ]; then
   chmod -R 777 "$DESTINATION/comfyui/models"
   chmod -R 777 "$DESTINATION/comfyui/custom_nodes"
   chmod -R 777 "$DESTINATION/comfyui/input"
+
+  # step up a directory and create a bash script that will cd to the absolute path of the
+  # destination directory plus the comfyui directory and run .venv/bin/python main.py --listen 0.0.0.0
+  cd ..
+  echo "#!/bin/bash" > run_comfyui.sh
+  echo "cd \"$DESTINATION/comfyui\"" >> run_comfyui.sh
+  echo ".venv/bin/python main.py --listen 0.0.0.0" >> run_comfyui.sh
 
   # make the script executable
   chmod +x run_comfyui.sh
