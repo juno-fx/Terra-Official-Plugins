@@ -80,7 +80,7 @@ if [ -n "$INSTALL" ]; then
     git clone https://github.com/robertvoy/ComfyUI-Distributed.git
   fi
   sed -i 's/window\.location\.origin/window.location.href/g' ComfyUI-Distributed/web/gpupanel.js
-  sed -i 's|const url = `http://${host}:${worker.port}/prompt`;|const url = `${window.location.origin}/viewer/${host}/prompt`;|g' ComfyUI-Distributed/web/gpupanel.js
+  sed -i 's|const url = `http://${host}:${worker.port}/prompt`;|const url = `${window.location.origin}/polaris/${host}/prompt`;|g' ComfyUI-Distributed/web/gpupanel.js
   cd ../
 
   # allow the outputs, models, custom_nodes, and input directories to have write permissions
