@@ -54,6 +54,12 @@ if [ -n "$INSTALL" ]; then
   echo "cd \"$DESTINATION/comfyui\"" >> run_comfyui.sh
   echo ".venv/bin/python main.py --listen 0.0.0.0" >> run_comfyui.sh
 
+  # install comfyui manger
+  cd custom_nodes
+  git clone https://github.com/ltdrdata/ComfyUI-Manager comfyui-manager
+  uv pip install --no-cache -r custom_nodes/comfyui-manager/requirements.txt
+  cd ..
+
   # allow the outputs, models, custom_nodes, and input directories to have write permissions
   mkdir -p "$DESTINATION/comfyui/user"
   mkdir -p "$DESTINATION/comfyui/temp"
