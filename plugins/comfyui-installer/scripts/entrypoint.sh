@@ -36,14 +36,17 @@ if [ -n "$INSTALL" ]; then
   # install python to the system
   uv python install -f -r -i py_install 3.12
   cd py_install
-  rm -rf *
-  mv cpython* cpython
+  rm -rfv *
+  # Find the directory that starts with "cpython-" and rename it to "python"
+  for d in cpython-*; do
+    [ -d "$d" ] && mv "$d" python && break
+  done
   cd ../
 
   # create the virtual environment if it doesn't exist
   if [ ! -d ".venv" ]; then
     echo "Creating virtual environment..."
-    uv venv .venv -p "$DESTINATION/comfyui/py_install/cpython/bin/python"
+    uv venv .venv -p "$DESTINATION/comfyui/py_install/python/bin/python"
   else
     echo "Virtual environment already exists."
   fi
