@@ -21,14 +21,13 @@ rm -rfv "$DESTINATION/$VERSION.tgz" "$DESTINATION/$VERSION-linux-x86_64.run"
 
 # app icon setup
 cp -v ./assets/nuke.png $DESTINATION/
-ln -svf "$LAUNCH" "$DESTINATION/$VERSION/launch"
 rm -rfv "$DESTINATION/nuke.desktop"
 
 echo "[Desktop Entry]
 Version=$VERSION
 Name=Nuke $VERSION
 Comment=Nuke compositing software
-Exec=junogl $DESTINATION/$VERSION/launch
+Exec=$LAUNCH
 Icon=$ICON
 Terminal=false
 Type=Application
