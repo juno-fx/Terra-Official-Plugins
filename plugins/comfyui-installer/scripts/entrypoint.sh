@@ -50,6 +50,8 @@ if [ -n "$INSTALL" ]; then
   # install comfyui manger
   cd custom_nodes
 
+  git config pull.rebase false
+
   # check if the ComfyUI-Manager directory exists, if it does, skip cloning
   if [ -d "comfyui-manager" ]; then
     echo "ComfyUI-Manager directory already exists..."
