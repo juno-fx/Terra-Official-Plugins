@@ -173,7 +173,7 @@ data:
       * The following property can be used to specify a different root path.
       * If set to false, this is disabled.
       */
-    //httpAdminRoot: '/admin',
+    httpAdminRoot: '/admin',
 
       /** The following property can be used to add a custom middleware function
       * in front of all admin http routes. For example, to set custom http
@@ -228,7 +228,7 @@ data:
       //    //req.skipRawBodyParser = true;
       //    next();
       //},
-    httpAdminRoot: "/{{ .Release.Namespace }}/node-red/",
+    httpAdminRoot: "/polaris/{{ .Values.name }}/",
       /** When httpAdminRoot is used to move the UI to a different root path, the
       * following property can be used to identify a directory of static content
       * that should be served at http://localhost:1880/.

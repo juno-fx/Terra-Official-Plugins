@@ -1,6 +1,11 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}-terra-metadata
+  name: "{{ .Release.Name }}-terra-metadata"
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
 data:
-  chart: "{{ .Chart.Name }}"
+  chart: "{{ .Release.Name }}-scripts-configmap"
+  description: "Node RED Workflow Builder"
+  fields: |
+    []
