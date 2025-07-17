@@ -94,7 +94,7 @@ spec:
           livenessProbe:
             httpGet:
               path: "/polaris/{{ .Values.name }}/"
-              port: 3000
+              port: 1880
             failureThreshold: 24
             periodSeconds: 5
           ports:
