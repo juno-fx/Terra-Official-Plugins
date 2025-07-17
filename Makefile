@@ -24,7 +24,7 @@ test: cluster dependencies
 	@kubectl -n argocd port-forward service/argocd-server 8080:80 > /dev/null 2>&1
 
 package:
-	docker run --rm -v $(shell pwd):/workspace -w /workspace \
+	@docker run --rm -v $(shell pwd):/workspace -w /workspace \
 		alpine /bin/ash -c "apk add bash make tar && make _package ARGS=$(ARGS)"
 
 new-plugin:
@@ -42,11 +42,11 @@ new-plugin:
 	@echo " >> Ready to go << "
 
 verify:
-	docker run --rm -v $(shell pwd):/workspace -w /workspace \
+	@docker run --rm -v $(shell pwd):/workspace -w /workspace \
 		alpine /bin/ash -c "apk add bash make tar && bash hack/verify.sh"
 
 lint:
-	bash hack/lint.sh
+	@bash hack/lint.sh
 
 # wrappers
 _package:
@@ -65,7 +65,7 @@ _package:
 
 # documentation
 docs:
-	.venv/bin/mkdocs serve
+	@.venv/bin/mkdocs serve
 
 # env
 cluster:
