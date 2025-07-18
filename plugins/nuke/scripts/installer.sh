@@ -29,9 +29,19 @@ Name=Nuke $VERSION
 Comment=Nuke compositing software
 Exec=$LAUNCH
 Icon=$ICON
-Terminal=false
+Terminal=true
 Type=Application
 Categories=X-Polaris" >> $DESTINATION/nuke.desktop
+
+echo "[Desktop Entry]
+Version=$VERSION
+Name=Nuke $VERSION GPU
+Comment=Nuke compositing software GPU enabled
+Exec=vglrun -d /dev/dri/card0 $LAUNCH
+Icon=$ICON
+Terminal=true
+Type=Application
+Categories=X-Polaris" >> $DESTINATION/nuke-gpu.desktop
 
 cat $DESTINATION/*.desktop
 
