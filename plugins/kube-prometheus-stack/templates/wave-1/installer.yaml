@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-kube-prometheus-stack
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-prometheus-stack
+  sources:
+    - repoURL: https://github.com/prometheus-community/helm-charts.git
+      path: ./charts/kube-prometheus-stack/
+      targetRevision: main
+      helm:
+        releaseName: kube-prometheus-stack
+        values: |
+          grafana:
+            ingress:
+              enabled: true
+              ingressClassName: nginx  # will need to change this
+              hosts:
+                - {{ .Values.host }}
+              path: {{ .Values.path }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+      - CreateNamespace=true

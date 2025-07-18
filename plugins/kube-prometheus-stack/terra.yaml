@@ -1,0 +1,18 @@
+resource_id: kube-prometheus-stack
+name: kube-prometheus-stack
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/kube-prometheus-stack/assets/logo.png
+description: Full Prometheus monitoring stack
+category: monitoring
+tags:
+  - monitoring
+  - prometheus
+  - grafana
+  - alertmanager
+  - cluster-level
+fields:
+  - name: host
+    description: Connection URL. i.e. `grafana.example.com`. Keep in mind you must set up a DNS record for this host to point to your cluster's ingress controller.
+    required: true
+  - name: path
+    description: Connection URL sub path. i.e. `grafana.example.com/my/path/grafana`.
+    required: false
