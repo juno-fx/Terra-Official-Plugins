@@ -1,7 +1,7 @@
-resource_id: comfyui-installer
-name: ComfyUI Installer
+resource_id: comfyui-desktop
+name: ComfyUI Desktop
 icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/comfyui/assets/logo.png
-description: Install ComfyUI to shared storage.
+description: Install ComfyUI to shared storage, launchable via a workstation.
 category: AI
 tags:
   - comfyui
