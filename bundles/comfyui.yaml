@@ -1,0 +1,30 @@
+resource_id: comfyui-bundle
+name: ComfyUI Bundle
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/comfyui/assets/logo.png
+description: ComfyUI Installer and workload schema template plugin in 1 simple bundle
+category: Bundle
+tags:
+  - comfyui
+  - machine-learning
+  - ai
+  - image-generation
+  - diffusion
+  - cluster-level
+fields:
+  - name: destination
+    description: Destination directory
+    required: true
+  - name: install_volume
+    description: The name of the install volume
+    required: true
+    type: shared-volume
+plugins:
+  - plugin: ComfyUI Installer
+    name: comfyui-installer
+    values:
+      install_volume:
+        reference: install_volume
+      destination:
+        hardcoded: '/comfyui'
+  - plugin: ComfyUI
+    name: comfyui
