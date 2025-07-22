@@ -9,7 +9,7 @@ tags:
   - ai
   - image-generation
   - diffusion
-  - cluster-level
+
 fields:
   - name: destination
     description: Destination directory
