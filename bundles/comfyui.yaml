@@ -1,7 +1,7 @@
 resource_id: comfyui-bundle
 name: ComfyUI Bundle
 icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/comfyui/assets/logo.png
-description: ComfyUI Installer and workload schema template plugin in 1 simple bundle
+description: ComfyUI Installer and workload schema template plugin in 1 simple bundle for first time comfyUI install
 category: Bundle
 tags:
   - comfyui
@@ -9,6 +9,7 @@ tags:
   - ai
   - image-generation
   - diffusion
+  - first-time-install
 
 fields:
   - name: destination
