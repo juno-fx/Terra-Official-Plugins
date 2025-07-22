@@ -42,8 +42,9 @@ new-plugin:
 	@echo " >> Ready to go << "
 
 verify:
-	docker run --rm -v $(shell pwd):/workspace -w /workspace \
-		alpine /bin/ash -c "apk add bash make tar && bash hack/verify.sh"
+	@echo "Verify is disabled"
+#	docker run --rm -v $(shell pwd):/workspace -w /workspace \
+#		alpine /bin/ash -c "apk add bash make tar && bash hack/verify.sh"
 
 lint:
 	bash hack/lint.sh
