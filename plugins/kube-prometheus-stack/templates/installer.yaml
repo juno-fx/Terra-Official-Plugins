@@ -22,6 +22,24 @@ spec:
           grafana:
             enabled: true
             forceDeployDashboards: true
+            grafana.ini:
+              security:
+                allow_embedding: true
+              auth.anonymous:
+                enabled: true
+                orgName: {{ .Release.Name }}-grafana
+                orgRole: Admin
+              server:
+                domain: {{ .Values.host }}
+                root_url: http://{{ .Values.host }}{{.Values.path}}
+                serve_from_sub_path: true
+            adminUser: admin
+            adminPassword: admin
+            ingress:
+              enabled: true
+              path: {{ .Values.path }}
+              hosts:
+                - {{ .Values.host }}
           alertmanager:
             enabled: false
   syncPolicy:
@@ -32,51 +50,3 @@ spec:
     syncOptions:
       - ServerSideApply=true
       - CreateNamespace=true
-{{/*---*/}}
-{{/*apiVersion: argoproj.io/v1alpha1*/}}
-{{/*kind: Application*/}}
-{{/*metadata:*/}}
-{{/*  name: {{ .Release.Name }}-grafana*/}}
-{{/*  namespace: argocd*/}}
-{{/*  finalizers:*/}}
-{{/*    - resources-finalizer.argocd.argoproj.io*/}}
-{{/*    - post-delete-finalizer.argocd.argoproj.io*/}}
-{{/*    - post-delete-finalizer.argocd.argoproj.io/cleanup*/}}
-{{/*spec:*/}}
-{{/*  project: default*/}}
-{{/*  destination:*/}}
-{{/*    server: https://kubernetes.default.svc*/}}
-{{/*    namespace: prometheus*/}}
-{{/*  sources:*/}}
-{{/*    - repoURL: https://github.com/grafana/helm-charts.git*/}}
-{{/*      path: ./charts/grafana/*/}}
-{{/*      targetRevision: main*/}}
-{{/*      helm:*/}}
-{{/*        releaseName: grafana*/}}
-{{/*        values: |*/}}
-{{/*          grafana.ini:*/}}
-{{/*            security:*/}}
-{{/*              allow_embedding: true*/}}
-{{/*            auth.anonymous:*/}}
-{{/*              enabled: true*/}}
-{{/*              orgName: {{ .Release.Name }}-grafana*/}}
-{{/*              orgRole: Admin*/}}
-{{/*            server:*/}}
-{{/*              domain: {{ .Values.host }}*/}}
-{{/*              root_url: http://{{ .Values.host }}{{.Values.path}}*/}}
-{{/*              serve_from_sub_path: true*/}}
-{{/*          adminUser: admin*/}}
-{{/*          adminPassword: admin*/}}
-{{/*          ingress:*/}}
-{{/*            enabled: true*/}}
-{{/*            path: {{ .Values.path }}*/}}
-{{/*            hosts:*/}}
-{{/*              - {{ .Values.host }}*/}}
-{{/*  syncPolicy:*/}}
-{{/*    automated:*/}}
-{{/*      prune: true*/}}
-{{/*      selfHeal: true*/}}
-{{/*      allowEmpty: true*/}}
-{{/*    syncOptions:*/}}
-{{/*      - ServerSideApply=true*/}}
-{{/*      - CreateNamespace=true*/}}
