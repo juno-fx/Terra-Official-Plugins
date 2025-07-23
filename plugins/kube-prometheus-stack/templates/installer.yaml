@@ -20,11 +20,12 @@ spec:
         releaseName: prometheus
         values: |
           additionalDataSources:
-           - name: {{ .Release.Name }}-loki
-             type: loki
-             url: http://loki:3100/loki/api/v1
-             jsonData:
-               maxLines: 1000
+           -  name: {{ .Release.Name }}-loki
+              type: loki
+              access: proxy
+              url: http://loki:3100
+              jsonData:
+                maxLines: 1000
           grafana:
             enabled: true
             forceDeployDashboards: true
