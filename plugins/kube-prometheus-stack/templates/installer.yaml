@@ -3,6 +3,8 @@ kind: Application
 metadata:
   name: {{ .Release.Name }}-kube-prometheus-stack
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
     - post-delete-finalizer.argocd.argoproj.io
@@ -23,8 +25,6 @@ spec:
             ingress:
               enabled: true
               ingressClassName: nginx  # will need to change this
-              annotations:
-                nginx.ingress.kubernetes.io/rewrite-target: /
               hosts:
                 - {{ .Values.host }}
               path: {{ .Values.path }}
