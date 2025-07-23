@@ -1,5 +1,5 @@
 resource_id: kube-prometheus-stack
-name: kube-prometheus-stack
+name: Kubernetes Prometheus Stack
 icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/kube-prometheus-stack/assets/logo.png
 description: Full Prometheus monitoring stack
 category: monitoring
