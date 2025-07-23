@@ -18,14 +18,9 @@ spec:
       targetRevision: main
       helm:
         releaseName: prometheus
-{{/*        values: |*/}}
-{{/*          grafana:*/}}
-{{/*            ingress:*/}}
-{{/*              enabled: true*/}}
-{{/*              ingressClassName: nginx  # will need to change this*/}}
-{{/*              hosts:*/}}
-{{/*                - {{ .Values.host }}*/}}
-{{/*              path: {{ .Values.path }}*/}}
+        values: |
+          alertmanager:
+            enabled: false
   syncPolicy:
     automated:
       prune: true
