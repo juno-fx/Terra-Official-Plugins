@@ -25,7 +25,7 @@ spec:
           livenessProbe:
             httpGet:
               scheme: HTTP
-              path: "{{ .Values.prefix }}"
+              path: "{{ .Values.prefix }}/"
               port: 4466
             initialDelaySeconds: 30
             timeoutSeconds: 30
