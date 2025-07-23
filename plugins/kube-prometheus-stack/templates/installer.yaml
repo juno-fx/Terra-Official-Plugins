@@ -14,11 +14,14 @@ spec:
     namespace: prometheus
   sources:
     - repoURL: https://github.com/prometheus-community/helm-charts.git
-      path: ./charts/prometheus/
+      path: ./charts/kube-prometheus-stack/
       targetRevision: main
       helm:
         releaseName: prometheus
         values: |
+          grafana:
+            enabled: false
+            forceDeployDashboards: true
           alertmanager:
             enabled: false
   syncPolicy:
