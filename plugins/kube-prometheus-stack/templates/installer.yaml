@@ -59,6 +59,7 @@ spec:
             server:
               domain: {{ .Values.host }}
               root_url: http://{{ .Values.host }}{{.Values.path}}
+              serve_from_sub_path: true
           adminUser: admin
           adminPassword: admin
           ingress:
