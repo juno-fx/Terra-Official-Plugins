@@ -52,6 +52,8 @@ spec:
         releaseName: grafana
         values: |
           grafana.ini:
+            security:
+              allow_embedding: true
             auth.anonymous:
               enabled: true
               orgName: {{ .Release.Name }}-grafana
