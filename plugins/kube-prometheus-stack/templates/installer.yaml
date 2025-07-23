@@ -1,10 +1,8 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: {{ .Release.Name }}-kube-prometheus-stack
+  name: {{ .Release.Name }}-prometheus
   namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "1"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
     - post-delete-finalizer.argocd.argoproj.io
@@ -13,21 +11,21 @@ spec:
   project: default
   destination:
     server: https://kubernetes.default.svc
-    namespace: kube-prometheus-stack
+    namespace: prometheus
   sources:
     - repoURL: https://github.com/prometheus-community/helm-charts.git
-      path: ./charts/kube-prometheus-stack/
+      path: ./charts/prometheus/
       targetRevision: main
       helm:
-        releaseName: kube-prometheus-stack
-        values: |
-          grafana:
-            ingress:
-              enabled: true
-              ingressClassName: nginx  # will need to change this
-              hosts:
-                - {{ .Values.host }}
-              path: {{ .Values.path }}
+        releaseName: prometheus
+{{/*        values: |*/}}
+{{/*          grafana:*/}}
+{{/*            ingress:*/}}
+{{/*              enabled: true*/}}
+{{/*              ingressClassName: nginx  # will need to change this*/}}
+{{/*              hosts:*/}}
+{{/*                - {{ .Values.host }}*/}}
+{{/*              path: {{ .Values.path }}*/}}
   syncPolicy:
     automated:
       prune: true
