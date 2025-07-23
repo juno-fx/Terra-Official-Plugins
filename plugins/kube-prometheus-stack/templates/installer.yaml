@@ -52,11 +52,10 @@ spec:
         releaseName: grafana
         values: |
           grafana.ini:
-            auth:
-              anonymous:
-                enabled: true
-                orgName: {{ .Release.Name }}-grafana
-                orgRole: Admin
+            auth.anonymous:
+              enabled: true
+              orgName: {{ .Release.Name }}-grafana
+              orgRole: Admin
             server:
               domain: {{ .Values.host }}
               root_url: http://{{ .Values.host }}{{.Values.path}}
