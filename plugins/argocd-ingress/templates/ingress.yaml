@@ -3,17 +3,13 @@ kind: Ingress
 metadata:
   name: "{{ .Release.Name }}-argocd-server-ingress"
   namespace: argocd
-  annotations:
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
 spec:
   ingressClassName: nginx
   rules:
     - host: "{{ .Values.host }}"
       http:
         paths:
-          - path: /
+          - path: "{{ .Values.prefix }}"
             pathType: Prefix
             backend:
               service:
