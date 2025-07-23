@@ -23,6 +23,8 @@ spec:
             ingress:
               enabled: true
               ingressClassName: nginx  # will need to change this
+              annotations:
+                nginx.ingress.kubernetes.io/rewrite-target: /
               hosts:
                 - {{ .Values.host }}
               path: {{ .Values.path }}
