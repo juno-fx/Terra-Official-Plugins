@@ -3,9 +3,8 @@ kind: StatefulSet
 metadata:
   name: "{{ .Values.name }}"
   annotations:
-    # comma separated list of users that can access this workstation as read only.
-    juno-innovations.com/shared: "none"
-    juno-innovations.com/workload: "true"
+    juno-innovations.com/shared: "none"    # comma separated list of users that can access this workload as read only.
+    juno-innovations.com/workload: "true"  # mark this as a workload for kuiper and front end UI reference
     juno-innovations.com/kuiper-state: "{{ .Values._kuiper }}"
   labels:
     juno-innovations.com/app: "polaris"
