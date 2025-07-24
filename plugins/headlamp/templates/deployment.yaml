@@ -13,6 +13,7 @@ spec:
       labels:
         k8s-app: headlamp
     spec:
+      serviceAccountName: headlamp-runner
       containers:
         - name: headlamp
           image: ghcr.io/headlamp-k8s/headlamp:latest
