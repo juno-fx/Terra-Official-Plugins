@@ -13,4 +13,4 @@ data:
   # disabling as we are using federated auth from the ingress
   server.disable.auth: "true"
   # allow for iframe embedding
-  server.x.frame.options: ""
+  server.x.frame.options: "allow-from *"
