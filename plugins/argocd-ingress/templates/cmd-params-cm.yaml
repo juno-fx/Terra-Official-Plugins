@@ -8,6 +8,9 @@ metadata:
     app.kubernetes.io/name: argocd-cmd-params-cm
     app.kubernetes.io/part-of: argocd
 data:
-  # Used if Argo CD is running behind reverse proxy under subpath different from /
+  # allows for per service ingress
   server.rootpath: "{{ .Values.prefix }}"
+  # disabling as we are using federated auth from the ingress
   server.disable.auth: "true"
+  # allow for iframe embedding
+  server.x.frame.options: ""
