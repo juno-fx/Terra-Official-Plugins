@@ -3,6 +3,9 @@ kind: Ingress
 metadata:
   name: headlamp-ingress
   namespace: kube-system
+  annotations:
+    nginx.ingress.kubernetes.io/auth-url: "http://genesis.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-service/{{ .Release.Name }}/"
+    nginx.ingress.kubernetes.io/auth-signin: /unauthorized/
 spec:
   ingressClassName: nginx
   rules:
