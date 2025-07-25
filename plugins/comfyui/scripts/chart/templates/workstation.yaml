@@ -4,6 +4,7 @@ metadata:
   name: "{{ .Values.name }}"
   annotations:
     juno-innovations.com/shared: "none"    # comma separated list of users that can access this workload as read only.
+    juno-innovations.com/workload: "true"  # mark this as a workload for kuiper and the frontend UI
     juno-innovations.com/kuiper-state: "{{ .Values._kuiper }}"
   labels:
     juno-innovations.com/app: "polaris"
