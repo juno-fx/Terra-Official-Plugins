@@ -65,6 +65,12 @@ spec:
         parameters:
           - name: "toolkit.version"
             value: "v1.17.0-ubi8"
+          - name: "dcgmExporter.enabled"
+            value: "{{ .Values.prometheus_exporter }}"
+          - name: "dcgmExporter.serviceMonitor.enabled"
+            value: "{{ .Values.prometheus_exporter }}"
+          - name: "nodeStatusExporter.enabled"
+            value: "{{ .Values.prometheus_exporter }}"
           - name: "toolkit.enabled"
             value: "{{ .Values.install_toolkit }}"
           - name: "driver.enabled"
