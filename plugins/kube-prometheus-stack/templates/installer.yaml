@@ -45,21 +45,6 @@ spec:
                 - {{ .Values.host }}
           alertmanager:
             enabled: false
-
-          # nvidia scrape setup
-          # based on
-          # https://docs.nvidia.com/datacenter/cloud-native/gpu-telemetry/latest/kube-prometheus.html
-          serviceMonitorSelectorNilUsesHelmValues: false
-          additionalScrapeConfigs:
-            - job_name: gpu-metrics
-              scrape_interval: 1s
-              metrics_path: /metrics
-              scheme: http
-              kubernetes_sd_configs:
-                - role: endpointslice
-                  namespaces:
-                    names:
-                      - gpu-operator
   syncPolicy:
     automated:
       prune: true
