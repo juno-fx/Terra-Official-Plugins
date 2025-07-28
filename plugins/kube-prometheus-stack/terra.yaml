@@ -10,6 +10,12 @@ tags:
   - alertmanager
   - cluster-level
 fields:
+  - name: username
+    description: Admin username
+    required: true
+  - name: password
+    description: Admin password
+    required: true
   - name: host
     description: Connection URL. i.e. `grafana.example.com`. Keep in mind you must set up a DNS record for this host to point to your cluster's ingress controller.
     required: true

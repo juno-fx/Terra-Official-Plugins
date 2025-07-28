@@ -33,10 +33,13 @@ spec:
                 domain: {{ .Values.host }}
                 root_url: http://{{ .Values.host }}{{.Values.path}}
                 serve_from_sub_path: true
-            adminUser: admin
-            adminPassword: admin
+            adminUser: {{ .Values.username }}
+            adminPassword: {{ .Values.password }}
             ingress:
               enabled: true
+              annotations:
+                nginx.ingress.kubernetes.io/auth-url: "http://genesis.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-service/{{ .Release.Name }}/"
+                nginx.ingress.kubernetes.io/auth-signin: /unauthorized/
               path: {{ .Values.path }}
               hosts:
                 - {{ .Values.host }}

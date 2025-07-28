@@ -1,3 +1,5 @@
 # configuration
 host:
 path: /
+username: admin
+password: admin
