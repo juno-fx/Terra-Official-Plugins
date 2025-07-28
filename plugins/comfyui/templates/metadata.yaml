@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-terra-metadata"
+  annotations:
+    juno-innovations.com/workload: "true"  # mark this as a workload for our frontend UI
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+data:
+  chart: "{{ .Release.Name }}-scripts-configmap"
+  description: "ComfyUI Deployment"
+  fields: |
+    []

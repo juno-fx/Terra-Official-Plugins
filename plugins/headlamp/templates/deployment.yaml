@@ -19,12 +19,13 @@ spec:
           args:
             - "-in-cluster"
             - "-plugins-dir=/headlamp/plugins"
+            - "-base-url={{ .Values.prefix }}"
           ports:
             - containerPort: 4466
           livenessProbe:
             httpGet:
               scheme: HTTP
-              path: /
+              path: "{{ .Values.prefix }}/"
               port: 4466
             initialDelaySeconds: 30
             timeoutSeconds: 30

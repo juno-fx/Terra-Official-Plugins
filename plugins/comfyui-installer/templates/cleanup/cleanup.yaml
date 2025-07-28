@@ -1,9 +1,9 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ .Release.Name }}-installer
+  name: {{ .Release.Name }}-cleanup
   annotations:
-    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/hook: PostDelete
     argocd.argoproj.io/hook-delete-policy: HookSucceeded
 spec:
   backoffLimit: 1
@@ -14,13 +14,11 @@ spec:
         - name: installer
           image: ubuntu:latest
           env:
-            - name: INSTALL
+            - name: CLEANUP
               value: "true"
             - name: DESTINATION
-              value: "{{ .Values.install_volume.container_path }}{{ .Values.destination }}"
-            - name: URL
-              value: "{{ .Values.url }}"
-          command: [ "/terra/bootstrap.sh" ]
+              value: "{{ .Values.install_volume.container_path }}/{{ .Values.destination }}"
+          command: ["/terra/bootstrap.sh"]
           volumeMounts:
             - name: installer
               mountPath: /terra/bootstrap.sh
@@ -39,6 +37,5 @@ spec:
             claimName: {{ .Values.install_volume.name }}
         - name: installer
           configMap:
-            name: {{ .Release.Name }}-scripts-configmap
+            name: {{ .Release.Name }}-scripts-configmap-cleanup
             defaultMode: 0500
-

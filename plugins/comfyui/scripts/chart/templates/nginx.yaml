@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Values.name }}"
+data:
+  entrypoint.sh: |
+    #!/bin/bash
+    set -e
+
+    cp -v /tmp/nginx.conf /opt/helios/nginx.conf
+
+    echo "Nginx override configuration copied to /opt/helios/nginx.conf"
+  nginx.conf: |
+    events {}
+    http {
+      server {
+        listen 3000 default_server;
+        listen [::]:3000 default_server;
+        location /polaris/{{ .Values.name }}/ {
+          proxy_http_version      1.1;
+          proxy_set_header        Host $host;
+          proxy_set_header        Upgrade $http_upgrade;
+          proxy_set_header        Connection "upgrade";
+          proxy_set_header        X-Real-IP $remote_addr;
+          proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header        X-Forwarded-Proto $scheme;
+          proxy_set_header        Cookie "";
+          proxy_read_timeout      3600s;
+          proxy_send_timeout      3600s;
+          add_header              'Access-Control-Allow-Origin' '*' always;
+          add_header              'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+          add_header              'Access-Control-Allow-Headers' 'Authorization,Content-Type,Accept,Origin,User-Agent,DNT,Cache-Control,X-Mx-ReqToken,Keep-Alive,X-Requested-With,If-Modified-Since';
+          add_header              'Access-Control-Allow-Credentials' 'true';
+          add_header              'Cross-Origin-Embedder-Policy' 'require-corp';
+          add_header              'Cross-Origin-Opener-Policy' 'same-origin';
+          add_header              'Cross-Origin-Resource-Policy' 'same-site';
+          proxy_pass               http://127.0.0.1:8188/;
+          proxy_buffering          off;
+        }
+        location = /polaris/{{ .Values.name }}/probe {
+          alias /tmp/.healthz;
+          add_header Last-Modified $date_gmt;
+          add_header Cache-Control 'no-store, no-cache';
+          if_modified_since off;
+          expires off;
+          etag off;
+        }
+        location = /health {
+          alias /tmp/.healthz;
+          add_header Last-Modified $date_gmt;
+          add_header Cache-Control 'no-store, no-cache';
+          if_modified_since off;
+          expires off;
+          etag off;
+        }
+      }
+    }
+

@@ -21,18 +21,27 @@ rm -rfv "$DESTINATION/$VERSION.tgz" "$DESTINATION/$VERSION-linux-x86_64.run"
 
 # app icon setup
 cp -v ./assets/nuke.png $DESTINATION/
-ln -svf "$LAUNCH" "$DESTINATION/$VERSION/launch"
 rm -rfv "$DESTINATION/nuke.desktop"
 
 echo "[Desktop Entry]
 Version=$VERSION
 Name=Nuke $VERSION
 Comment=Nuke compositing software
-Exec=junogl $DESTINATION/$VERSION/launch
+Exec=$LAUNCH
 Icon=$ICON
-Terminal=false
+Terminal=true
 Type=Application
 Categories=X-Polaris" >> $DESTINATION/nuke.desktop
+
+echo "[Desktop Entry]
+Version=$VERSION
+Name=Nuke $VERSION GPU
+Comment=Nuke compositing software GPU enabled
+Exec=vglrun -d /dev/dri/card0 $LAUNCH
+Icon=$ICON
+Terminal=true
+Type=Application
+Categories=X-Polaris" >> $DESTINATION/nuke-gpu.desktop
 
 cat $DESTINATION/*.desktop
 

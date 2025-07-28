@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-scripts-configmap-cleanup
+  annotations:
+    argocd.argoproj.io/hook: PostDelete
+data:
+  bootstrap.sh: |
+    #!/bin/bash
+    echo "Unpacking scripts..."
+    # decode base64 encoded scripts mount at /terra/scripts.base64
+    base64 -d /terra/scripts.base64 > /terra/scripts.tar.gz
+    
+    # extract scripts to /terra/scripts
+    tar -xzvf /terra/scripts.tar.gz -C /terra/
+    
+    # make scripts executable
+    chmod +x -v /terra/scripts/*.sh
+    
+    # start entrypoint.sh
+    cd /terra/scripts
+    pwd
+    ./entrypoint.sh
+  packaged_scripts.base64: "H4sIAAAAAAAAA+1XbW/bNhDOZ/+Ka1KgHxZJcZqXIcUGBE0/BOiyYm32ZRlSWqItLhLJkZQdr+t/3/FFsmzLiYO2GIbpAsS2xHvueM/xIalTxaTRyc43tAO00+Nj94m2+rn+fTg8PDjageNvmVRtlTZEAewoIcxD4x57/x81Hfin3Ki5FIybWOdfOYYl9eToaBP/p8eHL1f4f3l6crgDB185j077n/O/9ywZMZ6MiM4HA00NRHRA01zA7nusi2F8AovWAN8tcRzvDgZ7kOY0vQOTE4P/KFy8ef/h8ur8w+XPV+gzZUrwEn1hShQjo4IC04ARBmwMv0H0F+w+b3nswu+vLAofAPj428BxYSxkDG/umc0V80J3/A7DwZgtcsSQNsPLq/cfzt++fSg7lwNUMiOGOh8914aWIWmOSQeQdsJ7MKpYkdVjAYg0ASP8YBzbrCggmsOEmYHzSTMwwsXIqMbsiWGCQ8YUTY1QcxxT3uEviORKqfAN+q4885CF4D5tRaXQzOLYyWNBMkE1f2FsdTQW7LJ56J/sW0ikWNjHhGd1CTBZAD95DJmKcjyvWHvuNV2v7avry0X+QApFSTb3+DqGa4toSYodTW4SAdD9xMKArLBIQrEJ41ASrKayhBaatiPhJG1f1hEXU22QLZSvRW6M1GdJgk/yahRjvMTFJFzweSkqnQSY2PpEUUalyWG4lNhSnratbKklhiXKF1vOTY7UtdoKh0gmG9qrqXeqfweHQH/TNnu20m1akxA3kfPb4Juk3jl6GQ8P4+EwKhiv7qP7709uT46iCa88qXZlBGJdR9eRF3w+c4x+abSuVrj0vpajd36iwbvhp5rWJWgWxhgibHUGi9i113oHLKM2jRb8aOai1ESl+DKsZaTHVKRYWv8dq2O5QvEUh3d2vAW2k+yAbWbqh17rVjHGSpRnX0yzk20/pqmpzRRcvmui8RVCrJDwa0cxV5Z8oAFAi0ql1KfmUElq2NTLo+2F1lKJIi6ilKBu24ZQ9M8KBcWC69jcm+VlFOaESsEnTinsSsUNXZS3XKCo2tFOCgQfs4kTl1hR3OsojImdjW+Q9hYR1CD6iXCCmC0583PabzXMPug7zDz1etShk1HpUR7Qy45AK0X0nfSwBjYoT9XCwmQKVZkkq0ArM6iJXEhh6826cDP+ZGIddhwn3QxnWArFRpWh2QOkXSxGPY04VWJO42kXEL4tNEQFGWyqfTvqWv0frL4SI6rMVMyTDiy7Idmlg6goiy90MmM8E7ObuBCpOyrcxL7e4UXzPM4VHSeTF10JJjM6SiaykoTTIv5DtwP8jctE47lFFfADfLTpYrbPP+VCm89nzz/NhLqjKpZCmc+JRA2T5uOrZR8ctJKKzxDHiwLPWbqGW/hvnWa7O7AzxMwxLyojK0tuieu9wM/28t93BxnGcUTTDgz3Rtx2czKlMFMMNwZJVcm0xmz1xiNXo56VxtX8+DDczqU7puWYF0S/wOnp6SOIWwx9Aqqvy5aDfe22HNwu8JYujoFwQsWTjsSzJZC24CFLYZcmYG8i4Z7hrxYzZnWgOSuTkRZFZXkjeFATTgAccuchGmRRaee3UJJ2WFXx1q4UziRWv2I5R8UqsCXx8HQQu7+6C1uCgf63ARnvzY1EtG5Vu/DjplEIdtNZsZtd9NrotnW++IBye7eJUqF0lOOuYveidWRXv5LchRuPLz69p2llrHvD8nf3HZ7Lx/8g3J4GW2G8UyHd6CILatzRrONi9vrtm/Or63dbXBvtDSyMXr6B4V4ipn4CFxuuU7V8U+L0G9PaePkK6u1pXr9+tZDWJ/dvX+l766233nrrrbfeeuutt95666233nrrrbfenP0DMumk7gAoAAA="
