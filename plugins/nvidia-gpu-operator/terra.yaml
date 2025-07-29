@@ -9,9 +9,6 @@ tags:
   - operator
   - cluster-level
 fields:
-  - name: prometheus_exporter
-    description: true or false. If true, the NVIDIA GPU Operator will deploy a Prometheus exporter to monitor GPU metrics.
-    required: false
   - name: install_toolkit
     description: true or false. Not needed if the toolkit is preinstalled on the nodes.
     required: false
