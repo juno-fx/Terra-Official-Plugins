@@ -14,6 +14,12 @@ spec:
       targetRevision: v24.9.0
       helm:
         values: |-
+          dcgm:
+            enabled: true
+          dcgmExporter:
+            enabled: true
+            serviceMonitor:
+              enabled: true
           daemonsets:
             tolerations:
               - key: nvidia.com/gpu
@@ -65,10 +71,6 @@ spec:
         parameters:
           - name: "toolkit.version"
             value: "v1.17.0-ubi8"
-          - name: "dcgm.enabled"
-            value: "true"
-          - name: "dcgmExporter.enabled"
-            value: "true"
           - name: "toolkit.enabled"
             value: "{{ .Values.install_toolkit }}"
           - name: "driver.enabled"
