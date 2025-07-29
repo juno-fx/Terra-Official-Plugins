@@ -19,6 +19,7 @@ spec:
       helm:
         releaseName: prometheus
         values: |
+          serviceMonitorSelectorNilUsesHelmValues: false
           additionalScrapeConfigs:
             - job_name: gpu-metrics
               scrape_interval: 1s
@@ -28,11 +29,8 @@ spec:
                 - role: endpoints
                   namespaces:
                     names:
-                      - prometheus
+                      - gpu-operator
               relabel_configs:
-                - source_labels: [__meta_kubernetes_endpoints_name]
-                  action: drop
-                  regex: .*-node-feature-discovery-master
                 - source_labels: [__meta_kubernetes_pod_node_name]
                   action: replace
                   target_label: kubernetes_node
