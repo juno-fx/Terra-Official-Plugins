@@ -15,10 +15,6 @@ spec:
       helm:
         values: |-
 
-          dcgm:
-            enabled: true
-          dcgmExporter:
-            enabled: true
           daemonsets:
             tolerations:
               - key: nvidia.com/gpu
@@ -68,6 +64,10 @@ spec:
                   effect: NoSchedule
         releaseName: gpu-operator
         parameters:
+          - name: "dcgmExporter.enabled"
+            value: "true"
+          - name: "dcgm.enabled"
+            value: "true"
           - name: "dcgmExporter.serviceMonitor.enabled"
             value: "true"
           - name: "toolkit.version"
