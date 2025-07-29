@@ -3,4 +3,3 @@ host:
 path: /
 username: admin
 password: admin
-nvidia_dcgm: false

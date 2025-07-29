@@ -22,6 +22,3 @@ fields:
   - name: path
     description: Connection URL sub path. i.e. `grafana.example.com/my/path/grafana`.
     required: false
-  - name: nvidia_dcgm
-    description: Enable the NVIDIA DCGM exporter for GPU metrics. This is required if you want to monitor NVIDIA GPUs.
-    required: false
