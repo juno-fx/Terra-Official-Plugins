@@ -14,8 +14,8 @@ spec:
     server: https://kubernetes.default.svc
     namespace: prometheus
   sources:
-    - repoURL: https://github.com/NVIDIA/dcgm-exporter.git
-      path: ./deployment/
+    - repoURL: https://nvidia.github.io/dcgm-exporter/helm-charts
+      chart: gpu-helm-charts/dcgm-exporter
       targetRevision: main
       helm:
         releaseName: prometheus-nvidia-dcgm
