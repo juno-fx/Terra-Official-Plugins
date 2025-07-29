@@ -12,7 +12,7 @@ spec:
   project: default
   destination:
     server: https://kubernetes.default.svc
-    namespace: prometheus-nvidia-dcgm
+    namespace: gpu-operator
   sources:
     - repoURL: https://github.com/NVIDIA/dcgm-exporter.git
       path: ./deployment/
@@ -20,7 +20,7 @@ spec:
       helm:
         releaseName: prometheus-nvidia-dcgm
 {{/*        values: |*/}}
-
+{{/*          */}}
   syncPolicy:
     automated:
       prune: true
