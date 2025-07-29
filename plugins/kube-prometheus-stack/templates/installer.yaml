@@ -19,6 +19,23 @@ spec:
       helm:
         releaseName: prometheus
         values: |
+          additionalScrapeConfigs:
+            - job_name: gpu-metrics
+              scrape_interval: 1s
+              metrics_path: /metrics
+              scheme: http
+              kubernetes_sd_configs:
+                - role: endpoints
+                  namespaces:
+                    names:
+                      - prometheus
+              relabel_configs:
+                - source_labels: [__meta_kubernetes_endpoints_name]
+                  action: drop
+                  regex: .*-node-feature-discovery-master
+                - source_labels: [__meta_kubernetes_pod_node_name]
+                  action: replace
+                  target_label: kubernetes_node
           grafana:
             enabled: true
             forceDeployDashboards: true
