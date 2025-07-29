@@ -18,8 +18,6 @@ spec:
             enabled: true
           dcgmExporter:
             enabled: true
-            serviceMonitor:
-              enabled: true
           daemonsets:
             tolerations:
               - key: nvidia.com/gpu
@@ -69,6 +67,8 @@ spec:
                   effect: NoSchedule
         releaseName: gpu-operator
         parameters:
+          - name: "dcgmExporter.serviceMonitor.enabled"
+            value: "true"
           - name: "toolkit.version"
             value: "v1.17.0-ubi8"
           - name: "toolkit.enabled"
