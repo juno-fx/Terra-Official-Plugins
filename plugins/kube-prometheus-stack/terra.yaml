@@ -2,13 +2,13 @@ resource_id: kube-prometheus-stack
 name: Kubernetes Prometheus Stack
 icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/kube-prometheus-stack/assets/logo.png
 description: Full Prometheus monitoring stack
-category: monitoring
+category: Monitoring
 tags:
-  - monitoring
   - prometheus
   - grafana
   - alertmanager
   - cluster-level
+  - dashboard
 fields:
   - name: username
     description: Admin username

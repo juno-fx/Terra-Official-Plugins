@@ -5,7 +5,6 @@ description: The Fast Open-Source Remote Access and Support Software.
 category: VDI
 tags:
   - remote desktop
-  - vdi
   - rustdesk
   - remote access
 fields:
