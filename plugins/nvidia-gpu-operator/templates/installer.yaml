@@ -11,7 +11,7 @@ spec:
   sources:
     - repoURL: https://helm.ngc.nvidia.com/nvidia
       chart: gpu-operator
-      targetRevision: v24.9.0
+      targetRevision: v25.3.2
       helm:
         values: |-
 
@@ -70,8 +70,6 @@ spec:
             value: "true"
           - name: "dcgmExporter.serviceMonitor.enabled"
             value: "true"
-          - name: "toolkit.version"
-            value: "v1.17.0-ubi8"
           - name: "toolkit.enabled"
             value: "{{ .Values.install_toolkit }}"
           - name: "driver.enabled"
