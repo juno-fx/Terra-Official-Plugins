@@ -91,21 +91,21 @@ spec:
               memory: "{{ .Values.memoryLimit }}"
             {{- end }}
             {{- end }}
-          startupProbe:
-            httpGet:
-              path: "/polaris/{{ .Values.name }}/"
-              port: 3000
-            initialDelaySeconds: 2 # webtop boots very fast
-            failureThreshold: 60  # start up totals 2 * 60 = 2 mins
-            periodSeconds: 2
-          livenessProbe:
-            httpGet:
-              path: "/polaris/{{ .Values.name }}/"
-              port: 3000
-            failureThreshold: 24
-            periodSeconds: 5
+{{/*          startupProbe:*/}}
+{{/*            httpGet:*/}}
+{{/*              path: "/polaris/{{ .Values.name }}/"*/}}
+{{/*              port: 3000*/}}
+{{/*            initialDelaySeconds: 2 # webtop boots very fast*/}}
+{{/*            failureThreshold: 60  # start up totals 2 * 60 = 2 mins*/}}
+{{/*            periodSeconds: 2*/}}
+{{/*          livenessProbe:*/}}
+{{/*            httpGet:*/}}
+{{/*              path: "/polaris/{{ .Values.name }}/"*/}}
+{{/*              port: 3000*/}}
+{{/*            failureThreshold: 24*/}}
+{{/*            periodSeconds: 5*/}}
           ports:
-            - containerPort: 3000
+            - containerPort: 3001
               name: viewer
           env:
             - name: JUNO_WORKSTATION
