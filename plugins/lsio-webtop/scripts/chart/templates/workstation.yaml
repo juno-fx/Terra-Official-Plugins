@@ -126,10 +126,10 @@ spec:
             - name: {{ .name | quote }}
               value: {{ .value | quote }}
             {{- end }}
-{{/*          volumeMounts:*/}}
-{{/*            {{- if .Values.volumeMounts }}*/}}
-{{/*            {{- toYaml .Values.volumeMounts | nindent 12 }}*/}}
-{{/*            {{- end }}*/}}
+          volumeMounts:
+            {{- if .Values.volumeMounts }}
+            {{- toYaml .Values.volumeMounts | nindent 12 }}
+            {{- end }}
 {{/*            {{- if .Values.plugins }}*/}}
 {{/*            {{- range .Values.plugins }}*/}}
 {{/*            - name: {{ .name | quote }}*/}}
@@ -137,10 +137,10 @@ spec:
 {{/*              mountPath: "/etc/helios/init.d/{{ .name }}/{{ .file }}"*/}}
 {{/*            {{- end }}*/}}
 {{/*            {{- end }}*/}}
-{{/*      volumes:*/}}
-{{/*        {{- if .Values.volumeMounts }}*/}}
-{{/*        {{- toYaml .Values.volumes | nindent 8 }}*/}}
-{{/*        {{- end }}*/}}
+      volumes:
+        {{- if .Values.volumeMounts }}
+        {{- toYaml .Values.volumes | nindent 8 }}
+        {{- end }}
 {{/*        {{- if .Values.plugins }}*/}}
 {{/*        {{- range .Values.plugins }}*/}}
 {{/*        - name: {{ .name | quote }}*/}}
