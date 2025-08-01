@@ -126,26 +126,31 @@ spec:
             - name: {{ .name | quote }}
               value: {{ .value | quote }}
             {{- end }}
-{{/*          volumeMounts:*/}}
-{{/*            {{- if .Values.volumeMounts }}*/}}
-{{/*            {{- toYaml .Values.volumeMounts | nindent 12 }}*/}}
-{{/*            {{- end }}*/}}
-{{/*            {{- if .Values.plugins }}*/}}
-{{/*            {{- range .Values.plugins }}*/}}
-{{/*            - name: {{ .name | quote }}*/}}
-{{/*              subPath: {{ .file | quote }}*/}}
-{{/*              mountPath: "/etc/helios/init.d/{{ .name }}/{{ .file }}"*/}}
-{{/*            {{- end }}*/}}
-{{/*            {{- end }}*/}}
-{{/*      volumes:*/}}
-{{/*        {{- if .Values.volumeMounts }}*/}}
-{{/*        {{- toYaml .Values.volumes | nindent 8 }}*/}}
-{{/*        {{- end }}*/}}
-{{/*        {{- if .Values.plugins }}*/}}
-{{/*        {{- range .Values.plugins }}*/}}
-{{/*        - name: {{ .name | quote }}*/}}
-{{/*          configMap:*/}}
-{{/*            name: {{ .config | quote }}*/}}
-{{/*            defaultMode: 0777*/}}
-{{/*        {{- end }}*/}}
-{{/*        {{- end }}*/}}
+          volumeMounts:
+            - mountPath: /dev/shm
+              name: dshm
+            {{- if .Values.volumeMounts }}
+            {{- toYaml .Values.volumeMounts | nindent 12 }}
+            {{- end }}
+            {{- if .Values.plugins }}
+            {{- range .Values.plugins }}
+            - name: {{ .name | quote }}
+              subPath: {{ .file | quote }}
+              mountPath: "/etc/helios/init.d/{{ .name }}/{{ .file }}"
+            {{- end }}
+            {{- end }}
+      volumes:
+        - name: dshm
+          emptyDir:
+            medium: Memory
+        {{- if .Values.volumeMounts }}
+        {{- toYaml .Values.volumes | nindent 8 }}
+        {{- end }}
+        {{- if .Values.plugins }}
+        {{- range .Values.plugins }}
+        - name: {{ .name | quote }}
+          configMap:
+            name: {{ .config | quote }}
+            defaultMode: 0777
+        {{- end }}
+        {{- end }}
