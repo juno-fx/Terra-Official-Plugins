@@ -1,4 +1,4 @@
-name: Lint
+name: Lint Docs
 on:
   push:
   repository_dispatch:
@@ -13,4 +13,4 @@ jobs:
       - name: Run the lint target
         shell: bash
         run: |
-          make lint
+          make lint-docs
