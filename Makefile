@@ -69,11 +69,12 @@ docs:
 	.venv/bin/mkdocs serve
 
 
+# realpath due to: https://github.com/linkchecker/linkchecker/issues/873
 lint: .venv/bin/activate
 	@(grep -q -r '<a href' docs && (echo Please use markdown links instead of href. && exit 1)) || true
 	([[ -d site ]] && rm -rf site/) || true
 	.venv/bin/mkdocs build --strict
-	.venv/bin/linkchecker site/index.html
+	.venv/bin/linkchecker '$(realpath .)/site/index.html'
 
 # when using devbox, this will already exist and not trigger
 # It's used by the CI, where devbox hook behavior is different
