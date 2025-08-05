@@ -6,7 +6,6 @@ category: CG
 tags:
   - houdini
   - sidefx
-  - cg
   - vfx
   - usd
   - animation
@@ -14,9 +13,6 @@ tags:
   - simulation
   - rendering
   - effects
-  - solaris
-  - procedural
-  - l-systems
   - modeling
 fields:
   - name: version
