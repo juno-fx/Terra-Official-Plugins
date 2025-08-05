@@ -1,7 +1,7 @@
 # Plugin Types
 
 While a Terra Plugin can be just about anything, we have organized some of the standard types you can expect to come across.
-These standard plugin types can also be seen and integrated into our front-end Terra App Store accessible via Genesis.Please
+These standard plugin types can also be seen and integrated into our front-end Terra App Store accessible via Genesis. Please
 see below for our different types, along with examples you can reference directly in our official plugins repository.
 
 ## Plugin & Application
