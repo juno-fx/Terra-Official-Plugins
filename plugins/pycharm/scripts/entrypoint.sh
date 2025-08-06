@@ -7,5 +7,5 @@ if [ -n "$CLEANUP" ]; then
 fi
 
 if [ -n "${INSTALL}" ]; then
-    ./installer.sh "$URL" "$DESTINATION"
+    ./installer.sh "$VERSION" "$DESTINATION"
 fi

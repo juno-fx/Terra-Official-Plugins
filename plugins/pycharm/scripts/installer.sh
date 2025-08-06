@@ -4,29 +4,38 @@ set -e
 apt update
 echo "installing wget"
 apt install -y wget
-echo "Installing pycharm..."
-echo $2
+
+executable="$(echo "$VERSION" | cut -d'v' -f1)"
+LAUNCH="$DESTINATION/pycharm-community-$VERSION/$executable"
+ICON="$DESTINATION/pycharm.png"
+
+echo "Installing $VERSION"
+echo "Destination $DESTINATION"
+echo "Executable: $executable"
+
 cd /tmp
 
-wget -q -O /tmp/pycharm-community-$1.tar.gz "https://download.jetbrains.com/python/pycharm-community-$1.tar.gz"
-chmod +x /tmp/pycharm-community-$1.tar.gz
+wget -q -O /tmp/pycharm-community-$VERSION "https://download.jetbrains.com/python/pycharm-community-$VERSION.tar.gz"
+chmod +x /tmp/pycharm-community-$VERSION.tar.gz
 
 echo "Extracting pycharm..."
-tar xzvf /tmp/pycharm-community-$1.tar.gz -C $2/
+tar xzvf /tmp/pycharm-community-$VERSION.tar.gz -C $DESTINATION/
 
-chmod -R 777 $2/pycharm-community-$1
-chmod -R 777 $2
+chmod -R 777 $DESTINATION/pycharm-community-$VERSION
+chmod -R 777 $DESTINATION
 
 # app icon setup
-cp "./assets/pycharm.png" "$2/pycharm.png"
-cp "./assets/pycharm.desktop" "$2/pycharm.desktop"
-# replace our icon/exec placeholder strings with proper values
-cd $2
-pwd
-ls -la
-sed -i -e "s@DESTINATION-PATH@$2/pycharm.sh@g" "$2/pycharm.desktop"
-sed -i -e "s@ICON-PATH@$2/pycharm.png@g" "$2/pycharm.desktop"
-echo "Adding desktop file"
-echo "Desktop file created."
-chmod -R 777 "$2/"
-cat $2/*.desktop
+cp -v ./assets/pycharm.png $DESTINATION/
+rm -rfv "$DESTINATION/pycharm.desktop"
+
+echo "[Desktop Entry]
+Version=$DESTINATION
+Name=Pycharm Community $DESTINATION
+Comment=Pycharm Community IDE
+Exec=$LAUNCH
+Icon=$ICON
+Terminal=true
+Type=Application
+Categories=X-Polaris" >> $DESTINATION/pycharm.desktop
+
+cat $DESTINATION/*.desktop
