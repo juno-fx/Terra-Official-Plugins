@@ -5,15 +5,13 @@ apt update
 echo "installing wget"
 apt install -y wget
 
-LAUNCH="$DESTINATION/$VERSION/$executable"
+LAUNCH="$DESTINATION/$VERSION/bin/pycharm.sh "
 ICON="$DESTINATION/pycharm.png"
 
 echo "Installing $VERSION"
 echo "Destination $DESTINATION"
 
-cd /tmp
 wget -q -O pycharm-$VERSION.tar.gz -P /tmp "https://download-cdn.jetbrains.com/python/pycharm-$VERSION.tar.gz"
-ls -la
 chmod +x /tmp/pycharm-$VERSION.tar.gz
 
 echo "Extracting pycharm..."
