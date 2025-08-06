@@ -2,7 +2,7 @@
 set -e
 
 if [ -n "$CLEANUP" ]; then
-  rm -rvf "$DESTINATION"
+  rm -rvf "$DESTINATION/pycharm-$VERSION"
   exit 0
 fi
 
