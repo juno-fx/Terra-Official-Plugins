@@ -5,7 +5,7 @@ apt update
 echo "installing wget"
 apt install -y wget
 
-LAUNCH="$DESTINATION/$VERSION/bin/pycharm.sh "
+LAUNCH="$DESTINATION/pycharm-$VERSION/bin/pycharm.sh "
 ICON="$DESTINATION/pycharm.png"
 
 # store our current working dir
@@ -20,7 +20,7 @@ wget -q -O pycharm-$VERSION.tar.gz -P /tmp "https://download-cdn.jetbrains.com/p
 chmod +x /tmp/pycharm-$VERSION.tar.gz
 
 echo "Extracting pycharm..."
-mkdir -p "$DESTINATION/$VERSION"
+mkdir -p "$DESTINATION"
 tar xzvf /tmp/pycharm-$VERSION.tar.gz -C $DESTINATION/
 
 chmod -R 777 $DESTINATION/$VERSION
