@@ -1,5 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 set -e
+# install curl
+apt update
+apt install curl -y
 
 LAUNCH="$DESTINATION/pycharm-$VERSION/bin/pycharm.sh "
 ICON="$DESTINATION/pycharm.png"
