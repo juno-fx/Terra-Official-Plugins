@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-scripts-configmap
+data:
+  bootstrap.sh: |
+    #!/bin/bash
+    echo "Unpacking scripts..."
+    # decode base64 encoded scripts mount at /terra/scripts.base64
+    base64 -d /terra/scripts.base64 > /terra/scripts.tar.gz
+    
+    # extract scripts to /terra/scripts
+    tar -xzvf /terra/scripts.tar.gz -C /terra/
+    
+    # make scripts executable
+    chmod +x -v /terra/scripts/*.sh
+    
+    # start entrypoint.sh
+    cd /terra/scripts
+    pwd
+    ./entrypoint.sh
+  packaged_scripts.base64: "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"
