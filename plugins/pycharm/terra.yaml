@@ -12,7 +12,7 @@ tags:
 
 fields:
   - name: version
-    description: Version of PyCharm to install. i.e. 2024.1.4
+    description: Version of PyCharm to install. i.e. 2025.2
     required: True
   - name: install_volume
     description: The name of the install volume
