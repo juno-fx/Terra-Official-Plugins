@@ -19,7 +19,6 @@ chmod -R 555 $DESTINATION
 
 echo "Adding desktop files"
 # app icon setup
-cd $working_dir
 cp -v ${PWD}/assets/pycharm.png $DESTINATION/
 rm -rfv "$DESTINATION/pycharm.desktop"
 
