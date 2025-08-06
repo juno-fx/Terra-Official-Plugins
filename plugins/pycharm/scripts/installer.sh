@@ -22,8 +22,6 @@ chmod +x /tmp/pycharm-$VERSION.tar.gz
 echo "Extracting pycharm..."
 mkdir -p "$DESTINATION"
 tar xzvf /tmp/pycharm-$VERSION.tar.gz -C $DESTINATION/
-
-chmod -R 777 $DESTINATION/$VERSION
 chmod -R 777 $DESTINATION
 
 echo "Adding desktop files"
