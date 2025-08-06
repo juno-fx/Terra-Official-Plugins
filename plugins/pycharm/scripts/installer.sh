@@ -4,7 +4,7 @@ set -e
 apt update
 apt install curl -y
 
-INSTALL_DIR = "$DESTINATION/pycharm-$VERSION"
+INSTALL_DIR="$DESTINATION/pycharm-$VERSION"
 LAUNCH="$INSTALL_DIR/bin/pycharm.sh "
 ICON="$INSTALL_DIR/pycharm.png"
 
