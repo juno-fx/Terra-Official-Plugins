@@ -12,7 +12,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: installer
-          image: ubuntu:latest
+          image: curlimages/curl:8.15.0
           env:
             - name: INSTALL
               value: "true"
