@@ -13,6 +13,7 @@ echo "Destination $DESTINATION"
 
 cd /tmp
 wget -O pycharm-$VERSION -P /tmp "https://download-cdn.jetbrains.com/python/pycharm-$VERSION.tar.gz"
+ls -la
 chmod +x /tmp/pycharm-$VERSION.tar.gz
 
 echo "Extracting pycharm..."
