@@ -17,6 +17,7 @@ ls -la
 chmod +x /tmp/pycharm-$VERSION.tar.gz
 
 echo "Extracting pycharm..."
+mkdir -p "$DESTINATION/$VERSION"
 tar xzvf /tmp/pycharm-$VERSION.tar.gz -C $DESTINATION/
 
 chmod -R 777 $DESTINATION/$VERSION
