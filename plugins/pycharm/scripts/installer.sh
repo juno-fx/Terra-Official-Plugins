@@ -12,7 +12,7 @@ echo "Installing $VERSION"
 echo "Destination $DESTINATION"
 
 cd /tmp
-wget -q -O /tmp/pycharm-$VERSION "https://download-cdn.jetbrains.com/python/pycharm-$VERSION.tar.gz"
+wget -O pycharm-$VERSION -P /tmp "https://download-cdn.jetbrains.com/python/pycharm-$VERSION.tar.gz"
 chmod +x /tmp/pycharm-$VERSION.tar.gz
 
 echo "Extracting pycharm..."
