@@ -1,0 +1,4 @@
+apiVersion: v1
+name: minecraft
+version: 0.0.1
+icon: https://1000logos.net/wp-content/uploads/2018/10/Minecraft-Logo.png
