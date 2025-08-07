@@ -5,6 +5,7 @@ cpuLimit: null
 memoryLimit: null
 session:
 volume:
+  name:
 env:
   - name: JUNO
     value: "true"
