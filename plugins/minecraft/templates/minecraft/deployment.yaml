@@ -2,26 +2,27 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: "{{ .Release.Name }}"
-  annotations:
-    # comma separated list of users that can access this workstation as read only.
-    juno-innovations.com/shared: "none"
-    juno-innovations.com/kuiper-state: "{{ .Values._kuiper }}"
-  labels:
-    juno-innovations.com/app: "polaris"
-    juno-innovations.com/workstation: "{{ .Release.Name }}"
-    juno-innovations.com/user: "minecraft"
-    juno-innovations.com/session: "{{ .Values.session }}"
+{{/*  annotations:*/}}
+{{/*    # comma separated list of users that can access this workstation as read only.*/}}
+{{/*    juno-innovations.com/shared: "none"*/}}
+{{/*    juno-innovations.com/kuiper-state: "{{ .Values._kuiper }}"*/}}
+{{/*  labels:*/}}
+{{/*    juno-innovations.com/app: "polaris"*/}}
+{{/*    juno-innovations.com/workstation: "{{ .Release.Name }}"*/}}
+{{/*    juno-innovations.com/user: "minecraft"*/}}
+{{/*    juno-innovations.com/session: "{{ .Values.session }}"*/}}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      juno-innovations.com/workstation: "{{ .Release.Name }}"
+      juno-innovations.com/workload: "{{ .Release.Name }}"
   template:
     metadata:
       labels:
-        juno-innovations.com/app: polaris
-        juno-innovations.com/user: "minecraft"
-        juno-innovations.com/workstation: "{{ .Release.Name }}"
+        juno-innovations.com/workload: "{{ .Release.Name }}"
+{{/*        juno-innovations.com/app: polaris*/}}
+{{/*        juno-innovations.com/user: "minecraft"*/}}
+{{/*        juno-innovations.com/workstation: "{{ .Release.Name }}"*/}}
     spec:
       automountServiceAccountToken: false
       containers:
