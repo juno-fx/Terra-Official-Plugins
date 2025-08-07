@@ -1,7 +1,7 @@
-{{/*apiVersion: apps/v1*/}}
-{{/*kind: StatefulSet*/}}
-{{/*metadata:*/}}
-{{/*  name: "{{ .Release.Name }}"*/}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{ .Release.Name }}"
 {{/*  annotations:*/}}
 {{/*    # comma separated list of users that can access this workstation as read only.*/}}
 {{/*    juno-innovations.com/shared: "none"*/}}
@@ -11,45 +11,45 @@
 {{/*    juno-innovations.com/workstation: "{{ .Release.Name }}"*/}}
 {{/*    juno-innovations.com/user: "minecraft"*/}}
 {{/*    juno-innovations.com/session: "{{ .Values.session }}"*/}}
-{{/*spec:*/}}
-{{/*  replicas: 1*/}}
-{{/*  selector:*/}}
-{{/*    matchLabels:*/}}
-{{/*      juno-innovations.com/workload: "{{ .Release.Name }}"*/}}
-{{/*  template:*/}}
-{{/*    metadata:*/}}
-{{/*      labels:*/}}
-{{/*        juno-innovations.com/workload: "{{ .Release.Name }}"*/}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      juno-innovations.com/workload: "{{ .Release.Name }}"
+  template:
+    metadata:
+      labels:
+        juno-innovations.com/workload: "{{ .Release.Name }}"
 {{/*        juno-innovations.com/app: polaris*/}}
 {{/*        juno-innovations.com/user: "minecraft"*/}}
 {{/*        juno-innovations.com/workstation: "{{ .Release.Name }}"*/}}
-{{/*    spec:*/}}
-{{/*      automountServiceAccountToken: false*/}}
-{{/*      containers:*/}}
-{{/*        - name: minecraft*/}}
-{{/*          imagePullPolicy: IfNotPresent*/}}
-{{/*          image: "itzg/minecraft-server"*/}}
-{{/*          resources:*/}}
-{{/*            requests:*/}}
-{{/*              memory: "{{ .Values.memory }}"*/}}
-{{/*              cpu: "{{ .Values.cpu }}"*/}}
-{{/*            limits:*/}}
-{{/*            {{- if .Values.cpuLimit }}*/}}
-{{/*              cpu: "{{ .Values.cpuLimit }}"*/}}
-{{/*            {{- end }}*/}}
-{{/*            {{- if .Values.memoryLimit }}*/}}
-{{/*              memory: "{{ .Values.memoryLimit }}"*/}}
-{{/*            {{- end }}*/}}
-{{/*          ports:*/}}
-{{/*            - containerPort: 25565*/}}
-{{/*              name: game*/}}
-{{/*          env:*/}}
-{{/*            - name: EULA*/}}
-{{/*              value: "TRUE"*/}}
-{{/*          volumeMounts:*/}}
-{{/*            - name: data*/}}
-{{/*              mountPath: /data*/}}
-{{/*      volumes:*/}}
-{{/*        - name: data*/}}
-{{/*          persistentVolumeClaim:*/}}
-{{/*            claimName: "{{ .Values.volume.name }}"*/}}
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: minecraft
+          imagePullPolicy: IfNotPresent
+          image: "itzg/minecraft-server"
+          resources:
+            requests:
+              memory: "{{ .Values.memory }}"
+              cpu: "{{ .Values.cpu }}"
+            limits:
+            {{- if .Values.cpuLimit }}
+              cpu: "{{ .Values.cpuLimit }}"
+            {{- end }}
+            {{- if .Values.memoryLimit }}
+              memory: "{{ .Values.memoryLimit }}"
+            {{- end }}
+          ports:
+            - containerPort: 25565
+              name: game
+          env:
+            - name: EULA
+              value: "TRUE"
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: "{{ .Values.volume.name }}"
