@@ -1,0 +1,30 @@
+resource_id: minecraft
+name: Minecraft
+icon: https://1000logos.net/wp-content/uploads/2018/10/Minecraft-Logo.png
+description: A popular sandbox game that allows players to build and explore virtual worlds made of blocks.
+category: Gaming
+tags:
+  - minecraft
+  - sandbox
+  - multiplayer
+  - block-building
+fields:
+  - name: name
+    description: Name of the Minecraft server
+    required: true
+  - name: volume
+    description: The name of the volume to store Minecraft data
+    required: true
+    type: exclusive-volume
+  - name: cpu
+    description: Number of CPU cores to allocate to the Minecraft server
+    required: false
+  - name: memory
+    description: Amount of memory to allocate to the Minecraft server
+    required: false
+  - name: cpuLimit
+    description: Optional CPU limit for the Minecraft server
+    required: false
+  - name: memoryLimit
+    description: Optional memory limit for the Minecraft server
+    required: false

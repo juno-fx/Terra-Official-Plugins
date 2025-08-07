@@ -1,0 +1,12 @@
+name: minecraft
+user: minecraft
+cpu: "1"
+memory: "1Gi"
+cpuLimit: null
+memoryLimit: null
+session:
+volume:
+env:
+  - name: JUNO
+    value: "true"
+_kuiper:

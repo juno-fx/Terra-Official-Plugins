@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{ .Values.name }}"
+  annotations:
+    # comma separated list of users that can access this workstation as read only.
+    juno-innovations.com/shared: "none"
+    juno-innovations.com/kuiper-state: "{{ .Values._kuiper }}"
+  labels:
+    juno-innovations.com/app: "polaris"
+    juno-innovations.com/workstation: "{{ .Values.name }}"
+    juno-innovations.com/user: "minecraft"
+    juno-innovations.com/session: "{{ .Values.session }}"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      juno-innovations.com/workstation: "{{ .Values.name }}"
+  template:
+    metadata:
+      labels:
+        juno-innovations.com/app: polaris
+        juno-innovations.com/user: "minecraft"
+        juno-innovations.com/workstation: "{{ .Values.name }}"
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: minecraft
+          imagePullPolicy: IfNotPresent
+          image: "itzg/minecraft-server"
+          resources:
+            requests:
+              memory: "{{ .Values.memory }}"
+              cpu: "{{ .Values.cpu }}"
+            limits:
+            {{- if .Values.cpuLimit }}
+              cpu: "{{ .Values.cpuLimit }}"
+            {{- end }}
+            {{- if .Values.memoryLimit }}
+              memory: "{{ .Values.memoryLimit }}"
+            {{- end }}
+          ports:
+            - containerPort: 25565
+              name: game
+          env:
+            - name: EULA
+              value: "TRUE"
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: "{{ .Values.volume }}"
