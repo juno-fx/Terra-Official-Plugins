@@ -9,9 +9,6 @@ tags:
   - multiplayer
   - block-building
 fields:
-  - name: name
-    description: Name of the Minecraft server
-    required: true
   - name: volume
     description: The name of the volume to store Minecraft data
     required: true

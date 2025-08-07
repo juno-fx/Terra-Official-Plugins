@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: "{{ .Values.name }}"
+  name: "{{ .Release.Name }}"
 spec:
   selector:
-    juno-innovations.com/workstation: "{{ .Values.name }}"
+    juno-innovations.com/workstation: "{{ .Release.Name }}"
   ports:
     - port: 25565
       targetPort: 25565
