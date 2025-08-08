@@ -1,0 +1,6 @@
+url: "https://launcher.mojang.com/download/Minecraft.tar.gz"
+install_volume:
+  name: apps-pv-claim
+  sub_path:
+  container_path: /apps
+destination: /minecraft
