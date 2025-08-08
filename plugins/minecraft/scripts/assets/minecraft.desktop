@@ -4,6 +4,6 @@ Name=Minecraft Launcher
 Comment=Launcher for Minecraft
 Exec=DESTINATION-PATH
 Icon=ICON-PATH
-Terminal=false
+Terminal=true
 Type=Application
 Categories=X-Polaris
