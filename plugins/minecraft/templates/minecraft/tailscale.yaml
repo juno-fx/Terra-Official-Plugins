@@ -1,0 +1,7 @@
+apiVersion: tailscale.com/v1alpha1
+kind: Connector
+metadata:
+  name: "{{ .Release.Name }}"
+spec:
+  hostname: "{{ .Release.Name }}"
+  exitNode: true
