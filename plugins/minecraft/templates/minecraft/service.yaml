@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: "{{ .Release.Name }}"
   annotations:
-    tailscale.com/hostname: "minecraft"
+    tailscale.com/hostname: "juno-minecraft"
     tailscale.com/expose: "true"
 spec:
   selector:
