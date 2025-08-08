@@ -2,6 +2,9 @@ apiVersion: v1
 kind: Service
 metadata:
   name: "{{ .Release.Name }}"
+  annotations:
+    tailscale.com/hostname: "juno-minecraft"
+    tailscale.com/expose: "true"
 spec:
   selector:
     juno-innovations.com/workload: "{{ .Release.Name }}"
