@@ -6,6 +6,8 @@ metadata:
     tailscale.com/hostname: "juno-minecraft"
     tailscale.com/expose: "true"
 spec:
+  type: LoadBalancer
+  loadBalancerClass: tailscale
   selector:
     juno-innovations.com/workload: "{{ .Release.Name }}"
   ports:
