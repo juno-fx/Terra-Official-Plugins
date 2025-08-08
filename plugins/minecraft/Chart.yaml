@@ -1,0 +1,4 @@
+apiVersion: v1
+name: minecraft
+version: 0.0.1
+icon: https://www.minecraft.net/content/dam/minecraftnet/games/minecraft/logos/Global-Header_MCCB-Logo_300x51.svg

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=latest
+Name=Minecraft Launcher
+Comment=Launcher for Minecraft
+Exec=DESTINATION-PATH
+Icon=ICON-PATH
+Terminal=false
+Type=Application
+Categories=X-Polaris
