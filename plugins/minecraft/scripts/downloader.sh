@@ -14,6 +14,7 @@ wget "$1"
 tar -xvzf Minecraft.tar.gz
 mv -v minecraft-launcher/* "$2/"
 
+cd /terra/scripts
 # app icon setup
 cp "./assets/minecraft.png" "$2/minecraft.png"
 cp "./assets/minecraft.desktop" "$2/minecraft.desktop"
