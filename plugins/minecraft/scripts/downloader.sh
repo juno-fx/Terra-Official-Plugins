@@ -7,10 +7,11 @@ echo "Installing $1 -> $2"
 apt update
 apt install -y wget
 
+mkdir -vp "$2/"
+
 cd /tmp/
 wget "$1"
 tar -xvzf Minecraft.tar.gz
-ls -la
 mv -v minecraft-launcher/* "$2/"
 
 # app icon setup
