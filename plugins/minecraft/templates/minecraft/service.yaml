@@ -2,9 +2,6 @@ apiVersion: v1
 kind: Service
 metadata:
   name: "{{ .Release.Name }}"
-  annotations:
-    tailscale.com/hostname: "juno-minecraft"
-    tailscale.com/expose: "true"
 spec:
   selector:
     juno-innovations.com/workload: "{{ .Release.Name }}"
@@ -13,19 +10,3 @@ spec:
       targetPort: 25565
       protocol: TCP
       name: game
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: test
-  annotations:
-    tailscale.com/hostname: "test-minecraft"
-    tailscale.com/expose: "true"
-spec:
-  selector:
-    app: test
-  ports:
-    - port: 80
-      targetPort: 80
-      protocol: TCP
-      name: http
