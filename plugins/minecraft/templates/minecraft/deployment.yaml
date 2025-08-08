@@ -31,6 +31,8 @@ spec:
           ports:
             - containerPort: 25565
               name: game
+            - containerPort: 25575
+              name: rcon
           env:
             - name: EULA
               value: "TRUE"
