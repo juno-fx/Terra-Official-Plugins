@@ -18,12 +18,13 @@ cd /terra/scripts
 # app icon setup
 cp "./assets/minecraft.png" "$2/minecraft.png"
 cp "./assets/minecraft.desktop" "$2/minecraft.desktop"
+cp "./assets/launcher.sh" "$2/launcher.sh"
 
 # replace our icon/exec placeholder strings with proper values
 cd $2
 pwd
 ls -la
-sed -i -e "s@DESTINATION-PATH@$2/minecraft-launcher@g" "$2/minecraft.desktop"
+sed -i -e "s@DESTINATION-PATH@$2/launcher.sh DESTINATION-PATH@g" "$2/minecraft.desktop"
 sed -i -e "s@ICON-PATH@$2/minecraft.png@g" "$2/minecraft.desktop"
 echo "Adding desktop file"
 echo "Desktop file created."
