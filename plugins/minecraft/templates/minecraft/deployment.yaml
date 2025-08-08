@@ -3,7 +3,7 @@ kind: StatefulSet
 metadata:
   name: "{{ .Release.Name }}"
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       juno-innovations.com/workload: "{{ .Release.Name }}"
