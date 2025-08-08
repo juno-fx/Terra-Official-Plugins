@@ -24,7 +24,7 @@ cp "./assets/launcher.sh" "$2/launcher.sh"
 cd $2
 pwd
 ls -la
-sed -i -e "s@DESTINATION-PATH@$2/launcher.sh DESTINATION-PATH@g" "$2/minecraft.desktop"
+sed -i -e "s@DESTINATION-PATH@$2/launcher.sh $2@g" "$2/minecraft.desktop"
 sed -i -e "s@ICON-PATH@$2/minecraft.png@g" "$2/minecraft.desktop"
 echo "Adding desktop file"
 echo "Desktop file created."
