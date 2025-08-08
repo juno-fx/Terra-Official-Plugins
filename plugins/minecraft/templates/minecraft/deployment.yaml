@@ -11,9 +11,6 @@ spec:
     metadata:
       labels:
         juno-innovations.com/workload: "{{ .Release.Name }}"
-      annotations:
-        tailscale.com/hostname: "juno-minecraft"
-        tailscale.com/expose: "true"
     spec:
       automountServiceAccountToken: false
       containers:
