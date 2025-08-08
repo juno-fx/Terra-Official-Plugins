@@ -6,10 +6,12 @@ metadata:
     tailscale.com/hostname: "juno-minecraft"
     tailscale.com/expose: "true"
 spec:
+  type: NodePort
   selector:
     juno-innovations.com/workload: "{{ .Release.Name }}"
   ports:
     - port: 25565
       targetPort: 25565
+      nodePort: 31008
       protocol: TCP
       name: game
