@@ -3,11 +3,9 @@ kind: Service
 metadata:
   name: "{{ .Release.Name }}"
   annotations:
-    service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
-    service.beta.kubernetes.io/aws-load-balancer-type: "external"
-    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
+    tailscale.com/hostname: "juno-minecraft"
+    tailscale.com/expose: "true"
 spec:
-  type: LoadBalancer
   selector:
     juno-innovations.com/workload: "{{ .Release.Name }}"
   ports:
