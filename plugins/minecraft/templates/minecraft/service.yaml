@@ -15,3 +15,7 @@ spec:
       targetPort: 25565
       protocol: TCP
       name: game
+    - port: 25565
+      targetPort: 25565
+      protocol: UDP
+      name: game-udp
