@@ -2,12 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: "{{ .Release.Name }}"
-  annotations:
-    tailscale.com/hostname: "juno-minecraft"
-    tailscale.com/expose: "true"
 spec:
-  type: LoadBalancer
-  loadBalancerClass: tailscale
   selector:
     juno-innovations.com/workload: "{{ .Release.Name }}"
   ports:
@@ -15,7 +10,3 @@ spec:
       targetPort: 25565
       protocol: TCP
       name: game
-    - port: 25565
-      targetPort: 25565
-      protocol: UDP
-      name: game-udp
