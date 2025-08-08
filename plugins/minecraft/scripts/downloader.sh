@@ -10,6 +10,7 @@ apt install -y wget
 cd /tmp/
 wget "$1"
 tar -xvzf Minecraft.tar.gz
+ls -la
 mv -v minecraft-launcher/* "$2/"
 
 # app icon setup
