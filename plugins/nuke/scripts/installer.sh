@@ -20,7 +20,7 @@ tar -xvf "/tmp/$VERSION.tgz" -C /tmp/
 rm -rfv "$DESTINATION/$VERSION.tgz" "$DESTINATION/$VERSION-linux-x86_64.run"
 
 # app icon setup
-cp -v ./assets/nuke.png $DESTINATION/
+cp -v ./assets/nuke.png $DESTINATION/$VERSION/
 rm -rfv "$DESTINATION/nuke.desktop"
 
 echo "[Desktop Entry]
