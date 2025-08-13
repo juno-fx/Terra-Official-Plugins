@@ -5,7 +5,7 @@ apt install curl -y
 
 executable="$(echo "$VERSION" | cut -d'v' -f1)"
 LAUNCH="$DESTINATION/$VERSION/$executable"
-ICON="$DESTINATION/nuke.png"
+ICON="$DESTINATION/$VERSION/nuke.png"
 
 echo "Installing $VERSION"
 echo "Destination $DESTINATION"
@@ -31,7 +31,7 @@ Exec=$LAUNCH
 Icon=$ICON
 Terminal=true
 Type=Application
-Categories=X-Polaris" >> $DESTINATION/nuke.desktop
+Categories=X-Polaris" >> $DESTINATION/$VERSION/nuke.desktop
 
 echo "[Desktop Entry]
 Version=$VERSION
@@ -41,7 +41,7 @@ Exec=vglrun -d /dev/dri/card0 $LAUNCH
 Icon=$ICON
 Terminal=true
 Type=Application
-Categories=X-Polaris" >> $DESTINATION/nuke-gpu.desktop
+Categories=X-Polaris" >> $DESTINATION/$VERSION/nuke-gpu.desktop
 
 cat $DESTINATION/*.desktop
 
