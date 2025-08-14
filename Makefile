@@ -10,7 +10,8 @@ $(eval $(ARGS):;@:)
 test: cluster dependencies
 	@echo " >> Deploying $(ARGS) << "
 	@helm upgrade -i terra-plugin ./tests/Application \
-		--set branch=$(shell git rev-parse --abbrev-ref HEAD),plugin=$(ARGS) \
+		--set branch=$(shell git rev-parse --abbrev-ref HEAD) \
+		--set remote=$(shell hack/get-remote.sh),plugin=$(ARGS) \
 		--wait \
 		--timeout 5m
 	@echo

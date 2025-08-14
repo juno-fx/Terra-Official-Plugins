@@ -9,7 +9,7 @@ spec:
     server: https://kubernetes.default.svc
     namespace: argocd
   sources:
-    - repoURL: https://github.com/juno-fx/Terra-Official-Plugins.git
+    - repoURL: {{ .Values.remote }}
       path: ./plugins/{{ .Values.plugin }}/
       targetRevision: {{ .Values.branch }}
       helm:
