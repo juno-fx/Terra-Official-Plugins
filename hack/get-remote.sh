@@ -14,4 +14,4 @@ fi
 remote=${remote##*@}
 remote=${remote/:/\/}
 
-printf "https://${remote}"
+printf "https://%s" "${remote}"
