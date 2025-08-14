@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: filebrowser
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: filebrowser
+  template:
+    metadata:
+      labels:
+        app: filebrowser
+    spec:
+      containers:
+      - name: filebrowser
+        image: filebrowser/filebrowser
+        args:
+          - "--port"
+          - "8080"
+          - "--noauth"
+          - "--root"
+          - "/srv"
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - mountPath: /srv/apps
+          name: apps
+      volumes:
+      - name: apps
+        persistentVolumeClaim:
+          claimName: apps-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: filebrowser
+spec:
+  selector:
+    app: filebrowser
+  ports:
+    - port: 80
+      targetPort: 8080
+      nodePort: 30088
+  type: NodePort

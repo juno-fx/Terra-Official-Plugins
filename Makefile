@@ -14,6 +14,8 @@ test: cluster dependencies
 		--wait \
 		--timeout 5m
 	@echo
+	@echo " >> Filebrowser UI Listening << "
+	@echo "http://localhost:8888"
 	@echo " >> ArgoCD UI Listening << "
 	@echo "http://localhost:8080"
 	@echo
@@ -21,7 +23,6 @@ test: cluster dependencies
 	@echo "admin"
 	@kubectl -n argocd get secret argocd-initial-admin-secret \
                -o jsonpath="{.data.password}" | base64 -d; echo
-	@kubectl -n argocd port-forward service/argocd-server 8080:80 > /dev/null 2>&1
 
 package:
 	docker run --rm -v $(shell pwd):/workspace -w /workspace \
@@ -90,6 +91,9 @@ dependencies: cluster
 	@kubectl create namespace argocd || echo "Argo namespace already exists..."
 	@echo " >> Installing ArgoCD << "
 	@kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+	@ kubectl -n argocd patch service argocd-server -p '{"spec": {"type": "NodePort"}}'
+	@kubectl -n argocd patch service argocd-server \
+  		-p '{"spec": {"ports": [{"port": 80, "nodePort": 30080}]}}'
 	@echo "Waiting for ArgoCD to be ready..."
 	@sleep 15
 	@kubectl wait --namespace argocd \
@@ -99,6 +103,10 @@ dependencies: cluster
 	@echo " >> ArgoCD Ready << "
 	@echo " >> Setting Example Volumes << "
 	@kubectl apply -n argocd -f k8s/
+	@kubectl wait --namespace argocd \
+		--for=condition=ready pod \
+		--selector=app=filebrowser \
+		--timeout=90s
 	@echo " >> Cluster Ready << "
 
 down:

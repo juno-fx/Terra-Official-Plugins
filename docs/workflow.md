@@ -34,7 +34,7 @@ locally without needing to deploy to a production environment until they are rea
     $ make test my-plugin
     ...
     >> ArgoCD UI Listening <<
-    http://localhost:8080
+    http://localhost:
    
     >> ArgoCD Admin Credentials <<
     admin
@@ -64,6 +64,9 @@ locally without needing to deploy to a production environment until they are rea
         ArgoCD will automatically refresh the application every 3 minutes. If you want to force a refresh, you can click the "Refresh" button in the ArgoCD UI.
 
 7. **Verify Changes**: You can verify the changes by checking the logs of the application or by accessing the application in the local cluster.
+
+If your plugin handles unpacking things to a filesystem, we provide a UI to browse our test install directory through `http://localhost:8888`.
+This becomes available once you run `make test <plugin name>`.
 
 8. **Repeat**: Continue making changes and pushing them to the remote branch. ArgoCD will keep your local cluster in sync with the latest changes.
 
