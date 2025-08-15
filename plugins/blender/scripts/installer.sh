@@ -10,6 +10,7 @@ INSTALL_DIR="$DESTINATION/blender-$VERSION-linux-x64"
 LAUNCH="$INSTALL_DIR/blender %f"
 ICON="$INSTALL_DIR/blender.png"
 DESKTOP_FILE="$INSTALL_DIR/blender-$VERSION.desktop"
+DESKTOP_FILE_GPU="$INSTALL_DIR/blender-$VERSION-gpu.desktop"
 RELEASE=$(echo $VERSION | cut -d'.' -f1-2) # split 4.5.1 to 4.5
 
 # Download and Install the application
@@ -49,7 +50,8 @@ Terminal=true
 Type=Application
 Categories=X-Polaris
 MimeType=application/x-blender
-StartupWMClass=Blender" >> "$INSTALL_DIR/blender-$VERSION-gpu.desktop"
+StartupWMClass=Blender" >> "$DESKTOP_FILE_GPU"
 
 echo "Desktop file created at $DESKTOP_FILE"
-cat "$DESTINATION/$VERSION"/*.desktop
+echo "Desktop file created at $DESKTOP_FILE_GPU"
+cat "$INSTALL_DIR"/*.desktop
