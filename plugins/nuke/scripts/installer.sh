@@ -20,7 +20,7 @@ tar -xvf "/tmp/$VERSION.tgz" -C /tmp/
 rm -rfv "$DESTINATION/$VERSION.tgz" "$DESTINATION/$VERSION-linux-x86_64.run"
 
 # app icon setup
-cp -v ./assets/nuke.png $DESTINATION/$VERSION/
+cp -v ./assets/nuke.png "$DESTINATION/$VERSION/"
 rm -rfv "$DESTINATION/nuke.desktop"
 
 echo "[Desktop Entry]
@@ -31,7 +31,7 @@ Exec=$LAUNCH
 Icon=$ICON
 Terminal=true
 Type=Application
-Categories=X-Polaris" >> $DESTINATION/$VERSION/nuke.desktop
+Categories=X-Polaris" >> "$DESTINATION/$VERSION"/nuke.desktop
 
 echo "[Desktop Entry]
 Version=$VERSION
@@ -41,7 +41,7 @@ Exec=vglrun -d /dev/dri/card0 $LAUNCH
 Icon=$ICON
 Terminal=true
 Type=Application
-Categories=X-Polaris" >> $DESTINATION/$VERSION/nuke-gpu.desktop
+Categories=X-Polaris" >> "$DESTINATION/$VERSION"/nuke-gpu.desktop
 
-cat $DESTINATION/*.desktop
+cat "$DESTINATION"/*.desktop
 
