@@ -39,5 +39,17 @@ Categories=X-Polaris
 MimeType=application/x-blender
 StartupWMClass=Blender" >> "$DESKTOP_FILE"
 
+echo "[Desktop Entry]
+Version=$VERSION
+Name=Blender $VERSION GPU
+Comment=3D modeling, animation, rendering and post-production
+Exec=vglrun -d /dev/dri/card0 $LAUNCH
+Icon=$ICON
+Terminal=true
+Type=Application
+Categories=X-Polaris
+MimeType=application/x-blender
+StartupWMClass=Blender" >> "$INSTALL_DIR/blender-$VERSION-gpu.desktop"
+
 echo "Desktop file created at $DESKTOP_FILE"
-cat "$DESKTOP_FILE"
+cat "$DESTINATION/$VERSION"/*.desktop
