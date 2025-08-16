@@ -1,5 +1,5 @@
 # configuration
-host: "/localhost"
+host:
 version: "latest"
 destination: /node-red
 prefix: "/"
