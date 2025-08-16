@@ -2,11 +2,11 @@ resource_id: node-red
 name: Node Red
 icon: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/node-red/assets/logo.png?raw=true"
 description: Installs Node Red flow runner on your cluster.
-category: workflow
+category: Workflows
 tags:
   - node-red
-  - workflow
+  - dashboard
   - infrastructure
   - automation
-  - cluster-level
+
 fields: []
