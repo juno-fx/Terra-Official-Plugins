@@ -1,0 +1,26 @@
+resource_id: embergen
+name: Embergen
+icon: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/embergen/scripts/assets/embergen.png?raw=true"
+description: Real-time volumetric effects and VFX software for artists and studios. Embergen is a powerful tool for creating stunning visual effects such as fire, smoke, explosions, and more.
+category: CG
+tags:
+  - embergen
+  - vfx
+  - 3d
+  - simulation
+  - effects
+  - volumetrics
+  - realtime
+  - gpu
+  - particles
+fields:
+  - name: version
+    description: Version of Embergen to install. i.e. 1.2.4
+    required: True
+  - name: install_volume
+    description: The name of the install volume
+    required: true
+    type: shared-volume
+  - name: destination
+    description: Destination directory (defaults to /embergen)
+    required: false
