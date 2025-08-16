@@ -120,6 +120,8 @@ nav:
         - configuration.md
         - workflow.md
         - advanced.md
+        - plugin-types.md
+        - plugin-fields.md
       - Community:
         - contributing.md
   - Plugins:

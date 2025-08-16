@@ -1,0 +1,7 @@
+# configuration
+destination: /pycharm
+version: 2025.2
+install_volume:
+  name: apps-pv-claim
+  sub_path:
+  container_path: /apps

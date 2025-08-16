@@ -1,0 +1,23 @@
+resource_id: pycharm
+name: pycharm
+icon: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/pycharm/scripts/assets/pycharm.png?raw=true"
+description: Python development IDE by JetBrains.
+category: Software Development
+tags:
+  - pycharm
+  - ide
+  - python
+  - development
+  - jetbrains
+
+fields:
+  - name: version
+    description: Version of PyCharm to install. i.e. 2025.2
+    required: True
+  - name: install_volume
+    description: The name of the install volume
+    required: true
+    type: shared-volume
+  - name: destination
+    description: Destination directory (defaults to /pycharm)
+    required: false

@@ -2,7 +2,7 @@ resource_id: helios-ram-monitor
 name: Helios RAM Monitor
 icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios/scripts/assets/helios-icon.png
 description: Notifies the user of high RAM usage on the host server. This can trigger an eviction of the workstation. This is intended to warn the user to start freeing up resources.
-category: plugin
+category: Helios Plugin
 tags:
     - ram
     - desktop

@@ -2,7 +2,7 @@ resource_id: headlamp
 name: Headlamp
 icon: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/headlamp/assets/logo.png?raw=true"
 description: Headlamp is a web-based Kubernetes dashboard that provides a user-friendly interface for managing Kubernetes clusters. It allows users to view and interact with cluster resources, perform administrative tasks, and monitor cluster health.
-category: infrastructure
+category: Infrastructure
 tags:
   - dashboard
   - kubernetes
@@ -11,4 +11,10 @@ tags:
   - monitoring
   - admin
   - cluster-level
-fields: []
+fields:
+  - name: host
+    description: Connection URL. i.e. `headlamp.example.com`. Keep in mind you must set up a DNS record for this host to point to your cluster's ingress controller.
+    required: true
+  - name: prefix
+    description: Connection URL prefix. i.e. `/headlamp`. Will default to `/` if not set.
+    required: false

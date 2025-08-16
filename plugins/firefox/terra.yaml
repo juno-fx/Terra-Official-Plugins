@@ -5,7 +5,6 @@ description: Firefox web browser installer. This plugin installs in the /apps/fi
 category: Web
 tags:
   - firefox
-  - web
   - browser
 fields:
   - name: destination

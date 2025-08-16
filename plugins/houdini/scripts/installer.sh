@@ -95,7 +95,7 @@ Name=Houdini FX $VERSION
 Comment=SideFX Houdini software
 Exec=vglrun -d /dev/dri/card0 $INSTALL_DIR/bin/houdinifx %F
 Icon="$DESTINATION/houdini.png"
-Terminal=false
+Terminal=true
 Type=Application
 Categories=X-Polaris" > $DESTINATION/houdinifx_$VERSION.desktop
 
@@ -105,7 +105,7 @@ Name=Houdini Core $VERSION
 Comment=SideFX Houdini software
 Exec=vglrun -d /dev/dri/card0 $INSTALL_DIR/bin/houdinicore %F
 Icon="$DESTINATION/houdini.png"
-Terminal=false
+Terminal=true
 Type=Application
 Categories=X-Polaris" > $DESTINATION/houdinicore_$VERSION.desktop
 

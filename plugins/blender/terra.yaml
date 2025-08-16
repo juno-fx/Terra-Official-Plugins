@@ -1,0 +1,26 @@
+resource_id: blender
+name: Blender
+icon: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/blender/scripts/assets/blender.png?raw=true"
+description: Blender is licensed as GNU GPL, owned by its contributors. For that reason Blender is Free and Open Source software, forever.
+category: CG
+tags:
+  - blender
+  - vfx
+  - usd
+  - animation
+  - 3d
+  - simulation
+  - rendering
+  - effects
+  - modeling
+fields:
+  - name: version
+    description: Version of Blender to install. i.e. 4.5.1
+    required: True
+  - name: install_volume
+    description: The name of the install volume
+    required: true
+    type: shared-volume
+  - name: destination
+    description: Destination directory (defaults to /blender)
+    required: false

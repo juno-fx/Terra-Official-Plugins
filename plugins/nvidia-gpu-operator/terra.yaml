@@ -2,7 +2,7 @@ resource_id: nvidia-gpu-operator
 name: NVIDIA GPU Operator
 icon: https://www.nvidia.com/content/nvidiaGDC/us/en_US/about-nvidia/legal-info/logo-brand-usage/_jcr_content/root/responsivegrid/nv_container_392921705/nv_container/nv_image.coreimg.100.410.png/1703060329053/nvidia-logo-vert.png
 description: Enable GPU acceleration for compute workloads on NVIDIA GPUs. After installed, make sure to follow the time-slicing configuration steps on the official NVIDIA documentation. https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/gpu-sharing.html
-category: hardware
+category: Hardware
 tags:
   - gpu
   - nvidia
