@@ -30,9 +30,9 @@ fields:
     description: A multselect field
     required: true
     type: multi
-    options: ["one, two, three"]
+    options: ["one", "two", "three"]
   - name: selectfield
     description: A multselect field
     required: true
     type: select
-    options: ["foo, bar, test"]
+    options: ["foo", "bar", "test"]
