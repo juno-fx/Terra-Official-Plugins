@@ -10,7 +10,7 @@ cd /tmp
 wget -q -O /tmp/firefox.appimage "$1"
 chmod +x /tmp/firefox.appimage
 
-echo "Extracting firefox..."
+echo "Extracting Test firefox..."
 /tmp/firefox.appimage --appimage-extract > /dev/null
 cp -r -v ./squashfs-root "$2/"
 cd -

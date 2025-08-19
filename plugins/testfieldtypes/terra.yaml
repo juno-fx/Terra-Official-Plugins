@@ -1,10 +1,10 @@
-resource_id: firefox
-name: FirefoxNew
-icon: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/firefox/scripts/assets/firefox.png?raw=true"
-description: Firefox web browser installer. This plugin installs in the /apps/firefox directory as default.
+resource_id: testfields
+name: testfieldsNew
+icon: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/testfields/scripts/assets/testfields.png?raw=true"
+description: testfields web browser installer. This plugin installs in the /apps/testfields directory as default.
 category: Web
 tags:
-  - firefox
+  - testfields
   - browser
 fields:
   - name: destination
