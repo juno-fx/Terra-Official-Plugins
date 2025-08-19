@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-scripts-configmap
+data:
+  bootstrap.sh: |
+    #!/bin/bash
+    echo "Unpacking scripts..."
+    # decode base64 encoded scripts mount at /terra/scripts.base64
+    base64 -d /terra/scripts.base64 > /terra/scripts.tar.gz
+    
+    # extract scripts to /terra/scripts
+    tar -xzvf /terra/scripts.tar.gz -C /terra/
+    
+    # make scripts executable
+    chmod +x -v /terra/scripts/*.sh
+    
+    # start entrypoint.sh
+    cd /terra/scripts
+    pwd
+    ./entrypoint.sh
+  packaged_scripts.base64: "H4sIAAAAAAAAA+2Ya2/bNhSG81m/4kQ11m2o5EtjB/DgAobrDUPXNnBRYEAcBLRE21okUiUpt67h/75DSbYV3xM4Lbby/RAxFHkuJHUeJtITQaxk+ewJVUFdXtbTJ2r9udmuVmuVxhnUnzKohRKpiAA4E5yrfeMOvf+PSub774WUsCR25fj0Pg7sf+3i4mJt/1/W8AGV04eyqR98/5+dlwcBKw+IHFuWpAocalnt3h/vO69v37Xfdj9ctTvdFhEj7vmWJWjEJ/TW42wYjCIS397R6c+/wMwCVMg9EoIX3TIS0ZZdqtqFbhyIXbWsK/1BvTEHu6ctBmykB8Dz0gwf8+cwFDyCTurlLYmhNMutzgvzgyGcw10yoJ4KYYSRL6MCuzABHKZ/X08JX7wq+3RSZkkYQu3VT9XfQI0pS02vwtsWA/icSmBcAf0SSPUC5F0Qx5iD67r2cr6gKhEMKmnHMDhh3A6HfyRnMVHjlj1zfaKImy3ckUm9KS71/WQgYFvX/aFJLvLDIL3xgzPsLx04jprGNM232IuGrmd9m8d9uwl9OzuWffsFtvWyZL1lvTLlLM++Pb+xrbll5duqq50+dUkMbTzbnderrGWa4frA7AtwvCh9u+07AHs5xsa2HwXMpYwMQuofMyGRVEiXMM6mEU/kaurOSHwnJoJE8sigCsPRHXqbUOHqqqZX7HGz/UDqIF2SPNbCF3eIfdTlsQo4kzuzFQPiHZVnPhA9xDwMvKnr0yFJQrW0vLHdkKMPT2kUh1RRH2TieVTKIX5F03Pb+t41+im15H+6HomgT3ADOMR/vO2t879eqxr+fws9jP/PoDOm3p1m2FWv+/uff0MgQc8izM8gEsVqauHr62twvuryno1rOljWb24KOMq+xm6v977XXBijbBIIziLKFEyICHRxgQh3CAZ0002GIcSWgqqF8LFS2KzqwiMuJlnXhISJHvdy47ZypT3osrT1XvA5UGPIeNMqzVIrxQvLiZkYUTGia1BEJmroIf+wtSBfUzezaBCD8yIG849eZ7QXgx9jNLuJwbUF30dAsJVI6IEpuxi4mLwzmnUU7vayn4KrAzt/sJF7MDyc7lE4xPFhyD876X34150LUKTjLo87wQi24CFtptu1j5L5WSE6sh+Tlf9HLfiPJVdMYx4wdfoLgIZ6o3Gx8/8/9Upjnf+X9Ybh/7dQkf8L/Gt8b6H3JryF4GI/vPF6IOinJBBYKQaJSuGNbjbQnbpEf52/uu13H69Sh628iG7x3EtY+tfB4uqekjePFUpZI/PhFv6zZdFQ0oKVD7jzqsC++yVur83CbVnH/7130cjIyMjIyMjIyMjIyMjIyMjIaLv+BRyvElIAKAAA"
