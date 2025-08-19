@@ -37,3 +37,5 @@ echo "Updating argocd-rbac-cm..."
 patch_configmap "argocd-rbac-cm" "policy.default" "role:admin"
 
 echo "ArgoCD ConfigMaps configuration completed successfully!"
+
+kubectl rollout restart deployment argocd-server -n "${ARGOCD_NAMESPACE}"
