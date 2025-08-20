@@ -1,6 +1,6 @@
 resource_id: argocd-dashboard
 name: ArgoCD Dashboard
-icon: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/argocd-ingress/assets/logo.png?raw=true"
+icon: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/argocd-dashboard/assets/logo.png?raw=true"
 description: Sets up an embedded ArgoCD dashboard available directly in your Genesis instance. This plugin works exclusively with https:// Genesis URLs
 category: Infrastructure
 tags:

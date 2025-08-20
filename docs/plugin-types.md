@@ -44,7 +44,7 @@ data:
 
 
 #### Examples
-- **Dashboard**: argocd-ingress
+- **Dashboard**: argocd-dashboard
 
 
 ## Bundles
