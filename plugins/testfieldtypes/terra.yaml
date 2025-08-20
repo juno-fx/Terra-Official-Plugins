@@ -25,7 +25,7 @@ fields:
   - name: booleanfield
     description: A boolean field
     required: true
-    type: int
+    type: boolean
   - name: multifield
     description: A multselect field
     required: true
