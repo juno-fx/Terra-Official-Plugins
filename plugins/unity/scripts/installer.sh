@@ -2,6 +2,7 @@ set -e
 
 apt update
 apt install curl -y
+apt install jq -y
 
 INSTALL_DIR="$DESTINATION/unity-$VERSION"
 LAUNCH="$INSTALL_DIR/bin/unity.sh"
