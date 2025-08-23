@@ -1,0 +1,7 @@
+# configuration
+destination: /embergen
+version: 1.2.4
+install_volume:
+  name: apps-pv-claim
+  sub_path:
+  container_path: /apps
