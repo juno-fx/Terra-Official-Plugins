@@ -14,7 +14,8 @@ echo "Destination $INSTALL_DIR"
 response_url="https://services.api.unity.com/unity/editor/release/v1/releases?version=$VERSION&platform=LINUX"
 echo $response_url
 response=$(curl -s "$response_url")
-url=$(echo "response" | jq -r '.results[0].downloads[0].url')
+
+url=$(echo "$response" | jq -r '.results[0].downloads[0].url')
 
 curl -o "/tmp/unity-$VERSION.tar.gz" -P /tmp "$url"
 
