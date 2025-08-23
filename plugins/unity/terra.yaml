@@ -1,5 +1,5 @@
 resource_id: unity
-name: unity
+name: Unity Editor
 icon: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/unity/scripts/assets/unity.png?raw=true"
 description: Unity Game Engine to Target directory
 category: Game Engine
