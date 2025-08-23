@@ -7,7 +7,7 @@ apt install jq -y
 apt install xz-utils -y
 
 INSTALL_DIR="$DESTINATION/unity-$VERSION"
-LAUNCH="$INSTALL_DIR/Editor/unity.sh"
+LAUNCH="$INSTALL_DIR/Editor/Unity"
 ICON="$INSTALL_DIR/unity.png"
 
 echo "Installing $VERSION"
