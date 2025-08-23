@@ -2,7 +2,7 @@
 set -e
 
 if [ -n "$CLEANUP" ]; then
-  sudo apt-get remove unityhub
+  apt-get remove unityhub
   exit 0
 fi
 
