@@ -1,0 +1,16 @@
+resource_id: unity-hub
+name: Unity Hub
+icon: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/unity/scripts/assets/unity.png?raw=true"
+description: Unity Hub Project and License Manager
+category: Game Engine
+tags:
+  - unity
+  - animation
+  - rendering
+  - real-time
+  - licensing
+fields:
+  - name: install_volume
+    description: The name of the install volume
+    required: true
+    type: shared-volume
