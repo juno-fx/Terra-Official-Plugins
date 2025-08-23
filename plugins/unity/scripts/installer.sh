@@ -1,8 +1,10 @@
 set -e
 
+echo "installing needed packages"
 apt update
 apt install curl -y
 apt install jq -y
+apt install xz-utils
 
 INSTALL_DIR="$DESTINATION/unity-$VERSION"
 LAUNCH="$INSTALL_DIR/bin/unity.sh"
