@@ -9,8 +9,4 @@ tags:
   - rendering
   - real-time
   - licensing
-fields:
-  - name: install_volume
-    description: The name of the install volume
-    required: true
-    type: shared-volume
+fields: []
