@@ -11,7 +11,7 @@ ICON="$INSTALL_DIR/unity.png"
 echo "Installing $VERSION"
 echo "Destination $INSTALL_DIR"
 
-reponse_url="https://services.api.unity.com/unity/editor/release/v1/releases?version=$VERSION&platform=LINUX"
+response_url="https://services.api.unity.com/unity/editor/release/v1/releases?version=$VERSION&platform=LINUX"
 echo $response_url
 response=$(curl "$reponse_url")
 url=$(echo "$test" | jq -r '.results[0].downloads[0].url')
