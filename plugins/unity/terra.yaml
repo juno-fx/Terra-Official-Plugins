@@ -12,10 +12,10 @@ fields:
   - name: version
     description: Version of unity to install. i.e. 6000.2
     required: true
-  - name: destination
-    description: Destination directory
-    required: true
   - name: install_volume
     description: The name of the install volume
     required: true
     type: shared-volume
+  - name: destination
+    description: Destination directory defaults to "/unity"
+    required: false
