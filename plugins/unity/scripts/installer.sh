@@ -17,11 +17,11 @@ response=$(curl -s "$response_url")
 
 url=$(echo "$response" | jq -r '.results[0].downloads[0].url')
 echo "Download URL: $url"
-curl -o "/tmp/unity-$VERSION.tar.gz" -P /tmp "$url"
+curl -o "/tmp/unity-$VERSION.tar.xz" -P /tmp "$url"
 
 echo "Extracting Unity..."
 mkdir -p "$INSTALL_DIR"
-tar xzvf "/tmp/unity-$VERSION.tar.gz" -C "$DESTINATION/"
+tar xzvf "/tmp/unity-$VERSION.tar.xz" -C "$DESTINATION/"
 chmod -R 555 "$DESTINATION"
 
 echo "[Desktop Entry]
