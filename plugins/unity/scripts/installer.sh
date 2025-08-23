@@ -9,10 +9,11 @@ LAUNCH="$INSTALL_DIR/bin/unity.sh"
 ICON="$INSTALL_DIR/unity.png"
 
 echo "Installing $VERSION"
-echo "Destination $DESTINATION"
-echo "Executable: $executable"
+echo "Destination $INSTALL_DIR"
 
-response=$(curl "https://services.api.unity.com/unity/editor/release/v1/releases?version=$VERSION&platform=LINUX")
+reponse_url="https://services.api.unity.com/unity/editor/release/v1/releases?version=$VERSION&platform=LINUX"
+echo $response_url
+response=$(curl "$reponse_url")
 url=$(echo "$test" | jq -r '.results[0].downloads[0].url')
 
 curl -o "/tmp/unity-$VERSION.tar.gz" -P /tmp "$url"
