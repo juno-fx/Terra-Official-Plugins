@@ -23,7 +23,7 @@ curl -o "/tmp/unity-$VERSION.tar.xz" -P /tmp "$url"
 
 echo "Extracting Unity..."
 mkdir -p "$INSTALL_DIR"
-tar xzvf "/tmp/unity-$VERSION.tar.xz" -C "$INSTALL_DIR/"
+tar xJvf "/tmp/unity-$VERSION.tar.xz" -C "$INSTALL_DIR/"
 chmod -R 555 "$DESTINATION"
 
 echo "Adding desktop files"
