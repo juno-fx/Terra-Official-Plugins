@@ -2,6 +2,7 @@ set -e
 # https://docs.unity3d.com/hub/manual/InstallHub.html
 
 echo "Installing needed packages"
+apt update
 apt install -y wget
 apt install -y gpg
 
