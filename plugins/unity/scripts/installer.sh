@@ -7,7 +7,7 @@ apt install jq -y
 apt install xz-utils -y
 
 INSTALL_DIR="$DESTINATION/unity-$VERSION"
-LAUNCH="$INSTALL_DIR/bin/unity.sh"
+LAUNCH="$INSTALL_DIR/Editor/unity.sh"
 ICON="$INSTALL_DIR/unity.png"
 
 echo "Installing $VERSION"
@@ -23,10 +23,11 @@ curl -o "/tmp/unity-$VERSION.tar.xz" -P /tmp "$url"
 
 echo "Extracting Unity..."
 mkdir -p "$INSTALL_DIR"
-tar xJvf "/tmp/unity-$VERSION.tar.xz" -C "$INSTALL_DIR/"
+tar xzvf "/tmp/unity-$VERSION.tar.xz" -C "$INSTALL_DIR/"
 chmod -R 555 "$DESTINATION"
 
 echo "Adding desktop files"
+
 # app icon setup
 cp -v "${PWD}/assets/unity.png" "$INSTALL_DIR/"
 rm -rfv "$INSTALL_DIR/unity.desktop"
@@ -51,5 +52,5 @@ Terminal=true
 Type=Application
 Categories=X-Polaris" >> "$INSTALL_DIR"/unity-gpu.desktop
 
-cat "$DESTINATION"/*.desktop
+cat "$INSTALL_DIR"/*.desktop
 
