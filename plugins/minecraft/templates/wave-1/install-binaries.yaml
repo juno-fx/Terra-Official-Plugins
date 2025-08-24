@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-install-binaries
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: installer
+          image: ubuntu:latest
+          env:
+            - name: DOWNLOAD
+              value: "true"
+            - name: URL
+              value: "{{ .Values.url }}"
+            - name: MOUNT_LOCATION
+              value: "{{ .Values.install_volume.container_path }}"
+            - name: DESTINATION
+              value: "{{ .Values.install_volume.container_path }}{{ .Values.destination }}"
+          command: ["/terra/bootstrap.sh"]
+          volumeMounts:
+            - name: installer
+              mountPath: /terra/bootstrap.sh
+              subPath: bootstrap.sh
+            - name: installer
+              mountPath: /terra/scripts.base64
+              subPath: packaged_scripts.base64
+            - name: mount
+              mountPath: {{ .Values.install_volume.container_path }}
+              {{- if .Values.install_volume.sub_path }}
+              subPath: {{ .Values.install_volume.sub_path }}
+              {{- end }}
+      volumes:
+        - name: mount
+          persistentVolumeClaim:
+            claimName: {{ .Values.install_volume.name }}
+        - name: installer
+          configMap:
+            name: {{ .Release.Name }}-scripts-configmap
+            defaultMode: 0500

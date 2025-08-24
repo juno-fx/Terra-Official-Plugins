@@ -1,0 +1,18 @@
+resource_id: minecraft
+name: Minecraft Launcher
+icon: https://www.minecraft.net/content/dam/minecraftnet/games/minecraft/logos/Global-Header_MCCB-Logo_300x51.svg
+description: A launcher for Minecraft, allowing users to play the game.
+category: Gaming
+tags:
+  - gaming
+  - minecraft
+  - launcher
+  - games
+fields:
+  - name: install_volume
+    description: The name of the install volume
+    required: true
+    type: shared-volume
+  - name: destination
+    description: Destination directory
+    required: true
