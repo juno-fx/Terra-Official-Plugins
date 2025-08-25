@@ -1,6 +1,6 @@
 # configuration
 destination: /vscode
-version: 2025.2
+version: latest
 install_volume:
   name: apps-pv-claim
   sub_path:

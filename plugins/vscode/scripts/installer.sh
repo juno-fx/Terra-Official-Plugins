@@ -26,7 +26,7 @@ rm -rfv "$INSTALL_DIR/vscode.desktop"
 
 echo "[Desktop Entry]
 Version=$VERSION
-Name=Pycharm $VERSION
+Name=VScode $VERSION
 Comment=VScode IDE
 Exec=$LAUNCH
 Icon=$ICON
