@@ -6,7 +6,7 @@ apt update
 apt install curl -y
 
 INSTALL_DIR="$DESTINATION/vscode-$VERSION"
-LAUNCH="$INSTALL_DIR/bin/vscode.sh "
+LAUNCH="$INSTALL_DIR/VSCode-linux-x64/bin/vscode.sh "
 ICON="$INSTALL_DIR/vscode.png"
 
 echo "Installing $VERSION"
@@ -16,7 +16,7 @@ curl -L -o "/tmp/vscode-$VERSION.tar.gz" -P /tmp "https://update.code.visualstud
 
 echo "Extracting vscode..."
 mkdir -p "$INSTALL_DIR"
-tar xzvf "/tmp/vscode-$VERSION.tar.gz" -C "$DESTINATION/"
+tar xzvf "/tmp/vscode-$VERSION.tar.gz" -C "$INSTALL_DIR/"
 chmod -R 555 "$DESTINATION"
 
 echo "Adding desktop files"
