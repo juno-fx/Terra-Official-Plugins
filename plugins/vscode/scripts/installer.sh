@@ -12,7 +12,7 @@ ICON="$INSTALL_DIR/vscode.png"
 echo "Installing $VERSION"
 echo "Destination $INSTALL_DIR"
 
-curl -o "/tmp/vscode-$VERSION.tar.gz" -P /tmp "https://update.code.visualstudio.com/$VERSION/linux-x64/stable"
+curl -L -o "/tmp/vscode-$VERSION.tar.gz" -P /tmp "https://update.code.visualstudio.com/$VERSION/linux-x64/stable"
 
 echo "Extracting vscode..."
 mkdir -p "$INSTALL_DIR"
