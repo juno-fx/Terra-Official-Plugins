@@ -1,0 +1,21 @@
+resource_id: vscode
+name: vscode
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/vscode/scripts/assets/vscode.png
+description: The open source AI code editor
+category: Software Development
+tags:
+  - vscode
+  - ide
+  - development
+fields:
+  - name: version
+    description: Version of VScode to install.
+    required: True
+  - name: install_volume
+    description: The name of the install volume
+    required: true
+    type: shared-volume
+  - name: destination
+    description: Destination directory (defaults to /vscode)
+    required: false
+
