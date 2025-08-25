@@ -20,8 +20,8 @@ tar xzvf "/tmp/vscode-$VERSION.tar.gz" -C "$INSTALL_DIR/"
 chmod -R 555 "$INSTALL_DIR"
 
 echo "Adding right permissions for chrome-sandbox"
-chown root:root "$INSTALL_DIR/VSCode-linux-x64/bin/chrome-sandbox"
-chmod 4755 "$INSTALL_DIR/VSCode-linux-x64/bin/chrome-sandbox"
+chown root:root "$INSTALL_DIR/VSCode-linux-x64/chrome-sandbox"
+chmod 4755 "$INSTALL_DIR/VSCode-linux-x64/chrome-sandbox"
 
 echo "Adding desktop files"
 # app icon setup
