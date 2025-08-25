@@ -17,7 +17,11 @@ curl -L -o "/tmp/vscode-$VERSION.tar.gz" -P /tmp "https://update.code.visualstud
 echo "Extracting vscode..."
 mkdir -p "$INSTALL_DIR"
 tar xzvf "/tmp/vscode-$VERSION.tar.gz" -C "$INSTALL_DIR/"
-chmod -R 555 "$DESTINATION"
+chmod -R 555 "$INSTALL_DIR"
+
+echo "Adding right permissions for chrome-sandbox"
+chown root:root "$INSTALL_DIR/VSCode-linux/bin/chrome-sandbox"
+chmod 4755 "$INSTALL_DIR/VSCode-linux/bin/chrome-sandbox"
 
 echo "Adding desktop files"
 # app icon setup
