@@ -6,7 +6,7 @@ apt update
 apt install curl -y
 
 INSTALL_DIR="$DESTINATION/vscode-$VERSION"
-LAUNCH="$INSTALL_DIR/VSCode-linux-x64/bin/vscode.sh "
+LAUNCH="$INSTALL_DIR/VSCode-linux-x64/bin/code"
 ICON="$INSTALL_DIR/vscode.png"
 
 echo "Installing $VERSION"
