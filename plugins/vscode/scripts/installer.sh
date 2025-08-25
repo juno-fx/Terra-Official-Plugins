@@ -24,7 +24,7 @@ chown root:root "$INSTALL_DIR/VSCode-linux-x64/chrome-sandbox"
 chmod 4755 "$INSTALL_DIR/VSCode-linux-x64/chrome-sandbox"
 
 echo "Creating symlink"
-ln -s "$INSTALL_DIR/VSCode-linux-x64/bin/code" "/usr/bin/code"
+ln -s "$INSTALL_DIR/VSCode-linux-x64/bin/code" "/usr/local/bin/code"
 
 echo "Adding desktop files"
 # app icon setup
