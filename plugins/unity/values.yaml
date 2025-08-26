@@ -1,0 +1,7 @@
+# configuration
+version: 6000.2
+destination: /unity
+install_volume:
+  name: apps-pv-claim
+  sub_path:
+  container_path: /apps

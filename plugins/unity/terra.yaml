@@ -1,0 +1,23 @@
+resource_id: unity
+name: Unity Editor
+icon: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/unity/scripts/assets/unity.png?raw=true"
+description: Unity Game Engine 2D and 3D Development Platform
+category: Game Engine
+tags:
+  - unity
+  - animation
+  - rendering
+  - real-time
+  - 3d
+  - 2d
+fields:
+  - name: version
+    description: Version of unity to install. i.e. 6000.2
+    required: true
+  - name: install_volume
+    description: The name of the install volume
+    required: true
+    type: shared-volume
+  - name: destination
+    description: Destination directory defaults to "/unity"
+    required: false
