@@ -8,6 +8,8 @@ tags:
   - animation
   - rendering
   - real-time
+  - 3D
+  - 2D
 fields:
   - name: version
     description: Version of unity to install. i.e. 6000.2
