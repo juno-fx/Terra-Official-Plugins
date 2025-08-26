@@ -1,7 +1,7 @@
 resource_id: unity
 name: Unity Editor
 icon: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/unity/scripts/assets/unity.png?raw=true"
-description: Unity Game Engine to Target directory
+description: Unity Game Engine 2D and 3D Development Platform
 category: Game Engine
 tags:
   - unity
