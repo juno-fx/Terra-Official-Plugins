@@ -37,18 +37,19 @@ mkdir -p $temp_folder
 mkdir -p "$temp_folder"/"$VERSION"
 mkdir -p "$temp_folder"/"$VERSION"/installs
 TEMP_VERSION_FOLDER="$temp_folder"/"$VERSION"
-
+echo $TEMP_VERSION_FOLDER
 echo "Downloading Houdini $VERSION"
 if [ "$DEV_APPS_DEBUG" = true ]
 then
 	echo "Dev Apps Debug is enabled"
-  cp /tmp/houdini.tar.gz "$TEMP_VERSION_FOLDER"/houdini.tar.gz
-  chmod +x "$TEMP_VERSION_FOLDER"/houdini.tar.gz
+  cp /tmp/houdini-launcher.iso "$TEMP_VERSION_FOLDER"/houdini-launcher.iso
+  chmod +x "$TEMP_VERSION_FOLDER"/houdini-launcher.iso
 else
-  venv/bin/python "${PWD}/sidefx_downloader.py" --version $HOUDINI_VERSION --build $HOUDINI_BUILD --key "$SIDEFX_CLIENT_ID" --secret "$SIDEFX_CLIENT_SECRET" --output "$TEMP_VERSION_FOLDER"
+  venv/bin/python "$WORKING_DIR}/sidefx_downloader.py" --version $HOUDINI_VERSION --build $HOUDINI_BUILD --key "$SIDEFX_CLIENT_ID" --secret "$SIDEFX_CLIENT_SECRET" --output "$TEMP_VERSION_FOLDER"
 fi
 
 echo "Extracting houdini-launcher.iso"
+
 chmod 555 "$TEMP_VERSION_FOLDER"/houdini-launcher.iso
 7z x "$TEMP_VERSION_FOLDER"/houdini-launcher.iso -o"$TEMP_VERSION_FOLDER"/installs > "$TEMP_VERSION_FOLDER"/houdini_extract.log
 
