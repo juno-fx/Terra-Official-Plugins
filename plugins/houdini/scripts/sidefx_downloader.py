@@ -7,7 +7,7 @@ import hashlib
 import shutil
 import click
 import requests
-
+from pprint import pprint
 sys.path.append(os.path.abspath(f"{__file__}/../"))
 
 import sidefx
@@ -25,59 +25,64 @@ def run_download(version=None, build=None, key=None, secret=None, output=None):
         "version": os.environ.get("HOUDINI_VERSION", version),
         "build": os.environ.get("HOUDINI_BUILD", build),
         "release": "gold",
-        "platform": "linux_x86_64_gcc9.3",
+        "platform": "linux_x86_64_gcc11.2",
         "product": "houdini",
     }
-
-    # This service object retrieve a token using your Application ID and secret
-    service = sidefx.service(
-        client_id=os.environ.get("SIDEFX_CLIENT_ID", key),
-        client_secret_key=os.environ.get("SIDEFX_CLIENT_SECRET", secret),
-    )
+    product = "houdini-launcher"
+    service = create_service(CLIENT_ID, CLIENT_SECRET)
 
     # Retrieve the daily builds list, if you want the latest production
     # you can skip this step
-    releases_list = service.download.get_daily_builds_list(
-        product=target_release["product"],
-        version=target_release["version"],
-        platform="linux",
-    )
-
-    for _got_version in releases_list:
-        if _got_version["platform"]:
-            if (
-                _got_version["platform"] == target_release["platform"]
-                and _got_version["release"] == target_release["release"]
-            ):
-                if _got_version["build"] == target_release["build"]:
-                    print(_got_version)
-                    _download_release = _got_version
-
-    # Retrieve the latest daily build available
-    _download_release = service.download.get_daily_build_download(
-        product=target_release["product"],
+    builds = service.download.get_daily_builds_list(
+        product,
         version=target_release["version"],
         build=target_release["build"],
-        platform="linux",
-    )
+        platform="Linux",
+        only_production=False)
+    pprint(builds)
+    for build in builds:
+        if (
+            build.get("platform")== target_release["platform"]
+            and build.get("release") == target_release["release"]
+            and build.get("build") == target_release["build"]
+        ):
+            print(build)
+            download_build(service, build, output)
+            break
 
-    # Download the file
-    local_filename = os.path.join(output, "houdini.tar.gz")
-    r = requests.get(_download_release["download_url"], stream=True, timeout=90)
-    if r.status_code == 200:
-        with open(local_filename, "wb") as f:
-            r.raw.decode_content = True
-            shutil.copyfileobj(r.raw, f)
-    else:
-        raise InterruptedError("Error downloading file!")
 
-    # Verify the file checksum is matching
-    file_hash = hashlib.md5()
-    with open(local_filename, "rb") as f:
-        for chunk in iter(lambda: f.read(4096), b""):
-            file_hash.update(chunk)
-    if file_hash.hexdigest() != _download_release["hash"]:
-        raise ValueError("Checksum does not match!")
+# Return a sidefx.service object allowing access to API functions.
+def create_service(client_id, client_secret_key):
+    return sidefx.service(
+        access_token_url="https://www.sidefx.com/oauth2/application_token",
+        client_id=client_id,
+        client_secret_key=client_secret_key,
+        endpoint_url="https://www.sidefx.com/api/")
+
+
+# Download the file specified in "build" argument and return the
+# downloaded filename on success.
+def download_build(service, build, output):
+    local_path = os.path.join(output, "houdini-launcher.iso")
+    build_info = service.download.get_daily_build_download(
+        build["product"], build["version"], build["build"], "Linux")
+    download_file(build_info["download_url"], local_path)
+    return build_info["filename"]
+
+
+# Download the file hosted on "url" and name it as "filename"
+def download_file(url, filename):
+    with requests.get(url, stream=True) as response:
+        with open(filename, "wb") as open_file:
+            shutil.copyfileobj(response.raw, open_file)
+    make_executable(filename)
+
+
+# Add executable privilege to the file specified in "file_path"
+def make_executable(file_path):
+    stat_info = os.stat(file_path)
+    os.chmod(file_path, stat.ST_MODE | stat.S_IEXEC | stat.S_IXUSR |
+            stat.S_IXGRP | stat.S_IRUSR | stat.S_IRGRP)
 
 
 if __name__ == "__main__":

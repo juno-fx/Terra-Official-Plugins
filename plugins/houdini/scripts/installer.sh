@@ -6,6 +6,7 @@ echo "Installing $VERSION - $DESTINATION"
 echo "Setting up prequesites"
 apt update
 apt install bc wget unzip python3 python3-venv python3-pip -y
+apt install p7zip -y
 python3 -m venv venv
 source venv/bin/activate
 venv/bin/pip --version
@@ -15,13 +16,15 @@ venv/bin/pip  install click
 
 
 # store our current working dir
-working_dir="$PWD"
-echo $working_dir
+WORKING_DIR="$PWD"
+echo $WORKING_DIR
 
 # We need to pass export SIDEFX_CLIENT_ID=''; export SIDEFX_CLIENT_SECRET=''; export DEV_APPS_DEBUG=true to the scipt itself
 export SIDEFX_CLIENT_ID=$CLIENT_ID
 export SIDEFX_CLIENT_SECRET=$CLIENT_SECRET
 
+# Hardcoding until we can sort out a way to gather the license date from new launcher installer
+export LICENSE_DATE="SideFX-2021-10-13"
 # split our version/build values
 echo "version"
 echo $VERSION
@@ -33,61 +36,51 @@ temp_folder="/tmp/apps_temp"
 mkdir -p $temp_folder
 mkdir -p "$temp_folder"/"$VERSION"
 mkdir -p "$temp_folder"/"$VERSION"/installs
-temp_folder_version="$temp_folder"/"$VERSION"
+TEMP_VERSION_FOLDER="$temp_folder"/"$VERSION"
 
 echo "Downloading Houdini $VERSION"
 if [ "$DEV_APPS_DEBUG" = true ]
 then
 	echo "Dev Apps Debug is enabled"
-  cp /tmp/houdini.tar.gz $temp_folder_version/houdini.tar.gz
-  chmod +x $temp_folder_version/houdini.tar.gz
+  cp /tmp/houdini.tar.gz $TEMP_VERSION_FOLDER/houdini.tar.gz
+  chmod +x $TEMP_VERSION_FOLDER/houdini.tar.gz
 else
-  venv/bin/python "$working_dir/sidefx_downloader.py" --version $HOUDINI_VERSION --build $HOUDINI_BUILD --key $SIDEFX_CLIENT_ID --secret $SIDEFX_CLIENT_SECRET --output $temp_folder_version
+  venv/bin/python "${PWD}/sidefx_downloader.py" --version $HOUDINI_VERSION --build $HOUDINI_BUILD --key $SIDEFX_CLIENT_ID --secret $SIDEFX_CLIENT_SECRET --output $temp_folder_version
 fi
 
-echo "Extracting Houdini tar.gz"
-chmod 777 $temp_folder_version/houdini.tar.gz
-tar -xvf $temp_folder_version/houdini.tar.gz -C $temp_folder_version/installs > $temp_folder_version/houdini_extract.log
-rm -rf $temp_folder_version/houdini.tar.gz
-echo "Houdini.tar.gz extracted to $temp_folder_version/installs"
+echo "Extracting houdini-launcher.iso"
+chmod 555 $TEMP_VERSION_FOLDER/houdini-launcher.iso
+7z x $TEMP_VERSION_FOLDER/houdini-launcher.iso -o$TEMP_VERSION_FOLDER/installs > $TEMP_VERSION_FOLDER/houdini_extract.log
 
-# get gcc version
-files=( "${temp_folder_version}"/installs/*/ )
-hou_installer_folder="${files[0]}"
+rm -rf $TEMP_VERSION_FOLDER/houdini-launcher.iso
+echo "houdini-launcher.iso extracted to $TEMP_VERSION_FOLDER/installs"
 
-echo "Installing Houdini... $INSTALL_DIR ..."
+echo "Installing Houdini Launcher... $INSTALL_DIR/launcher ..."
 
-mkdir -p $DESTINATION
-chmod -R 777 $DESTINATION
-mkdir -p $INSTALL_DIR
-chmod -R 777 $INSTALL_DIR
-echo "Houdini Install Dir: $INSTALL_DIR"
+mkdir -p "$DESTINATION"
+chmod -R 555 "$DESTINATION"
+mkdir -p "$INSTALL_DIR"
+chmod -R 555 "$INSTALL_DIR"
+mkdir -p "$INSTALL_DIR/launcher"
+chmod -R 555 "$INSTALL_DIR/launcher"
+mkdir -p "$INSTALL_DIR/shfs"
+chmod -R 555 "$INSTALL_DIR/shfs"
+echo "Houdini Install Dir: $INSTALL_DIR/launcher"
 
-# get license date from file
-export $(cat $hou_installer_folder/houdini.install | grep 'LICENSE_DATE=' | tr -d '"')
+cd "$TEMP_VERSION_FOLDER"
+
+./installs/install_houdini.launcher.sh "$INSTALL_DIR"/launcher
+
 echo "License Date:" $LICENSE_DATE
-
-
-mkdir -p $DESTINATION/hq_server $DESTINATION/hq_client $DESTINATION/hqueue_shared
-chmod -R 777 $DESTINATION/hq_server $DESTINATION/hq_client $DESTINATION/hqueue_shared
-
 echo "Running Houdini Installer for $VERSION"
 
-cd $hou_installer_folder
-./houdini.install --auto-install --install-menus --install-sidefxlabs --sidefxlabs-dir $INSTALL_DIR --no-install-hfs-symlink --no-root-check \
---no-install-bin-symlink \
---no-install-license --accept-EULA $LICENSE_DATE \
---make-dir $INSTALL_DIR \
---install-dir $INSTALL_DIR  #> $DESTINATION/houdini_install.log
+cd "$INSTALL_DIR"
+./launcher/bin/houdini_installer install --product Houdini --version "$Version" --install-shfs "$INSTALL_DIR/shfs"--install-package --installdir "$INSTALL_DIR" --accept-EULA="$LICENSE_DATE"
 
 echo "Adding desktop files"
+cd ""$WORKING_DIR"
 # app icon setup
-cd $working_dir
-cp -v ./assets/houdini.png $DESTINATION/
-
-cd $DESTINATION
-pwd
-ls -la
+cp -v ./assets/houdini.png INSTALL_DIR/
 
 echo "[Desktop Entry]
 Version=$VERSION
