@@ -37,7 +37,6 @@ def run_download(version=None, build=None, key=None, secret=None, output=None):
     builds = service.download.get_daily_builds_list(
         product,
         version=target_release["version"],
-        build=target_release["build"],
         platform="Linux",
         only_production=False)
     pprint(builds)
