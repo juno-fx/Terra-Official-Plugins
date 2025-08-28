@@ -29,7 +29,8 @@ def run_download(version=None, build=None, key=None, secret=None, output=None):
         "product": "houdini",
     }
     product = "houdini-launcher"
-    service = create_service(CLIENT_ID, CLIENT_SECRET)
+    service = create_service(client_id=os.environ.get("SIDEFX_CLIENT_ID", key),
+                             client_secret_key=os.environ.get("SIDEFX_CLIENT_SECRET", secret))
 
     # Retrieve the daily builds list, if you want the latest production
     # you can skip this step
