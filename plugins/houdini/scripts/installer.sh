@@ -46,7 +46,7 @@ else
 fi
 
 echo "Extracting Houdini tar.gz"
-chmod 777 $temp_folder_version/houdini.tar.gz
+chmod 555 $temp_folder_version/houdini.tar.gz
 tar -xvf $temp_folder_version/houdini.tar.gz -C $temp_folder_version/installs > $temp_folder_version/houdini_extract.log
 rm -rf $temp_folder_version/houdini.tar.gz
 echo "Houdini.tar.gz extracted to $temp_folder_version/installs"
@@ -58,9 +58,9 @@ hou_installer_folder="${files[0]}"
 echo "Installing Houdini... $INSTALL_DIR ..."
 
 mkdir -p $DESTINATION
-chmod -R 777 $DESTINATION
+chmod -R 555 $DESTINATION
 mkdir -p $INSTALL_DIR
-chmod -R 777 $INSTALL_DIR
+chmod -R 555 $INSTALL_DIR
 echo "Houdini Install Dir: $INSTALL_DIR"
 
 # get license date from file
@@ -68,8 +68,8 @@ export $(cat $hou_installer_folder/houdini.install | grep 'LICENSE_DATE=' | tr -
 echo "License Date:" $LICENSE_DATE
 
 
-mkdir -p $DESTINATION/hq_server $DESTINATION/hq_client $DESTINATION/hqueue_shared
-chmod -R 777 $DESTINATION/hq_server $DESTINATION/hq_client $DESTINATION/hqueue_shared
+#mkdir -p $INSTALL_DIR/hq_server $INSTALL_DIR/hq_client $INSTALL_DIR/hqueue_shared
+#chmod -R 555 $INSTALL_DIR/hq_server $INSTALL_DIR/hq_client $INSTALL_DIR/hqueue_shared
 
 echo "Running Houdini Installer for $VERSION"
 
@@ -83,9 +83,9 @@ cd $hou_installer_folder
 echo "Adding desktop files"
 # app icon setup
 cd $working_dir
-cp -v ./assets/houdini.png $DESTINATION/
+cp -v ./assets/houdini.png $INSTALL_DIR
 
-cd $DESTINATION
+cd $INSTALL_DIR
 pwd
 ls -la
 
@@ -94,27 +94,27 @@ Version=$VERSION
 Name=Houdini FX $VERSION
 Comment=SideFX Houdini software
 Exec=vglrun -d /dev/dri/card0 $INSTALL_DIR/bin/houdinifx %F
-Icon="$DESTINATION/houdini.png"
+Icon="$INSTALL_DIR/houdini.png"
 Terminal=true
 Type=Application
-Categories=X-Polaris" > $DESTINATION/houdinifx_$VERSION.desktop
+Categories=X-Polaris" > $INSTALL_DIR/houdinifx_$VERSION.desktop
 
 echo "[Desktop Entry]
 Version=$VERSION
 Name=Houdini Core $VERSION
 Comment=SideFX Houdini software
 Exec=vglrun -d /dev/dri/card0 $INSTALL_DIR/bin/houdinicore %F
-Icon="$DESTINATION/houdini.png"
+Icon="$INSTALL_DIR/houdini.png"
 Terminal=true
 Type=Application
-Categories=X-Polaris" > $DESTINATION/houdinicore_$VERSION.desktop
+Categories=X-Polaris" > $INSTALL_DIR/houdinicore_$VERSION.desktop
 
 # set permission for desktop files and copy over to applications dir
-chmod 644 $DESTINATION/houdinicore_$VERSION.desktop
-chmod 644 $DESTINATION/houdinifx_$VERSION.desktop
+chmod 644 $INSTALL_DIR/houdinicore_$VERSION.desktop
+chmod 644 $INSTALL_DIR/houdinifx_$VERSION.desktop
 
 
-cat $DESTINATION/*.desktop
+cat $INSTALL_DIR/*.desktop
 
 echo "Desktop file created."
 echo "Install Complete"

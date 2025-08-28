@@ -16,6 +16,8 @@ spec:
           env:
             - name: CLEANUP
               value: "true"
+            - name: VERSION
+              value: "{{ .Values.version }}"
             - name: DESTINATION
               value: "{{ .Values.install_volume.container_path }}{{ .Values.destination }}"
           command: ["/terra/bootstrap.sh"]
