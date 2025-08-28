@@ -42,18 +42,18 @@ echo "Downloading Houdini $VERSION"
 if [ "$DEV_APPS_DEBUG" = true ]
 then
 	echo "Dev Apps Debug is enabled"
-  cp /tmp/houdini.tar.gz $TEMP_VERSION_FOLDER/houdini.tar.gz
-  chmod +x $TEMP_VERSION_FOLDER/houdini.tar.gz
+  cp /tmp/houdini.tar.gz "$TEMP_VERSION_FOLDER"/houdini.tar.gz
+  chmod +x "$TEMP_VERSION_FOLDER"/houdini.tar.gz
 else
-  venv/bin/python "${PWD}/sidefx_downloader.py" --version $HOUDINI_VERSION --build $HOUDINI_BUILD --key $SIDEFX_CLIENT_ID --secret $SIDEFX_CLIENT_SECRET --output $TEMP_VERSION_FOLDER
+  venv/bin/python "${PWD}/sidefx_downloader.py" --version $HOUDINI_VERSION --build $HOUDINI_BUILD --key "$SIDEFX_CLIENT_ID" --secret "$SIDEFX_CLIENT_SECRET" --output "$TEMP_VERSION_FOLDER"
 fi
 
 echo "Extracting houdini-launcher.iso"
-chmod 555 $TEMP_VERSION_FOLDER/houdini-launcher.iso
-7z x $TEMP_VERSION_FOLDER/houdini-launcher.iso -o$TEMP_VERSION_FOLDER/installs > $TEMP_VERSION_FOLDER/houdini_extract.log
+chmod 555 "$TEMP_VERSION_FOLDER"/houdini-launcher.iso
+7z x "$TEMP_VERSION_FOLDER"/houdini-launcher.iso -o"$TEMP_VERSION_FOLDER"/installs > "$TEMP_VERSION_FOLDER"/houdini_extract.log
 
-echo "houdini-launcher.iso extracted to $TEMP_VERSION_FOLDER/installs"
-echo "Installing Houdini Launcher... $INSTALL_DIR/launcher ..."
+echo "houdini-launcher.iso extracted to "$TEMP_VERSION_FOLDER"/installs"
+echo "Installing Houdini Launcher... "$INSTALL_DIR"/launcher ..."
 
 mkdir -p "$DESTINATION"
 chmod -R 555 "$DESTINATION"
@@ -63,7 +63,7 @@ mkdir -p "$INSTALL_DIR/launcher"
 chmod -R 555 "$INSTALL_DIR/launcher"
 mkdir -p "$INSTALL_DIR/shfs"
 chmod -R 555 "$INSTALL_DIR/shfs"
-echo "Houdini Install Dir: $INSTALL_DIR/launcher"
+echo "Houdini Install Dir: "$INSTALL_DIR"/launcher"
 
 cd "$TEMP_VERSION_FOLDER"
 
