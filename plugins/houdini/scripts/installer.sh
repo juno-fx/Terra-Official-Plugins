@@ -78,7 +78,7 @@ cd "$INSTALL_DIR"
 ./launcher/bin/houdini_installer install --product Houdini --version "$Version" --install-shfs "$INSTALL_DIR/shfs"--install-package --installdir "$INSTALL_DIR" --accept-EULA="$LICENSE_DATE"
 
 echo "Adding desktop files"
-cd ""$WORKING_DIR"
+cd "$WORKING_DIR"
 # app icon setup
 cp -v ./assets/houdini.png INSTALL_DIR/
 
@@ -87,27 +87,27 @@ Version=$VERSION
 Name=Houdini FX $VERSION
 Comment=SideFX Houdini software
 Exec=vglrun -d /dev/dri/card0 $INSTALL_DIR/bin/houdinifx %F
-Icon="$DESTINATION/houdini.png"
+Icon="$INSTALL_DIR/houdini.png"
 Terminal=true
 Type=Application
-Categories=X-Polaris" > $DESTINATION/houdinifx_$VERSION.desktop
+Categories=X-Polaris" > $INSTALL_DIR/houdinifx_$VERSION.desktop
 
 echo "[Desktop Entry]
 Version=$VERSION
 Name=Houdini Core $VERSION
 Comment=SideFX Houdini software
 Exec=vglrun -d /dev/dri/card0 $INSTALL_DIR/bin/houdinicore %F
-Icon="$DESTINATION/houdini.png"
+Icon="$INSTALL_DIR/houdini.png"
 Terminal=true
 Type=Application
-Categories=X-Polaris" > $DESTINATION/houdinicore_$VERSION.desktop
+Categories=X-Polaris" > $INSTALL_DIR/houdinicore_$VERSION.desktop
 
 # set permission for desktop files and copy over to applications dir
-chmod 644 $DESTINATION/houdinicore_$VERSION.desktop
-chmod 644 $DESTINATION/houdinifx_$VERSION.desktop
+chmod 644 $INSTALL_DIR/houdinicore_$VERSION.desktop
+chmod 644 $INSTALL_DIR/houdinifx_$VERSION.desktop
 
 
-cat $DESTINATION/*.desktop
+cat $INSTALL_DIR/*.desktop
 
 echo "Desktop file created."
 echo "Install Complete"
