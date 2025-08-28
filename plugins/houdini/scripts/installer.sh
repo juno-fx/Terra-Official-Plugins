@@ -45,7 +45,7 @@ then
   cp /tmp/houdini-launcher.iso "$TEMP_VERSION_FOLDER"/houdini-launcher.iso
   chmod +x "$TEMP_VERSION_FOLDER"/houdini-launcher.iso
 else
-  venv/bin/python "$WORKING_DIR}/sidefx_downloader.py" --version $HOUDINI_VERSION --build $HOUDINI_BUILD --key "$SIDEFX_CLIENT_ID" --secret "$SIDEFX_CLIENT_SECRET" --output "$TEMP_VERSION_FOLDER"
+  venv/bin/python "$WORKING_DIR/sidefx_downloader.py" --version $HOUDINI_VERSION --build $HOUDINI_BUILD --key "$SIDEFX_CLIENT_ID" --secret "$SIDEFX_CLIENT_SECRET" --output "$TEMP_VERSION_FOLDER"
 fi
 
 echo "Extracting houdini-launcher.iso"
