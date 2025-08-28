@@ -32,11 +32,11 @@ export HOUDINI_VERSION="${VERSION%.*}"
 export HOUDINI_BUILD="${VERSION##*.}"
 INSTALL_DIR="$DESTINATION/$VERSION"
 
-temp_folder="/tmp/apps_temp"
-mkdir -p $temp_folder
-mkdir -p "$temp_folder"/"$VERSION"
-mkdir -p "$temp_folder"/"$VERSION"/installs
-TEMP_VERSION_FOLDER="$temp_folder"/"$VERSION"
+TEMP_FOLDER="/tmp/apps_temp"
+mkdir -p $TEMP_FOLDER
+mkdir -p "$TEMP_FOLDER"/"$VERSION"
+mkdir -p "$TEMP_FOLDER"/"$VERSION"/installs
+TEMP_VERSION_FOLDER="$TEMP_FOLDER"/"$VERSION"
 echo $TEMP_VERSION_FOLDER
 echo "Downloading Houdini $VERSION"
 if [ "$DEV_APPS_DEBUG" = true ]
@@ -47,7 +47,10 @@ then
 else
   venv/bin/python "$WORKING_DIR/sidefx_downloader.py" --version $HOUDINI_VERSION --build $HOUDINI_BUILD --key "$SIDEFX_CLIENT_ID" --secret "$SIDEFX_CLIENT_SECRET" --output "$TEMP_VERSION_FOLDER"
 fi
+cd TEMP_VERSION_FOLDER
 
+ls -la
+cd WORKING_DIR
 echo "Extracting houdini-launcher.iso"
 
 chmod 555 "$TEMP_VERSION_FOLDER"/houdini-launcher.iso
