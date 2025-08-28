@@ -75,7 +75,7 @@ echo "License Date:" $LICENSE_DATE
 echo "Running Houdini Installer for $VERSION"
 
 cd "$INSTALL_DIR"
-./launcher/bin/houdini_installer install --product Houdini --version "$Version" --install-shfs --shfs-directory "$INSTALL_DIR/shfs"--install-package --installdir "$INSTALL_DIR" --accept-EULA="$LICENSE_DATE"
+./launcher/bin/houdini_installer install --product Houdini --version "$Version" --install-shfs --shfs-directory "$INSTALL_DIR/shfs" --install-package --installdir "$INSTALL_DIR" --accept-EULA="$LICENSE_DATE"
 
 echo "Adding desktop files"
 cd "$WORKING_DIR"
