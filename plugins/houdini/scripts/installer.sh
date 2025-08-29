@@ -39,14 +39,9 @@ mkdir -p "$TEMP_FOLDER"/"$VERSION"/installs
 TEMP_VERSION_FOLDER="$TEMP_FOLDER"/"$VERSION"
 echo $TEMP_VERSION_FOLDER
 echo "Downloading Houdini $VERSION"
-if [ "$DEV_APPS_DEBUG" = true ]
-then
-	echo "Dev Apps Debug is enabled"
-  cp /tmp/houdini-launcher.iso "$TEMP_VERSION_FOLDER"/houdini-launcher.iso
-  chmod +x "$TEMP_VERSION_FOLDER"/houdini-launcher.iso
-else
-  venv/bin/python "$WORKING_DIR/sidefx_downloader.py" --version $HOUDINI_VERSION --build $HOUDINI_BUILD --key "$SIDEFX_CLIENT_ID" --secret "$SIDEFX_CLIENT_SECRET" --output "$TEMP_VERSION_FOLDER"
-fi
+
+venv/bin/python "$WORKING_DIR/sidefx_downloader.py" --version $HOUDINI_VERSION --build $HOUDINI_BUILD --key "$SIDEFX_CLIENT_ID" --secret "$SIDEFX_CLIENT_SECRET" --output "$TEMP_VERSION_FOLDER"
+
 cd TEMP_VERSION_FOLDER
 
 ls -la
