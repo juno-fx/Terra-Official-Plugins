@@ -27,7 +27,7 @@ def run_download(version=None, build=None, key=None, secret=None, output=None):
         "platform": "linux_x86_64_gcc11.2",
         "product": "houdini",
     }
-    product = "houdini"
+    product = "launcher-iso"
     service = create_service(client_id=os.environ.get("SIDEFX_CLIENT_ID", key),
                              client_secret_key=os.environ.get("SIDEFX_CLIENT_SECRET", secret))
 
