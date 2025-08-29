@@ -47,7 +47,7 @@ echo "Extracting houdini-launcher.iso"
 chmod 555 "$TEMP_VERSION_FOLDER"/houdini-launcher.iso
 7z x "$TEMP_VERSION_FOLDER"/houdini-launcher.iso -o"$TEMP_VERSION_FOLDER"/installs > "$TEMP_VERSION_FOLDER"/houdini_extract.log
 
-echo "houdini-launcher.iso extracted to "$TEMP_VERSION_FOLDER"
+echo "houdini-launcher.iso extracted to "$TEMP_VERSION_FOLDER""
 echo "Installing Houdini Launcher... "$INSTALL_DIR"/launcher ..."
 
 mkdir -p "$DESTINATION"
