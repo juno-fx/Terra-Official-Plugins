@@ -70,7 +70,7 @@ echo "License Date:" $LICENSE_DATE
 echo "Running Houdini Installer for $VERSION"
 
 cd "$INSTALL_DIR"
-./launcher/bin/houdini_installer install --product Houdini --version "$Version" --shfs-directory "$INSTALL_DIR/shfs" --installdir "$INSTALL_DIR" --offline-installer "$TEMP_VERSION_FOLDER/houdini-installer.iso" --accept-EULA="$LICENSE_DATE"
+./launcher/bin/houdini_installer install --product Houdini --version "$VERSION" --shfs-directory "$INSTALL_DIR/shfs" --installdir "$INSTALL_DIR" --offline-installer "$TEMP_VERSION_FOLDER/houdini-installer.iso" --accept-EULA="$LICENSE_DATE"
 
 echo "cleaning up temp files"
 rm -rf $TEMP_VERSION_FOLDER
