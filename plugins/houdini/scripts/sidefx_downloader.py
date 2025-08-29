@@ -41,6 +41,7 @@ def run_download(version=None, build=None, key=None, secret=None, output=None):
 
     for build in builds:
         if build.get("build") == target_release["build"]:
+            pprint(build)
             download_build(service, build, output)
             break
 
