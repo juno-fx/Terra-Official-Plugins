@@ -36,19 +36,12 @@ def run_download(version=None, build=None, key=None, secret=None, output=None):
     # you can skip this step
     builds = service.download.get_daily_builds_list(
         product,
-        version=target_release["version"],
+        version=None,
         platform="Linux",
         only_production=False)
+
     pprint(builds)
-    for build in builds:
-        if (
-            build.get("platform")== target_release["platform"]
-            and build.get("release") == target_release["release"]
-            and build.get("build") == target_release["build"]
-        ):
-            print(build)
-            download_build(service, build, output)
-            break
+    download_build(service, builds[0], output)
 
 
 # Return a sidefx.service object allowing access to API functions.
