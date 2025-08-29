@@ -42,10 +42,6 @@ echo "Downloading Houdini $VERSION"
 
 venv/bin/python "$WORKING_DIR/sidefx_downloader.py" --version $HOUDINI_VERSION --build $HOUDINI_BUILD --key "$SIDEFX_CLIENT_ID" --secret "$SIDEFX_CLIENT_SECRET" --output "$TEMP_VERSION_FOLDER"
 
-cd TEMP_VERSION_FOLDER
-
-ls -la
-cd WORKING_DIR
 echo "Extracting houdini-launcher.iso"
 
 chmod 555 "$TEMP_VERSION_FOLDER"/houdini-launcher.iso
