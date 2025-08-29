@@ -60,7 +60,7 @@ mkdir -p "$INSTALL_DIR/shfs"
 chmod -R 555 "$INSTALL_DIR/shfs"
 echo "Houdini Install Dir: "$INSTALL_DIR"/launcher"
 
-cd "$TEMP_VERSION_FOLDER"
+cd "$TEMP_VERSION_FOLDER"/installs
 ls
 ./install_houdini.launcher.sh "$INSTALL_DIR"/launcher
 
