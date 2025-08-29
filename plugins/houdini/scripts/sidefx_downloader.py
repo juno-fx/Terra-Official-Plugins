@@ -2,8 +2,7 @@
 
 import os
 import sys
-
-import hashlib
+import stat
 import shutil
 import click
 import requests
