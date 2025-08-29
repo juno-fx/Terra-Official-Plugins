@@ -58,6 +58,8 @@ def download_build(service, build, output):
     build_info = service.download.get_daily_build_download(
         build["product"], build["version"], build["build"], "linux")
     download_file(build_info["download_url"], local_path)
+    pprint(build_info)
+    pprint(local_path)
     return build_info["filename"]
 
 
