@@ -80,8 +80,12 @@ ls
 --offline-installer "$TEMP_VERSION_FOLDER/houdini-installer.iso" \
 --accept-EULA="$LICENSE_DATE"
 
+echo "Installing SideFX Labs Production Build $HOUDINI_VERSION"
+./launcher/bin/houdini_installer install-package \
+--package-name "SideFX Labs $HOUDINI_VERSION Production Build"
+
 echo "cleaning up temp files"
-rm -rf $TEMP_VERSION_FOLDER
+rm -rf "$TEMP_VERSION_FOLDER"
 
 echo "Adding desktop files"
 cd "$WORKING_DIR"
