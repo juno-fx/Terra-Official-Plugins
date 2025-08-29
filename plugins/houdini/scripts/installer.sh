@@ -62,7 +62,11 @@ echo "Houdini Install Dir: "$INSTALL_DIR"/launcher"
 
 cd "$TEMP_VERSION_FOLDER/installs"
 echo $PWD
+echo "-----"
 ls
+echo "----"
+echo "testing"
+chmod +x ./install_houdini_launcher.sh
 ./install_houdini_launcher.sh "$INSTALL_DIR"/launcher
 
 echo "License Date:" $LICENSE_DATE
