@@ -54,7 +54,7 @@ def create_service(client_id, client_secret_key):
 # Download the file specified in "build" argument and return the
 # downloaded filename on success.
 def download_build(service, build, output):
-    local_path = os.path.join(output, "houdini-launcher.iso")
+    local_path = os.path.join(output, "houdini-launcher.sh")
     build_info = service.download.get_daily_build_download(
         build["product"], build["version"], build["build"], "linux")
     download_file(build_info["download_url"], local_path)
