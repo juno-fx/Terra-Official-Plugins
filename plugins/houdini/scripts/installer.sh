@@ -60,7 +60,7 @@ mkdir -p "$INSTALL_DIR/shfs"
 chmod -R 555 "$INSTALL_DIR/shfs"
 echo "Houdini Install Dir: "$INSTALL_DIR"/launcher"
 
-cd "$TEMP_VERSION_FOLDER"
+cd "$TEMP_VERSION_FOLDER"/houdini-installer
 echo $PWD
 ls
 ./houdini-launcher.sh "$INSTALL_DIR"/launcher
@@ -69,7 +69,7 @@ echo "License Date:" $LICENSE_DATE
 echo "Running Houdini Installer for $VERSION"
 
 cd "$INSTALL_DIR"
-./launcher/bin/houdini_installer install --product Houdini --version "$Version" --install-shfs --shfs-directory "$INSTALL_DIR/shfs" --install-package --installdir "$INSTALL_DIR" --offline-installer "$TEMP_VERSION_FOLDER/houdini-launcher.iso" --accept-EULA="$LICENSE_DATE"
+./launcher/bin/houdini_installer install --product Houdini --version "$Version" --install-shfs --shfs-directory "$INSTALL_DIR/shfs" --install-package --installdir "$INSTALL_DIR" --offline-installer "$TEMP_VERSION_FOLDER/houdini-installer.iso" --accept-EULA="$LICENSE_DATE"
 
 echo "cleaning up temp files"
 rm -rf $TEMP_VERSION_FOLDER/houdini-launcher.iso
