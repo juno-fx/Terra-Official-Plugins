@@ -90,10 +90,10 @@ echo "Installing Houdini $VERSION to $INSTALL_DIR/houdini"
 --offline-installer "$TEMP_VERSION_FOLDER/houdini-installer.iso" \
 --accept-EULA="$LICENSE_DATE"
 
-echo "Installing SideFX Labs Production Build $HOUDINI_VERSION to $INSTALL_DIR/houdini/packages"
+echo "Installing SideFX Labs Production Build $HOUDINI_VERSION to $INSTALL_DIR/sidefx_packages"
 ./launcher/bin/houdini_installer install-package \
 --package-name "SideFX Labs $HOUDINI_VERSION Production Build" \
---installdir "$INSTALL_DIR/houdini/packages"
+--installdir "$INSTALL_DIR/sidefx_packages"
 
 echo "cleaning up temp files"
 rm -rf "$TEMP_VERSION_FOLDER"
