@@ -44,7 +44,7 @@ venv/bin/python "$WORKING_DIR/sidefx_downloader.py" --version $HOUDINI_VERSION -
 
 if [ ! -f "$TEMP_VERSION_FOLDER"/houdini-installer.iso ]; then
     echo "Unable to find download for $VERSION. exiting..."
-    exit
+    exit 1
 fi
 
 echo "Extracting houdini-launcher.iso"
