@@ -44,7 +44,6 @@ def run_download(version=None, build=None, key=None, secret=None, output=None):
             download_build(service, build, output)
             break
 
-
 # Return a sidefx.service object allowing access to API functions.
 def create_service(client_id, client_secret_key):
     return sidefx.service(

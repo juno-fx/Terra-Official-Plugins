@@ -42,6 +42,11 @@ echo "Downloading Houdini $VERSION"
 
 venv/bin/python "$WORKING_DIR/sidefx_downloader.py" --version $HOUDINI_VERSION --build $HOUDINI_BUILD --key "$SIDEFX_CLIENT_ID" --secret "$SIDEFX_CLIENT_SECRET" --output "$TEMP_VERSION_FOLDER"
 
+if [ ! -f "$TEMP_VERSION_FOLDER"/houdini-installer.iso ]; then
+    echo "Unable to find download for $VERSION. exiting..."
+    exit
+fi
+
 echo "Extracting houdini-launcher.iso"
 
 chmod 555 "$TEMP_VERSION_FOLDER"/houdini-installer.iso
@@ -58,20 +63,20 @@ mkdir -p "$INSTALL_DIR/launcher"
 chmod -R 555 "$INSTALL_DIR/launcher"
 mkdir -p "$INSTALL_DIR/shfs"
 chmod -R 555 "$INSTALL_DIR/shfs"
-echo "Houdini launcher Dir: "$INSTALL_DIR"/launcher"
+
 
 cd "$TEMP_VERSION_FOLDER/installs"
 ls
 
+echo "Installing launcher to $INSTALL_DIR/launcher"
 chmod +x ./install_houdini_launcher.sh
 ./install_houdini_launcher.sh "$INSTALL_DIR"/launcher
 
 echo "License Date:" $LICENSE_DATE
-echo "Running Houdini Installer for $VERSION"
-
 cd "$INSTALL_DIR"
 ls
 
+echo "Installing Houdini $VERSION to $INSTALL_DIR/houdini"
 ./launcher/bin/houdini_installer install \
 --product Houdini \
 --version "$VERSION" \
@@ -80,7 +85,7 @@ ls
 --offline-installer "$TEMP_VERSION_FOLDER/houdini-installer.iso" \
 --accept-EULA="$LICENSE_DATE"
 
-echo "Installing SideFX Labs Production Build $HOUDINI_VERSION"
+echo "Installing SideFX Labs Production Build $HOUDINI_VERSION to $INSTALL_DIR/packages"
 ./launcher/bin/houdini_installer install-package \
 --package-name "SideFX Labs $HOUDINI_VERSION Production Build" \
 --installdir "$INSTALL_DIR/packages"
