@@ -40,15 +40,7 @@ def run_download(version=None, build=None, key=None, secret=None, output=None):
         platform="linux",
         only_production=False)
 
-    pprint(builds)
-    for build in builds:
-        if (
-            build.get("platform")== target_release["platform"]
-            and build.get("release") == target_release["release"]
-        ):
-            print(build)
-            download_build(service, build, output)
-            break
+    download_build(service, builds[0], output)
 
 
 # Return a sidefx.service object allowing access to API functions.
@@ -65,7 +57,7 @@ def create_service(client_id, client_secret_key):
 def download_build(service, build, output):
     local_path = os.path.join(output, "houdini-launcher.iso")
     build_info = service.download.get_daily_build_download(
-        build["product"], build["version"], build["build"], "Linux")
+        build["product"], build["version"], build["build"], "linux")
     download_file(build_info["download_url"], local_path)
     return build_info["filename"]
 
