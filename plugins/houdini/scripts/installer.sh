@@ -19,7 +19,7 @@ venv/bin/pip  install click
 WORKING_DIR="$PWD"
 echo $WORKING_DIR
 
-# We need to pass export SIDEFX_CLIENT_ID=''; export SIDEFX_CLIENT_SECRET=''; export DEV_APPS_DEBUG=true to the scipt itself
+# We need to pass export SIDEFX_CLIENT_ID=''; export SIDEFX_CLIENT_SECRET=''
 export SIDEFX_CLIENT_ID=$CLIENT_ID
 export SIDEFX_CLIENT_SECRET=$CLIENT_SECRET
 
