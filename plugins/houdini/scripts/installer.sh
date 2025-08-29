@@ -40,7 +40,12 @@ TEMP_VERSION_FOLDER="$TEMP_FOLDER"/"$VERSION"
 echo $TEMP_VERSION_FOLDER
 echo "Downloading Houdini $VERSION"
 
-venv/bin/python "$WORKING_DIR/sidefx_downloader.py" --version $HOUDINI_VERSION --build $HOUDINI_BUILD --key "$SIDEFX_CLIENT_ID" --secret "$SIDEFX_CLIENT_SECRET" --output "$TEMP_VERSION_FOLDER"
+venv/bin/python "$WORKING_DIR/sidefx_downloader.py" \
+--version $HOUDINI_VERSION \
+--build $HOUDINI_BUILD \
+--key "$SIDEFX_CLIENT_ID" \
+--secret "$SIDEFX_CLIENT_SECRET" \
+--output "$TEMP_VERSION_FOLDER"
 
 if [ ! -f "$TEMP_VERSION_FOLDER"/houdini-installer.iso ]; then
     echo "Unable to find download for $VERSION. exiting..."
