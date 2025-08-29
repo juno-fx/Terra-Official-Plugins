@@ -38,7 +38,6 @@ def run_download(version=None, build=None, key=None, secret=None, output=None):
         version=target_release["version"],
         platform="linux",
         only_production=False)
-    pprint(builds)
     download_build(service, builds[0], output)
 
 
