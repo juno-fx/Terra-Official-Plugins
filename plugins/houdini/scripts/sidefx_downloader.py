@@ -6,7 +6,7 @@ import stat
 import shutil
 import click
 import requests
-from pprint import pprint
+
 sys.path.append(os.path.abspath(f"{__file__}/../"))
 
 import sidefx
@@ -41,7 +41,6 @@ def run_download(version=None, build=None, key=None, secret=None, output=None):
 
     for build in builds:
         if build.get("build") == target_release["build"]:
-            pprint(build)
             download_build(service, build, output)
             break
 
@@ -62,8 +61,8 @@ def download_build(service, build, output):
     build_info = service.download.get_daily_build_download(
         build["product"], build["version"], build["build"], "linux_x86_64_gcc11.2")
     download_file(build_info["download_url"], local_path)
-    print('build info name')
-    pprint(build_info["filename"])
+    print('Downloading Build:')
+    print(build_info["filename"])
     return build_info["filename"]
 
 

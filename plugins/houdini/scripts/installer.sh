@@ -71,7 +71,14 @@ echo "Running Houdini Installer for $VERSION"
 
 cd "$INSTALL_DIR"
 ls
-./launcher/bin/houdini_installer install --product Houdini --version "$VERSION" --shfs-directory "$INSTALL_DIR/shfs" --installdir "$INSTALL_DIR/houdini" --offline-installer "$TEMP_VERSION_FOLDER/houdini-installer.iso" --accept-EULA="$LICENSE_DATE"
+
+./launcher/bin/houdini_installer install \
+--product Houdini \
+--version "$VERSION" \
+--shfs-directory "$INSTALL_DIR/shfs" \
+--installdir "$INSTALL_DIR/houdini" \
+--offline-installer "$TEMP_VERSION_FOLDER/houdini-installer.iso" \
+--accept-EULA="$LICENSE_DATE"
 
 echo "cleaning up temp files"
 rm -rf $TEMP_VERSION_FOLDER
@@ -79,32 +86,42 @@ rm -rf $TEMP_VERSION_FOLDER
 echo "Adding desktop files"
 cd "$WORKING_DIR"
 # app icon setup
-cp -v ./assets/houdini.png INSTALL_DIR/
+cp -v ./assets/houdini.png "$INSTALL_DIR"/
 
 echo "[Desktop Entry]
 Version=$VERSION
 Name=Houdini FX $VERSION
 Comment=SideFX Houdini software
-Exec=vglrun -d /dev/dri/card0 $INSTALL_DIR/bin/houdinifx %F
+Exec=$INSTALL_DIR/houdini/bin/houdinifx %F
 Icon="$INSTALL_DIR/houdini.png"
 Terminal=true
 Type=Application
-Categories=X-Polaris" > $INSTALL_DIR/houdinifx_$VERSION.desktop
+Categories=X-Polaris" > $INSTALL_DIR/houdini_fx_$VERSION.desktop
 
 echo "[Desktop Entry]
 Version=$VERSION
 Name=Houdini Core $VERSION
 Comment=SideFX Houdini software
-Exec=vglrun -d /dev/dri/card0 $INSTALL_DIR/bin/houdinicore %F
+Exec=$INSTALL_DIR/houdini/bin/houdinicore %F
 Icon="$INSTALL_DIR/houdini.png"
 Terminal=true
 Type=Application
-Categories=X-Polaris" > $INSTALL_DIR/houdinicore_$VERSION.desktop
+Categories=X-Polaris" > $INSTALL_DIR/houdini_core_$VERSION.desktop
+
+echo "[Desktop Entry]
+Version=$VERSION
+Name=Houdini Launcher $VERSION
+Comment=SideFX Houdini software Launcher
+Exec=$INSTALL_DIR/launcher/bin/houdini_launcher
+Icon="$INSTALL_DIR/houdini.png"
+Terminal=true
+Type=Application
+Categories=X-Polaris" > $INSTALL_DIR/houdini_launcher_$VERSION.desktop
 
 # set permission for desktop files and copy over to applications dir
-chmod 644 $INSTALL_DIR/houdinicore_$VERSION.desktop
-chmod 644 $INSTALL_DIR/houdinifx_$VERSION.desktop
-
+chmod 644 $INSTALL_DIR/houdini_core_$VERSION.desktop
+chmod 644 $INSTALL_DIR/houdini_fx_$VERSION.desktop
+chmod 644 $INSTALL_DIR/houdini_launcher_$VERSION.desktop
 
 cat $INSTALL_DIR/*.desktop
 
