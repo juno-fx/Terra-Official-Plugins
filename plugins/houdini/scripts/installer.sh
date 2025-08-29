@@ -82,7 +82,8 @@ ls
 
 echo "Installing SideFX Labs Production Build $HOUDINI_VERSION"
 ./launcher/bin/houdini_installer install-package \
---package-name "SideFX Labs $HOUDINI_VERSION Production Build"
+--package-name "SideFX Labs $HOUDINI_VERSION Production Build" \
+--installdir "$INSTALL_DIR/packages"
 
 echo "cleaning up temp files"
 rm -rf "$TEMP_VERSION_FOLDER"
