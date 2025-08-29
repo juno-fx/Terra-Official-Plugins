@@ -27,7 +27,7 @@ def run_download(version=None, build=None, key=None, secret=None, output=None):
         "platform": "linux_x86_64_gcc11.2",
         "product": "houdini",
     }
-    product = "houdini-launcher"
+    product = "houdini"
     service = create_service(client_id=os.environ.get("SIDEFX_CLIENT_ID", key),
                              client_secret_key=os.environ.get("SIDEFX_CLIENT_SECRET", secret))
 
@@ -38,7 +38,7 @@ def run_download(version=None, build=None, key=None, secret=None, output=None):
         version=target_release["version"],
         platform="linux",
         only_production=False)
-
+    pprint(builds)
     download_build(service, builds[0], output)
 
 
@@ -54,7 +54,7 @@ def create_service(client_id, client_secret_key):
 # Download the file specified in "build" argument and return the
 # downloaded filename on success.
 def download_build(service, build, output):
-    local_path = os.path.join(output, "houdini-launcher.sh")
+    local_path = os.path.join(output, "houdini-installer.iso")
     build_info = service.download.get_daily_build_download(
         build["product"], build["version"], build["build"], "linux")
     download_file(build_info["download_url"], local_path)

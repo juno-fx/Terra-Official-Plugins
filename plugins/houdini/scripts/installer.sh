@@ -44,10 +44,10 @@ venv/bin/python "$WORKING_DIR/sidefx_downloader.py" --version $HOUDINI_VERSION -
 
 echo "Extracting houdini-launcher.iso"
 
-chmod 555 "$TEMP_VERSION_FOLDER"/houdini-launcher.sh
-#7z x "$TEMP_VERSION_FOLDER"/houdini-launcher.sh -o"$TEMP_VERSION_FOLDER"
+chmod 555 "$TEMP_VERSION_FOLDER"/houdini-installer.iso
+7z x "$TEMP_VERSION_FOLDER"/houdini-installer.iso -o"$TEMP_VERSION_FOLDER"
 
-echo "houdini-launcher.iso extracted to "$TEMP_VERSION_FOLDER""
+echo "houdini-installer.iso extracted to "$TEMP_VERSION_FOLDER""
 echo "Installing Houdini Launcher... "$INSTALL_DIR"/launcher ..."
 
 mkdir -p "$DESTINATION"
@@ -63,7 +63,6 @@ echo "Houdini Install Dir: "$INSTALL_DIR"/launcher"
 cd "$TEMP_VERSION_FOLDER"
 echo $PWD
 ls
-
 ./houdini-launcher.sh "$INSTALL_DIR"/launcher
 
 echo "License Date:" $LICENSE_DATE
