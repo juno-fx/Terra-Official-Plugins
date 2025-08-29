@@ -72,7 +72,7 @@ cd "$INSTALL_DIR"
 ./launcher/bin/houdini_installer install --product Houdini --version "$Version" --install-shfs --shfs-directory "$INSTALL_DIR/shfs" --install-package --installdir "$INSTALL_DIR" --offline-installer "$TEMP_VERSION_FOLDER/houdini-installer.iso" --accept-EULA="$LICENSE_DATE"
 
 echo "cleaning up temp files"
-rm -rf $TEMP_VERSION_FOLDER/houdini-installer.iso
+rm -rf $TEMP_VERSION_FOLDER
 
 echo "Adding desktop files"
 cd "$WORKING_DIR"
