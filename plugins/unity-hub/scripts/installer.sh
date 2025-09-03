@@ -48,3 +48,4 @@ Categories=X-Polaris" >> "$INSTALL_DIR"/unity.desktop
 
 cat "$INSTALL_DIR"/*.desktop
 
+echo "install complete"
