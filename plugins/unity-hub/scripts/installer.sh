@@ -17,7 +17,7 @@ sh -c 'echo "deb [signed-by=/usr/share/keyrings/Unity_Technologies_ApS.gpg] http
 
 apt update
 echo "getting unity download url"
-URL=$(apt-get -qq --print-uris download unityhub)
+URL=$(apt-get --print-uris download unityhub | awk '{print $1}' | tr -d "'")
 
 echo "Downloading Unity Hub"
 echo $URL
