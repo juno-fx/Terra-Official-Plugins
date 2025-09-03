@@ -10,6 +10,7 @@ LAUNCH="$INSTALL_DIR/unityhub"
 ICON="$INSTALL_DIR/unity.png"
 TEMP_LOCATION='/tmp/unity-hub'
 
+WORKING_DIR="$PWD"
 echo "Destination $INSTALL_DIR"
 
 wget -qO - https://hub.unity3d.com/linux/keys/public | gpg --dearmor | tee /usr/share/keyrings/Unity_Technologies_ApS.gpg > /dev/null
@@ -29,7 +30,10 @@ wget -O "$TEMP_LOCATION/unity-hub.deb" "$URL"
 echo "Extracting Unity Hub..."
 mkdir -p $INSTALL_DIR
 #dpkg-deb -xv "$TEMP_LOCATION/unity-hub.deb" "$TEMP_LOCATION"
-ar vx "$TEMP_LOCATION/unity-hub.deb" "$TEMP_LOCATION"
+ar vx "$TEMP_LOCATION/unity-hub.deb"
+cd $TEMP_LOCATION
+ls
+
 tar xzvf "$TEMP_LOCATION/data.tar.gz"-C "$INSTALL_DIR/"
 chmod -R 555 "$INSTALL_DIR"
 
