@@ -5,6 +5,7 @@ apt update
 apt install wget -y
 apt install gnupg -y
 apt install binutils -y
+apt install bzip2 -y
 INSTALL_DIR="$DESTINATION/unity-hub"
 LAUNCH="$INSTALL_DIR/unityhub"
 ICON="$INSTALL_DIR/unity.png"
