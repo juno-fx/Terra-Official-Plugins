@@ -4,8 +4,6 @@ echo "installing needed packages"
 apt update
 apt install wget -y
 apt install gnupg -y
-apt install binutils -y
-apt install bzip2 -y
 INSTALL_DIR="$DESTINATION/unity-hub"
 LAUNCH="$INSTALL_DIR/opt/unityhub/unityhub"
 ICON="$INSTALL_DIR/unity.png"
@@ -29,9 +27,7 @@ wget -O "$TEMP_LOCATION/unity-hub.deb" "$URL"
 
 echo "Extracting Unity Hub..."
 mkdir -p $INSTALL_DIR
-dpkg-deb -xv "$TEMP_LOCATION/unity-hub.deb" "$TEMP_LOCATION"
-
-tar xvjf "$TEMP_LOCATION/data.tar.bz2" -C "$INSTALL_DIR/"
+dpkg-deb -xv "$TEMP_LOCATION/unity-hub.deb" "$INSTALL_DIR"
 chmod -R 555 "$INSTALL_DIR"
 
 echo "Adding desktop files"
