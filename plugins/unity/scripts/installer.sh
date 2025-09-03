@@ -46,7 +46,7 @@ echo "[Desktop Entry]
 Version=$VERSION
 Name=unity $VERSION GPU
 Comment=Unity Game Engine
-Exec=vglrun -d /dev/dri/card0 $LAUNCH
+Exec=vglrun -d /dev/dri/card1 $LAUNCH
 Icon=$ICON
 Terminal=true
 Type=Application
