@@ -34,7 +34,7 @@ ar vx "$TEMP_LOCATION/unity-hub.deb"
 cd $TEMP_LOCATION
 ls
 
-tar xvjf "$TEMP_LOCATION/data.tar.bz2"-C "$INSTALL_DIR/"
+tar xvjf "$TEMP_LOCATION/data.tar.bz2" -C "$INSTALL_DIR/"
 chmod -R 555 "$INSTALL_DIR"
 
 echo "Adding desktop files"
