@@ -1,0 +1,4 @@
+apiVersion: v1
+name: unity-hub
+version: 0.0.1
+icon: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/unity/scripts/assets/unity.png?raw=true"

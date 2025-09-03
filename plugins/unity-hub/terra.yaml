@@ -1,0 +1,22 @@
+resource_id: unity-hub
+name: Unity Hub
+icon: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/unity/scripts/assets/unity.png?raw=true"
+description: Unity Hub - Streamline Unity installation, project management, and version control.
+category: Software Manager
+tags:
+  - unity
+  - animation
+  - rendering
+  - real-time
+  - 3d
+  - 2d
+  - installation
+  - licensing
+fields:
+  - name: install_volume
+    description: The name of the install volume
+    required: true
+    type: shared-volume
+  - name: destination
+    description: Destination directory defaults to "/unity"
+    required: false
