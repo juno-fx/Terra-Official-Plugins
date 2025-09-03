@@ -30,10 +30,10 @@ wget -O "$TEMP_LOCATION/unity-hub.deb" "$URL"
 
 echo "Extracting Unity Hub..."
 mkdir -p $INSTALL_DIR
-#dpkg-deb -xv "$TEMP_LOCATION/unity-hub.deb" "$TEMP_LOCATION"
-cd $TEMP_LOCATION
-ar vx "$TEMP_LOCATION/unity-hub.deb"
-ls
+dpkg-deb -xv "$TEMP_LOCATION/unity-hub.deb" "$TEMP_LOCATION"
+#cd $TEMP_LOCATION
+#ar vx "$TEMP_LOCATION/unity-hub.deb"
+#ls
 
 tar xvjf "$TEMP_LOCATION/data.tar.bz2" -C "$INSTALL_DIR/"
 chmod -R 555 "$INSTALL_DIR"
