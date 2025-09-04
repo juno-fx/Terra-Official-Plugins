@@ -2,7 +2,7 @@
 set -e
 
 if [ -n "$CLEANUP" ]; then
-  rm -rvf "$DESTINATION/$VERSION"
+  rm -rvf "$DESTINATION/unity-$VERSION"
   exit 0
 fi
 
