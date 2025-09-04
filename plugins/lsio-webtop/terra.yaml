@@ -1,0 +1,11 @@
+resource_id: lsio-webtop
+name: LSIO Webtop
+icon: https://raw.githubusercontent.com/linuxserver/docker-templates/master/linuxserver.io/img/webtop-logo.png
+description: Webtop containerized workstation from LinuxServer.io.
+category: Workstations
+tags:
+  - selkies
+  - vdi
+  - lsio
+  - cluster-level
+fields: []
