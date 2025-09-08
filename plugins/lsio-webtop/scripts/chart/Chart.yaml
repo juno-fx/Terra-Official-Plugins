@@ -2,4 +2,4 @@ apiVersion: v1
 description: LSIO Webtop deployment setup
 name: lsio-webtop
 version: 0.0.0
-icon: https://raw.githubusercontent.com/linuxserver/docker-templates/master/linuxserver.io/img/webtop-logo.png
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/lsio-webtop/scripts/assets/logo.png
