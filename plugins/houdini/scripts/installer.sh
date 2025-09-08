@@ -33,8 +33,6 @@ export HOUDINI_BUILD="${VERSION##*.}"
 INSTALL_DIR="$DESTINATION/$VERSION"
 
 TEMP_FOLDER="/tmp/apps_temp"
-mkdir -p $TEMP_FOLDER
-mkdir -p "$TEMP_FOLDER"/"$VERSION"
 mkdir -p "$TEMP_FOLDER"/"$VERSION"/installs
 TEMP_VERSION_FOLDER="$TEMP_FOLDER"/"$VERSION"
 echo $TEMP_VERSION_FOLDER
@@ -60,14 +58,10 @@ chmod 555 "$TEMP_VERSION_FOLDER"/houdini-installer.iso
 echo "houdini-installer.iso extracted to "$TEMP_VERSION_FOLDER""
 echo "Installing Houdini Launcher... "$INSTALL_DIR"/launcher ..."
 
-mkdir -p "$DESTINATION"
-chmod -R 555 "$DESTINATION"
-mkdir -p "$INSTALL_DIR"
-chmod -R 555 "$INSTALL_DIR"
 mkdir -p "$INSTALL_DIR/launcher"
-chmod -R 555 "$INSTALL_DIR/launcher"
 mkdir -p "$INSTALL_DIR/shfs"
-chmod -R 555 "$INSTALL_DIR/shfs"
+chmod -R 555 "$DESTINATION" "$INSTALL_DIR" "$INSTALL_DIR/launcher" "$INSTALL_DIR/shfs"
+
 
 
 cd "$TEMP_VERSION_FOLDER/installs"
