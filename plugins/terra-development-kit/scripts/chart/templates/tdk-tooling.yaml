@@ -9,3 +9,13 @@ data:
 
     apt update -y
     apt upgrade -y
+
+    # setup a symlink from /config/data to the users home directory under the tdk folder
+    mkdir -vp $HOME/tdk
+    ln -v /config/data $HOME/tdk/data
+
+    # link the /config/workspace to the users home directory under the tdk folder
+    ln -v /config/workspace $HOME/tdk/workspace
+
+    # list the contents of the /config directory
+    ls -la /config
