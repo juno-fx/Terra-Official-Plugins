@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-tooling
+data:
+  system.sh: |
+    #!/bin/sh
+    set -e
+
+    apt update -y
+    apt upgrade -y
