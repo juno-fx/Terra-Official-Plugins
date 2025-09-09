@@ -16,4 +16,4 @@ spec:
               service:
                 name: {{ .Values.name }}
                 port:
-                  number: 8443
+                  number: 3000
