@@ -13,15 +13,11 @@ data:
 
     # clean out defaults
     rm -rfv /config/workspace
-    mv /config/data /config/data.bak || true
 
     # setup a symlink from /config/data to the users home directory under the tdk folder
+    mv /config/data /config/data.bak || true
     mkdir -vp "$HOME/tdk/data"
     ln -sv "$HOME/tdk/data" /config/data
-
-    # link the /config/workspace to the users home directory under the tdk folder
-    mkdir -vp "$HOME/tdk/workspace"
-    ln -sv "$HOME/tdk/workspace" /config/workspace
 
     # apply defaults only if /config/data is empty and a backup exists
     if [ -d /config/data.bak ] && [ -z "$(ls -A /config/data)" ]; then
@@ -30,6 +26,23 @@ data:
     else
       echo "Skipping restore, /config/data already has content or no backup exists."
     fi
+
+    # setup a symlink from /config/extensions to the users home directory under the tdk folder
+    mv /config/extensions /config/extensions.bak || true
+    mkdir -vp "$HOME/tdk/extensions"
+    ln -sv "$HOME/tdk/extensions" /config/extensions
+
+    # apply defaults only if /config/extensions is empty and a backup exists
+    if [ -d /config/extensions.bak ] && [ -z "$(ls -A /config/extensions)" ]; then
+      echo "/config/extensions is empty, restoring defaults"
+      rsync -a -P --delete /config/extensions.bak/ /config/extensions/ || true
+    else
+      echo "Skipping restore, /config/extensions already has content or no backup exists."
+    fi
+
+    # link the /config/workspace to the users home directory under the tdk folder
+    mkdir -vp "$HOME/tdk/workspace"
+    ln -sv "$HOME/tdk/workspace" /config/workspace
 
     # set permissions
     chown -Rv abc:abc "$HOME/tdk"
