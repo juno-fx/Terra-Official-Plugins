@@ -9,9 +9,11 @@ data:
 
     apt update -y
     apt upgrade -y
+    apt install rsync -y
 
     # clean out defaults
-    rm -rfv /config/data /config/workspace
+    rm -rfv /config/workspace
+    mv /config/data /config/data.bak || true
 
     # setup a symlink from /config/data to the users home directory under the tdk folder
     mkdir -vp $HOME/tdk
@@ -19,6 +21,9 @@ data:
 
     # link the /config/workspace to the users home directory under the tdk folder
     ln -sv $HOME/tdk/workspace /config/workspace
+
+    # apply defaults if no backup exists
+    rsync -a -P --delete /config/data.bak/ /config/data/ || true
 
     # list the contents of the /config directory
     ls -la /config
