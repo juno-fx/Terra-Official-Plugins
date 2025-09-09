@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{ .Values.name }}"
+  annotations:
+    # comma separated list of users that can access this workstation as read only.
+    juno-innovations.com/shared: "none"
+    juno-innovations.com/kuiper-state: "{{ .Values._kuiper }}"
+    juno-innovations.com/workload: "Application"  # mark this as a workload and it's type for the frontend UI
+  labels:
+    juno-innovations.com/app: "polaris"
+    juno-innovations.com/workstation: "{{ .Values.name }}"
+    juno-innovations.com/user: "{{ .Values.user }}"
+    juno-innovations.com/session: "{{ .Values.session }}"
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      juno-innovations.com/workstation: "{{ .Values.name }}"
+
+  template:
+    metadata:
+      labels:
+        juno-innovations.com/app: polaris
+        juno-innovations.com/user: "{{ .Values.user }}"
+        juno-innovations.com/workstation: "{{ .Values.name }}"
+      annotations:
+        # This will block the cluster autoscaler from evicting this pod in the case
+        # it can move to a cheaper instance. This does come at a cost, but ideally
+        # this should stop from a workstation getting ripped out from under existing users.
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+
+    spec:
+      automountServiceAccountToken: false
+      hostname: "{{ .Values.name }}"
+
+      containers:
+        - name: code-server
+          imagePullPolicy: IfNotPresent
+          image: "lscr.io/linuxserver/code-server:latest"
+          startupProbe:
+            tcpSocket:
+              port: 8443
+            initialDelaySeconds: 2 # helios boots very fast
+            failureThreshold: 60  # start up totals 2 * 60 = 2 mins
+            periodSeconds: 2
+          livenessProbe:
+            tcpSocket:
+              port: 8443
+            failureThreshold: 24
+            periodSeconds: 5
+          ports:
+            - containerPort: 8443
+              name: viewer
+          env:
+            - name: JUNO_PROJECT
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: USER
+              value: "{{ .Values.user }}"
+            - name: HOME
+              value: "/home/{{ .Values.user }}"
+            - name: PUID
+              value: "{{ .Values.puid }}"
+            - name: PGID
+              value: "{{ .Values.guid }}"
+            {{- range .Values.env }}
+            - name: {{ .name | quote }}
+              value: {{ .value | quote }}
+            {{- end }}
+          volumeMounts:
+            {{- if .Values.volumeMounts }}
+            {{- toYaml .Values.volumeMounts | nindent 12 }}
+            {{- end }}
+      volumes:
+        {{- if .Values.volumeMounts }}
+        {{- toYaml .Values.volumes | nindent 8 }}
+        {{- end }}

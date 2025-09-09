@@ -1,0 +1,10 @@
+resource_id: terra-development-kit
+name: terra-development-kit
+icon: https://www.juno-innovations.com/terra-icon.png
+description: Terra Development Kit ships with all the tools you need to get started with development on Terra.
+category: Development
+tags:
+  - terra
+  - juno
+  - cluster-level
+fields: []
