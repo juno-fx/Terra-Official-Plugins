@@ -71,7 +71,7 @@ spec:
       {{- end }}
 
       containers:
-        - name: helios
+        - name: webtop
           imagePullPolicy: IfNotPresent
           image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
           resources:
@@ -91,19 +91,21 @@ spec:
               memory: "{{ .Values.memoryLimit }}"
             {{- end }}
             {{- end }}
-          startupProbe:
-            tcpSocket:
-              port: 3000
-            initialDelaySeconds: 2 # helios boots very fast
-            failureThreshold: 60  # start up totals 2 * 60 = 2 mins
-            periodSeconds: 2
-          livenessProbe:
-            tcpSocket:
-              port: 3000
-            failureThreshold: 24
-            periodSeconds: 5
+{{/*          startupProbe:*/}}
+{{/*            httpGet:*/}}
+{{/*              path: "/polaris/{{ .Values.name }}/"*/}}
+{{/*              port: 3000*/}}
+{{/*            initialDelaySeconds: 2 # webtop boots very fast*/}}
+{{/*            failureThreshold: 60  # start up totals 2 * 60 = 2 mins*/}}
+{{/*            periodSeconds: 2*/}}
+{{/*          livenessProbe:*/}}
+{{/*            httpGet:*/}}
+{{/*              path: "/polaris/{{ .Values.name }}/"*/}}
+{{/*              port: 3000*/}}
+{{/*            failureThreshold: 24*/}}
+{{/*            periodSeconds: 5*/}}
           ports:
-            - containerPort: 3000
+            - containerPort: 3001
               name: viewer
           env:
             - name: JUNO_WORKSTATION
@@ -112,21 +114,21 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
-            - name: USER
-              value: "{{ .Values.user }}"
-            - name: HOME
-              value: "/home/{{ .Values.user }}"
-            - name: UID
+            - name: PUID
               value: "{{ .Values.puid }}"
-            - name: GID
+            - name: PGID
               value: "{{ .Values.guid }}"
-            - name: PREFIX
+            - name: SUBFOLDER
               value: "/polaris/{{ .Values.name }}/"
+            - name: START_DOCKER
+              value: "false"
             {{- range .Values.env }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}
             {{- end }}
           volumeMounts:
+            - mountPath: /dev/shm
+              name: dshm
             {{- if .Values.volumeMounts }}
             {{- toYaml .Values.volumeMounts | nindent 12 }}
             {{- end }}
@@ -138,6 +140,9 @@ spec:
             {{- end }}
             {{- end }}
       volumes:
+        - name: dshm
+          emptyDir:
+            medium: Memory
         {{- if .Values.volumeMounts }}
         {{- toYaml .Values.volumes | nindent 8 }}
         {{- end }}
