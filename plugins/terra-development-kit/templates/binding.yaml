@@ -9,5 +9,5 @@ roleRef:
   name: {{ .Values.name }}-tdk
 subjects:
   - kind: ServiceAccount
-    name: {{ .Values.name }}-tdk
+    name: tdk-cluster
     namespace: {{ .Release.Namespace }}

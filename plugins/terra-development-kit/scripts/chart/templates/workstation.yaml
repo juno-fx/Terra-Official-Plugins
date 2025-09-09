@@ -28,7 +28,7 @@ spec:
         juno-innovations.com/workstation: "{{ .Values.name }}"
 
     spec:
-      serviceAccountName: {{ .Values.name }}-tdk
+      serviceAccountName: tdk-cluster
       hostname: "{{ .Values.name }}"
       containers:
         - name: nginx
