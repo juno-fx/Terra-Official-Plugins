@@ -16,18 +16,24 @@ data:
     mv /config/data /config/data.bak || true
 
     # setup a symlink from /config/data to the users home directory under the tdk folder
-    mkdir -vp $HOME/tdk/data
-    ln -sv $HOME/tdk/data /config/data
+    mkdir -vp "$HOME/tdk/data"
+    ln -sv "$HOME/tdk/data" /config/data
 
     # link the /config/workspace to the users home directory under the tdk folder
-    mkdir -vp $HOME/tdk/workspace
-    ln -sv $HOME/tdk/workspace /config/workspace
+    mkdir -vp "$HOME/tdk/workspace"
+    ln -sv "$HOME/tdk/workspace" /config/workspace
 
-    # apply defaults if no backup exists
-    rsync -a -P --delete /config/data.bak/ /config/data/ || true
+    # apply defaults only if /config/data is empty and a backup exists
+    if [ -d /config/data.bak ] && [ -z "$(ls -A /config/data)" ]; then
+      echo "/config/data is empty, restoring defaults"
+      rsync -a -P --delete /config/data.bak/ /config/data/ || true
+    else
+      echo "Skipping restore, /config/data already has content or no backup exists."
+    fi
 
     # set permissions
-    chown -Rv abc:abc $HOME/tdk
+    chown -Rv abc:abc "$HOME/tdk"
 
     # list the contents of the /config directory
     ls -la /config
+
