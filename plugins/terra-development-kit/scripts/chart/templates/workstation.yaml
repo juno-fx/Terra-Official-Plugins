@@ -35,8 +35,17 @@ spec:
     spec:
       automountServiceAccountToken: false
       hostname: "{{ .Values.name }}"
-
       containers:
+        - name: nginx
+          image: "nginx:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+              name: nginx
+          volumeMounts:
+            - name: nginx
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
         - name: code-server
           imagePullPolicy: IfNotPresent
           image: "lscr.io/linuxserver/code-server:latest"
@@ -76,6 +85,9 @@ spec:
             {{- toYaml .Values.volumeMounts | nindent 12 }}
             {{- end }}
       volumes:
+        - name: nginx
+          configMap:
+            name: "{{ .Values.name }}-nginx"
         {{- if .Values.volumeMounts }}
         {{- toYaml .Values.volumes | nindent 8 }}
         {{- end }}
