@@ -10,6 +10,9 @@ data:
     apt update -y
     apt upgrade -y
 
+    # clean out defaults
+    rm -rfv /config/data /config/workspace
+
     # setup a symlink from /config/data to the users home directory under the tdk folder
     mkdir -vp $HOME/tdk
     ln -sv $HOME/tdk/data /config/data
