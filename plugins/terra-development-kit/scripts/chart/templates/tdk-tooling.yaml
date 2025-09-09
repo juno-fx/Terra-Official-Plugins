@@ -16,14 +16,18 @@ data:
     mv /config/data /config/data.bak || true
 
     # setup a symlink from /config/data to the users home directory under the tdk folder
-    mkdir -vp $HOME/tdk
+    mkdir -vp $HOME/tdk/data
     ln -sv $HOME/tdk/data /config/data
 
     # link the /config/workspace to the users home directory under the tdk folder
+    mkdir -vp $HOME/tdk/workspace
     ln -sv $HOME/tdk/workspace /config/workspace
 
     # apply defaults if no backup exists
     rsync -a -P --delete /config/data.bak/ /config/data/ || true
+
+    # set permissions
+    chown -Rv abc:abc $HOME/tdk
 
     # list the contents of the /config directory
     ls -la /config
