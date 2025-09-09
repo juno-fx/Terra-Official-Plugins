@@ -26,11 +26,6 @@ spec:
         juno-innovations.com/app: polaris
         juno-innovations.com/user: "{{ .Values.user }}"
         juno-innovations.com/workstation: "{{ .Values.name }}"
-      annotations:
-        # This will block the cluster autoscaler from evicting this pod in the case
-        # it can move to a cheaper instance. This does come at a cost, but ideally
-        # this should stop from a workstation getting ripped out from under existing users.
-        cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
 
     spec:
       automountServiceAccountToken: false
@@ -52,8 +47,8 @@ spec:
           startupProbe:
             tcpSocket:
               port: 8443
-            initialDelaySeconds: 2 # helios boots very fast
-            failureThreshold: 60  # start up totals 2 * 60 = 2 mins
+            initialDelaySeconds: 2
+            failureThreshold: 120  # start up totals 2 * 120 = 4 mins
             periodSeconds: 2
           livenessProbe:
             tcpSocket:

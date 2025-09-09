@@ -7,9 +7,22 @@ data:
     #!/bin/sh
     set -e
 
+    # set noninteractive frontend for apt
+    export DEBIAN_FRONTEND=noninteractive
+
+    # update and install packages
     apt update -y
     apt upgrade -y
-    apt install rsync -y
+    apt install rsync python3 python3-venv wget curl neofetch -y
+
+    # install kubectl
+    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+    echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+    install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+    # setup neofetch
+    ln -sf /bin/neofetch /bin/fastfetch
 
     # clean out defaults
     rm -rfv /config/workspace
@@ -49,4 +62,3 @@ data:
 
     # list the contents of the /config directory
     ls -la /config
-
