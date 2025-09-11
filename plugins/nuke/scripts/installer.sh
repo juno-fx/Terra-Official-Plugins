@@ -4,8 +4,8 @@ apt update
 apt install curl -y
 
 executable="$(echo "Nuke$VERSION" | cut -d'v' -f1)"
-LAUNCH="$DESTINATION/$VERSION/$executable"
-ICON="$DESTINATION/$VERSION/nuke.png"
+LAUNCH="$DESTINATION/Nuke$VERSION/$executable"
+ICON="$DESTINATION/Nuke$VERSION/nuke.png"
 
 echo "Installing $VERSION"
 echo "Destination $DESTINATION"
@@ -16,10 +16,10 @@ echo "Extracting nuke..."
 tar xzvf "/tmp/Nuke$VERSION.tgz" -C /tmp/
 "/tmp/Nuke$VERSION-linux-x86_64.run" --prefix="$DESTINATION/" --accept-foundry-eula
 
-rm -rfv "$DESTINATION/$VERSION.tgz" "$DESTINATION/$VERSION-linux-x86_64.run"
+rm -rfv "$DESTINATION/Nuke$VERSION.tgz" "$DESTINATION/Nuke$VERSION-linux-x86_64.run"
 
 # app icon setup
-cp -v ./assets/nuke.png "$DESTINATION/$VERSION/"
+cp -v ./assets/nuke.png "$DESTINATION/Nuke$VERSION/"
 rm -rfv "$DESTINATION/nuke.desktop"
 
 echo "[Desktop Entry]
@@ -30,17 +30,7 @@ Exec=$LAUNCH
 Icon=$ICON
 Terminal=true
 Type=Application
-Categories=X-Polaris" >> "$DESTINATION/$VERSION"/nuke.desktop
+Categories=X-Polaris" >> "$DESTINATION/Nuke$VERSION"/nuke.desktop
 
-echo "[Desktop Entry]
-Version=$VERSION
-Name=Nuke $VERSION GPU
-Comment=Nuke compositing software GPU enabled
-Exec=vglrun -d /dev/dri/card0 $LAUNCH
-Icon=$ICON
-Terminal=true
-Type=Application
-Categories=X-Polaris" >> "$DESTINATION/$VERSION"/nuke-gpu.desktop
-
-cat "$DESTINATION"/*.desktop
+cat "$DESTINATION/Nuke$VERSION/*.desktop"
 
