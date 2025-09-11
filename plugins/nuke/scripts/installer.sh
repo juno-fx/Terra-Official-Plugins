@@ -3,7 +3,7 @@ set -e
 apt update
 apt install curl -y
 
-executable="$(echo "$VERSION" | cut -d'v' -f1)"
+executable="$(echo "Nuke$VERSION" | cut -d'v' -f1)"
 LAUNCH="$DESTINATION/$VERSION/$executable"
 ICON="$DESTINATION/$VERSION/nuke.png"
 
