@@ -32,5 +32,6 @@ Terminal=true
 Type=Application
 Categories=X-Polaris" >> "$DESTINATION/Nuke$VERSION"/nuke.desktop
 
-cat "$DESTINATION/Nuke$VERSION/*.desktop"
+cat "$DESTINATION/Nuke$VERSION/"*.desktop
 
+echo "Nuke Terra Install Complete"
