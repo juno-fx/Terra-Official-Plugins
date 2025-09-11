@@ -6,7 +6,7 @@ apt install curl -y
 EXECUTABLE="$(echo "Nuke$VERSION" | cut -d'v' -f1)"
 INSTALL_DIR="$DESTINATION/Nuke$VERSION/"
 LAUNCH="$INSTALL_DIR/$EXECUTABLE"
-ICON="$DESTINATION/Nuke$VERSION/nuke.png"
+ICON="$INSTALL_DIR/nuke.png"
 
 echo "Installing $VERSION"
 echo "Destination $DESTINATION"
