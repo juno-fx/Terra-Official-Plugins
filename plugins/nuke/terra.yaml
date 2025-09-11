@@ -14,7 +14,7 @@ tags:
   - rendering
 fields:
   - name: version
-    description: Version of Nuke to install. i.e. Nuke14.0v2
+    description: Version of Nuke to install. i.e. 16.0v5
     required: true
   - name: destination
     description: Destination directory
