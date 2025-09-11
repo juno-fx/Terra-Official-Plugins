@@ -11,11 +11,10 @@ echo "Installing $VERSION"
 echo "Destination $DESTINATION"
 echo "Executable: $executable"
 
-curl -LJO -o nuke.tgz "https://thefoundry.s3.amazonaws.com/products/nuke/releases/$VERSION/Nuke$VERSION-linux-x86_64.tgz"
-mv -v "download_product" "/tmp/$VERSION.tgz"
+curl -Lo "Nuke$Version.tgz" "https://thefoundry.s3.amazonaws.com/products/nuke/releases/$VERSION/Nuke$VERSION-linux-x86_64.tgz"
 
-tar -xvf "/tmp/$VERSION.tgz" -C /tmp/
-"/tmp/$VERSION-linux-x86_64.run" --prefix="$DESTINATION/" --accept-foundry-eula
+tar -xvf "/tmp/Nuke$VERSION.tgz" -C /tmp/
+"/tmp/Nuke$VERSION-linux-x86_64.run" --prefix="$DESTINATION/" --accept-foundry-eula
 
 rm -rfv "$DESTINATION/$VERSION.tgz" "$DESTINATION/$VERSION-linux-x86_64.run"
 
