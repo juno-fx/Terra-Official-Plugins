@@ -11,9 +11,9 @@ echo "Installing $VERSION"
 echo "Destination $DESTINATION"
 echo "Executable: $executable"
 
-curl -Lo "/tmp/Nuke$Version.tgz" -P /tmp "https://thefoundry.s3.amazonaws.com/products/nuke/releases/$VERSION/Nuke$VERSION-linux-x86_64.tgz"
-
-tar -xvf "/tmp/Nuke$VERSION.tgz" -C /tmp/
+curl -o "/tmp/Nuke$Version.tgz" -P /tmp "https://thefoundry.s3.amazonaws.com/products/nuke/releases/$VERSION/Nuke$VERSION-linux-x86_64.tgz"
+echo "Extracting nuke..."
+tar xzvf "/tmp/Nuke$VERSION.tgz" -C /tmp/
 "/tmp/Nuke$VERSION-linux-x86_64.run" --prefix="$DESTINATION/" --accept-foundry-eula
 
 rm -rfv "$DESTINATION/$VERSION.tgz" "$DESTINATION/$VERSION-linux-x86_64.run"
