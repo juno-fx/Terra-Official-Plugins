@@ -60,6 +60,8 @@ spec:
           ports:
             - containerPort: 8443
               name: viewer
+            - containerPort: 9418
+              name: git
           env:
             - name: JUNO_PROJECT
               valueFrom:
