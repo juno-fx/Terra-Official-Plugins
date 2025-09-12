@@ -1,0 +1,9 @@
+resource_id: terra-namespace-admin
+name: terra-namespace-admin
+icon: https://www.juno-innovations.com/terra-icon.png
+description: Installs a namespace scoped admin role and rolebinding for managing resources within a namespace.
+category: Development
+tags:
+  - terra
+  - juno
+fields: []

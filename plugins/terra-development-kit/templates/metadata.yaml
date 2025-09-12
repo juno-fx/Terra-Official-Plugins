@@ -8,6 +8,9 @@ data:
   chart: "{{ .Release.Name }}-scripts-configmap"
   description: "Terra Development Kit"
   fields: |
+    - name: terra_role
+      description: Name of a Terra role to assign to Development Kit
+      required: false
     - name: packages
       description: Additional packages to install
       required: false
