@@ -1,7 +1,8 @@
 # configuration
 host:
-prefix: "/"
+version: "latest"
 destination: /node-red
+prefix: "/"
 install_volume:
   name: apps-pv-claim
   sub_path:

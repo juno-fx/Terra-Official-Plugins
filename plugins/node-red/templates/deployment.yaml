@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{ .Release.Name }}"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      juno-innovations.com/dashboard: "{{ .Release.Name }}"
+  template:
+    metadata:
+      labels:
+        juno-innovations.com/dashboard: "{{ .Release.Name }}"
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: node-red
+          imagePullPolicy: IfNotPresent
+          image: "nodered/node-red"
+          startupProbe:
+            httpGet:
+              path: "{{ .Values.prefix }}"
+              port: 1880
+            initialDelaySeconds: 2 # helios boots very fast
+            failureThreshold: 60  # start up totals 2 * 60 = 2 mins
+            periodSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: "{{ .Values.prefix }}"
+              port: 1880
+            failureThreshold: 24
+            periodSeconds: 5
+          ports:
+            - containerPort: 1880
+              name: viewer
+          volumeMounts:
+            - name: settings
+              mountPath: /data/settings.js
+              subPath: settings.js
+      volumes:
+        - name: settings
+          configMap:
+            name: node-red-settings
