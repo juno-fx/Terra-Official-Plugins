@@ -19,10 +19,12 @@ fields:
     description: Version of Houdini to install. i.e. 20.5.278
     required: true
     default: 20.5.278
+    type: string
   - name: destination
     description: Destination directory
     required: true
     default: /houdini
+    type: string
   - name: client_id
     description: SideFX Client ID
     required: true
