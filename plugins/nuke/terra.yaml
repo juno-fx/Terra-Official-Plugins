@@ -16,9 +16,11 @@ fields:
   - name: version
     description: Version of Nuke to install. i.e. 16.0v5
     required: true
+    default: 16.0v5
   - name: destination
     description: Destination directory
     required: true
+    default: /nuke
   - name: install_volume
     description: The name of the install volume
     required: true

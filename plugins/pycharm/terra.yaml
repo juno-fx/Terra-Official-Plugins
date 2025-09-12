@@ -14,6 +14,7 @@ fields:
   - name: version
     description: Version of PyCharm to install. i.e. 2025.2
     required: True
+    default: 2025.2
   - name: install_volume
     description: The name of the install volume
     required: true
@@ -21,3 +22,4 @@ fields:
   - name: destination
     description: Destination directory (defaults to /pycharm)
     required: false
+    default: /pycharm
