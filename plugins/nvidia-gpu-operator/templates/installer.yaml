@@ -11,9 +11,10 @@ spec:
   sources:
     - repoURL: https://helm.ngc.nvidia.com/nvidia
       chart: gpu-operator
-      targetRevision: v24.9.0
+      targetRevision: v25.3.2
       helm:
         values: |-
+
           daemonsets:
             tolerations:
               - key: nvidia.com/gpu
@@ -63,8 +64,12 @@ spec:
                   effect: NoSchedule
         releaseName: gpu-operator
         parameters:
-          - name: "toolkit.version"
-            value: "v1.17.0-ubi8"
+          - name: "dcgmExporter.enabled"
+            value: "true"
+          - name: "dcgm.enabled"
+            value: "true"
+          - name: "dcgmExporter.serviceMonitor.enabled"
+            value: "true"
           - name: "toolkit.enabled"
             value: "{{ .Values.install_toolkit }}"
           - name: "driver.enabled"
