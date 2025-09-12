@@ -19,10 +19,9 @@ Our Workstation and Workload plugins are intended to be schemas, which can be in
 that specifies they either a "workload" or "workstation", this is how it will be categorized in the Terra app store. They should also include a helm chart for the schema install. The schema will then be installed as a configMap. Once the schemas are installed, they can be used to create custom templates via Genesis in our Workstation/Workloads table. Once a template is created
 users can launch their workstation or workload within a project deployment. While fundamentally Workstations and Workloads work in the same way, we do provide ways to organize and differentiate them both via the backend, and frontend. For workloads you will want to be sure to include a `juno-innovations.com/workload` annotation in both the metadata.yaml and the charts workstation.yaml.
 The metadata annotation is how the Genesis front end knows which table to include the workstation/workload in. The charts workstation.yaml annotation is how Kuiper knows whether or not it is a workstation or workload.
-As a reminder, the way these are processed on the backend are no different, and these annotations are simply used for organizing the workstations and workloads in the ui.
+As a reminder, the way these are processed on the backend are no different, and these annotations are simply used for organizing the workstations and workloads in the UI.
 Please see below for examples that can be referenced on what these type of plugins look like, and how they can be created/customized to fit your needs.
 
-metadata.yaml annotations example
 ```yaml linenums="1" title="my-workload/templates/metadata.yaml"
 apiVersion: v1
 kind: ConfigMap
@@ -32,7 +31,6 @@ metadata:
     juno-innovations.com/workload: "Application"  # mark this as a workload and it's type for the frontend UI
 ```
 
-workstation.yaml  annotations example
 ```yaml linenums="1" title="my-workload/scripts/chart/templates/workstation.yaml"
 apiVersion: apps/v1
 kind: StatefulSet
