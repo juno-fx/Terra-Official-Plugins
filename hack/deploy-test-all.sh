@@ -19,10 +19,7 @@ cleanup() {
   echo ">>> Caught termination signal. Cleaning up..."
   echo ">>> Uninstalling Source: $CLEAN_HOSTNAME"
   curl -sS -X DELETE "http://terra:8000/terra/sources/$CLEAN_HOSTNAME" || true
-  if [[ -n "${GIT_DAEMON_PID:-}" ]]; then
-    echo ">>> Killing git daemon (PID: $GIT_DAEMON_PID)"
-    kill "$GIT_DAEMON_PID" 2>/dev/null || true
-  fi
+  killall git-daemon
   echo ">>> Cleanup complete."
 }
 
@@ -32,7 +29,6 @@ trap cleanup INT TERM EXIT
 # start the local git server
 cd ../
 git daemon --verbose --export-all --base-path=. --reuseaddr --informative-errors &
-GIT_DAEMON_PID=$!
 
 # let it start up
 sleep 1
@@ -53,4 +49,4 @@ curl -sS -X POST http://terra:8000/terra/sources \
      -H "Content-Type: application/json" \
      -d "$DATA"
 
-wait "$GIT_DAEMON_PID"
+sleep infinity

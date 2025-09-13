@@ -13,7 +13,7 @@ data:
     # update and install packages
     apt update -y
     apt upgrade -y
-    apt install rsync wget curl neofetch {{ .Values.packages }} -y
+    apt install rsync wget curl neofetch psmisc {{ .Values.packages }} -y
 
     # install kubectl
     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -66,6 +66,9 @@ data:
 
     # set permissions
     chown -R abc:abc "$HOME/tdk"
+
+    # install k9s
+    wget https://github.com/derailed/k9s/releases/latest/download/k9s_linux_amd64.deb && apt install ./k9s_linux_amd64.deb && rm k9s_linux_amd64.deb
 
     # install gh cli
     (type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y)) \

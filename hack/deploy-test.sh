@@ -37,6 +37,9 @@ cleanup() {
   echo ">>> Cleanup complete."
 }
 
+# Trap Ctrl+C (SIGINT), SIGTERM, and EXIT
+trap cleanup INT TERM EXIT
+
 helm upgrade -i "$CLEAN_HOSTNAME" ./tests/Application/ \
   --set branch="$CURRENT_GIT_REF" \
   --set remote="$URL" \
