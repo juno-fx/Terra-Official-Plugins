@@ -21,6 +21,13 @@ test-all:
 	@./hack/deploy-test-all.sh
 	@echo
 
+deploy:
+	@echo "Test Deploying Changes: $(PLUGIN_NAME)"
+	@$(MAKE) --no-print-directory package $(PLUGIN_NAME)
+	@git add ./plugins/$(PLUGIN_NAME)/ || true
+	@git commit || true
+	@kubectl patch -n argocd app $(PLUGIN_NAME) --patch-file ./tests/sync-patch.yaml --type merge
+
 new-plugin:
 	@echo " >> Building New Plugin: $(ARGS) << "
 	@mkdir -p ./plugins/$(ARGS)

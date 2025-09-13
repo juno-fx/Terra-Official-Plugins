@@ -34,6 +34,7 @@ cleanup() {
   echo ">>> Caught termination signal. Cleaning up..."
   echo ">>> Uninstalling Helm release: $CLEAN_HOSTNAME"
   helm uninstall "$CLEAN_HOSTNAME" || true
+  killall git-daemon
   echo ">>> Cleanup complete."
 }
 
@@ -47,4 +48,14 @@ helm upgrade -i "$CLEAN_HOSTNAME" ./tests/Application/ \
 
 # start the local git server
 cd ../
-git daemon --verbose --export-all --base-path=. --reuseaddr --informative-errors
+git daemon --verbose --export-all --base-path=. --reuseaddr --informative-errors &
+cd -
+
+sleep 2
+
+echo
+echo
+echo " >> Starting Development Shell << "
+echo " >> Press CTRL+D to exit << "
+
+PLUGIN_NAME=$PLUGIN_NAME /bin/bash
