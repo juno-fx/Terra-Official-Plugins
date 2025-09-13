@@ -1,6 +1,14 @@
 #!/bin/bash
 set -euo pipefail
 
+# Require at least one argument
+if [ $# -lt 1 ]; then
+    echo "Usage: $0 <plugin-name>"
+    exit 1
+fi
+
+PLUGIN_NAME=$1
+
 # Clean hostname (strip off -N suffix, e.g. fred-0 -> fred)
 CLEAN_HOSTNAME=$(echo "$HOSTNAME" | cut -d'-' -f1)
 
@@ -13,20 +21,27 @@ if [ -z "${JUNO_PROJECT:-}" ]; then
   exit 1
 fi
 
-URL="http://${CLEAN_HOSTNAME}.${JUNO_PROJECT}.svc.cluster.local:9418/"
+URL="git://${CLEAN_HOSTNAME}.${JUNO_PROJECT}.svc.cluster.local:9418/Terra-Official-Plugins"
 
-# Build JSON payload safely with jq
-DATA=$(jq -n \
-  --arg name "$CLEAN_HOSTNAME" \
-  --arg ref "$CURRENT_GIT_REF" \
-  --arg url "$URL" \
-  '{name: $name, ref: $ref, url: $url}')
+echo "Plugin: $PLUGIN_NAME"
+echo "TDK Name: $CLEAN_HOSTNAME"
+echo "Git Branch: $CURRENT_GIT_REF"
+echo "URL: $URL"
 
-echo " >> Terra Payload << "
-echo $DATA
-echo
+# Define cleanup function
+cleanup() {
+  echo
+  echo ">>> Caught termination signal. Cleaning up..."
+  echo ">>> Uninstalling Helm release: $CLEAN_HOSTNAME"
+  helm uninstall "$CLEAN_HOSTNAME" || true
+  echo ">>> Cleanup complete."
+}
 
-# Send POST request
-curl -sS -X POST http://terra:8000/terra/sources \
-     -H "Content-Type: application/json" \
-     -d "$DATA"
+helm upgrade -i "$CLEAN_HOSTNAME" ./tests/Application/ \
+  --set branch="$CURRENT_GIT_REF" \
+  --set remote="$URL" \
+  --set plugin="$PLUGIN_NAME"
+
+# start the local git server
+cd ../
+git daemon --verbose --export-all --base-path=. --reuseaddr --informative-errors

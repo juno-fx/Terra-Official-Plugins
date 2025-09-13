@@ -1,4 +1,4 @@
-.PHONY: plugins docs verify
+.PHONY: plugins docs verify venv
 
 SHELL := /bin/bash
 MAKEFLAGS += --no-print-directory
@@ -7,9 +7,18 @@ ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
 $(eval $(ARGS):;@:)
 
 # workflow
-test:
+venv:
+	python3 -m venv .venv
+	.venv/bin/pip install -r requirements.txt
+
+test-plugin:
 	@echo " >> Deploying $(ARGS) << "
-	@./hack/deploy-test.sh
+	@./hack/deploy-test.sh $(ARGS)
+	@echo
+
+test-all:
+	@echo " >> Deploying All Plugins << "
+	@./hack/deploy-test-all.sh
 	@echo
 
 new-plugin:
@@ -63,12 +72,10 @@ lint-docs: .venv/bin/activate
 
 # when using devbox, this will already exist and not trigger
 # It's used by the CI, where devbox hook behavior is different
-.venv/bin/activate:
-	python3 -m venv .venv
-	.venv/bin/pip install -r requirements.txt
+.venv/bin/activate: venv
 
 # LEGACY
-test-%: cluster dependencies
+test-%:
 	@echo "Legacy: Use 'make test $(subst test-,,$@)' instead."
 	@$(MAKE) --no-print-directory test $(subst test-,,$@)
 
