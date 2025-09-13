@@ -10,6 +10,9 @@ data:
   chart: "{{ .Release.Name }}-scripts-configmap"
   description: "Terra Development Kit"
   fields: |
+    - name: icon
+      description: icon
+      default: https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Visual_Studio_Code_1.35_icon.svg/2048px-Visual_Studio_Code_1.35_icon.svg.png
     - name: registry
       description: Registry to pull from
       default: lscr.io
