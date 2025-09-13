@@ -23,8 +23,8 @@ data:
       description: Tag to pull from
       default: latest
     - name: terra_role
-      description: Name of a Terra role to assign to Development Kit
+      description: Name of a Terra role to assign to Development Kit. This refers to the plugin level installed roles.
       required: false
     - name: packages
-      description: Additional packages to install
+      description: Additional packages to install. You can use spaces " " to install multiples.
       required: false

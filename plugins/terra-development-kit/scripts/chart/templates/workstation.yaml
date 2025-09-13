@@ -45,7 +45,7 @@ spec:
               subPath: nginx.conf
         - name: code-server
           imagePullPolicy: IfNotPresent
-          image: "lscr.io/linuxserver/code-server:latest"
+          image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
           startupProbe:
             tcpSocket:
               port: 8443
