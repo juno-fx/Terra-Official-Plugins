@@ -28,4 +28,4 @@ data:
     - name: packages
       description: Additional packages to install. You can use spaces " " to install multiples.
       required: false
-      default: python3 python3-venv
+      default: python3 python3-venv 
