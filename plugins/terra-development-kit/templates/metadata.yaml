@@ -10,9 +10,15 @@ data:
   chart: "{{ .Release.Name }}-scripts-configmap"
   description: "Terra Development Kit"
   fields: |
-    - name: blah
-      description: stuff
-      required: false
+    - name: registry
+      description: Registry to pull from
+      default: lscr.io
+    - name: repo
+      description: Repo to pull from
+      default: linuxserver/code-server
+    - name: tag
+      description: Tag to pull from
+      default: latest
     - name: terra_role
       description: Name of a Terra role to assign to Development Kit
       required: false
