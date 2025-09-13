@@ -73,6 +73,10 @@ data:
     # install helm
     curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
+    # configure default credentials
+    git config --global user.email "tdk@juno-innovations.com"
+    git config --global user.name "tdk"
+
     # install gh cli
     (type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y)) \
       && sudo mkdir -p -m 755 /etc/apt/keyrings \
