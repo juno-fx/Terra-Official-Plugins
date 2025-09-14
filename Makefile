@@ -16,8 +16,8 @@ test-plugin:
 	@./hack/deploy-test.sh $(ARGS)
 	@echo
 
-test-all:
-	@echo " >> Deploying All Plugins << "
+test-catalog:
+	@echo " >> Deploying Catalog << "
 	@./hack/deploy-test-all.sh
 	@echo
 
