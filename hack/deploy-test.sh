@@ -85,11 +85,12 @@ helm upgrade -i "$CLEAN_HOSTNAME" ./tests/Application/ \
   --namespace "$JUNO_PROJECT" \
   --set branch="$CURRENT_GIT_REF" \
   --set remote="$URL" \
-  --set plugin="$PLUGIN_NAME"
+  --set plugin="$PLUGIN_NAME" \
+  --set name="$PLUGIN_NAME-$CLEAN_HOSTNAME-dev"
 
 echo
 echo
 echo " >> Starting Development Shell << "
 echo " >> Press CTRL+D to exit << "
 
-PLUGIN_NAME=$PLUGIN_NAME "${SHELL:-/bin/bash}"
+PLUGIN_NAME=$PLUGIN_NAME /bin/bash
