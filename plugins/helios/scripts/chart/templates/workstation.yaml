@@ -6,7 +6,7 @@ metadata:
     # comma separated list of users that can access this workstation as read only.
     juno-innovations.com/shared: "none"
     juno-innovations.com/kuiper-state: "{{ .Values._kuiper }}"
-    juno-innovations.com/workload: "Application"  # mark this as a workload and it's type for the frontend UI
+
   labels:
     juno-innovations.com/app: "polaris"
     juno-innovations.com/workstation: "{{ .Values.name }}"
