@@ -22,6 +22,8 @@ The metadata annotation is how the Genesis front end knows which table to includ
 As a reminder, the way these are processed on the backend are no different, and these annotations are simply used for organizing the workstations and workloads in the UI.
 Please see below for examples that can be referenced on what these type of plugins look like, and how they can be created/customized to fit your needs.
 
+For additional information about our Workstation and Workloads schemas see our [Genesis Instances](https://juno-fx.github.io/Orion-Documentation/genesis/workstations/) documentation
+
 ```yaml linenums="1" title="my-workload/templates/metadata.yaml"
 apiVersion: v1
 kind: ConfigMap
