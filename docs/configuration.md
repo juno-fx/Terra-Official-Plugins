@@ -37,8 +37,8 @@ UI uses to display storage options, connection settings, and configuration param
 - **string**: A simple text input field
 - **int**: A simple integer text input field
 - **boolean**: A True/False Boolean Field
-- **multi**: A multi selection box, This will require the options priority
-- **select**: A single selection box, This will require the options priority
+- **multi**: A multi selection box, This will require the options property
+- **select**: A single selection box, This will require the options property
 - **shared-volume**: A shared volume input field, allowing multiple plugins to access the same storage
 - **exclusive-volume**: An exclusive volume input field, ensuring only this plugin can access the storage
 
