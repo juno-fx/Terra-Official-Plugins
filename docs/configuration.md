@@ -42,6 +42,9 @@ UI uses to display storage options, connection settings, and configuration param
 - **shared-volume**: A shared volume input field, allowing multiple plugins to access the same storage
 - **exclusive-volume**: An exclusive volume input field, ensuring only this plugin can access the storage
 
+Please note: Not all Genesis/Terra release versions have full field support. Field type and support is continuously 
+added in newer release version as we find the need for additional field handling.
+
 ### String
 
 Pretend you have a simple Plugin that just needs to receive a string value from the user. Let's say you need to know the 
