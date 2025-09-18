@@ -21,10 +21,10 @@ You have 2 ways to develop using the TDK.
 
 The in-cluster TDK ships with a VSCode environment you can launch and run inside a project in Orion.
 
-| Pros                                                                                                   | Cons                                                                          |
-|--------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
-| The environment is already optimized with the proper libraries including kubectl, helm, k9s and python | Need to install the TDK plugin for the IDE to be setup                        |
-| Service account roles are attached and provide access to argo with no additional setup                 | Additional service accounts need to be created to attach to the running IDE's |
+| Pros                                                                                                  | Cons                                                                          |
+|-------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
+| The environment is already optimized with the proper packages including kubectl, helm, k9s and python | Need to install the TDK plugin for the IDE to be setup                        |
+| Service account roles are attached and provide access to argo with no additional setup                | Additional service accounts need to be created to attach to the running IDE's |
 
 #### Setup
 
@@ -64,7 +64,7 @@ cloud hosted, or on a juno cluster on the same network.
     !!! info "Devbox"
 
         For local development, we do provide a devbox setup which will install all of this for you in most cases. Sometimes Helm can have issues, so just verify before
-        begining development.
+        begining development. You can do so by running `helm version`.
 
 2. Make sure you have `kubectl` pointing to the cluster you want to interact with.
 3. Verify you have access to the Application and Namespace objects in kubernetes.

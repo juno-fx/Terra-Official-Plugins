@@ -1,9 +1,0 @@
-resource_id: terra-cluster-admin
-name: terra-cluster-admin
-icon: https://www.juno-innovations.com/terra-icon.png
-description: Installs a cluster scoped admin role and rolebinding for managing resources within a the entire cluster.
-category: Development
-tags:
-  - terra
-  - juno
-fields: []
