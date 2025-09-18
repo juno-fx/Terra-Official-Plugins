@@ -1,4 +1,4 @@
-name: helios
+name: tdk
 user:
 repo:
 tag:
@@ -18,10 +18,10 @@ session:
 volumeMounts: []
 volumes: []
 env:
-- name: JUNO
-  value: "true"
+  - name: JUNO
+    value: "true"
 selector:
 plugins: []
 _kuiper:
-
-
+packages: ""
+terra_role:

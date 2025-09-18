@@ -17,7 +17,7 @@ You have 2 ways to develop using the TDK.
 1. In-Cluster
 2. Remote
 
-### In-Cluster (Coming soon)
+### In-Cluster
 
 The in-cluster TDK ships with a VSCode environment you can launch and run inside a project in Orion.
 

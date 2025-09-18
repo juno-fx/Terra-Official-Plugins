@@ -1,0 +1,9 @@
+resource_id: namespace-admin
+name: namespace-admin
+icon: https://www.juno-innovations.com/terra-icon.png
+description: Installs a Service Account in a target Project so workloads/workstations can be granted admin for kubernetes in that Project.
+category: Development
+tags:
+  - terra
+  - juno
+fields: []
