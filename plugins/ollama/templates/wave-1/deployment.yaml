@@ -4,6 +4,10 @@ metadata:
   name: "{{ .Release.Name }}"
   labels:
     terra.juno-innovations.com/app: "{{ .Release.Name }}"
+    juno-innovations.com/app: "polaris"
+  annotations:
+    juno-innovations.com/kuiper-state: "{}"
+
 spec:
   revisionHistoryLimit: 0
   selector:
