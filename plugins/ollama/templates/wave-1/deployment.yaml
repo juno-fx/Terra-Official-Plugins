@@ -8,6 +8,7 @@ metadata:
     juno-innovations.com/app: "polaris"
     juno-innovations.com/workstation: "ollama"
     juno-innovations.com/user: "terra"
+    juno-innovations.com/workload: Application
   annotations:
     juno-innovations.com/kuiper-state: "{}"
 
