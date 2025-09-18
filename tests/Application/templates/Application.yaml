@@ -1,8 +1,10 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: terra-test
+  name: {{ .Values.name }}
   namespace: argocd
+  finalizers:
+    - "resources-finalizer.argocd.argoproj.io"
 spec:
   project: default
   destination:
@@ -12,10 +14,6 @@ spec:
     - repoURL: {{ .Values.remote }}
       path: ./plugins/{{ .Values.plugin }}/
       targetRevision: {{ .Values.branch }}
-      helm:
-        parameters:
-          - name: "namespace"
-            value: ""
   syncPolicy:
     automated:
       prune: true
