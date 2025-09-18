@@ -18,8 +18,10 @@ session:
 volumeMounts: []
 volumes: []
 env:
-  - name: JUNO
-    value: "true"
+- name: JUNO
+  value: "true"
 selector:
 plugins: []
 _kuiper:
+
+
