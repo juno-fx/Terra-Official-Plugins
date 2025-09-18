@@ -21,7 +21,7 @@ spec:
       {{- end }}
       containers:
         - name: ollama
-          image: ollama/ollama:blah
+          image: ollama/ollama:latest
           imagePullPolicy: IfNotPresent
           {{- if .Values.gpu }}
           resources:
