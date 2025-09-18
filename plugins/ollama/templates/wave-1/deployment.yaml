@@ -7,6 +7,7 @@ metadata:
     terra.juno-innovations.com/app: "{{ .Release.Name }}"
     juno-innovations.com/app: "polaris"
     juno-innovations.com/workstation: "ollama"
+    juno-innovations.com/user: "terra"
   annotations:
     juno-innovations.com/kuiper-state: "{}"
 
@@ -19,6 +20,7 @@ spec:
     metadata:
       name: "{{ .Release.Name }}"
       labels:
+        juno-innovations.com/user: "terra"
         juno-innovations.com/workstation: "ollama"
         terra.juno-innovations.com/app: "{{ .Release.Name }}"
         juno-innovations.com/app: polaris
