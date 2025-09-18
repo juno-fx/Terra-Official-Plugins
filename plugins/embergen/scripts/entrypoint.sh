@@ -2,10 +2,10 @@
 set -e
 
 if [ -n "$CLEANUP" ]; then
-  rm -rvf "$DESTINATION/$VERSION"
+  rm -rvf "$DESTINATION/EmberGen-$VERSION"
   exit 0
 fi
 
 if [ -n "${INSTALL}" ]; then
-    ./installer.sh
+    ./installer.sh "$VERSION" "$DESTINATION"
 fi
