@@ -23,7 +23,7 @@ spec:
         - name: ollama
           image: ollama/ollama:latest
           imagePullPolicy: IfNotPresent
-          {{- .Values.gpu }}
+          {{- if .Values.gpu }}
           resources:
             limits:
               nvidia.com/gpu: 1
