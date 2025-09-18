@@ -7,7 +7,7 @@ see below for our different types, along with examples you can reference directl
 ## Plugin & Application
 
 Our most basic types are our Plugin and Application types. The only difference between these, is an application requires either a "shared-volume" or "exclusive-volume" to install too.
-Where a plugin does not require any traditional storage space. You can learn more about our different plugin field types [here](plugin-fields.md).
+Where a plugin does not require any traditional storage space. You can learn more about our different plugin field types [here](configuration.md#field-types).
 
 #### Examples
 - **Application**: Firefox
