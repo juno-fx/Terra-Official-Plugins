@@ -2,16 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: "{{ .Release.Name }}"
-  namespace: tdk
   labels:
     terra.juno-innovations.com/app: "{{ .Release.Name }}"
-    juno-innovations.com/app: "polaris"
-    juno-innovations.com/workstation: "ollama"
-    juno-innovations.com/user: "terra"
-    juno-innovations.com/workload: Application
-  annotations:
-    juno-innovations.com/kuiper-state: "{}"
-
 spec:
   revisionHistoryLimit: 0
   selector:
@@ -21,10 +13,7 @@ spec:
     metadata:
       name: "{{ .Release.Name }}"
       labels:
-        juno-innovations.com/user: "terra"
-        juno-innovations.com/workstation: "ollama"
         terra.juno-innovations.com/app: "{{ .Release.Name }}"
-        juno-innovations.com/app: polaris
     spec:
       automountServiceAccountToken: false
       {{- if .Values.runtime }}
@@ -32,7 +21,7 @@ spec:
       {{- end }}
       containers:
         - name: ollama
-          image: ollama/ollama:latest
+          image: ollama/ollama:blah
           imagePullPolicy: IfNotPresent
           {{- if .Values.gpu }}
           resources:
