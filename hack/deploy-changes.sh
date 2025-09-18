@@ -21,8 +21,11 @@ git commit || true
 if [ -n "$PLUGIN_CATALOG" ]; then
     echo "Refresh the Terra App Store to see changes"
 else
+    # Clean hostname (strip off -N suffix, e.g. fred-0 -> fred)
+    CLEAN_HOSTNAME=$(echo "$HOSTNAME" | cut -d'-' -f1)
+    
     echo "Triggering argo refresh"
-    kubectl patch -n argocd app "${PLUGIN_NAME}" \
+    kubectl patch -n argocd app "$PLUGIN_NAME-$CLEAN_HOSTNAME-dev" \
         --patch-file ./tests/sync-patch.yaml \
         --type merge
 fi
