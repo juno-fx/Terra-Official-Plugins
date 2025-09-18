@@ -17,14 +17,14 @@ You have 2 ways to develop using the TDK.
 1. In-Cluster
 2. Remote
 
-### In Cluster
+### In-Cluster
 
-The in cluster TDK ships with a VSCode environment you can launch and run inside of a project in Orion.
+The in-cluster TDK ships with a VSCode environment you can launch and run inside a project in Orion.
 
-| Pros         | Cons             |
-|-------------|------------------|
-| The environment is already optimized with the proper libraries including kubectl, helm, k9s and python        | Need to install the TDK plugin for the IDE to be setup           |
-| Service account roles are attached and provide access to argo with no additional setup | Additional service accounts need to be created to attach to the running IDE's           |
+| Pros                                                                                                   | Cons                                                                          |
+|--------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
+| The environment is already optimized with the proper libraries including kubectl, helm, k9s and python | Need to install the TDK plugin for the IDE to be setup                        |
+| Service account roles are attached and provide access to argo with no additional setup                 | Additional service accounts need to be created to attach to the running IDE's |
 
 #### Setup
 
@@ -48,11 +48,11 @@ The in cluster TDK ships with a VSCode environment you can launch and run inside
 You can also use the remote setup which will bind to an existing cluster which can be a local kind cluster, 
 cloud hosted, or on a juno cluster on the same network.
 
-| Pros         | Cons             |
-|-------------|------------------|
-| Use your own IDE        | You local machine must be accessible from the cluster           |
-| Uses your own kubeconfig for access | Kubectl must be configured properly to point to the correct cluster           |
-| No additional plugins need to be installed    | If using `kind` you must provision the cluster locally yourself and verify it has Orion and Argo installed properly           |
+| Pros                                       | Cons                                                                                                                |
+|--------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
+| Use your own IDE                           | You local machine must be accessible from the cluster                                                               |
+| Uses your own kubeconfig for access        | Kubectl must be configured properly to point to the correct cluster                                                 |
+| No additional plugins need to be installed | If using `kind` you must provision the cluster locally yourself and verify it has Orion and Argo installed properly |
 
 #### Setup
 
@@ -94,11 +94,11 @@ cloud hosted, or on a juno cluster on the same network.
 
     Because the cluster needs access to the local machine to pull the git repo, you need to make sure that the cluster can get to your
     local machine without issue. We normally recommend you are on the same network as the cluster so you don't run in to issues. In 
-    more security concious environments, the in cluster workflow makes more sense.
+    more security concious environments, the in-cluster workflow makes more sense.
 
 ## Plugin Workflow
 
-From this point on, the workflow is the same for both remote and in cluster.
+From this point on, the workflow is the same for both remote and in-cluster.
 
 
 1. **Create a Plugin**: Use the `make new-plugin <plugin name>` command to create a new plugin scaffolding.
