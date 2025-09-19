@@ -1,8 +1,8 @@
 # configuration
 destination: "ollama"
 install_volume:
-  name: apps-pv-claim
-  sub_path:
-  container_path: /apps
+  name: tdk-home
+  sub_path: ollama
+  container_path: /apps # ignored
 gpu: false
 runtime: ""

@@ -32,12 +32,12 @@ spec:
             - name: api
               containerPort: 11434
               protocol: TCP
-      #     volumeMounts:
-      #       - name: mount
-      #         mountPath: "/root/.ollama"
-      #         subPath: {{ .Values.destination }}
-      # volumes:
-      #   - name: mount
-      #     persistentVolumeClaim:
-      #       claimName: {{ .Values.install_volume.name }}
+          volumeMounts:
+            - name: mount
+              mountPath: "/root/.ollama"
+              subPath: {{ .Values.destination }}
+      volumes:
+        - name: mount
+          persistentVolumeClaim:
+            claimName: {{ .Values.install_volume.name }}
 
