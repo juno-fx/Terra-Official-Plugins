@@ -1,0 +1,21 @@
+resource_id: flow-production-tracking
+name: Autodesk Flow Production Tracking v2.1.0
+icon: "https://global.discourse-cdn.com/shotgunsoftware/original/2X/e/e9c7b2033d3dc2d7fadac71d426d1c572f175e27.png"
+description: Powerful cloud-based project management and production tracking tool designed for creative teams.
+category: CG
+tags:
+  - flow
+  - autodesk
+  - project management
+  - production tracking
+  - cloud-based
+  - shotgun
+  - shotgrid
+fields:
+  - name: install_volume
+    description: The name of the install volume
+    required: true
+    type: shared-volume
+  - name: destination
+    description: Destination directory (defaults to /flow)
+    required: false

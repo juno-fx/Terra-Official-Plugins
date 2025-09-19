@@ -1,0 +1,4 @@
+apiVersion: v1
+name: flow-production-tracking
+version: 0.0.1
+icon: "https://global.discourse-cdn.com/shotgunsoftware/original/2X/e/e9c7b2033d3dc2d7fadac71d426d1c572f175e27.png"
