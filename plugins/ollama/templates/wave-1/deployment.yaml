@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Release.Name }}"
+  labels:
+    terra.juno-innovations.com/app: "{{ .Release.Name }}"
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      terra.juno-innovations.com/app: "{{ .Release.Name }}"
+  template:
+    metadata:
+      name: "{{ .Release.Name }}"
+      labels:
+        terra.juno-innovations.com/app: "{{ .Release.Name }}"
+    spec:
+      automountServiceAccountToken: false
+      {{- if .Values.runtime }}
+      runtimeClassName: {{ .Values.runtime }}
+      {{- end }}
+      containers:
+        - name: ollama
+          image: ollama/ollama:latest
+          imagePullPolicy: IfNotPresent
+          {{- if .Values.gpu }}
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+          {{- end }}
+          ports:
+            - name: api
+              containerPort: 11434
+              protocol: TCP
+          volumeMounts:
+            - name: mount
+              mountPath: "/root/.ollama"
+              subPath: {{ .Values.destination }}
+      volumes:
+        - name: mount
+          persistentVolumeClaim:
+            claimName: {{ .Values.install_volume.name }}
+

@@ -82,11 +82,11 @@ start_git_daemon
 sleep 1
 
 helm upgrade -i "$CLEAN_HOSTNAME" ./tests/Application/ \
-  --namespace "$JUNO_PROJECT" \
   --set branch="$CURRENT_GIT_REF" \
   --set remote="$URL" \
   --set plugin="$PLUGIN_NAME" \
-  --set name="$PLUGIN_NAME-$CLEAN_HOSTNAME-dev"
+  --set name="$PLUGIN_NAME-$CLEAN_HOSTNAME-dev" \
+  --set project="$JUNO_PROJECT"
 
 echo
 echo
