@@ -4,23 +4,23 @@ icon: https://ih1.redbubble.net/image.5611428487.0532/st,small,507x507-pad,600x6
 description: Get up and running with large language models.
 category: AI
 tags:
-  - llm
-  - machine-learning
-fields: 
-  - name: runtime
-    description: This is the underlying container runtime. Normally you need to set this to the container runtime that has access to the GPU. For example, "nvidia". You can also leave this empty which will default to CPU.
-    required: false
-    default: ""
-  - name: gpu
-    description: This is the underlying container runtime. Normally you need to set this to the container runtime that has access to the GPU. For example, "nvidia". You can also leave this empty which will default to CPU.
-    required: true
-    type: boolean
-    default: false
-  - name: destination
-    description: Destination directory
-    required: true
-    default: "/ollama"
-  - name: install_volume
-    description: The name of the install volume to store the persisted data.
-    required: true
-    type: shared-volume
+- llm
+- machine-learning
+fields:
+- name: runtime
+  description: This is the underlying container runtime. Normally you need to set this to the container runtime that has access to the GPU. For example, "nvidia". You can also leave this empty which will default to CPU.
+  required: false
+  default: ""
+- name: gpu
+  description: This is the underlying container runtime. Normally you need to set this to the container runtime that has access to the GPU. For example, "nvidia". You can also leave this empty which will default to CPU.
+  required: true
+  type: boolean
+  default: false
+- name: destination
+  description: Destination directory (DO NOT ADD A LEADING SLASH "/")
+  required: true
+  default: "ollama"
+- name: install_volume
+  description: The name of the install volume to store the persisted data.
+  required: true
+  type: shared-volume
