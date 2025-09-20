@@ -45,6 +45,7 @@ spec:
     kind: HTTPRoute
     name: "{{ .Values.name }}-helios"
   extAuth:
+    # 'Cookie' is necessary for the Authorization service and not passed via Envoy by default
     headersToExtAuth:
       - Host
       - Method
