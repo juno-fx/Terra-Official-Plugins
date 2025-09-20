@@ -1,36 +1,3 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    meta.helm.sh/release-name: wm
-    meta.helm.sh/release-namespace: daniel
-    nginx.ingress.kubernetes.io/auth-url: http://hubble.daniel.svc.cluster.local:3000/api/auth-workstation/wm/
-    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
-    nginx.ingress.kubernetes.io/use-regex: "true"
-  creationTimestamp: "2025-09-18T23:34:52Z"
-  generation: 1
-  labels:
-    app.kubernetes.io/managed-by: Helm
-  name: wm-ingress
-  namespace: daniel
-  resourceVersion: "120887"
-  uid: 0c2c1462-d789-480f-b3d6-502c174a035a
-spec:
-  rules:
-  - host: daniel.juno-online.local
-    http:
-      paths:
-      - backend:
-          service:
-            name: wm
-            port:
-              number: 3000
-        path: /polaris/wm/
-        pathType: Prefix
-status:
-  loadBalancer: {}
-
 ---
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
@@ -50,30 +17,14 @@ spec:
             type: PathPrefix
             value: "/polaris/{{ .Values.name }}/"
       backendRefs:
-        - name: hubble
+        - name: "{{ .Values.name }}"
           port: 3000
 
 ---
 apiVersion: gateway.envoyproxy.io/v1alpha1
-kind: SecurityPolicy
-metadata:
-  name: ext-auth-example
-spec:
-  targetRefs:
-    - group: gateway.networking.k8s.io
-      kind: HTTPRoute
-      name: myapp
-  extAuth:
-    http:
-      backendRefs:
-        - name: http-ext-auth
-          port: 9002
-      headersToBackend: ["x-current-user"]
----
-apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: Backend
 metadata:
-  name: wm-helios
+  name: "{{ .Values.name }}-helios"
   namespace: daniel
 spec:
   endpoints:
@@ -82,3 +33,22 @@ spec:
         port: 3000
   tls:
     insecureSkipVerify: true
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: "{{ .Values.name }}-helios"
+  namespace: "{{ .Values.namespace }}"
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: "{{ .Values.name }}-helios"
+  extAuth:
+    http:
+      backendRefs:
+      - kind: Service
+        name: hubble
+        namespace: "{{ .Values.namespace }}"
+        port: 3000
+      path: /api/authorization-service
