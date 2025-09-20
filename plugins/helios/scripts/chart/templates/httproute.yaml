@@ -45,6 +45,13 @@ spec:
     kind: HTTPRoute
     name: "{{ .Values.name }}-helios"
   extAuth:
+    headersToExtAuth:
+      - Host
+      - Method
+      - Path
+      - Content-Length
+      - Authorization
+      - Cookie
     http:
       backendRefs:
       - kind: Service
