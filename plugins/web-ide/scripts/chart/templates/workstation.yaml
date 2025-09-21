@@ -28,9 +28,6 @@ spec:
         juno-innovations.com/workstation: "{{ .Values.name }}"
 
     spec:
-      {{- if .Values.terra_role }}
-      serviceAccountName: {{ .Values.terra_role }}
-      {{- end }}
       hostname: "{{ .Values.name }}"
       containers:
         - name: nginx
@@ -91,7 +88,7 @@ spec:
             name: "{{ .Values.name }}-tooling"
         - name: nginx
           configMap:
-            name: {{ .Values.name }}-web-ide
+            name: "{{ .Values.name }}-web-ide"
         {{- if .Values.volumeMounts }}
         {{- toYaml .Values.volumes | nindent 8 }}
         {{- end }}
