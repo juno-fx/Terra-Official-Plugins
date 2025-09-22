@@ -8,7 +8,7 @@ complex and powerful plugins that can be used in other ways.
 Terra allows you to define a `ConfigMap` that contains metadata about your plugin. This `ConfigMap` can be used to store
 additional information about your plugin that can be accessed by other plugins or applications via the Terra REST API. 
 
-To use this feature, you can define the `metadata` field in your `terra.yaml` file:
+To use this feature, you can define the `metadata` field in your `plugins/<plugin name>/templates/metadata.yaml` file:
 
 ```yaml linenums="1" title="plugins/nuke/templates/metadata.yaml"
 --8<-- "plugins/nuke/templates/metadata.yaml"
@@ -73,6 +73,9 @@ Mounted Job
     ConfigMap. This will repackage the scripts directory and update the ConfigMap with the new base64 encoded string. You will
     then need to push the changes to the remote branch for ArgoCD to pick up the changes.
 
+    !!! info "TDK"
+        The TDK will automatically do this for you if you are running the development environment with `make deploy`.
+
 ### Security Considerations
 
 The scripts directory is a powerful feature that allows you to run custom scripts during the plugin's installation process.
@@ -83,9 +86,7 @@ the scripts stored in plain text in the git repository will be guaranteed to be 
 that the scripts are always up-to-date and to prevent any potential security issues or malicious code from being executed
 during the plugin's installation process.
 
-This is not the case when running locally on your system. When you run `make test <plugin name>`, ArgoCD will use the 
-pre-packaged scripts that are pre-encoded in the ConfigMap in the git source code. This is one of the drawbacks of the
-local development workflow. Please exercise caution when using the scripts directory and ensure that you are not
-introducing any security vulnerabilities into your plugin. Always review the scripts you are adding to the directory and
-ensure they are safe to run in a production environment.
-
+This is not the case when running locally on your system. When you run `make test-plugin <plugin name>`, ArgoCD will use the 
+pre-packaged scripts that are pre-encoded in the ConfigMap in the git source code. This is one of the drawbacks of the development 
+workflow. Please exercise caution when using the scripts directory and ensure that you are not introducing any security vulnerabilities 
+into your plugin. Always review the scripts you are adding to the directory and ensure they are safe to run in a production environment.

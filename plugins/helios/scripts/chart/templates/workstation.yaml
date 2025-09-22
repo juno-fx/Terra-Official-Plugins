@@ -71,7 +71,7 @@ spec:
       {{- end }}
 
       containers:
-        - name: polaris
+        - name: helios
           imagePullPolicy: IfNotPresent
           image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
           resources:
@@ -92,15 +92,13 @@ spec:
             {{- end }}
             {{- end }}
           startupProbe:
-            httpGet:
-              path: "/polaris/{{ .Values.name }}/probe"
+            tcpSocket:
               port: 3000
             initialDelaySeconds: 2 # helios boots very fast
             failureThreshold: 60  # start up totals 2 * 60 = 2 mins
             periodSeconds: 2
           livenessProbe:
-            httpGet:
-              path: "/health"
+            tcpSocket:
               port: 3000
             failureThreshold: 24
             periodSeconds: 5
