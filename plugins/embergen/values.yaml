@@ -1,6 +1,6 @@
 # configuration
-version: 16.0v5
-destination: /nuke
+destination: /embergen
+version: 1.2.4
 install_volume:
   name: apps-pv-claim
   sub_path:
