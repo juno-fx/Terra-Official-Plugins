@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-terra-metadata
+  annotations:
+    juno-innovations.com/workload: "Application"  # mark this as a workload and it's type for the frontend UI
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+data:
+  chart: "{{ .Release.Name }}-scripts-configmap"
+  description: "Terra Development Kit"
+  fields: |
+    - name: icon
+      description: icon
+      default: https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Visual_Studio_Code_1.35_icon.svg/2048px-Visual_Studio_Code_1.35_icon.svg.png
+    - name: registry
+      description: Registry to pull from
+      default: lscr.io
+    - name: repo
+      description: Repo to pull from
+      default: linuxserver/code-server
+    - name: tag
+      description: Tag to pull from
+      default: latest
+    - name: terra_role
+      description: Name of a Terra role to assign to Development Kit. This refers to the plugin level installed roles.
+      required: false
+      type: k8sServiceAccount
+    - name: packages
+      description: Additional packages to install. You can use spaces " " to install multiples.
+      required: false
+      default: python3 python3-venv 
