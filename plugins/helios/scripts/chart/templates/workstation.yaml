@@ -143,6 +143,7 @@ spec:
         - name: shm
           emptyDir:
             medium: Memory
+            sizeLimit: 1Gi
         {{- if .Values.volumeMounts }}
         {{- toYaml .Values.volumes | nindent 8 }}
         {{- end }}
