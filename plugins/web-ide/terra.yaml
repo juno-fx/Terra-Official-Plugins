@@ -1,0 +1,11 @@
+resource_id: web-ide
+name: web-ide
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/web-ide/scripts/assets/logo.png
+description: Web based IDE using code server
+category: Development
+tags:
+- ide
+- vscode
+- cluster-level
+- workload
+fields: []
