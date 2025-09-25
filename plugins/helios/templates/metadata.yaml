@@ -12,4 +12,5 @@ data:
       description: Image Pull Policy (defaults to Always)
       required: false
       type: select
+      default: "Always"
       options: ["Always", "IfNotPresent", "Never"]
