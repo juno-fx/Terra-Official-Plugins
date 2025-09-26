@@ -84,13 +84,16 @@ sleep 1
 helm upgrade -i "$CLEAN_HOSTNAME" ./tests/Application/ \
   --namespace "$JUNO_PROJECT" \
   --set branch="$CURRENT_GIT_REF" \
+  --set project="$JUNO_PROJECT" \
   --set remote="$URL" \
   --set plugin="$PLUGIN_NAME" \
   --set name="$PLUGIN_NAME-$CLEAN_HOSTNAME-dev"
-
 echo
+echo
+echo " >> WARNING <<"
+echo " >> Depending on your cluster environment, storage bind could take a while to be ready."
 echo
 echo " >> Starting Development Shell << "
 echo " >> Press CTRL+D to exit << "
-
+echo
 PLUGIN_NAME=$PLUGIN_NAME /bin/bash

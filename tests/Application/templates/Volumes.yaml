@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: data-pv-claim
+  annotations:
+    kuiper.juno-innovations.com/sub-path: none
+  labels:
+    juno-innovations.com/owned: "true"
+    juno-innovations.com/project: {{ .Values.project }}
+spec:
+  storageClassName: local-path
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/tmp/shared"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: data-pv-claim
+  labels:
+    juno-innovations.com/owned: "true"
+    juno-innovations.com/project: {{ .Values.project }}
+    juno-innovations.com/volume: data-pv-claim
+spec:
+  storageClassName: local-path
+  volumeName: data-pv-claim
+  resources:
+    requests:
+      storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: apps-pv-claim
+  annotations:
+    kuiper.juno-innovations.com/container-path: /apps/
+    kuiper.juno-innovations.com/sub-path: ""
+  labels:
+    juno-innovations.com/owned: "true"
+    juno-innovations.com/project: {{ .Values.project }}
+spec:
+  storageClassName: local-path
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/tmp/shared"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: apps-pv-claim
+  annotations:
+    kuiper.juno-innovations.com/container-path: /apps/
+    kuiper.juno-innovations.com/sub-path: ""
+  labels:
+    juno-innovations.com/owned: "true"
+    juno-innovations.com/project: {{ .Values.project }}
+    juno-innovations.com/volume: apps-pv-claim
+    kuiper.juno-innovations.com: "mount"
+spec:
+  storageClassName: local-path
+  volumeName: apps-pv-claim
+  resources:
+    requests:
+      storage: 1Gi
+  accessModes:
+    - ReadWriteMany
