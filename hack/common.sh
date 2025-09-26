@@ -40,7 +40,14 @@ in_cluster() {
 
 # Start a git daemon in the project root
 start_git_daemon() {
+  # store the current working directory
+  echo
+  cwd=$(pwd)
+  echo " >> Starting git daemon << "
   cd ../
-  git daemon --verbose --export-all --base-path=. --reuseaddr --informative-errors &
+  git daemon --verbose --export-all --base-path=. --reuseaddr --informative-errors &> "${cwd}/.git-daemon.log" &
   cd -
+  echo " >> git daemon Running << "
+  echo " >> Logs streaming to: ${cwd}/.git-daemon.log << "
+  echo
 }
