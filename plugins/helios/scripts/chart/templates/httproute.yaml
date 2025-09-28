@@ -18,7 +18,7 @@ spec:
             value: "/polaris/{{ .Values.name }}/"
       backendRefs:
         - name: "{{ .Values.name }}-helios"
-          port: 3000
+          port: 3001
           kind: Service
       filters:
         - type: ExtensionRef

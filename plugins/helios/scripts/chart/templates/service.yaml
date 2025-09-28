@@ -6,7 +6,14 @@ spec:
   selector:
     juno-innovations.com/workstation: "{{ .Values.name }}"
   ports:
+    # To be retired once we sunset v1 (ingress-based Orion).
+    # pod-to-pod TLS handling should be handled cluster level and by design
+    # All templates on >= 2.0.0 hit 3001 already 
     - port: 3000
       targetPort: 3000
+      protocol: TCP
+      name: helios-ssl
+    - port: 3001
+      targetPort: 3001
       protocol: TCP
       name: helios

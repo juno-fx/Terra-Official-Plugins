@@ -93,18 +93,23 @@ spec:
             {{- end }}
           startupProbe:
             tcpSocket:
-              port: 3000
+              port: 3001
             initialDelaySeconds: 2 # helios boots very fast
             failureThreshold: 60  # start up totals 2 * 60 = 2 mins
             periodSeconds: 2
           livenessProbe:
             tcpSocket:
-              port: 3000
+              port: 3001
             failureThreshold: 24
             periodSeconds: 5
           ports:
+            # To be retired once we sunset v1 (ingress-based Orion).
+            # pod-to-pod TLS handling should be handled cluster level and by design
+            # All templates on >= 2.0.0 hit 3001 already 
             - containerPort: 3000
               name: viewer
+            - containerPort: 3001
+              name: viewer-helios
           env:
             - name: JUNO_WORKSTATION
               value: "{{ .Values.name }}"
