@@ -6,8 +6,8 @@ metadata:
   name: "{{ .Values.name }}-helios"
 spec:
   parentRefs:
-    - name: "{{ .Values.gateway_name }}"
-      namespace: "{{ .Values.gateway_namespace }}"
+    - name: "{{ .Values.gateway.name }}"
+      namespace: "{{ .Values.gateway.namespace }}"
       sectionName: https
   hostnames:
     - "{{ .Values.host }}"

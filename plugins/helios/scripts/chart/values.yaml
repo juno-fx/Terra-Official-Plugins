@@ -25,3 +25,6 @@ plugins: []
 _kuiper:
 # defaults to 'traefik' or 'ingress-nginx'
 proxy_namespace:
+gateway:
+  name: orion
+  namespace: argocd
