@@ -144,3 +144,6 @@ Thumbs.db
 .idea
 .apps
 /jtmp/
+
+
+.vscode/
