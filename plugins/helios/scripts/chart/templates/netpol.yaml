@@ -10,4 +10,4 @@ spec:
     - from:
         - namespaceSelector:
             matchLabels:
-              name: {{ include "helios.proxyNamespace" . }}
+              name: {{ include "juno.proxyNamespace" . }}
