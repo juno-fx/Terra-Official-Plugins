@@ -23,3 +23,5 @@ env:
 selector:
 plugins: []
 _kuiper:
+# defaults to 'traefik' or 'ingress-nginx'
+proxy_namespace:

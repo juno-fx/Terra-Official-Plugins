@@ -8,3 +8,4 @@ memory:
 memoryLimit:
 gpu:
 env:
+proxy_namespace:

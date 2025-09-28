@@ -1,3 +1,4 @@
+{{- if eq .Values._juno_gateway_api true }}
 ---
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
@@ -17,46 +18,13 @@ spec:
             type: PathPrefix
             value: "/polaris/{{ .Values.name }}/"
       backendRefs:
-        - name: "{{ .Values.name }}"
+        - name: "{{ .Values.name }}-helios"
           port: 3000
-
----
-apiVersion: gateway.envoyproxy.io/v1alpha1
-kind: Backend
-metadata:
-  name: "{{ .Values.name }}-helios"
-  namespace: daniel
-spec:
-  endpoints:
-    - fqdn:
-        hostname: wm.daniel.svc.cluster.local
-        port: 3000
-  tls:
-    insecureSkipVerify: true
----
-apiVersion: gateway.envoyproxy.io/v1alpha1
-kind: SecurityPolicy
-metadata:
-  name: "{{ .Values.name }}-helios"
-  namespace: "{{ .Values.namespace }}"
-spec:
-  targetRef:
-    group: gateway.networking.k8s.io
-    kind: HTTPRoute
-    name: "{{ .Values.name }}-helios"
-  extAuth:
-    # 'Cookie' is necessary for the Authorization service and not passed via Envoy by default
-    headersToExtAuth:
-      - Host
-      - Method
-      - Path
-      - Content-Length
-      - Authorization
-      - Cookie
-    http:
-      backendRefs:
-      - kind: Service
-        name: hubble
-        namespace: "{{ .Values.namespace }}"
-        port: 3000
-      path: /api/authorization-service
+          kind: Service
+      filters:
+        - type: ExtensionRef
+          extensionRef:
+            group: traefik.io
+            kind: Middleware
+            name: "hubble-auth-service"
+{{- end }}
