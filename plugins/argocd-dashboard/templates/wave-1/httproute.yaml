@@ -3,12 +3,12 @@
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 metadata:
-  name: "{{ .Values.name }}-helios"
+  name: "{{ .Release.Name }}-argocd-orion-dashboard"
   namespace: "{{ .Values.namespace }}"
 spec:
   parentRefs:
-    - name: "{{ .Values.gateway_name }}"
-      namespace: "{{ .Values.gateway_namespace }}"
+    - name: "{{ .Values.gateway.name }}"
+      namespace: "{{ .Values.gateway.namespace }}"
       sectionName: https
   hostnames:
     - "{{ .Values.host }}"
@@ -16,15 +16,15 @@ spec:
     - matches:
         - path:
             type: PathPrefix
-            value: "/polaris/{{ .Values.name }}/"
+            value: "{{ .Values.prefix }}"
       backendRefs:
-        - name: "{{ .Values.name }}-helios"
-          port: 3000
+        - name: "argocd-server"
+          port: 80
           kind: Service
       filters:
         - type: ExtensionRef
           extensionRef:
             group: traefik.io
             kind: Middleware
-            name: "hubble-auth-service"
+            name: "genesis-auth-service"
 {{- end }}

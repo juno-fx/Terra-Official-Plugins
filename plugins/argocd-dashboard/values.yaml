@@ -2,6 +2,11 @@
 host:
 prefix: "/argocd"
 
+# Gateway API configuration
+gateway:
+  name: orion
+  namespace: argocd
+
 # This gets defaulted via a helm template - if you use traefik or ingress-nginx in their default NS, you dont need to do anything
 proxy_namespace:
 
