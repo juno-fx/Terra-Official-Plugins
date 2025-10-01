@@ -23,3 +23,9 @@ env:
 selector:
 plugins: []
 _kuiper:
+
+# defaults to 'traefik' or 'ingress-nginx' depending on the Orion release
+proxy_namespace:
+gateway:
+  name: orion
+  namespace: argocd
