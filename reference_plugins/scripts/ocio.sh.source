@@ -1,4 +1,0 @@
-
-echo "Setting OCIO environment variable to: ROOT_APP/configs/studio-config-v2.0.0_aces-v1.3_ocio-v2.2.ocio"
-export OCIO=ROOT_APP/configs/studio-config-v2.0.0_aces-v1.3_ocio-v2.2.ocio
-
