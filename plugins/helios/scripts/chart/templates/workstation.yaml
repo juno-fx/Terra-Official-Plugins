@@ -72,7 +72,7 @@ spec:
 
       containers:
         - name: helios
-          imagePullPolicy: "{{ .Values.pullPolicy }}"
+          imagePullPolicy: IfNotPresent
           image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
           resources:
             requests:
