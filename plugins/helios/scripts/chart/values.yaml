@@ -23,4 +23,3 @@ env:
 selector:
 plugins: []
 _kuiper:
-pullPolicy: Always
