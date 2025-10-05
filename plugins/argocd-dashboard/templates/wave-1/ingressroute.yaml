@@ -19,5 +19,6 @@ spec:
         - name: argocd-server
           port: 80
           scheme: https
-          serversTransport: insecure-transport
+          serversTransport: argocd-server-insecure-transport
+
 {{- end }}
