@@ -1,0 +1,11 @@
+apiVersion: traefik.io/v1alpha1
+kind: TraefikService
+metadata:
+  name: argocd-server
+  namespace: argocd
+spec:
+  weighted:
+    services:
+      - name: argocd-server
+        port: 443
+    serversTransport: insecure-transport

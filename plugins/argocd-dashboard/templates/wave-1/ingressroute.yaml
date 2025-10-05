@@ -1,0 +1,20 @@
+# The plain gateway API doesn't play nice with insecure-transport, so we are ok with "vendor lockin" here.
+# It is fairly trivial/low-cost to migrate away from this if we have to
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: "argocd-terra-dashboard"
+  namespace: "argocd"
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: "Host(`dark.juno-innovations.com`) && PathPrefix(`/argocd`)"
+      kind: Rule
+      middlewares:
+        - name: "genesis-auth-service"
+      services:
+        - name: argocd-server
+          port: 443
+          scheme: https
+          serversTransport: insecure-transport
