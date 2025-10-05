@@ -10,4 +10,4 @@ spec:
     - from:
         - namespaceSelector:
             matchLabels:
-              name: {{ include "juno.proxyNamespace" . }}
+              kubernetes.io/metadata.name: {{ include "juno.proxyNamespace" . }}
