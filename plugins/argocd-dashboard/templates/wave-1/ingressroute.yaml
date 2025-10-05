@@ -1,3 +1,4 @@
+{{- if eq .Values._juno_gateway_api true }}
 # The plain gateway API doesn't play nice with insecure-transport, so we are ok with "vendor lockin" here.
 # It is fairly trivial/low-cost to migrate away from this if we have to
 apiVersion: traefik.io/v1alpha1
@@ -18,3 +19,4 @@ spec:
           port: 443
           scheme: https
           serversTransport: insecure-transport
+{{- end }}
