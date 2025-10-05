@@ -10,13 +10,14 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: "Host(`{{ .Values.host }}`) && PathPrefix(`/{{ .Values.prefix }}`)"
+    - match: "Host(`{{ .Values.host }}`) && PathPrefix(`{{ .Values.prefix }}`)"
       kind: Rule
       middlewares:
         - name: "genesis-auth-service"
       services:
+        # argo listens for https on 80 too
         - name: argocd-server
-          port: 443
+          port: 80
           scheme: https
           serversTransport: insecure-transport
 {{- end }}
