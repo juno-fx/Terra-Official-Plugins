@@ -28,7 +28,6 @@ remove_configmap_key() {
 echo "Cleaning up ArgoCD ConfigMaps..."
 
 echo "Cleaning argocd-cm..."
-remove_configmap_key "argocd-cm" "admin.enabled"
 remove_configmap_key "argocd-cm" "users.anonymous.enabled"
 
 echo "Cleaning argocd-cmd-params-cm..."
@@ -37,6 +36,5 @@ remove_configmap_key "argocd-cmd-params-cm" "server.disable.auth"
 remove_configmap_key "argocd-cmd-params-cm" "server.x.frame.options"
 
 echo "Cleaning argocd-rbac-cm..."
-remove_configmap_key "argocd-rbac-cm" "policy.default"
 
 echo "ArgoCD ConfigMaps cleanup completed successfully!"
