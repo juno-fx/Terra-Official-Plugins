@@ -8,9 +8,4 @@ data:
   chart: "{{ .Release.Name }}-scripts-configmap"
   description: "Helios deployment with desktop streaming"
   fields: |
-    - name: pullPolicy
-      description: Image Pull Policy (defaults to Always)
-      required: false
-      type: select
-      default: "Always"
-      options: ["Always", "IfNotPresent", "Never"]
+    []
