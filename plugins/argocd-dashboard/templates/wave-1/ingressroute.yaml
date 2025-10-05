@@ -10,7 +10,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: "Host(`dark.juno-innovations.com`) && PathPrefix(`/argocd`)"
+    - match: "Host(`{{ .Values.host }}`) && PathPrefix(`/{{ .Values.prefix }}`)"
       kind: Rule
       middlewares:
         - name: "genesis-auth-service"
