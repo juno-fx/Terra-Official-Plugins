@@ -119,6 +119,7 @@ nav:
     - getting-started.md
     - plugin-types.md
     - workflow.md
+    - workflow-tdk.md
     - configuration.md
     - advanced.md
   - Community:
