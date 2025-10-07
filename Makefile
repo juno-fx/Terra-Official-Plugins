@@ -122,7 +122,7 @@ test: cluster dependencies
 
 
 # LEGACY
-test-%: cluster dependencies
+test-%:
 	@echo "Legacy: Use 'make test $(subst test-,,$@)' instead."
 	@$(MAKE) --no-print-directory test $(subst test-,,$@)
 
