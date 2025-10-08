@@ -1,0 +1,32 @@
+name: notebook
+user:
+repo:
+tag:
+registry:
+group:
+cpu: "1"
+memory: "1Gi"
+cpuLimit: null
+memoryLimit: null
+gpu: false
+idx: 0
+guid: 0
+puid: 0
+host:
+pullSecret:
+session:
+volumeMounts: []
+volumes: []
+env:
+  - name: JUNO
+    value: "true"
+selector:
+plugins: []
+_kuiper:
+
+gateway:
+  name: orion
+  namespace: argocd
+
+proxy_namespace:
+
