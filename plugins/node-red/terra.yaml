@@ -11,10 +11,13 @@ tags:
 
 fields:
   - name: registry
+    description: Container registry to pull from
     default: "nodered"
   - name: repo
+    description: Repository to pull from
     default: "node-red"
   - name: tag
+    description: Tag to pull
     default: "latest"
   - name: host
     description: Connection URL. i.e. `node-red.example.com`. Keep in mind you must set up a DNS record for this host to point to your cluster's ingress controller.
