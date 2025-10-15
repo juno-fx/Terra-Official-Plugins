@@ -1,6 +1,8 @@
 # configuration
+registry: nodered
+repo: node-red
+tag: latest
 host:
-version: "latest"
 destination: /node-red
 prefix: "/"
 install_volume:

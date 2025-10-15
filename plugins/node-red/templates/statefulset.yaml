@@ -16,7 +16,7 @@ spec:
       containers:
         - name: node-red
           imagePullPolicy: IfNotPresent
-          image: "nodered/node-red"
+          image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
           startupProbe:
             httpGet:
               path: "{{ .Values.prefix }}"
