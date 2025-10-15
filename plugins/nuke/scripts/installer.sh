@@ -3,25 +3,27 @@ set -e
 apt update
 apt install curl -y
 
-executable="$(echo "$VERSION" | cut -d'v' -f1)"
-LAUNCH="$DESTINATION/$VERSION/$executable"
-ICON="$DESTINATION/$VERSION/nuke.png"
+EXECUTABLE="$(echo "Nuke$VERSION" | cut -d'v' -f1)"
+INSTALL_DIR="$DESTINATION/Nuke$VERSION/"
+LAUNCH="$INSTALL_DIR/$EXECUTABLE"
+ICON="$INSTALL_DIR/nuke.png"
 
 echo "Installing $VERSION"
 echo "Destination $DESTINATION"
-echo "Executable: $executable"
+echo "Executable: $EXECUTABLE"
 
-curl -LJO -o nuke.tgz "https://www.foundry.com/products/download_product?file=$VERSION-linux-x86_64.tgz"
-mv -v "download_product" "/tmp/$VERSION.tgz"
 
-tar -xvf "/tmp/$VERSION.tgz" -C /tmp/
-"/tmp/$VERSION-linux-x86_64.run" --prefix="$DESTINATION/" --accept-foundry-eula
+curl -Lo "/tmp/Nuke$VERSION.tgz" -P /tmp "https://thefoundry.s3.amazonaws.com/products/nuke/releases/$VERSION/Nuke$VERSION-linux-x86_64.tgz"
 
-rm -rfv "$DESTINATION/$VERSION.tgz" "$DESTINATION/$VERSION-linux-x86_64.run"
+echo "Extracting nuke..."
+tar xzvf "/tmp/Nuke$VERSION.tgz" -C /tmp/
+"/tmp/Nuke$VERSION-linux-x86_64.run" --prefix="$DESTINATION/" --accept-foundry-eula
+
+rm -rfv "$DESTINATION/Nuke$VERSION.tgz" "$DESTINATION/Nuke$VERSION-linux-x86_64.run"
 
 # app icon setup
-cp -v ./assets/nuke.png "$DESTINATION/$VERSION/"
-rm -rfv "$DESTINATION/nuke.desktop"
+cp -v ./assets/nuke.png "$INSTALL_DIR"
+rm -rfv "$INSTALL_DIR/nuke.desktop"
 
 echo "[Desktop Entry]
 Version=$VERSION
@@ -31,17 +33,8 @@ Exec=$LAUNCH
 Icon=$ICON
 Terminal=true
 Type=Application
-Categories=X-Polaris" >> "$DESTINATION/$VERSION"/nuke.desktop
+Categories=X-Polaris" >> "$INSTALL_DIR/"nuke.desktop
 
-echo "[Desktop Entry]
-Version=$VERSION
-Name=Nuke $VERSION GPU
-Comment=Nuke compositing software GPU enabled
-Exec=vglrun -d /dev/dri/card0 $LAUNCH
-Icon=$ICON
-Terminal=true
-Type=Application
-Categories=X-Polaris" >> "$DESTINATION/$VERSION"/nuke-gpu.desktop
+cat "$INSTALL_DIR/"*.desktop
 
-cat "$DESTINATION"/*.desktop
-
+echo "Nuke Terra Install Complete"

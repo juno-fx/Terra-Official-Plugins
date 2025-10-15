@@ -1,0 +1,4 @@
+apiVersion: v1
+name: embergen
+version: 0.0.1
+icon: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/embergen/scripts/assets/embergen.png?raw=true"

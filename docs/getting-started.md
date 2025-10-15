@@ -5,10 +5,9 @@
 To get started with Terra plugins, you need to have the following prerequisites:
 
 - **Helm**: Ensure you have Helm installed on your system. You can download it from the [Helm website](https://helm.sh/docs/intro/install/).
-- **Docker**: Docker is used to run Kind. Install Docker from the [Docker website](https://docs.docker.com/get-docker/).
-- **Kind**: Kind is used to create a local Kubernetes cluster. You can install it by following the instructions on the [Kind website](https://kind.sigs.k8s.io/docs/user/quick-start/).
-- **Devbox**: Devbox is used to manage development environments. You can install it from the [Devbox website](https://www.jetify.com/docs/devbox/installing_devbox/).
+- **Kubectl**: Kubectl is used to talk to kubernetes clusters. You can install it from the [Kubectl website](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/).
 - **Git**: Ensure you have Git installed to clone the repository. You can download it from the [Git website](https://git-scm.com/downloads).
+- **Make**: Ensure you have Make installed to run the workflows. You can download it from the [Make website](https://www.gnu.org/software/make/).
 
 ## Repository Setup
 
@@ -24,21 +23,7 @@ To set up your Terra plugin repository, follow these steps:
     $ git checkout 999-my-branch
     ```
 
-2. **Activate Devbox**: Juno ships a full Devbox environment to help you get started quickly. Activate it by running:
-
-    <!-- termynal -->
-    
-    ```shell
-    $ devbox shell
-    Starting a devbox shell...
-    Requirement already satisfied: uv in ./.venv/lib/python3.12/site-packages (0.7.9)
-    
-    [notice] A new release of pip is available: 24.3.1 -> 25.1.1
-    [notice] To update, run: pip install --upgrade pip
-    Audited 4 packages in 1ms
-    ```
-
-3. **Create Our Plugin**: Juno provides a `Makefile` target that creates the scaffolding for a new plugin. You can use it to create a new plugin:
+2. **Create Our Plugin**: Juno provides a `Makefile` target that creates the scaffolding for a new plugin. You can use it to create a new plugin:
 
     <!-- termynal -->
     
@@ -52,6 +37,33 @@ To set up your Terra plugin repository, follow these steps:
    >> Ready to go <<
     ```
 
+2. **Launch Development Environment**: Use `make test-plugin <plugin name>` this will communicate with ArgoCD and create an Application deployment that points to your local system.
+
+    <!-- termynal -->
+
+    ```shell
+    $ make test-plugin my-plugin
+    >> Deploying my-plugin << 
+    Plugin: my-plugin
+    TDK Name: ginger
+    Git Branch: 354-build-terra-plugin-development-kit
+    Namespace (JUNO_PROJECT): tdk
+    URL: git://ginger.tdk.svc.cluster.local:9418/Terra-Official-Plugins
+    /config/workspace/Terra-Official-Plugins
+    [60867] Ready to rumble
+    Release "ginger" does not exist. Installing it now.
+    NAME: ginger
+    LAST DEPLOYED: Wed Sep 17 18:27:12 2025
+    NAMESPACE: tdk
+    STATUS: deployed
+    REVISION: 1
+    TEST SUITE: None
+
+
+    >> Starting Development Shell << 
+    >> Press CTRL+D to exit << 
+    $ 
+    ```
 
 
 ## Plugin Structure

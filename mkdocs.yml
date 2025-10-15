@@ -4,158 +4,158 @@ site_url: https://juno-innovations.com
 repo_url: https://github.com/juno-fx/Terra-Official-Plugins
 repo_name: juno-fx/Terra-Official-Plugins
 theme:
-  logo: assets/logos/terra/terra-color-W.png  # Will need terra-light.png and terra-dark.png
+  logo: assets/logos/terra/terra-color-W.png # Will need terra-light.png and terra-dark.png
   favicon: assets/logos/favicon/terra-icon.ico
   icon:
     repo: fontawesome/brands/github-alt
   name: material
   features:
-    # Navigation
-    - navigation.tabs
-    - navigation.tabs.sticky
-    - navigation.indexes
-    - navigation.prune
-    - navigation.sections
-    - navigation.path
-    - navigation.expand
-    - navigation.instant
-    - navigation.instant.prefetch
-    - navigation.tracking
-    # Table of contents
-    - toc.follow
-    # Search
-    - search.suggest
-    - search.highlight
-    - search.share
-    # Content
-    - content.tabs.link
-    - content.code.annotation
-    - content.code.copy
-    - content.code.select
-    # UI
-    - navigation.footer
-    - navigation.top
-    - header.autohide
+  # Navigation
+  - navigation.tabs
+  - navigation.tabs.sticky
+  - navigation.indexes
+  - navigation.prune
+  - navigation.sections
+  - navigation.path
+  - navigation.expand
+  - navigation.instant
+  - navigation.instant.prefetch
+  - navigation.tracking
+  # Table of contents
+  - toc.follow
+  # Search
+  - search.suggest
+  - search.highlight
+  - search.share
+  # Content
+  - content.tabs.link
+  - content.code.annotation
+  - content.code.copy
+  - content.code.select
+  # UI
+  - navigation.footer
+  - navigation.top
+  - header.autohide
   language: en
   palette:
-    # Dark mode (default - listed first)
-    - scheme: slate
-      primary: black
-      accent: orange
-      toggle:
-        icon: material/brightness-4
-        name: Switch to light mode
-    # Light mode
-    - scheme: default
-      primary: black
-      accent: blue
-      toggle:
-        icon: material/brightness-7
-        name: Switch to dark mode
+  # Dark mode (default - listed first)
+  - scheme: slate
+    primary: black
+    accent: orange
+    toggle:
+      icon: material/brightness-4
+      name: Switch to light mode
+  # Light mode
+  - scheme: default
+    primary: black
+    accent: blue
+    toggle:
+      icon: material/brightness-7
+      name: Switch to dark mode
   font: false
 
 plugins:
-  - search:
-      separator: '[\s\-\.]'
-      lang:
-        - en
-  - literate-nav
-  - termynal:
-      title: zsh
-      buttons: macos
-      prompt_literal_start:
-        - "$"
-  - gen-files:
-      scripts:
-        - docs/scripts/gen_plugins.py
+- search:
+    separator: '[\s\-\.]'
+    lang:
+    - en
+- literate-nav
+- termynal:
+    title: zsh
+    buttons: macos
+    prompt_literal_start:
+    - "$"
+- gen-files:
+    scripts:
+    - docs/scripts/gen_plugins.py
 
 markdown_extensions:
-  # Standard extensions
-  - md_in_html
-  - admonition
-  - pymdownx.details
-  - attr_list
-  - footnotes
-  - tables
-  - toc:
-      permalink: true
-      title: On this page
+# Standard extensions
+- md_in_html
+- admonition
+- pymdownx.details
+- attr_list
+- footnotes
+- tables
+- toc:
+    permalink: true
+    title: On this page
 
-  # PyMdown Extensions
-  - pymdownx.blocks.caption
-  - pymdownx.superfences:
-      custom_fences:
-        - name: mermaid
-          class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format
-  - pymdownx.highlight:
-      anchor_linenums: true
-      line_spans: __span
-      pygments_lang_class: true
-  - pymdownx.inlinehilite
-  - pymdownx.snippets:
-      check_paths: true
-  - pymdownx.tabbed:
-      alternate_style: true
-  - pymdownx.critic
-  - pymdownx.caret
-  - pymdownx.keys
-  - pymdownx.mark
-  - pymdownx.tilde
-  - pymdownx.smartsymbols
-  - pymdownx.emoji:
-      emoji_index: !!python/name:material.extensions.emoji.twemoji
-      emoji_generator: !!python/name:material.extensions.emoji.to_svg
-  - pymdownx.tasklist:
-      custom_checkbox: true
+# PyMdown Extensions
+- pymdownx.blocks.caption
+- pymdownx.superfences:
+    custom_fences:
+    - name: mermaid
+      class: mermaid
+      format: !!python/name:pymdownx.superfences.fence_code_format ""
+- pymdownx.highlight:
+    anchor_linenums: true
+    line_spans: __span
+    pygments_lang_class: true
+- pymdownx.inlinehilite
+- pymdownx.snippets:
+    check_paths: true
+- pymdownx.tabbed:
+    alternate_style: true
+- pymdownx.critic
+- pymdownx.caret
+- pymdownx.keys
+- pymdownx.mark
+- pymdownx.tilde
+- pymdownx.smartsymbols
+- pymdownx.emoji:
+    emoji_index: !!python/name:material.extensions.emoji.twemoji ""
+    emoji_generator: !!python/name:material.extensions.emoji.to_svg ""
+- pymdownx.tasklist:
+    custom_checkbox: true
 
 nav:
-  - Welcome:
-      - index.md
-  - Building Plugins:
-      - Repositories:
-        - repositories.md
-      - Development:
-        - getting-started.md
-        - configuration.md
-        - workflow.md
-        - advanced.md
-        - plugin-types.md
-        - plugin-fields.md
-      - Community:
-        - contributing.md
-  - Plugins:
-    - VDI:
-        - 'plugins/VDI/*.md'
-    - Web:
-        - 'plugins/Web/*.md'
-    - Networking:
-        - 'plugins/Networking/*.md'
-    - Compositing:
-        - 'plugins/Compositing/*.md'
-    - Rendering Management:
-        - 'plugins/Rendering Management/*.md'
-    - Utility:
-        - 'plugins/Utility/*.md'
-    - All Plugins:
-        - 'plugins/*/*.md'
-  - Related Documentation:
-    - related/related-docs.md
+- Welcome:
+  - index.md
+- Building Plugins:
+  - Repositories:
+    - repositories.md
+  - Development:
+    - getting-started.md
+    - plugin-types.md
+    - workflow.md
+    - workflow-tdk.md
+    - configuration.md
+    - advanced.md
+  - Community:
+    - contributing.md
+- Plugins:
+  - VDI:
+    - 'plugins/VDI/*.md'
+  - Web:
+    - 'plugins/Web/*.md'
+  - Networking:
+    - 'plugins/Networking/*.md'
+  - Compositing:
+    - 'plugins/Compositing/*.md'
+  - Rendering Management:
+    - 'plugins/Rendering Management/*.md'
+  - Utility:
+    - 'plugins/Utility/*.md'
+  - All Plugins:
+    - 'plugins/*/*.md'
+- Related Documentation:
+  - related/related-docs.md
 
 extra:
   generator: false
   #version:
   #  provider: mike  # Uncomment when mike is installed
   social:
-    - icon: fontawesome/brands/github-alt
-      link: https://github.com/juno-fx/
-      name: GitHub
-    - icon: fontawesome/brands/linkedin
-      link: https://www.linkedin.com/company/juno-innovations/about/
-      name: LinkedIn
-    - icon: fontawesome/brands/docker
-      link: https://hub.docker.com/u/junoinnovations
-      name: Docker Hub
+  - icon: fontawesome/brands/github-alt
+    link: https://github.com/juno-fx/
+    name: GitHub
+  - icon: fontawesome/brands/linkedin
+    link: https://www.linkedin.com/company/juno-innovations/about/
+    name: LinkedIn
+  - icon: fontawesome/brands/docker
+    link: https://hub.docker.com/u/junoinnovations
+    name: Docker Hub
   analytics:
     # Uncomment and add your Google Analytics ID when ready
     #provider: google
@@ -163,22 +163,19 @@ extra:
     consent:
       title: Cookie consent
       description: >-
-        We use cookies to recognize your repeated visits and preferences, as well
-        as to measure the effectiveness of our documentation and whether users
-        find what they're searching for. With your consent, you're helping us to
-        make our documentation better.
+        We use cookies to recognize your repeated visits and preferences, as well as to measure the effectiveness of our documentation and whether users find what they're searching for. With your consent, you're helping us to make our documentation better.
       actions:
-        - accept
-        - reject
-        - manage
+      - accept
+      - reject
+      - manage
   # SEO Meta tags
   meta:
-    - name: description
-      content: Official documentation for Juno Innovations Terra - Plugin development and catalog
-    - name: keywords
-      content: juno, innovations, terra, plugins, vdi, compositing, rendering, utility
-    - name: author
-      content: Juno Innovations
+  - name: description
+    content: Official documentation for Juno Innovations Terra - Plugin development and catalog
+  - name: keywords
+    content: juno, innovations, terra, plugins, vdi, compositing, rendering, utility
+  - name: author
+    content: Juno Innovations
 
 copyright: |
   &copy; 2025 Juno Innovations. All rights reserved. | 
@@ -187,9 +184,9 @@ copyright: |
   <a href="https://juno-fx.github.io/Helios/">Helios Workstations</a>
 
 extra_css:
-  - stylesheets/extra.css
+- stylesheets/extra.css
 
 extra_javascript:
-  - javascripts/theme-init.js
-  - javascripts/extra.js
-  - https://unpkg.com/mermaid@10/dist/mermaid.min.js
+- javascripts/theme-init.js
+- javascripts/extra.js
+- https://unpkg.com/mermaid@10/dist/mermaid.min.js

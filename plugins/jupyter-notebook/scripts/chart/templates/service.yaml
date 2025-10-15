@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Values.name }}-jupyter-notebook"
+spec:
+  selector:
+    juno-innovations.com/workstation: "{{ .Values.name }}"
+  ports:
+    - port: 8888
+      targetPort: 8888
+      protocol: TCP
+      name: jupyter
