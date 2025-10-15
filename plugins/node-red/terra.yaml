@@ -23,11 +23,13 @@ fields:
     description: Connection URL. i.e. `node-red.example.com`. Keep in mind you must set up a DNS record for this host to point to your cluster's ingress controller.
     required: true
   - name: prefix
-    description: Connection URL prefix. i.e. `/node-red`. Will default to `/` if not set.
+    description: Connection URL prefix. i.e. `/node-red`.
     required: false
+    default: "/node-red"
   - name: destination
     description: Destination directory defaults to /node-red
     required: false
+    default: "/node-red"
   - name: install_volume
     description: The name of the install volume
     required: true
