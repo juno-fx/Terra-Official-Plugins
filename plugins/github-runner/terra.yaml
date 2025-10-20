@@ -28,7 +28,7 @@ fields:
   - name: architecture
     description: Architecture of the GitHub runner
     required: true
-    type: options
+    type: select
     options:
       - x64
       - arm64
