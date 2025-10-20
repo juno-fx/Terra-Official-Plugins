@@ -2,7 +2,7 @@
 set -e
 
 if [ -n "$CLEANUP" ]; then
-  rm -rvf "$DESTINATION/$VERSION"
+  rm -rvf "$DESTINATION/$NAME"
   exit 0
 fi
 
