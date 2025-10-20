@@ -1,0 +1,52 @@
+resource_id: github-runner
+name: github-runner
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/github-runner/scripts/assets/logo.png
+description: Install and deploy GitHub runner
+category: CI/CD
+tags:
+  - cicd
+  - github
+  - runner
+  - devops
+  - automation
+  - developer
+  - integration
+  - continuous-integration
+  - continuous-deployment
+  - github-actions
+  - github-runner
+fields:
+  - name: name
+    description: Name of the GitHub runner
+    required: true
+    type: string
+  - name: version
+    description: Version of the GitHub runner
+    required: true
+    type: string
+    default: v2.329.0
+  - name: architecture
+    description: Architecture of the GitHub runner
+    required: true
+    type: options
+    options:
+      - x64
+      - arm64
+    default: x64
+  - name: url
+    description: GitHub repository or organization URL
+    required: true
+    type: string
+  - name: token
+    description: GitHub registration token
+    required: true
+    type: string
+  - name: destination
+    description: Location to install the runner. This will be the install_volume mount path. E.g., /runner/{name}
+    required: true
+    type: string
+    default: /runners
+  - name: install_volume
+    description: The name of the install volume
+    required: true
+    type: shared-volume

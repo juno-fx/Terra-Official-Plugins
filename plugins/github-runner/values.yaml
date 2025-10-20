@@ -1,0 +1,11 @@
+# configuration
+name:
+url:
+architecture: x64
+token:
+version: v2.329.0
+destination: /runners
+install_volume:
+  name: apps-pv-claim
+  sub_path:
+  container_path: /apps
