@@ -18,8 +18,6 @@ curl -o runner.tar.gz -L "https://github.com/actions/runner/releases/download/v$
 # extract the runner package
 tar -xzf runner.tar.gz
 
+su ubuntu
 # configure the runner
-./config.sh --unattended \
-  --url "${REPO_URL}" \
-  --token "${TOKEN}" \
-  --name "${NAME}"
+su ubuntu -c "./config.sh --unattended --url \"${REPO_URL}\" --token \"${TOKEN}\" --name \"${NAME}\""
