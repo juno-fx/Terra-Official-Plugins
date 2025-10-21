@@ -1,2 +1,2 @@
 # configure the runner
-./config.sh --unattended --url "${REPO_URL}" --token "${TOKEN}" --name "${NAME}"
+./config.sh --unattended --url "${URL}" --token "${TOKEN}" --name "${NAME}"

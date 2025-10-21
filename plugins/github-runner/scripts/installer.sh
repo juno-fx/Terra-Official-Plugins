@@ -21,4 +21,4 @@ cp /terra/scripts/provision.sh ./provision.sh
 chmod +x ./provision.sh
 
 # chroot and run provision script
-chroot /host/ bash -c "cd /${DESTINATION}/${NAME} && RUNNER_ALLOW_RUNASROOT='1' REPO_URL=${REPO_URL} TOKEN=${TOKEN} NAME=${NAME} ./provision.sh"
+chroot /host/ bash -c "cd /${DESTINATION}/${NAME} && RUNNER_ALLOW_RUNASROOT='1' URL=${URL} TOKEN=${TOKEN} NAME=${NAME} ./provision.sh"
