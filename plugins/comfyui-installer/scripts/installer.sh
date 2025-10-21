@@ -8,7 +8,10 @@ INSTALL_DIR="$DESTINATION/comfyui"
 # cd to the destination directory
 mkdir -p "$DESTINATION"
 cd "$DESTINATION"
-
+echo "destination"
+echo "$DESTINATION"
+echo "INSTALL_DIR"
+echo "$INSTALL_DIR"
 # clone the repository if it doesn't exist. If it does exist, cd into it and update it
 if [ -d "comfyui" ]; then
   echo "ComfyUI directory already exists. Updating..."
@@ -76,7 +79,7 @@ cd ..
 rm -rfv run_comfyui.sh
 echo "#!/bin/bash" > run_comfyui.sh
 echo "cd \"$INSTALL_DIR\"" >> run_comfyui.sh
-echo ".venv/bin/python main.py --listen 0.0.0.0 --enable-cors-header" >> run_comfyui.sh
+echo ".venv/bin/python main.py --listen 0.0.0.0 --enable-cors-header \$(command -v nvidia-smi >/dev/null 2>&1 || echo --cpu)" >> run_comfyui.sh
 
 # make the script executable
 chmod +x run_comfyui.sh
