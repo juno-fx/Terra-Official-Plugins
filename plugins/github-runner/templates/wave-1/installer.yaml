@@ -24,7 +24,7 @@ spec:
             - name: INSTALL
               value: "true"
             - name: DESTINATION
-              value: "{{ .Values.install_volume.container_path }}{{ .Values.destination }}"
+              value: "{{ .Values.destination }}"
             - name: VERSION
               value: "{{ .Values.version }}"
             - name: ARCHITECTURE
@@ -45,18 +45,10 @@ spec:
             - name: installer
               mountPath: /terra/scripts.base64
               subPath: packaged_scripts.base64
-            - name: mount
-              mountPath: /host{{ .Values.install_volume.container_path }}
-              {{- if .Values.install_volume.sub_path }}
-              subPath: {{ .Values.install_volume.sub_path }}
-              {{- end }}
       volumes:
         - name: host
           hostPath:
             path: /
-        - name: mount
-          persistentVolumeClaim:
-            claimName: {{ .Values.install_volume.name }}
         - name: installer
           configMap:
             name: {{ .Release.Name }}-scripts-configmap
