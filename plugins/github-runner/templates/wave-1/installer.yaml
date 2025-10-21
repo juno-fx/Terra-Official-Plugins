@@ -37,6 +37,8 @@ spec:
               value: "{{ .Values.token }}"
           command: [ "/terra/bootstrap.sh" ]
           volumeMounts:
+            - name: host
+              mountPath: /host
             - name: installer
               mountPath: /terra/bootstrap.sh
               subPath: bootstrap.sh
@@ -44,11 +46,14 @@ spec:
               mountPath: /terra/scripts.base64
               subPath: packaged_scripts.base64
             - name: mount
-              mountPath: {{ .Values.install_volume.container_path }}
+              mountPath: /host{{ .Values.install_volume.container_path }}
               {{- if .Values.install_volume.sub_path }}
               subPath: {{ .Values.install_volume.sub_path }}
               {{- end }}
       volumes:
+        - name: host
+          hostPath:
+            path: /
         - name: mount
           persistentVolumeClaim:
             claimName: {{ .Values.install_volume.name }}
