@@ -38,6 +38,7 @@ if [ -n "${INSTALL}" ]; then
     echo "Copying runner configuration to shared storage..."
     mkdir -pv /${DESTINATION}/${NAME}
     rsync -a /host/${DESTINATION}/${NAME}/ /${DESTINATION}/${NAME}/
+    rsync -a /host/${DESTINATION}/${NAME}/.* /${DESTINATION}/${NAME}/
     echo "GitHub Actions Runner v${VERSION} installed at ${DESTINATION}/${NAME}"
 
     exit 0
