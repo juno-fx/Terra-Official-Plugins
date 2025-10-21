@@ -6,8 +6,8 @@ apt install -y git
 
 INSTALL_DIR="$DESTINATION/comfyui"
 # cd to the destination directory
-mkdir -p "$INSTALL_DIR"
-cd "$INSTALL_DIR"
+mkdir -p "$DESTINATION"
+cd "$DESTINATION"
 
 # clone the repository if it doesn't exist. If it does exist, cd into it and update it
 if [ -d "comfyui" ]; then
