@@ -3,7 +3,7 @@ name:
 url:
 architecture: x64
 token:
-version: v2.329.0
+version: 2.329.0
 destination: /runners
 install_volume:
   name: apps-pv-claim
