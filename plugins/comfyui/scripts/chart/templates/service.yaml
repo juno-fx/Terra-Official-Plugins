@@ -13,7 +13,7 @@ spec:
     - port: 8188
       targetPort: 8188
       protocol: TCP
-      name: confyui
+      name: comfyui
     - port: 8189
       targetPort: 8189
       protocol: TCP
