@@ -46,7 +46,7 @@ fi
 if [ -n "${LAUNCH}" ]; then
     # pull the runners configuration from shared storage
     echo "Restoring runner configuration from shared storage..."
-    rsync -a /${DESTINATION}/${NAME}/* /host/${DESTINATION}/${NAME}/
+    rsync -a /${DESTINATION}/${NAME}/ /host/${DESTINATION}/${NAME}/
     echo "Configuration restored."
     ls -la /host/${DESTINATION}/${NAME}/
     ls -la /${DESTINATION}/${NAME}/
