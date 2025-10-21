@@ -14,5 +14,7 @@ data:
       default: true
       type: boolean
       description: "Use a GPU"
+    - name: icon
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/comfyui/scripts/assets/logo.png"
 
 
