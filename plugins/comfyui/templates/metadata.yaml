@@ -11,7 +11,6 @@ data:
   description: "ComfyUI Deployment"
   fields: |
     - name: gpu
-      default: true
       type: boolean
       description: "Use a GPU"
     - name: icon
