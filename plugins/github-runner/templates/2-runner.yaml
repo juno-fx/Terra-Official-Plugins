@@ -5,6 +5,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "2"
 spec:
+  revisionHistoryLimit: 0
   serviceName: {{ .Release.Name }}-runner
   selector:
     matchLabels:
