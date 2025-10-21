@@ -18,6 +18,6 @@ fi
 if [ -n "$CLEANUP" ]; then
   # remove the Destination directory
   echo "Cleaning up the destination directory..."
-  rm -rf "$DESTINATION"
+  rm -rf "$DESTINATION/comfyui"
   echo "Cleanup completed."
 fi
