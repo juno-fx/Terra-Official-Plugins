@@ -10,6 +10,9 @@ spec:
     matchLabels:
       runner: {{ .Release.Name }}-runner
   template:
+    metadata:
+      labels:
+        runner: {{ .Release.Name }}-runner
     spec:
       nodeSelector:
         {{- if eq .Values.architecture "x64" }}
