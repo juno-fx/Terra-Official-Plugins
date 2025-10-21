@@ -17,4 +17,5 @@ curl -o runner.tar.gz -L "https://github.com/actions/runner/releases/download/v$
 tar -xzf runner.tar.gz
 
 # configure the runner
+./bin/installdependencies.sh
 RUNNER_ALLOW_RUNASROOT="1" ./config.sh --unattended --url "${REPO_URL}" --token "${TOKEN}" --name "${NAME}"
