@@ -45,7 +45,7 @@ fi
 if [ -n "${LAUNCH}" ]; then
     # pull the runners configuration from shared storage
     echo "Restoring runner configuration from shared storage..."
-    rsync -a /${DESTINATION}/${NAME}/ /host/${DESTINATION}/${NAME}/
+    rsync -a -P /${DESTINATION}/${NAME}/ /host/${DESTINATION}/${NAME}/
     echo "Configuration restored."
 
     # chroot and run the run.sh script
