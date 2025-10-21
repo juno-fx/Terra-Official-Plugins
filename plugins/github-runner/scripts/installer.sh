@@ -7,7 +7,7 @@ apt install -y \
   rsync
 
 # clean up any previous installation
-rm -rf /host/${DESTINATION}/${NAME}
+rm -rf /host/${DESTINATION}/${NAME} /${DESTINATION}/${NAME}
 
 # setup workspace
 mkdir -pv /host/${DESTINATION}/${NAME}
