@@ -21,10 +21,10 @@ fields:
     required: true
     type: string
   - name: version
-    description: Version of the GitHub runner
+    description: Version of the GitHub runner. E.g., 2.329.0
     required: true
     type: string
-    default: v2.329.0
+    default: 2.329.0
   - name: architecture
     description: Architecture of the GitHub runner
     required: true
