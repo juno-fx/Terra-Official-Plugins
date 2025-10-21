@@ -4,9 +4,10 @@ set -e
 apt update
 apt install -y git
 
+INSTALL_DIR="$DESTINATION/comfyui"
 # cd to the destination directory
-mkdir -p "$DESTINATION"
-cd "$DESTINATION"
+mkdir -p "$INSTALL_DIR"
+cd "$INSTALL_DIR"
 
 # clone the repository if it doesn't exist. If it does exist, cd into it and update it
 if [ -d "comfyui" ]; then
@@ -23,8 +24,8 @@ fi
 pip install uv
 
 # install python to the system
-# if $DESTINATION/comfyui/py_install/cpython-3.12.11-linux-x86_64-gnu does not exist, then install it
-if [ ! -d "$DESTINATION/comfyui/py_install/cpython-3.12.11-linux-x86_64-gnu" ]; then
+# if $INSTALL_DIR/py_install/cpython-3.12.11-linux-x86_64-gnu does not exist, then install it
+if [ ! -d "$INSTALL_DIR/py_install/cpython-3.12.11-linux-x86_64-gnu" ]; then
   echo "Installing Python 3.12.11..."
   uv python install -f -r -i py_install 3.12.11
 else
@@ -34,8 +35,8 @@ fi
 # create the virtual environment if it doesn't exist
 if [ ! -d ".venv" ]; then
   echo "Creating virtual environment..."
-  echo "Using Python from: $DESTINATION/comfyui/py_install/cpython-3.12.11-linux-x86_64-gnu/bin/python"
-  uv venv .venv -p "$DESTINATION/comfyui/py_install/cpython-3.12.11-linux-x86_64-gnu/bin/python"
+  echo "Using Python from: $INSTALL_DIR/py_install/cpython-3.12.11-linux-x86_64-gnu/bin/python"
+  uv venv .venv -p "$INSTALL_DIR/py_install/cpython-3.12.11-linux-x86_64-gnu/bin/python"
 else
   echo "Virtual environment already exists."
 fi
@@ -59,33 +60,22 @@ git pull origin main
 uv pip install --no-cache -r requirements.txt
 cd ../
 
-# install comfyui distributed
-
-# check if the ComfyUI-Distributed directory exists, if it does, skip cloning
-rm -rfv ComfyUI-Distributed
-ls -la
-echo "Cloning ComfyUI-Distributed repository..."
-git clone --branch v1.1.0 https://github.com/robertvoy/ComfyUI-Distributed.git
-sed -i 's/window\.location\.origin/window.location.href/g' ComfyUI-Distributed/web/main.js
-sed -i 's|const url = `http://${host}:${worker.port}/prompt`;|const url = `${window.location.origin}/polaris/${host}/prompt`;|g' ComfyUI-Distributed/web/main.js
-cd ../
-
 # allow the outputs, models, custom_nodes, and input directories to have write permissions
-mkdir -p "$DESTINATION/comfyui/user"
-mkdir -p "$DESTINATION/comfyui/temp"
-chmod -R 777 "$DESTINATION/comfyui/user"
-chmod -R 777 "$DESTINATION/comfyui/temp"
-chmod -R 777 "$DESTINATION/comfyui/output"
-chmod -R 777 "$DESTINATION/comfyui/models"
-chmod -R 777 "$DESTINATION/comfyui/custom_nodes"
-chmod -R 777 "$DESTINATION/comfyui/input"
+mkdir -p "$INSTALL_DIR/user"
+mkdir -p "$INSTALL_DIR/temp"
+chmod -R 755 "$INSTALL_DIR/user"
+chmod -R 755 "$INSTALL_DIR/temp"
+chmod -R 755 "$INSTALL_DIR/output"
+chmod -R 755 "$INSTALL_DIR/models"
+chmod -R 755 "$INSTALL_DIR/custom_nodes"
+chmod -R 755 "$INSTALL_DIR/input"
 
 # step up a directory and create a bash script that will cd to the absolute path of the
 # destination directory plus the comfyui directory and run .venv/bin/python main.py --listen 0.0.0.0
 cd ..
 rm -rfv run_comfyui.sh
 echo "#!/bin/bash" > run_comfyui.sh
-echo "cd \"$DESTINATION/comfyui\"" >> run_comfyui.sh
+echo "cd \"$INSTALL_DIR\"" >> run_comfyui.sh
 echo ".venv/bin/python main.py --listen 0.0.0.0 --enable-cors-header" >> run_comfyui.sh
 
 # make the script executable
