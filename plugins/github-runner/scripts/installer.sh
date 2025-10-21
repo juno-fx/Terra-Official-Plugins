@@ -6,6 +6,9 @@ apt install -y \
   tar \
   rsync
 
+# clean up any previous installation
+rm -rf /host/${DESTINATION}/${NAME}
+
 # setup workspace
 mkdir -pv /host/${DESTINATION}/${NAME}
 cd /host/${DESTINATION}/${NAME}
