@@ -1,3 +1,5 @@
+set -e
+
 # build system
 apt update
 apt install -y git
@@ -64,8 +66,8 @@ rm -rfv ComfyUI-Distributed
 ls -la
 echo "Cloning ComfyUI-Distributed repository..."
 git clone --branch v1.1.0 https://github.com/robertvoy/ComfyUI-Distributed.git
-sed -i 's/window\.location\.origin/window.location.href/g' ComfyUI-Distributed/web/gpupanel.js
-sed -i 's|const url = `http://${host}:${worker.port}/prompt`;|const url = `${window.location.origin}/polaris/${host}/prompt`;|g' ComfyUI-Distributed/web/gpupanel.js
+sed -i 's/window\.location\.origin/window.location.href/g' ComfyUI-Distributed/web/main.js
+sed -i 's|const url = `http://${host}:${worker.port}/prompt`;|const url = `${window.location.origin}/polaris/${host}/prompt`;|g' ComfyUI-Distributed/web/main.js
 cd ../
 
 # allow the outputs, models, custom_nodes, and input directories to have write permissions
