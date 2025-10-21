@@ -3,10 +3,7 @@ set -e
 apt update
 apt install -y \
   curl \
-  tar \
-  sudo
-
-su ubuntu
+  tar
 
 # setup workspace
 mkdir -pv ${DESTINATION}
@@ -20,4 +17,4 @@ curl -o runner.tar.gz -L "https://github.com/actions/runner/releases/download/v$
 tar -xzf runner.tar.gz
 
 # configure the runner
-su ubuntu -c "./config.sh --unattended --url \"${REPO_URL}\" --token \"${TOKEN}\" --name \"${NAME}\""
+RUNNER_ALLOW_RUNASROOT="1" ./config.sh --unattended --url "${REPO_URL}" --token "${TOKEN}" --name "${NAME}"
