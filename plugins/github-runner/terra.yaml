@@ -16,6 +16,16 @@ tags:
   - github-actions
   - github-runner
 fields:
+  - name: cpu
+    description: CPU cores to allocate to the GitHub runner
+    required: true
+    type: string
+    default: "2"
+  - name: memory
+    description: Memory to allocate to the GitHub runner
+    required: true
+    type: string
+    default: "4Gi"
   - name: name
     description: Name of the GitHub runner
     required: true
