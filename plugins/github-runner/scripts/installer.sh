@@ -1,11 +1,11 @@
 set -e
 
 apt update
-apt upgrade -y
-
 apt install -y \
   curl \
   tar
+
+su ubuntu
 
 # setup workspace
 mkdir -pv ${DESTINATION}
