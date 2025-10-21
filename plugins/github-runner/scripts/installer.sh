@@ -17,7 +17,7 @@ curl -o runner.tar.gz -L "https://github.com/actions/runner/releases/download/v$
 tar -xzf runner.tar.gz
 
 # install provision script
-cp /terra/provision.sh ./provision.sh
+cp /terra/scripts/provision.sh ./provision.sh
 chmod +x ./provision.sh
 
 # chroot and run provision script
