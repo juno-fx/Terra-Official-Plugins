@@ -80,7 +80,9 @@ spec:
               cpu: "{{ .Values.cpu }}"
             # gotmpl's or is a function taking 2 args - this is "X or Y or Z" translated to python
             limits:
+              {{- if .Values.gpu }}
               nvidia.com/gpu: "1"
+              {{- end }}
             {{- if .Values.cpuLimit }}
               cpu: "{{ .Values.cpuLimit }}"
             {{- end }}
