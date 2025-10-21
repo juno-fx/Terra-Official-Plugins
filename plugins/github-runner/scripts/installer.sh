@@ -24,5 +24,6 @@ chmod +x ./provision.sh
 # chroot and run provision script
 chroot /host/ bash -c "cd /${DESTINATION}/${NAME} && RUNNER_ALLOW_RUNASROOT='1' URL=${URL} TOKEN=${TOKEN} NAME=${NAME} ./provision.sh"
 
-rsync -a -P /host/${DESTINATION}/${NAME}/ /${DESTINATION}/${NAME}/
+echo "Copying runner configuration to shared storage..."
+rsync -a /host/${DESTINATION}/${NAME}/ /${DESTINATION}/${NAME}/
 echo "GitHub Actions Runner v${VERSION} installed at ${DESTINATION}/${NAME}"
