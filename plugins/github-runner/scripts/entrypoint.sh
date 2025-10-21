@@ -50,7 +50,7 @@ if [ -n "${LAUNCH}" ]; then
 
     # chroot and run the run.sh script
     echo "Launching GitHub Actions Runner..."
-    chroot /host/ bash -c "cd /${DESTINATION}/${NAME} && ./run.sh"
+    chroot /host/ bash -c "cd /${DESTINATION}/${NAME} && RUNNER_ALLOW_RUNASROOT='1' ./run.sh"
 
     exit 0
 fi
