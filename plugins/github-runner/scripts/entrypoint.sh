@@ -36,6 +36,7 @@ if [ -n "${INSTALL}" ]; then
     chroot /host/ bash -c "cd /${DESTINATION}/${NAME} && RUNNER_ALLOW_RUNASROOT='1' ./config.sh --unattended --url ${URL} --token ${TOKEN} --name ${NAME} --replace"
 
     echo "Copying runner configuration to shared storage..."
+    mkdir -pv /${DESTINATION}/${NAME}
     rsync -a /host/${DESTINATION}/${NAME}/ /${DESTINATION}/${NAME}/
     echo "GitHub Actions Runner v${VERSION} installed at ${DESTINATION}/${NAME}"
 
