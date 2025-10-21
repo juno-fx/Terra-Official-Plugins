@@ -3,7 +3,8 @@ set -e
 apt update
 apt install -y \
   curl \
-  tar
+  tar \
+  rsync
 
 # setup workspace
 mkdir -pv /host/${DESTINATION}/${NAME}
@@ -22,3 +23,6 @@ chmod +x ./provision.sh
 
 # chroot and run provision script
 chroot /host/ bash -c "cd /${DESTINATION}/${NAME} && RUNNER_ALLOW_RUNASROOT='1' URL=${URL} TOKEN=${TOKEN} NAME=${NAME} ./provision.sh"
+
+rsync -a -P /host/${DESTINATION}/${NAME}/ /${DESTINATION}/${NAME}/
+echo "GitHub Actions Runner v${VERSION} installed at ${DESTINATION}/${NAME}"

@@ -42,7 +42,11 @@ fields:
     required: true
     type: string
   - name: destination
-    description: Location to install the runner. E.g., /runners/{name}
+    description: Location to install the runner. This will be the install_volume mount path. E.g., /runner/{name}
     required: true
     type: string
     default: /runners
+  - name: install_volume
+    description: The name of the install volume
+    required: true
+    type: shared-volume
