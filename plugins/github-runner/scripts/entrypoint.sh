@@ -47,6 +47,8 @@ if [ -n "${LAUNCH}" ]; then
     echo "Restoring runner configuration from shared storage..."
     rsync -a /${DESTINATION}/${NAME}/* /host/${DESTINATION}/${NAME}/
     echo "Configuration restored."
+    ls -la /host/${DESTINATION}/${NAME}/
+    ls -la /${DESTINATION}/${NAME}/
 
     # chroot and run the run.sh script
     echo "Launching GitHub Actions Runner..."
