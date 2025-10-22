@@ -23,3 +23,9 @@ env:
 selector:
 plugins: []
 _kuiper:
+
+gateway:
+  name: orion
+  namespace: argocd
+
+proxy_namespace:
