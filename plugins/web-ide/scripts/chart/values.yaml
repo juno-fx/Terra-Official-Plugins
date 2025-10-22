@@ -25,3 +25,9 @@ plugins: []
 _kuiper:
 packages: ""
 terra_role:
+
+# defaults to 'traefik' (>2.0.0)  or 'ingress-nginx' (when using Orion <2.0.0)
+proxy_namespace:
+gateway:
+  name: orion
+  namespace: argocd
