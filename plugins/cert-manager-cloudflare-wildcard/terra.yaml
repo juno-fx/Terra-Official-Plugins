@@ -1,0 +1,46 @@
+resource_id: cert-manager-cloudflare-wildcard
+name: Certificate Manager Cloudflare DNS Challenge
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/cert-manager-dns-challenge-wildcard/assets/logo.png
+description: Sets up the orion-tls secret using Cert-Manager and Cloudflare DNS
+category: Infrastructure
+tags:
+  - cluster-level
+fields:
+  - name: issuer_namespace
+    description: Namespace where the Issuer will be created
+    required: true
+    default: argocd
+    type: string
+  - name: acme_email
+    description: Email address for ACME registration
+    required: true
+    type: string
+  - name: acme_server
+    description: ACME server URL
+    required: true
+    default: https://acme-v02.api.letsencrypt.org/directory
+    type: string
+  - name: cloudflare_api_token_secret
+    description: Name of the secret to store the Cloudflare API token in
+    required: false
+    default: cloudflare-api-token
+    type: string
+  - name: cloudflare_api_token
+    description: Cloudflare API token for DNS challenge
+    required: true
+    type: string
+    secret: true
+  - name: domain
+    description: Domain for wildcard certificate
+    required: true
+    type: string
+  - name: tls_secret_name
+    description: Name of the secret to store the certificate
+    required: true
+    default: orion-tls
+    type: string
+  - name: cloudflare_api_token_secret_namespace 
+    description: Namespace of the secret to store the Cloudflare API token in
+    required: false
+    default: cert-manager
+    type: string
