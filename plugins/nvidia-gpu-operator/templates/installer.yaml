@@ -19,6 +19,8 @@ spec:
             value: "{{ .Values.install_toolkit }}"
           - name: "driver.enabled"
             value: "{{ .Values.install_driver }}"
+          - name: "driver.nvidiaDriverCRD.enabled"
+            value: "true"
           - name: "devicePlugin.config.name"
             value: "{{ .Values.slicing_config }}"
           - name: "devicePlugin.config.default"
