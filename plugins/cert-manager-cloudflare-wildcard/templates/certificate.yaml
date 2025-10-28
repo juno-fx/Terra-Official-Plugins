@@ -1,0 +1,14 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ .Values.tls_secret_name }}
+  namespace: {{ .Values.issuer_namespace }}
+spec:
+  secretName: {{ .Values.tls_secret_name }}
+  issuerRef:
+    name: letsencrypt-dns
+    kind: ClusterIssuer
+  dnsNames:
+    - {{ .Values.domain }}
+    - "*.{{ .Values.domain }}"
