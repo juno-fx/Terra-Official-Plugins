@@ -24,9 +24,5 @@ selector:
 plugins: []
 _kuiper:
 
-gateway:
-  name: orion
-  namespace: argocd
-
-proxy_namespace:
+proxy_namespace: ingress-nginx
 
