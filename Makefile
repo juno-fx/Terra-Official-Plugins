@@ -82,6 +82,7 @@ lint-docs: .venv/bin/activate
 	.venv/bin/pip install -r requirements.txt
 # env
 cluster:
+	@which kind || (echo "kind is not in PATH - did you install devbox and run 'devbox shell'?" && exit 1)
 	@kind create cluster --name terra-plugins --config .kind.yaml || echo "Cluster already exists..."
 
 dependencies: cluster

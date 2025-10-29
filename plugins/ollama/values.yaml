@@ -1,0 +1,8 @@
+# configuration
+destination: "ollama"
+install_volume:
+  name: tdk-home
+  sub_path: ollama
+  container_path: /apps # ignored
+gpu: false
+runtime: ""

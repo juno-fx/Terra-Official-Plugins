@@ -1,0 +1,13 @@
+resource_id: cert-manager
+name: Certificate Manager
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/cert-manager/assets/logo.png
+description: Automated certificate management - supporting a wide range of issuers, including LetsEncrypt. https://cert-manager.io/docs/configuration/issuers/
+category: Infrastructure
+tags:
+  - cluster-level
+fields:
+  - name: chart_version
+    description: Version of the cert-manager chart to install.
+    required: true
+    default: v1.19.1
+    type: string
