@@ -4,5 +4,7 @@ metadata:
   name: "{{ .Values.name }}"
 data:
   entrypoint.sh: |
-    echo "blah"
-    sleep infinity
+    echo "Changing directory"
+    cd "{{ .Values.entrypoint }}"
+    source .venv/bin/activate
+    python3 main.py --listen 0.0.0.0

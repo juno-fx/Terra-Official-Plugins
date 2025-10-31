@@ -23,6 +23,7 @@ env:
 selector:
 plugins: []
 _kuiper:
+entrypoint:
 
 gateway:
   name: orion
