@@ -27,10 +27,11 @@ fi
 pip install uv
 
 # install python to the system
-# if $INSTALL_DIR/py_install/cpython-3.12.11-linux-x86_64-gnu does not exist, then install it
-if [ ! -d "$INSTALL_DIR/py_install/cpython-3.12.11-linux-x86_64-gnu" ]; then
+# if $INSTALL_DIR/py_install/cpython-3.12.11-linux-gnu does not exist, then install it
+if [ ! -d "$INSTALL_DIR/py_install/cpython-3.12.11-linux-gnu" ]; then
   echo "Installing Python 3.12.11..."
   uv python install -f -r -i py_install 3.12.11
+  mv "$INSTALL_DIR/py_install/cpython-3.12.11-linux-*-gnu" "$INSTALL_DIR/py_install/cpython-3.12.11-linux-gnu"
 else
   echo "Python 3.12.11 already installed."
 fi
@@ -38,8 +39,8 @@ fi
 # create the virtual environment if it doesn't exist
 if [ ! -d ".venv" ]; then
   echo "Creating virtual environment..."
-  echo "Using Python from: $INSTALL_DIR/py_install/cpython-3.12.11-linux-x86_64-gnu/bin/python"
-  uv venv .venv -p "$INSTALL_DIR/py_install/cpython-3.12.11-linux-x86_64-gnu/bin/python"
+  echo "Using Python from: $INSTALL_DIR/py_install/cpython-3.12.11-linux-gnu"
+  uv venv .venv -p "$INSTALL_DIR/py_install/cpython-3.12.11-linux-gnu/bin/python"
 else
   echo "Virtual environment already exists."
 fi
