@@ -31,7 +31,7 @@ pip install uv
 if [ ! -d "$INSTALL_DIR/py_install/cpython-3.12.11-linux-gnu" ]; then
   echo "Installing Python 3.12.11..."
   uv python install -f -r -i py_install 3.12.11
-  mv "$INSTALL_DIR/py_install/cpython-3.12.11-linux-*-gnu" "$INSTALL_DIR/py_install/cpython-3.12.11-linux-gnu"
+  mv $INSTALL_DIR/py_install/cpython-3.12.11-linux-*-gnu "$INSTALL_DIR/py_install/cpython-3.12.11-linux-gnu"
 else
   echo "Python 3.12.11 already installed."
 fi
