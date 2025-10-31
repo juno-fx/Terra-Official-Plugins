@@ -19,4 +19,4 @@ spec:
               service:
                 name: {{ .Values.name }}
                 port:
-                  number: 8818
+                  number: 8188
