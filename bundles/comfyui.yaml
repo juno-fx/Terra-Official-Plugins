@@ -19,13 +19,26 @@ fields:
     description: The name of the install volume
     required: true
     type: shared-volume
+  - name: arch
+    description: What arch do you want to run
+    required: true
+    type: select
+    default: amd64
+    options:
+      - amd64
+      - arm64
 plugins:
   - plugin: ComfyUI Installer
     name: comfyui-installer
     values:
+      arch:
+        reference: arch
       install_volume:
         reference: install_volume
       destination:
         hardcoded: '/comfyui'
   - plugin: ComfyUI
     name: comfyui
+    values:
+      arch:
+        reference: arch

@@ -10,4 +10,26 @@ data:
   chart: "{{ .Release.Name }}-scripts-configmap"
   description: "ComfyUI Deployment"
   fields: |
-    []
+    - name: icon
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/comfyui/scripts/assets/logo.png"
+    - name: gpu
+      type: boolean
+      default:  true
+      description: "Use a GPU"
+    - name: registry
+      default: "docker.io"
+    - name: repo
+      default: "python"
+    - name: tag
+      default: "3.12"
+    - name: entrypoint
+      required: true
+      description: "Location where comfyui is installed."
+    - name: arch
+      description: "What arch do you want to run"
+      required: true
+      type: select
+      default: amd64
+      options:
+        - amd64
+        - arm64

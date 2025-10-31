@@ -23,3 +23,11 @@ env:
 selector:
 plugins: []
 _kuiper:
+entrypoint:
+arch: amd64
+
+gateway:
+  name: orion
+  namespace: argocd
+
+proxy_namespace:
