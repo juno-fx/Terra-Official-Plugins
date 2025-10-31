@@ -46,6 +46,7 @@ else
 fi
 source .venv/bin/activate
 uv pip install --no-cache -r requirements.txt
+uv pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu130 --force-reinstall
 
 # install comfyui manger
 cd custom_nodes
