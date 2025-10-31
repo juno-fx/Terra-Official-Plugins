@@ -4,3 +4,4 @@ install_volume:
   sub_path:
   container_path: /apps
 destination: /comfy
+arch: amd64

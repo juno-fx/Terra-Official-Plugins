@@ -25,3 +25,11 @@ data:
     - name: entrypoint
       required: true
       description: "Location where comfyui is installed."
+    - name: arch
+      description: "What arch do you want to run"
+      required: true
+      type: select
+      default: amd64
+      options:
+        - amd64
+        - arm64

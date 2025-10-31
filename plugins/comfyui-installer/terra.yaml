@@ -16,3 +16,11 @@ fields:
     description: The name of the install volume
     required: true
     type: shared-volume
+  - name: arch
+    description: What arch do you want to install for
+    required: true
+    type: select
+    default: amd64
+    options:
+      - amd64
+      - arm64

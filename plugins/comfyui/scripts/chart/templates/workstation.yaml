@@ -36,6 +36,9 @@ spec:
       automountServiceAccountToken: false
       hostname: "{{ .Values.name }}"
 
+      nodeSelector:
+        kubernetes.io/arch: "{{ .Values.arch }}"
+
       # workstation nodes will require juno-innovations.com/workstation: "true"
       affinity:
         nodeAffinity:
