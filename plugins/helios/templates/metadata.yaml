@@ -8,4 +8,6 @@ data:
   chart: "{{ .Release.Name }}-scripts-configmap"
   description: "Helios deployment with desktop streaming"
   fields: |
-    []
+    - name: icon
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios/scripts/assets/helios-icon.png"
+
