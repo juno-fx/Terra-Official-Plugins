@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "chart_version": {
+      "type": "string",
+      "default": "11.1.1",
+      "description": "Version of the Velero chart to install."
+    },
+    "bucket": {
+      "type": "string",
+      "description": "Name of the S3 bucket to store backups in"
+    },
+    "region": {
+      "type": "string",
+      "description": "S3 Region - check your provider's documentation for the appropriate value. Single-location providers such as minio will have it as well."
+    },
+    "s3Url": {
+      "type": "string",
+      "pattern": "^https?://",
+      "description": "S3-compatible storage URL, eg. https://s3.us-east-2.amazonaws.com"
+    },
+    "retention": {
+      "type": "string",
+      "pattern": "^[0-9]+(h|m|s)([0-9]+(h|m|s))*$",
+      "default": "720h0m0s",
+      "description": "Rotation interval after which old backups are deleted. Defaults to 30 days."
+    },
+    "access_key_id": {
+      "type": "string",
+      "description": "AWS access key ID for S3 authentication"
+    },
+    "secret_access_key": {
+      "type": "string",
+      "description": "AWS secret access key for S3 authentication"
+    }
+  },
+  "required": ["chart_version", "bucket", "access_key_id", "secret_access_key"]
+}

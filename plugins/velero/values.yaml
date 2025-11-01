@@ -1,0 +1,7 @@
+chart_version: 11.1.1
+# this means S3, not AWS. It works with any compatabile storage.
+provider: "aws"
+s3Url: https://s3.us-east-2.amazonaws.com
+bucket: example
+access_key_id: secret
+secret_access_key: secret

@@ -4,7 +4,7 @@ repo:
 tag:
 registry:
 group:
-cpu: "1"
+cpu: "4"
 memory: "1Gi"
 cpuLimit: null
 memoryLimit: null
