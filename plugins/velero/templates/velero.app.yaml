@@ -1,0 +1,62 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-velero
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: velero-system
+  sources:
+    - repoURL: https://vmware-tanzu.github.io/helm-charts
+      chart: velero
+      targetRevision: {{ .Values.chart_version }}
+      helm:
+        releaseName: velero
+        values: |
+          initContainers:
+            - name: velero-plugin-for-aws
+              image: velero/velero-plugin-for-aws:v1.1.0
+              imagePullPolicy: IfNotPresent
+              volumeMounts:
+                - mountPath: /target
+                  name: plugins
+          snapshotsEnabled: false
+          configuration:
+            backupStorageLocation:
+            - provider: {{ .Values.provider | quote }}
+              bucket: {{ .Values.bucket | quote }}
+              default: true
+              config:
+                {{- if .Values.region }}
+                region: {{ .Values.region | quote }}
+                {{- end }}
+                {{- if .Values.s3Url }}
+                s3Url: {{ .Values.s3Url | quote }}
+                {{- end }}
+          credentials:
+            useSecret: true
+            name: terra-velero-default
+            # Data to be stored in the Velero secret, if `useSecret` is true and `existingSecret` is empty.
+            # As of the current Velero release, Velero only uses one secret key/value at a time.
+            # The key must be named `cloud`, and the value corresponds to the entire content of your IAM credentials file.
+            # Note that the format will be different for different providers, please check their documentation.
+            # Here is a list of documentation for plugins maintained by the Velero team:
+            # [AWS] https://github.com/vmware-tanzu/velero-plugin-for-aws/blob/main/README.md
+            # [GCP] https://github.com/vmware-tanzu/velero-plugin-for-gcp/blob/main/README.md
+            # [Azure] https://github.com/vmware-tanzu/velero-plugin-for-microsoft-azure/blob/main/README.md
+            secretContents:
+              cloud: |
+                [default]
+                aws_access_key_id={{ .Values.access_key_id | quote }}
+                aws_secret_access_key={{ .Values.secret_access_key | quote }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - ServerSideApply=true
+      - CreateNamespace=true
