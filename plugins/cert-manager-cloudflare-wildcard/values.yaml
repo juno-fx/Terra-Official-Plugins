@@ -1,8 +1,0 @@
-issuer_namespace: argocd
-acme_email: admin@example.com
-acme_server: https://acme-v02.api.letsencrypt.org/directory
-cloudflare_api_token_secret: cloudflare-api-token
-cloudflare_api_token_secret_namespace: cert-manager
-cloudflare_api_token: ""
-domain: example.com
-tls_secret_name: orion-tls

@@ -64,7 +64,7 @@ cloud hosted, or on a juno cluster on the same network.
     !!! info "Devbox"
 
         For local development, we do provide a devbox setup which will install all of this for you in most cases. Sometimes Helm can have issues, so just verify before
-        begining development. You can do so by running `helm version`.
+        beginning development. You can do so by running `helm version`.
 
 2. Make sure you have `kubectl` pointing to the cluster you want to interact with.
 3. Verify you have access to the Application and Namespace objects in kubernetes.
@@ -94,7 +94,7 @@ cloud hosted, or on a juno cluster on the same network.
 
     Because the cluster needs access to the local machine to pull the git repo, you need to make sure that the cluster can get to your
     local machine without issue. We normally recommend you are on the same network as the cluster so you don't run in to issues. In 
-    more security concious environments, the in-cluster workflow makes more sense.
+    more security conscious environments, the in-cluster workflow makes more sense.
 
 ## Plugin Workflow
 
@@ -191,7 +191,7 @@ This targets deploying the entire repository to Terra as a source. This is usefu
 
 3. **Test Changes**: To test the changes you will need to open a second shell manually commit and package each plugin as you make changes. You **do not** need to push anything, but you must commit. To see your changes, simply login to Genesis and refresh the Terra App Store page.
 
-4. **Repeat**: Continue making changes and refrehing the Terra App Store page.
+4. **Repeat**: Continue making changes and refreshing the Terra App Store page.
 
 9. **Clean Up**: When you are done, all you need to do is press CTRL+D and it will automatically clean up after itself.
 

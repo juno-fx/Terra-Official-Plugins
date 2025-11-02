@@ -1,4 +1,3 @@
-{{- if not (eq .Values._juno_gateway_api true) }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -18,4 +17,3 @@ spec:
                 name: {{ .Values.name }}-jupyter-notebook
                 port:
                   number: 8888
-{{- end }}
