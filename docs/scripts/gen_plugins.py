@@ -1,5 +1,6 @@
 import mkdocs_gen_files
 from glob import glob
+import yaml
 
 plugins = glob("plugins/*/terra.yaml")
 
@@ -11,23 +12,13 @@ def generate(plugin):
 """
     return template
 
-
-
 for plugin in plugins:
     nav = mkdocs_gen_files.Nav()
-    icon = None
-    description = None
-    category = None
     with open(plugin, "r") as f:
-        plugin_data = f.read()
-        plugin_data = plugin_data.splitlines()
-        for line in plugin_data:
-            if line.startswith("icon:"):
-                icon = line.replace("icon:", "").strip()
-            elif line.startswith("description:"):
-                description = line.replace("description:", "").strip()
-            elif line.startswith("category:"):
-                category = line.replace("category:", "").strip()
+        plugin_data = yaml.safe_load(f)
+        icon = plugin_data["icon"]
+        description = plugin_data["description"]
+        category = plugin_data["category"]
 
     plugin_name = plugin.split('/')[1]
     plugin_path = f"plugins/{category}/{plugin_name}.md"
