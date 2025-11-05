@@ -16,9 +16,9 @@ for plugin in plugins:
     nav = mkdocs_gen_files.Nav()
     with open(plugin, "r") as f:
         plugin_data = yaml.safe_load(f)
-        icon = plugin_data["icon"]
-        description = plugin_data["description"]
-        category = plugin_data["category"]
+        icon = plugin_data.get("icon")
+        description = plugin_data.get("description")
+        category = plugin_data.get("category")
 
     plugin_name = plugin.split('/')[1]
     plugin_path = f"plugins/{category}/{plugin_name}.md"
