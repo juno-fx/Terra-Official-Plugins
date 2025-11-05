@@ -5,6 +5,7 @@ description: Backup operator for Kubernetes, using S3 as your storage.
 category: Infrastructure
 tags:
   - cluster-level
+  - backup
 fields:
   - name: chart_version
     description: Version of the Velero chart to install.
