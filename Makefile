@@ -65,6 +65,9 @@ package:
 docs:
 	.venv/bin/mkdocs serve
 
+deploy-docs: .venv/bin/activate
+	. .venv/bin/activate; mkdocs gh-deploy --force
+
 lint-docs: .venv/bin/activate
 	@(grep -q -r '<a href' docs && (echo Please use markdown links instead of href. && exit 1)) || true
 	([[ -d site ]] && rm -rf site/) || true
