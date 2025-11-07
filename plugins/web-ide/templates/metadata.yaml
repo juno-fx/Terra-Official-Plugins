@@ -12,7 +12,7 @@ data:
   fields: |
     - name: icon
       description: icon
-      default: https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Visual_Studio_Code_1.35_icon.svg/2048px-Visual_Studio_Code_1.35_icon.svg.png
+      default: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/web-ide/scripts/assets/logo.png
     - name: registry
       description: Registry to pull from
       default: lscr.io
