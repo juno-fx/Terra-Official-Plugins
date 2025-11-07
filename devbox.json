@@ -8,6 +8,10 @@
     "python3@latest",
     "kubernetes-helm@latest"
   ],
+  "env": {
+    "VENV_DIR": "venv",
+    "UV_PYTHON": "venv/bin/python"
+  },
   "shell": {
     "init_hook": [
       ". $VENV_DIR/bin/activate",

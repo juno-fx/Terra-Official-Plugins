@@ -1,6 +1,6 @@
 resource_id: pycharm
 name: pycharm
-icon: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/pycharm/scripts/assets/pycharm.png?raw=true"
+icon: https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/pycharm/scripts/assets/pycharm.png?raw=true
 description: Python development IDE by JetBrains.
 category: Software Development
 tags:
