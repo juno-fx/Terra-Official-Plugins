@@ -157,7 +157,7 @@ nav:
     - 'plugins/Data Science/*.md'
   - CG:
     - 'plugins/CG/*.md'
-  - All Plugins:
+  - Other Plugins:
     - 'plugins/*/*.md'
 - Related Documentation:
   - related/related-docs.md
