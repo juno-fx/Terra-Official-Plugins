@@ -125,40 +125,40 @@ nav:
   - Community:
     - contributing.md
 - Plugins:
-  - Monitoring:
-    - 'plugins/Monitoring/*.md'
-  - Infrastructure:
-    - 'plugins/Infrastructure/*.md'
-  - Rendering Management:
-    - 'plugins/Rendering Management/*.md'
-  - Workstations:
-    - 'plugins/Workstations/*.md'
-  - Hardware:
-    - 'plugins/Hardware/*.md'
-  - Software Development:
-    - 'plugins/Software Development/*.md'
-  - Helios Plugin:
-    - 'plugins/Helios Plugin/*.md'
-  - Networking:
-    - 'plugins/Networking/*.md'
-  - Desktop Plugin:
-    - 'plugins/Desktop Plugin/*.md'
   - AI:
     - 'plugins/AI/*.md'
-  - Compositing:
-    - 'plugins/Compositing/*.md'
-  - VDI:
-    - 'plugins/VDI/*.md'
-  - Utility:
-    - 'plugins/Utility/*.md'
-  - Web:
-    - 'plugins/Web/*.md'
-  - Data Science:
-    - 'plugins/Data Science/*.md'
   - CG:
     - 'plugins/CG/*.md'
+  - Compositing:
+    - 'plugins/Compositing/*.md'
+  - Data Science:
+    - 'plugins/Data Science/*.md'
+  - Desktop Plugin:
+    - 'plugins/Desktop Plugin/*.md'
+  - Hardware:
+    - 'plugins/Hardware/*.md'
+  - Helios Plugin:
+    - 'plugins/Helios Plugin/*.md'
+  - Infrastructure:
+    - 'plugins/Infrastructure/*.md'
+  - Monitoring:
+    - 'plugins/Monitoring/*.md'
+  - Networking:
+    - 'plugins/Networking/*.md'
+  - Rendering Management:
+    - 'plugins/Rendering Management/*.md'
+  - Software Development:
+    - 'plugins/Software Development/*.md'
+  - Utility:
+    - 'plugins/Utility/*.md'
+  - VDI:
+    - 'plugins/VDI/*.md'
+  - Web:
+    - 'plugins/Web/*.md'
+  - Workstations:
+    - 'plugins/Workstations/*.md'
   - Other Plugins:
-    - 'plugins/*/*.md'
+      - 'plugins/*/*.md'
 - Related Documentation:
   - related/related-docs.md
 
