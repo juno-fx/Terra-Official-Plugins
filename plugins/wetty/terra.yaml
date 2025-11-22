@@ -1,6 +1,6 @@
-resource_id:
+resource_id: wetty
 name: wetty
-icon:
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/wetty/scripts/assets/wetty.png
 description: Terminal access in browser over http/https
 category: Development
 tags: ["terminal", "ssh", "web"]
