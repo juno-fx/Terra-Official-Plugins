@@ -1,0 +1,27 @@
+resource_id:
+name: wetty
+icon:
+description: Terminal access in browser over http/https
+category: Development
+tags: ["terminal", "ssh", "web"]
+fields:
+  - name: chart_version
+    display_name: Chart Version
+    type: string
+    default: "3.0.1"
+    description: Wetty Helm chart version
+  - name: host
+    display_name: Hostname
+    type: string
+    default: ""
+    description: Hostname for ingress (optional)
+  - name: ssh_host
+    display_name: SSH Host
+    type: string
+    default: "localhost"
+    description: SSH host to connect to
+  - name: ssh_port
+    display_name: SSH Port
+    type: string
+    default: "22"
+    description: SSH port to connect to

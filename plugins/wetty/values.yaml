@@ -1,0 +1,6 @@
+# configuration
+chart_version: "3.0.1"
+host: ""
+ssh_host: "localhost"
+ssh_port: "22"
+
