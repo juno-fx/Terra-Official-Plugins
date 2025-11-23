@@ -4,3 +4,4 @@ icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/head
 description: Terminal access in browser over http/https
 category: Development
 tags: ["terminal", "ssh", "web"]
+fields: []
