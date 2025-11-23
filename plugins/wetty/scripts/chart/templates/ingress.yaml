@@ -1,7 +1,8 @@
+{{- if not (eq .Values._juno_gateway_api true) }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Values.name }}-ingress
+  name: {{ .Values.name }}-wetty
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/auth-url: "http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/"
@@ -14,6 +15,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ .Values.name }}
+                name: {{ .Values.name }}-wetty
                 port:
                   number: 3000
+{{- end }}
