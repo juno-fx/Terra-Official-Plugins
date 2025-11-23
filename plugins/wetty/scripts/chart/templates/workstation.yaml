@@ -30,6 +30,16 @@ spec:
     spec:
       hostname: "{{ .Values.name }}"
       containers:
+        - name: nginx
+          image: "nginx:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3001
+              name: nginx
+          volumeMounts:
+            - name: nginx
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
         - name: wetty
           imagePullPolicy: Always # TODO switch to IfNotPresent for later this is for testing
           image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
@@ -69,6 +79,11 @@ spec:
         - name: tooling
           configMap:
             name: "{{ .Values.name }}-tooling"
+        - name: nginx
+          configMap:
+            name: "{{ .Values.name }}-nginx"
         {{- if .Values.volumeMounts }}
         {{- toYaml .Values.volumes | nindent 8 }}
         {{- end }}
+
+
