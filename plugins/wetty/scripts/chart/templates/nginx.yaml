@@ -10,7 +10,6 @@ data:
         listen 3001;
         listen [::]:3001;
         location /polaris/{{ .Values.name }} {
-          proxy_pass http://localhost:3000/polaris/{{ .Values.name }};
           proxy_pass http://localhost:3000/wetty/ssh/{{ .Values.user }}?pass=password;
           proxy_http_version 1.1;
           proxy_set_header Upgrade $http_upgrade;
