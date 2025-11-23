@@ -1,0 +1,20 @@
+{{- if .Values.host }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-wetty
+  labels:
+    app: {{ .Release.Name }}-wetty
+spec:
+  rules:
+  - host: {{ .Values.host }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Release.Name }}-wetty
+            port:
+              number: 3000
+{{- end }}

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-wetty
+  labels:
+    app: {{ .Release.Name }}-wetty
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-wetty
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-wetty
+    spec:
+      containers:
+      - name: wetty
+        image: "wettyoss/wetty:{{ .Values.image_tag }}"
+        ports:
+        - containerPort: 3000
+          name: http
+        env:
+        - name: SSHHOST
+          value: "{{ .Values.ssh_host }}"
+        - name: SSHPORT
+          value: "{{ .Values.ssh_port }}"
+        {{- if .Values.base_path }}
+        - name: BASE
+          value: "{{ .Values.base_path }}"
+        {{- end }}

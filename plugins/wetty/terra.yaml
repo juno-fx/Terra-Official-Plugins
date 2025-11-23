@@ -5,11 +5,11 @@ description: Terminal access in browser over http/https
 category: Development
 tags: ["terminal", "ssh", "web"]
 fields:
-  - name: chart_version
-    display_name: Chart Version
+  - name: image_tag
+    display_name: Image Tag
     type: string
-    default: "3.0.1"
-    description: Wetty Helm chart version
+    default: "latest"
+    description: wettyoss/wetty Docker image tag
   - name: host
     display_name: Hostname
     type: string
@@ -25,3 +25,8 @@ fields:
     type: string
     default: "22"
     description: SSH port to connect to
+  - name: base_path
+    display_name: Base Path
+    type: string
+    default: ""
+    description: Base path for wetty (optional)

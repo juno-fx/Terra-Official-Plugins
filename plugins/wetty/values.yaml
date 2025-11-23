@@ -1,6 +1,7 @@
 # configuration
-chart_version: "3.0.1"
+image_tag: "latest"
 host: ""
 ssh_host: "localhost"
 ssh_port: "22"
+base_path: ""
 
