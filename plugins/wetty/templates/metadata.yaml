@@ -11,6 +11,8 @@ data:
   description: "Wetty terminal"
   fields: |
     - name: registry
+      default: ""
+    - name: repo
       default: "wettyoss/wetty"
     - name: tag
       default: "latest"
