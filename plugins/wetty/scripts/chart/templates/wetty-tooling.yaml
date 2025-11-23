@@ -9,5 +9,5 @@ data:
 
     cd /usr/src/app
 
-    yarn start --base "/polaris/{{ .Values.name }}/" --allow-iframe
+    yarn start --base "/polaris/{{ .Values.name }}" --allow-iframe
 
