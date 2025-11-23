@@ -13,7 +13,7 @@ data:
 
     adduser -D -u "{{ .Values.puid }}" -G wettyusers "{{ .Values.user }}"
 
-    echo "{{ .Values.user }}:password" | chpasswd
+    echo "{{ .Values.user }}:$USER_PASS" | chpasswd
 
     yarn start --base "/polaris/{{ .Values.name }}" --allow-iframe
 
