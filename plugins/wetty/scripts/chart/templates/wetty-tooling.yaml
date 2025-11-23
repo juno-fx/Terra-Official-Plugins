@@ -15,5 +15,7 @@ data:
 
     echo "{{ .Values.user }}:$USER_PASS" | chpasswd
 
+    apk add vim
+
     yarn start --base "/polaris/{{ .Values.name }}" --allow-iframe
 
