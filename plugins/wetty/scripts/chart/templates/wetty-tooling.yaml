@@ -15,7 +15,7 @@ data:
 
     echo "{{ .Values.user }}:$USER_PASS" | chpasswd
 
-    apk add "{{ .Values.packages }}"
+    apk add {{ .Values.packages }}
 
     yarn start --base "/polaris/{{ .Values.name }}" --allow-iframe
 
