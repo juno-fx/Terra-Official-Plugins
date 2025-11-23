@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: wetty
-        image: "wettyoss/wetty:{{ .Values.image_tag }}"
+        image: "{{ .Values.registry }}:{{ .Values.tag }}"
         ports:
         - containerPort: 3000
           name: http
