@@ -28,6 +28,9 @@ spec:
         juno-innovations.com/workstation: "{{ .Values.name }}"
 
     spec:
+      {{- if .Values.terra_role }}
+      serviceAccountName: {{ .Values.terra_role }}
+      {{- end }}
       hostname: "{{ .Values.name }}"
       containers:
         - name: nginx
