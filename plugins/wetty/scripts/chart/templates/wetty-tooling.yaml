@@ -9,5 +9,9 @@ data:
 
     cd /usr/src/app
 
+    useradd -D -u "{{ .Values.puid }}" -G "{{ .Values.guid }}" "{{ .Values.user }}"
+
+    echo "{{ .Values.user }}:password" | chpasswd
+
     yarn start --base "/polaris/{{ .Values.name }}" --allow-iframe
 
