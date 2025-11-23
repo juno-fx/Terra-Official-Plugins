@@ -11,7 +11,7 @@ data:
 
     addgroup -g "{{ .Values.guid }}" wettyusers
 
-    adduser -D -u "{{ .Values.puid }}" -G "{{ .Values.guid }}" "{{ .Values.user }}"
+    adduser -D -u "{{ .Values.puid }}" -G wettyusers "{{ .Values.user }}"
 
     echo "{{ .Values.user }}:password" | chpasswd
 
