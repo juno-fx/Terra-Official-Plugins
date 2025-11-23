@@ -10,28 +10,10 @@ data:
   chart: "{{ .Release.Name }}-scripts-configmap"
   description: "Wetty terminal"
   fields: |
-    - name: image_tag
-      display_name: Image Tag
-      type: string
+    - name: registry
+      default: "wettyoss/wetty"
+    - name: tag
       default: "latest"
-      description: wettyoss/wetty Docker image tag
-    - name: host
-      display_name: Hostname
-      type: string
-      default: ""
-      description: Hostname for ingress (optional)
-    - name: ssh_host
-      display_name: SSH Host
-      type: string
-      default: "localhost"
-      description: SSH host to connect to
-    - name: ssh_port
-      display_name: SSH Port
-      type: string
-      default: "22"
-      description: SSH port to connect to
-    - name: base_path
-      display_name: Base Path
-      type: string
-      default: ""
-      description: Base path for wetty (optional)
+    - name: icon
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/jupyter-notebook/scripts/assets/template-icon.png"
+
