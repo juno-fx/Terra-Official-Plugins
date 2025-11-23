@@ -3,5 +3,8 @@ name: wetty
 icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/wetty/scripts/assets/wetty.png
 description: Terminal access in browser over http/https
 category: Development
-tags: ["terminal", "ssh", "web"]
+tags:
+  - cluster-level
+  - development
+  - workload
 fields: []
