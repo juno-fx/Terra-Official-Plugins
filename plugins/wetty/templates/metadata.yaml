@@ -3,4 +3,31 @@ kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}-terra-metadata
 data:
-  chart: "{{ .Chart.Name }}"
+  chart: "{{ .Release.Name }}-scripts-configmap"
+  description: "Wetty terminal"
+  fields: |
+    - name: image_tag
+      display_name: Image Tag
+      type: string
+      default: "latest"
+      description: wettyoss/wetty Docker image tag
+    - name: host
+      display_name: Hostname
+      type: string
+      default: ""
+      description: Hostname for ingress (optional)
+    - name: ssh_host
+      display_name: SSH Host
+      type: string
+      default: "localhost"
+      description: SSH host to connect to
+    - name: ssh_port
+      display_name: SSH Port
+      type: string
+      default: "22"
+      description: SSH port to connect to
+    - name: base_path
+      display_name: Base Path
+      type: string
+      default: ""
+      description: Base path for wetty (optional)

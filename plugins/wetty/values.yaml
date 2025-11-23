@@ -1,7 +1,2 @@
 # configuration
-image_tag: "latest"
-host: ""
-ssh_host: "localhost"
-ssh_port: "22"
-base_path: ""
 
