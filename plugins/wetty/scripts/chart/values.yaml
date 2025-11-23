@@ -23,5 +23,3 @@ env:
 selector:
 plugins: []
 _kuiper:
-
-proxy_namespace: ingress-nginx

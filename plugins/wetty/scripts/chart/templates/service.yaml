@@ -1,15 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Release.Name }}-wetty
-  labels:
-    app: {{ .Release.Name }}-wetty
+  name: "{{ .Values.name }}"
 spec:
-  type: ClusterIP
-  ports:
-  - port: 3000
-    targetPort: 3000
-    protocol: TCP
-    name: http
   selector:
-    app: {{ .Release.Name }}-wetty
+    juno-innovations.com/workstation: "{{ .Values.name }}"
+  ports:
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
+      name: wetty
