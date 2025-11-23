@@ -9,7 +9,7 @@ data:
 
     cd /usr/src/app
 
-    useradd -D -u "{{ .Values.puid }}" -G "{{ .Values.guid }}" "{{ .Values.user }}"
+    adduser -D -u "{{ .Values.puid }}" -G "{{ .Values.guid }}" "{{ .Values.user }}"
 
     echo "{{ .Values.user }}:password" | chpasswd
 
