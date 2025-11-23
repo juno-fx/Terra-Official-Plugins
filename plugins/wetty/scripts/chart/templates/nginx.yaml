@@ -9,8 +9,9 @@ data:
       server {
         listen 3001;
         listen [::]:3001;
-        location /polaris/{{ .Values.name }} {
-          proxy_pass http://localhost:3000/polaris/{{ .Values.name }}/ssh/{{ .Values.user }}?pass=password;
+        location /polaris/{{ .Values.name }}/ {
+          rewrite ^/polaris/{{ .Values.name }}/(.*)$ /wetty/$1 break;
+          proxy_pass http://localhost:3000;
           proxy_http_version 1.1;
           proxy_set_header Upgrade $http_upgrade;
           proxy_set_header Connection "upgrade";
@@ -19,6 +20,9 @@ data:
           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
           proxy_set_header Host $http_host;
           proxy_set_header X-NginX-Proxy true;
+        }
+        location = /polaris/{{ .Values.name }} {
+          return 302 /polaris/{{ .Values.name }}/ssh/{{ .Values.user }}?pass={{ .Values.password }};
         }
       }
     }
