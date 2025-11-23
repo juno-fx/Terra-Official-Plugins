@@ -9,5 +9,3 @@ echo "Starting entrypoint script..."
 # directory so you can see the contents and begin
 # building your awesome plugin!
 ls -la
-
-yarn init
