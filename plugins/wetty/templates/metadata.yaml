@@ -5,7 +5,7 @@ metadata:
   labels:
     kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
   annotations:
-    juno-innovations.com/workload: "Application"
+    juno-innovations.com/workload: "Terminal"
 data:
   chart: "{{ .Release.Name }}-scripts-configmap"
   description: "Wetty terminal"
@@ -17,7 +17,7 @@ data:
     - name: tag
       default: "latest"
     - name: icon
-      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/jupyter-notebook/scripts/assets/template-icon.png"
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/wetty/scripts/assets/logo.png"
     - name: packages
       description: Additional packages to install. You can use spaces " " to install multiples.
       required: false
