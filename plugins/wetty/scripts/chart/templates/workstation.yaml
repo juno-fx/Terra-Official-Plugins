@@ -34,7 +34,7 @@ spec:
       hostname: "{{ .Values.name }}"
       containers:
         - name: nginx
-          image: "nginx:latest"
+          image: "nginx:1.29.3"
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3001
