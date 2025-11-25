@@ -47,12 +47,12 @@ To set up your Terra plugin repository, follow these steps:
    >> Ready to go <<
     ```
 
-4. **Launch Development Environment**: Use `make test-plugin <plugin name>` this will communicate with ArgoCD and create an Application deployment that points to your local system.
+4. **Launch Development Environment**: Use `make test <plugin name>` this will communicate with ArgoCD and create an Application deployment that points to your local system.
 
     <!-- termynal -->
 
     ```shell
-    $ make test-plugin my-plugin
+    $ make test my-plugin
     >> Deploying my-plugin << 
     Plugin: my-plugin
     TDK Name: ginger
