@@ -66,6 +66,10 @@ spec:
               value: "{{ .Values.puid }}"
             - name: PGID
               value: "{{ .Values.guid }}"
+            {{- if .Values.packages }}
+            - name: PACKAGES
+              value: "{{ .Values.packages }}"
+            {{- end }}
             {{- range .Values.env }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}

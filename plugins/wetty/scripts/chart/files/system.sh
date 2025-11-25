@@ -9,8 +9,8 @@ adduser -D -u "{{ .Values.puid }}" -G wettyusers "{{ .Values.user }}"
 
 echo "{{ .Values.user }}:$USER_PASS" | chpasswd
 
-{{ if .Values.packages }}
-apk add {{ .Values.packages }}
-{{ end }}
+if [ -n "$PACKAGES" ]; then
+  apk add "$PACKAGES"
+fi
 
 yarn start --base "/polaris/{{ .Values.name }}" --allow-iframe
