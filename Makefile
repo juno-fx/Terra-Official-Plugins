@@ -43,6 +43,8 @@ new-plugin:
 verify:
 	@echo "Verify is disabled"
 
+lint-scripts:
+	shellcheck plugins/wetty/scripts/chart/files/system.sh
 lint:
 	bash hack/lint.sh
 

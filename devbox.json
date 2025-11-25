@@ -6,10 +6,11 @@
     "kubectl@latest",
     "gnumake@latest",
     "python3@latest",
-    "kubernetes-helm@latest"
+    "kubernetes-helm@latest",
+    "shellcheck@latest"
   ],
   "env": {
-    "VENV_DIR": "venv",
+    "VENV_DIR":  "venv",
     "UV_PYTHON": "venv/bin/python"
   },
   "shell": {
