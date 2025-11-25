@@ -3,14 +3,15 @@ set -e
 
 cd /usr/src/app
 
-addgroup -g "{{ .Values.guid }}" wettyusers
+addgroup -g "$PGID" wettyusers
 
-adduser -D -u "{{ .Values.puid }}" -G wettyusers "{{ .Values.user }}"
+adduser -D -u "$PUID" -G wettyusers "$USER"
 
-echo "{{ .Values.user }}:$USER_PASS" | chpasswd
+echo "$USER:$USER_PASS" | chpasswd
 
 if [ -n "$PACKAGES" ]; then
-  apk add "$PACKAGES"
+  # shellcheck disable=SC2086
+  apk add $PACKAGES
 fi
 
-yarn start --base "/polaris/{{ .Values.name }}" --allow-iframe
+yarn start --base "/polaris/$WORKSTATION_NAME" --allow-iframe

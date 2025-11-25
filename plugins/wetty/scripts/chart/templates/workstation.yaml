@@ -66,6 +66,12 @@ spec:
               value: "{{ .Values.puid }}"
             - name: PGID
               value: "{{ .Values.guid }}"
+            - name: WORKSTATION_NAME
+              value: "{{ .Values.name }}"
+            {{- if .Values.user_pass }}
+            - name: USER_PASS
+              value: "{{ .Values.user_pass }}"
+            {{- end }}
             {{- if .Values.packages }}
             - name: PACKAGES
               value: "{{ .Values.packages }}"
