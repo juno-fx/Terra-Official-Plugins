@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{ .Values.name }}"
+  annotations:
+    # comma separated list of users that can access this workstation as read only.
+    juno-innovations.com/shared: "none"
+    juno-innovations.com/kuiper-state: "{{ .Values._kuiper }}"
+    juno-innovations.com/workload: "Terminal"  # mark this as a workload and it's type for the frontend UI
+  labels:
+    juno-innovations.com/app: "polaris"
+    juno-innovations.com/workstation: "{{ .Values.name }}"
+    juno-innovations.com/user: "{{ .Values.user }}"
+    juno-innovations.com/session: "{{ .Values.session }}"
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      juno-innovations.com/workstation: "{{ .Values.name }}"
+
+  template:
+    metadata:
+      labels:
+        juno-innovations.com/app: polaris
+        juno-innovations.com/user: "{{ .Values.user }}"
+        juno-innovations.com/workstation: "{{ .Values.name }}"
+
+    spec:
+      {{- if .Values.terra_role }}
+      serviceAccountName: {{ .Values.terra_role }}
+      {{- end }}
+      hostname: "{{ .Values.name }}"
+      containers:
+        - name: nginx
+          image: "nginx:1.29.3"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3001
+              name: nginx
+          volumeMounts:
+            - name: nginx
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+        - name: wetty
+          imagePullPolicy: IfNotPresent
+          image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
+          command:
+            - /bin/sh
+          args:
+            - /system.sh
+          ports:
+            - containerPort: 3000
+              name: viewer
+          env:
+            - name: JUNO_PROJECT
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: USER
+              value: "{{ .Values.user }}"
+            - name: HOME
+              value: "/home/{{ .Values.user }}"
+            - name: PUID
+              value: "{{ .Values.puid }}"
+            - name: PGID
+              value: "{{ .Values.guid }}"
+            - name: WORKSTATION_NAME
+              value: "{{ .Values.name }}"
+            {{- if .Values.user_pass }}
+            - name: USER_PASS
+              value: "{{ .Values.user_pass }}"
+            {{- end }}
+            {{- if .Values.packages }}
+            - name: PACKAGES
+              value: "{{ .Values.packages }}"
+            {{- end }}
+            {{- range .Values.env }}
+            - name: {{ .name | quote }}
+              value: {{ .value | quote }}
+            {{- end }}
+          volumeMounts:
+            - name: tooling
+              mountPath: /system.sh
+              subPath: system.sh
+              readOnly: true
+            {{- if .Values.volumeMounts }}
+            {{- toYaml .Values.volumeMounts | nindent 12 }}
+            {{- end }}
+      volumes:
+        - name: tooling
+          configMap:
+            name: "{{ .Values.name }}-tooling"
+        - name: nginx
+          configMap:
+            name: "{{ .Values.name }}-nginx"
+        {{- if .Values.volumeMounts }}
+        {{- toYaml .Values.volumes | nindent 8 }}
+        {{- end }}
+
+

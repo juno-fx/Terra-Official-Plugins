@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-terra-metadata
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+  annotations:
+    juno-innovations.com/workload: "Terminal"
+data:
+  chart: "{{ .Release.Name }}-scripts-configmap"
+  description: "Wetty terminal"
+  fields: |
+    - name: registry
+      default: "wettyoss"
+    - name: repo
+      default: "wetty"
+    - name: tag
+      default: "latest"
+    - name: icon
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/wetty/scripts/assets/logo.png"
+    - name: packages
+      description: Additional packages to install. You can use spaces " " to install multiples.
+      required: false
+      default: vim
+    - name: terra_role
+      description: Name of a Terra role to assign to Development Kit. This refers to the plugin level installed roles.
+      required: false
+      type: k8sServiceAccount
