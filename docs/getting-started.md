@@ -8,6 +8,8 @@ To get started with Terra plugins, you need to have the following prerequisites:
 - **Kubectl**: Kubectl is used to talk to kubernetes clusters. You can install it from the [Kubectl website](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/).
 - **Git**: Ensure you have Git installed to clone the repository. You can download it from the [Git website](https://git-scm.com/downloads).
 - **Make**: Ensure you have Make installed to run the workflows. You can download it from the [Make website](https://www.gnu.org/software/make/).
+- **Kind**: Ensure you have Kind installed to run the local cluster for testing. You can download it from the [Kind website](https://kind.sigs.k8s.io/docs/user/quick-start/).
+- **Devbox**: Ensure you have Devbox installed to manage your development environment. You can download it from the [Devbox website](https://www.jetify.com/devbox).
 
 ## Repository Setup
 
@@ -23,7 +25,15 @@ To set up your Terra plugin repository, follow these steps:
     $ git checkout 999-my-branch
     ```
 
-2. **Create Our Plugin**: Juno provides a `Makefile` target that creates the scaffolding for a new plugin. You can use it to create a new plugin:
+2. **Activate Devbox Environment**: Terra uses Devbox to manage the development environment. Activate the Devbox shell to ensure all dependencies are available.
+
+    <!-- termynal -->
+    
+    ```shell
+    $ devbox shell
+    ```
+
+3. **Create Our Plugin**: Juno provides a `Makefile` target that creates the scaffolding for a new plugin. You can use it to create a new plugin:
 
     <!-- termynal -->
     
@@ -37,7 +47,7 @@ To set up your Terra plugin repository, follow these steps:
    >> Ready to go <<
     ```
 
-2. **Launch Development Environment**: Use `make test-plugin <plugin name>` this will communicate with ArgoCD and create an Application deployment that points to your local system.
+4. **Launch Development Environment**: Use `make test-plugin <plugin name>` this will communicate with ArgoCD and create an Application deployment that points to your local system.
 
     <!-- termynal -->
 
