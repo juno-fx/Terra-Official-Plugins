@@ -1385,6 +1385,8 @@
 <li><strong>Kubectl</strong>: Kubectl is used to talk to kubernetes clusters. You can install it from the <a href="https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/">Kubectl website</a>.</li>
 <li><strong>Git</strong>: Ensure you have Git installed to clone the repository. You can download it from the <a href="https://git-scm.com/downloads">Git website</a>.</li>
 <li><strong>Make</strong>: Ensure you have Make installed to run the workflows. You can download it from the <a href="https://www.gnu.org/software/make/">Make website</a>.</li>
+<li><strong>Kind</strong>: Ensure you have Kind installed to run the local cluster for testing. You can download it from the <a href="https://kind.sigs.k8s.io/docs/user/quick-start/">Kind website</a>.</li>
+<li><strong>Devbox</strong>: Ensure you have Devbox installed to manage your development environment. You can download it from the <a href="https://www.jetify.com/devbox">Devbox website</a>.</li>
 </ul>
 <h2 id="repository-setup">Repository Setup<a class="headerlink" href="#repository-setup" title="Permanent link">&para;</a></h2>
 <p>To set up your Terra plugin repository, follow these steps:</p>
@@ -1394,12 +1396,16 @@
 <p><div class="termy" data-termynal data-ty-macos data-ty-title="zsh"><span data-ty="input" data-ty-prompt="$">git clone https://github.com/juno-fx/Terra-Official-Plugins</span><span data-ty="input" data-ty-prompt="$">cd Terra-Official-Plugins</span><span data-ty="input" data-ty-prompt="$">git checkout 999-my-branch</span><span data-ty></span></div></p>
 </li>
 <li>
+<p><strong>Activate Devbox Environment</strong>: Terra uses Devbox to manage the development environment. Activate the Devbox shell to ensure all dependencies are available.</p>
+<p><div class="termy" data-termynal data-ty-macos data-ty-title="zsh"><span data-ty="input" data-ty-prompt="$">devbox shell</span><span data-ty></span></div></p>
+</li>
+<li>
 <p><strong>Create Our Plugin</strong>: Juno provides a <code>Makefile</code> target that creates the scaffolding for a new plugin. You can use it to create a new plugin:</p>
 <p><div class="termy" data-termynal data-ty-macos data-ty-title="zsh"><span data-ty="input" data-ty-prompt="$">make new-plugin my-plugin</span><span data-ty>   &gt;&gt; Building New Plugin: my-plugin &lt;&lt;<br>   &gt;&gt; Setting up Plugin: my-plugin &lt;&lt;<br>   &gt;&gt; New Plugin Setup &lt;&lt;<br>   &gt;&gt; Added to git &lt;&lt;<br>   &gt;&gt; Plugin Location: .../Terra-Official-Plugins/plugins/my-plugin &lt;&lt;<br>   &gt;&gt; Ready to go &lt;&lt;<br></span></div></p>
 </li>
 <li>
-<p><strong>Launch Development Environment</strong>: Use <code>make test-plugin &lt;plugin name&gt;</code> this will communicate with ArgoCD and create an Application deployment that points to your local system.</p>
-<p><div class="termy" data-termynal data-ty-macos data-ty-title="zsh"><span data-ty="input" data-ty-prompt="$">make test-plugin my-plugin</span><span data-ty>&gt;&gt; Deploying my-plugin &lt;&lt; <br>Plugin: my-plugin<br>TDK Name: ginger<br>Git Branch: 354-build-terra-plugin-development-kit<br>Namespace (JUNO_PROJECT): tdk<br>URL: git://ginger.tdk.svc.cluster.local:9418/Terra-Official-Plugins<br>/config/workspace/Terra-Official-Plugins<br>[60867] Ready to rumble<br>Release &quot;ginger&quot; does not exist. Installing it now.<br>NAME: ginger<br>LAST DEPLOYED: Wed Sep 17 18:27:12 2025<br>NAMESPACE: tdk<br>STATUS: deployed<br>REVISION: 1<br>TEST SUITE: None<br><br><br>&gt;&gt; Starting Development Shell &lt;&lt; <br>&gt;&gt; Press CTRL+D to exit &lt;&lt; </span><span data-ty="input" data-ty-prompt="$"></span><span data-ty></span></div></p>
+<p><strong>Launch Development Environment</strong>: Use <code>make test &lt;plugin name&gt;</code> this will communicate with ArgoCD and create an Application deployment that points to your local system.</p>
+<p><div class="termy" data-termynal data-ty-macos data-ty-title="zsh"><span data-ty="input" data-ty-prompt="$">make test my-plugin</span><span data-ty>&gt;&gt; Deploying my-plugin &lt;&lt; <br>Plugin: my-plugin<br>TDK Name: ginger<br>Git Branch: 354-build-terra-plugin-development-kit<br>Namespace (JUNO_PROJECT): tdk<br>URL: git://ginger.tdk.svc.cluster.local:9418/Terra-Official-Plugins<br>/config/workspace/Terra-Official-Plugins<br>[60867] Ready to rumble<br>Release &quot;ginger&quot; does not exist. Installing it now.<br>NAME: ginger<br>LAST DEPLOYED: Wed Sep 17 18:27:12 2025<br>NAMESPACE: tdk<br>STATUS: deployed<br>REVISION: 1<br>TEST SUITE: None<br><br><br>&gt;&gt; Starting Development Shell &lt;&lt; <br>&gt;&gt; Press CTRL+D to exit &lt;&lt; </span><span data-ty="input" data-ty-prompt="$"></span><span data-ty></span></div></p>
 </li>
 </ol>
 <h2 id="plugin-structure">Plugin Structure<a class="headerlink" href="#plugin-structure" title="Permanent link">&para;</a></h2>

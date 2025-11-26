@@ -1317,6 +1317,7 @@
 via a local Kubernetes cluster installed with ArgoCD. This allows developers to iterate quickly on their plugins
 locally without needing to deploy to a production environment until they are ready. The workflow is as follows:</p>
 <ol>
+<li>Activate the Devbox environment.</li>
 <li>Create the plugin locally and push it to a remote branch.</li>
 <li>Launch a local Kind Cluster pre-installed with ArgoCD.</li>
 <li>Install the ArgoCD Application Resource that points to your plugin on your remote branch.</li>
@@ -1328,6 +1329,10 @@ locally without needing to deploy to a production environment until they are rea
 </ol>
 <h2 id="workflow-steps">Workflow Steps<a class="headerlink" href="#workflow-steps" title="Permanent link">&para;</a></h2>
 <ol>
+<li>
+<p><strong>Activate Devbox Environment</strong>: Terra uses Devbox to manage the development environment. Activate the Devbox shell to ensure all dependencies are available.</p>
+<p><div class="termy" data-termynal data-ty-macos data-ty-title="zsh"><span data-ty="input" data-ty-prompt="$">devbox shell</span><span data-ty></span></div></p>
+</li>
 <li>
 <p><strong>Create a Plugin</strong>: Use the <code>make new-plugin &lt;plugin name&gt;</code> command to create a new plugin scaffolding.</p>
 <p><div class="termy" data-termynal data-ty-macos data-ty-title="zsh"><span data-ty="input" data-ty-prompt="$">make new-plugin my-plugin</span><span data-ty></span></div></p>
