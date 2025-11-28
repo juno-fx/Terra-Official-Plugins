@@ -71,6 +71,16 @@ spec:
       {{- end }}
 
       containers:
+        - name: nginx
+          image: "nginx:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+              name: nginx
+          volumeMounts:
+            - name: nginx
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
         - name: webui
           imagePullPolicy: IfNotPresent
           image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
@@ -103,7 +113,7 @@ spec:
             failureThreshold: 24
             periodSeconds: 5
           ports:
-            - containerPort: 3000
+            - containerPort: 8080
               name: viewer
           env:
             - name: JUNO_PROJECT
