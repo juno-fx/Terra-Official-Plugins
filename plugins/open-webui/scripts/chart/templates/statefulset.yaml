@@ -71,16 +71,6 @@ spec:
       {{- end }}
 
       containers:
-        - name: nginx
-          image: "nginx:latest"
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 3000
-              name: nginx
-          volumeMounts:
-            - name: nginx
-              mountPath: /etc/nginx/nginx.conf
-              subPath: nginx.conf
         - name: webui
           imagePullPolicy: IfNotPresent
           image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
@@ -142,9 +132,6 @@ spec:
             # The web app itself runs as the uid passed in via NB_USER, non-root 
             runAsUser: 0
       volumes:
-        - name: nginx
-          configMap:
-            name: "{{ .Values.name }}-open-webui"
         {{- if .Values.volumeMounts }}
         {{- toYaml .Values.volumes | nindent 8 }}
         {{- end }}
