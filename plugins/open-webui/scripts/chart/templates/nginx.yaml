@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: "{{ .Values.name }}-web-ide"
+  name: "{{ .Values.name }}-open-webui"
 data:
   nginx.conf: |
     events {}
