@@ -1,2 +1,0 @@
-echo "Adding NukeSamurai to NUKE_PATH"
-export NUKE_PATH=$HOME/.nuke:/apps/nukesamurai

@@ -1,0 +1,19 @@
+resource_id: velero-cluster-backup
+name: Velero Cluster Backup
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/velero/assets/logo.png
+description: A scheduled backup of all K8s resources in the cluster, depending on the Velero plugin install. Note this does NOT back up data on volumes, only the Kubernetes api resources!
+category: Infrastructure
+tags:
+  - cluster-level
+  - backup
+fields:
+  - name: retention
+    description: "Rotation interval after which old backups are deleted. Defaults to 30 days."
+    required: false
+    default: 720h0m0s
+    type: string
+  - name: schedule
+    description: "Cron expression defining when to run the backup. Defaults to 7am daily."
+    required: false
+    default: "0 7 * * *"
+    type: string

@@ -1,0 +1,38 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-nvidia-gpu-operator
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gpu-operator
+  sources:
+    - repoURL: https://helm.ngc.nvidia.com/nvidia
+      chart: gpu-operator
+      targetRevision: v25.10.0
+      helm:
+        releaseName: gpu-operator
+        parameters:
+          - name: "toolkit.enabled"
+            value: "{{ .Values.install_toolkit }}"
+          - name: "driver.enabled"
+            value: "{{ .Values.install_driver }}"
+          - name: "driver.nvidiaDriverCRD.enabled"
+            value: "true"
+          - name: "devicePlugin.config.name"
+            value: "{{ .Values.slicing_config }}"
+          - name: "devicePlugin.config.default"
+            value: "any"
+          - name: "driver.useOpenKernelModules"
+            value: "true"
+          - name: "nfd.enabled"
+            value: "true"
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+      - CreateNamespace=true

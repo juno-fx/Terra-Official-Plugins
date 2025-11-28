@@ -1,0 +1,14 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Values.name }}-jupyter-notebook
+spec:
+  podSelector:
+    matchLabels:
+      juno-innovations.com/workstation: "{{ .Values.name }}"
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: "{{ .Values.proxy_namespace }}"
+
