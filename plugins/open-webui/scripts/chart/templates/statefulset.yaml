@@ -71,7 +71,7 @@ spec:
       {{- end }}
 
       containers:
-        - name: jupyter
+        - name: webui
           imagePullPolicy: IfNotPresent
           image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
           resources:

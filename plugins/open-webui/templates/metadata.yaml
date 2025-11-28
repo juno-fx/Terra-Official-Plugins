@@ -18,3 +18,5 @@ data:
       default: "main-ollama"
     - name: icon
       default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/open-webui/scripts/assets/logo.png"
+    - name: gpu
+      default: false

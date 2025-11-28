@@ -6,7 +6,7 @@ spec:
   selector:
     juno-innovations.com/workstation: "{{ .Values.name }}"
   ports:
-    - port: 3000
+    - port: 8080
       targetPort: 8080
       protocol: TCP
       name: webui
