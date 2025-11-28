@@ -103,7 +103,7 @@ spec:
             failureThreshold: 24
             periodSeconds: 5
           ports:
-            - containerPort: 8080
+            - containerPort: 3000
               name: viewer
           env:
             - name: JUNO_PROJECT
