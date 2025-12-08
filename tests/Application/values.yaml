@@ -3,4 +3,4 @@ plugin:
 remote:
 name:
 project:
-environment:
+environment: default
