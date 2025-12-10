@@ -16,7 +16,7 @@ apt install -y \
 # clean up any previous installation
 rm -rf /host/${DESTINATION}/${NAME}
 mkdir -pv /host/${DESTINATION}/${NAME}
-sleep infinity
+
 # fresh runner install
 if [ -n "${INSTALL}" ]; then
     # clean previous network install
