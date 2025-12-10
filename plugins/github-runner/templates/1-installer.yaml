@@ -10,6 +10,9 @@ spec:
   template:
     spec:
       restartPolicy: Never
+      dnsConfig:
+        nameservers:
+          - 8.8.8.8
       nodeSelector:
         {{- if eq .Values.architecture "x64" }}
         kubernetes.io/arch: amd64
