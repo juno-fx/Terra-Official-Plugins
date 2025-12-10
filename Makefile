@@ -43,6 +43,8 @@ new-plugin:
 verify:
 	@echo "Verify is disabled"
 
+lint-scripts:
+	shellcheck plugins/wetty/scripts/chart/files/system.sh
 lint:
 	bash hack/lint.sh
 
@@ -65,6 +67,9 @@ package:
 docs:
 	.venv/bin/mkdocs serve
 
+deploy-docs: .venv/bin/activate
+	. .venv/bin/activate; mkdocs gh-deploy --force
+
 lint-docs: .venv/bin/activate
 	@(grep -q -r '<a href' docs && (echo Please use markdown links instead of href. && exit 1)) || true
 	([[ -d site ]] && rm -rf site/) || true
@@ -82,6 +87,7 @@ lint-docs: .venv/bin/activate
 	.venv/bin/pip install -r requirements.txt
 # env
 cluster:
+	@which kind || (echo "kind is not in PATH - did you install devbox and run 'devbox shell'?" && exit 1)
 	@kind create cluster --name terra-plugins --config .kind.yaml || echo "Cluster already exists..."
 
 dependencies: cluster

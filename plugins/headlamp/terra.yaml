@@ -1,6 +1,6 @@
 resource_id: headlamp
 name: Headlamp
-icon: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/headlamp/assets/logo.png?raw=true"
+icon: https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/headlamp/assets/logo.png?raw=true
 description: Headlamp is a web-based Kubernetes dashboard that provides a user-friendly interface for managing Kubernetes clusters. It allows users to view and interact with cluster resources, perform administrative tasks, and monitor cluster health.
 category: Infrastructure
 tags:

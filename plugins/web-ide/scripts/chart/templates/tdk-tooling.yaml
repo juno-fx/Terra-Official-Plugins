@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-tooling"
+data:
+  system.sh: |
+    #!/bin/sh
+    set -e
+
+    # set noninteractive frontend for apt
+    export DEBIAN_FRONTEND=noninteractive
+
+    # update and install packages
+    apt update -y
+    apt upgrade -y
+    apt install make rsync wget curl neofetch psmisc {{ .Values.packages }} -y
+
+    # setup neofetch
+    ln -sf /bin/neofetch /bin/fastfetch
+
+    # ensure home directory exists
+    if [ ! -d "$HOME" ]; then
+      echo "Home directory $HOME does not exist, creating it"
+      mkdir -p "$HOME"
+      chown abc:abc "$HOME"
+    fi
+
+    # clean out defaults
+    rm -rfv /config/workspace
+
+    # setup a symlink from /config/data to the users home directory under the tdk folder
+    mv /config/data /config/data.bak || true
+    mkdir -vp "$HOME/tdk/data"
+    ln -sv "$HOME/tdk/data" /config/data
+
+    # apply defaults only if /config/data is empty and a backup exists
+    if [ -d /config/data.bak ] && [ -z "$(ls -A /config/data)" ]; then
+      echo "/config/data is empty, restoring defaults"
+      rsync -a -P --delete /config/data.bak/ /config/data/ || true
+    else
+      echo "Skipping restore, /config/data already has content or no backup exists."
+    fi
+
+    # setup a symlink from /config/extensions to the users home directory under the tdk folder
+    mv /config/extensions /config/extensions.bak || true
+    mkdir -vp "$HOME/tdk/extensions"
+    ln -sv "$HOME/tdk/extensions" /config/extensions
+
+    # apply defaults only if /config/extensions is empty and a backup exists
+    if [ -d /config/extensions.bak ] && [ -z "$(ls -A /config/extensions)" ]; then
+      echo "/config/extensions is empty, restoring defaults"
+      rsync -a -P --delete /config/extensions.bak/ /config/extensions/ || true
+    else
+      echo "Skipping restore, /config/extensions already has content or no backup exists."
+    fi
+
+    # link the /config/workspace to the users home directory under the tdk folder
+    mkdir -vp "$HOME/tdk/workspace"
+    ln -sv "$HOME/tdk/workspace" /config/workspace
+
+    # set permissions
+    chown -R abc:abc "$HOME/tdk"
+    
+    # configure default credentials
+    git config --global user.email "tdk@juno-innovations.com"
+    git config --global user.name "tdk"
+
+    # install gh cli
+    (type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y)) \
+      && sudo mkdir -p -m 755 /etc/apt/keyrings \
+      && out=$(mktemp) && wget -nv -O$out https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+      && cat $out | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
+      && sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+      && sudo mkdir -p -m 755 /etc/apt/sources.list.d \
+      && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+      && sudo apt update \
+      && sudo apt install gh -y
+

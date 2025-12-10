@@ -1,6 +1,6 @@
 resource_id: embergen
 name: Embergen
-icon: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/embergen/scripts/assets/embergen.png?raw=true"
+icon: https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/embergen/scripts/assets/embergen.png?raw=true
 description: Real-time volumetric effects and VFX software for artists and studios. Embergen is a powerful tool for creating stunning visual effects such as fire, smoke, explosions, and more.
 category: CG
 tags:
