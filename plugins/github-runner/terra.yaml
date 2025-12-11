@@ -16,6 +16,9 @@ tags:
   - github-actions
   - github-runner
 fields:
+  - name: pool
+    description: Compute pool to schedule the GitHub runner onto
+    type: string
   - name: cpu
     description: CPU cores to allocate to the GitHub runner
     required: true

@@ -31,14 +31,15 @@ if [ -n "${INSTALL}" ]; then
 
     # extract the runner package
     tar -xzf runner.tar.gz
+    rm -rfv runner.tar.gz
 
     # chroot and run provision script
     chroot /host/ bash -c "cd /${DESTINATION}/${NAME} && RUNNER_ALLOW_RUNASROOT='1' ./config.sh --unattended --url ${URL} --token ${TOKEN} --name ${NAME} --replace"
 
     echo "Copying runner configuration to shared storage..."
     mkdir -pv /${DESTINATION}/${NAME}
-    rsync -a /host/${DESTINATION}/${NAME}/ /${DESTINATION}/${NAME}/
-    rsync -a /host/${DESTINATION}/${NAME}/.* /${DESTINATION}/${NAME}/
+    rsync -a -P /host/${DESTINATION}/${NAME}/ /${DESTINATION}/${NAME}/
+    rsync -a -P /host/${DESTINATION}/${NAME}/.* /${DESTINATION}/${NAME}/
     echo "GitHub Actions Runner v${VERSION} installed at ${DESTINATION}/${NAME}"
 
     exit 0

@@ -10,6 +10,10 @@ spec:
   template:
     spec:
       restartPolicy: Never
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: true
+      hostNetwork: true
+      hostPID: true
       nodeSelector:
         {{- if eq .Values.architecture "x64" }}
         kubernetes.io/arch: amd64
@@ -20,6 +24,8 @@ spec:
       containers:
         - name: installer
           image: ubuntu:latest
+          securityContext:
+            privileged: true
           env:
             - name: INSTALL
               value: "true"
