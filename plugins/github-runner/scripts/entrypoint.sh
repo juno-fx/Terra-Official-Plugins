@@ -54,7 +54,9 @@ if [ -n "${LAUNCH}" ]; then
 
     # chroot and run the run.sh script
     echo "Launching GitHub Actions Runner..."
-    chroot /host/ bash -c "cd /${DESTINATION}/${NAME} && RUNNER_ALLOW_RUNASROOT='1' ./run.sh"
+    chroot /host/ bash -c "cd /${DESTINATION}/${NAME} && RUNNER_ALLOW_RUNASROOT='1' ./svc.sh install root && RUNNER_ALLOW_RUNASROOT='1' ./svc.sh start"
 
+    echo "GitHub Actions Runner launched."
+    sleep infinity
     exit 0
 fi
