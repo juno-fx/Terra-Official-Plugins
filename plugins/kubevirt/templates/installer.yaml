@@ -15,7 +15,7 @@ spec:
   sources:
     - path: plugins/kubevirt/releases/{{ .Values.version }}/
       repoURL: https://github.com/juno-fx/Terra-Official-Plugins.git
-      targetRevision: 430-add-kubevirt # TODO: replace this before merging
+      targetRevision: main
       directory:
         recurse: true
 
