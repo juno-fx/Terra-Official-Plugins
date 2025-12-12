@@ -1,0 +1,11 @@
+resource_id: vm-fedora
+name: VM Fedora Workstation
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/vm-fedora/scripts/assets/logo.png
+description: kubevirt compatible VM Fedora Workstation
+category: Workstations
+tags:
+  - virtualization
+  - virtual-machine
+  - kubevirt
+  - cluster-level
+fields: []

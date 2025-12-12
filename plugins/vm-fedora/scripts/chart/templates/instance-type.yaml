@@ -1,0 +1,9 @@
+apiVersion: instancetype.kubevirt.io/v1beta1
+kind: VirtualMachineInstancetype
+metadata:
+  name: "{{ .Values.name }}"
+spec:
+  cpu:
+    guest: "{{ .Values.cpu }}"
+  memory:
+    guest: "{{ .Values.memory }}"
