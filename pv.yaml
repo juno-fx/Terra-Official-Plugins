@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: windows
+spec:
+  capacity:
+    storage: 64Gi
+  accessModes:
+    - ReadWriteOnce
+  iscsi:
+    iqn: iqn.2021-04.serenity:windows
+    lun: 1
+    targetPortal: 192.168.70.15

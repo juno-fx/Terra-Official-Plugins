@@ -12,12 +12,16 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: kubevirt
-  source:
-    directory:
-      recurse: true
-    path: plugins/kubevirt/releases/{{ .Values.version }}/
-    repoURL: https://github.com/juno-fx/Terra-Official-Plugins.git
-    targetRevision: 430-add-kubevirt # TODO: replace this before merging
+  sources:
+    - path: plugins/kubevirt/releases/{{ .Values.version }}/
+      repoURL: https://github.com/juno-fx/Terra-Official-Plugins.git
+      targetRevision: 430-add-kubevirt # TODO: replace this before merging
+      directory:
+        recurse: true
+
+    - path: kubernetes/bundled.yaml
+      repoURL: https://github.com/kubevirt-manager/kubevirt-manager.git
+      targetRevision: main
 
   syncPolicy:
     automated:
