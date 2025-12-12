@@ -19,9 +19,11 @@ spec:
       directory:
         recurse: true
 
-    - path: kubernetes/bundled.yaml
+    - path: kubernetes
       repoURL: https://github.com/kubevirt-manager/kubevirt-manager.git
       targetRevision: main
+      directory:
+        include: bundled.yaml
 
   syncPolicy:
     automated:
