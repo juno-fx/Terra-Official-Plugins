@@ -4,6 +4,6 @@ metadata:
   name: "{{ .Values.name }}"
 spec:
   cpu:
-    guest: "{{ .Values.cpu }}"
+    guest: {{ .Values.cpu }}
   memory:
     guest: "{{ .Values.memory }}"
