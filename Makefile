@@ -113,7 +113,7 @@ test: cluster dependencies
 	@helm upgrade -i terra-plugin ./tests/Application \
 		--set branch=$(shell git rev-parse --abbrev-ref HEAD) \
 		--set remote=$(shell hack/get-remote.sh),plugin=$(ARGS) \
-		--set name=terra-test
+		--set name=terra-test \
 		--wait \
 		--timeout 5m
 	@echo

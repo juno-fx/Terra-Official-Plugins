@@ -19,7 +19,7 @@ CLEAN_HOSTNAME=$(echo "$HOSTNAME" | cut -d'-' -f1)
 CURRENT_GIT_REF=$(git rev-parse --abbrev-ref HEAD)
 
 # Build in-cluster URL
-URL="git://${CLEAN_HOSTNAME}.${JUNO_PROJECT}.svc.cluster.local:9418/Terra-Official-Plugins"
+URL="git://${CLEAN_HOSTNAME}.${JUNO_ENVIRONMENT}.svc.cluster.local:9418/Terra-Official-Plugins"
 
 echo "TDK Name: $CLEAN_HOSTNAME"
 echo "Git Branch: $CURRENT_GIT_REF"

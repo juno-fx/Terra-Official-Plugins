@@ -19,12 +19,12 @@ CLEAN_HOSTNAME=$(echo "$HOSTNAME" | cut -d'-' -f1)
 # Current git branch
 CURRENT_GIT_REF=$(git rev-parse --abbrev-ref HEAD)
 
-# If JUNO_PROJECT is not set, ask the user to choose a namespace
-if [ -z "${JUNO_PROJECT:-}" ]; then
-  echo ">>> JUNO_PROJECT environment variable not set."
+# If JUNO_ENVIRONMENT is not set, ask the user to choose a namespace
+if [ -z "${JUNO_ENVIRONMENT:-}" ]; then
+  echo ">>> JUNO_ENVIRONMENT environment variable not set."
   echo ">>> Fetching available namespaces from Kubernetes..."
   if ! command -v kubectl >/dev/null 2>&1; then
-    echo "Error: kubectl not found in PATH. Please install it or set JUNO_PROJECT manually." >&2
+    echo "Error: kubectl not found in PATH. Please install it or set JUNO_ENVIRONMENT manually." >&2
     exit 1
   fi
 
@@ -45,13 +45,13 @@ if [ -z "${JUNO_PROJECT:-}" ]; then
     exit 1
   fi
 
-  export JUNO_PROJECT="$USER_NAMESPACE"
-  echo ">>> JUNO_PROJECT set to '$JUNO_PROJECT'"
+  export JUNO_ENVIRONMENT="$USER_NAMESPACE"
+  echo ">>> JUNO_ENVIRONMENT set to '$JUNO_ENVIRONMENT'"
 fi
 
 # Build URL depending on environment
 if in_cluster; then
-  URL="git://${CLEAN_HOSTNAME}.${JUNO_PROJECT}.svc.cluster.local:9418/Terra-Official-Plugins"
+  URL="git://${CLEAN_HOSTNAME}.${JUNO_ENVIRONMENT}.svc.cluster.local:9418/Terra-Official-Plugins"
 else
   LOCAL_IP=$(get_local_ip)
   URL="git://${LOCAL_IP}:9418/Terra-Official-Plugins"
@@ -60,7 +60,7 @@ fi
 echo "Plugin: $PLUGIN_NAME"
 echo "TDK Name: $CLEAN_HOSTNAME"
 echo "Git Branch: $CURRENT_GIT_REF"
-echo "Namespace (JUNO_PROJECT): $JUNO_PROJECT"
+echo "Namespace (JUNO_ENVIRONMENT): $JUNO_ENVIRONMENT"
 echo "URL: $URL"
 
 # Define cleanup function
@@ -68,7 +68,7 @@ cleanup() {
   echo
   echo ">>> Caught termination signal. Cleaning up..."
   echo ">>> Uninstalling Helm release: $CLEAN_HOSTNAME"
-  helm uninstall "$CLEAN_HOSTNAME" --namespace "$JUNO_PROJECT" || true
+  helm uninstall "$CLEAN_HOSTNAME" --namespace "$JUNO_ENVIRONMENT" || true
   killall git-daemon || true
   echo ">>> Cleanup complete."
 }
@@ -86,7 +86,7 @@ helm upgrade -i "$CLEAN_HOSTNAME" ./tests/Application/ \
   --set remote="$URL" \
   --set plugin="$PLUGIN_NAME" \
   --set name="$PLUGIN_NAME-$CLEAN_HOSTNAME-dev" \
-  --set project="$JUNO_PROJECT"
+  --set project="$JUNO_ENVIRONMENT"
 
 echo
 echo

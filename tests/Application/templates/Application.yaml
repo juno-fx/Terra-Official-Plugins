@@ -9,7 +9,7 @@ spec:
   project: default
   destination:
     server: https://kubernetes.default.svc
-    namespace: {{ .Values.project }}
+    namespace: {{ .Values.environment }}
   sources:
     - repoURL: {{ .Values.remote }}
       path: ./plugins/{{ .Values.plugin }}/
