@@ -14,7 +14,14 @@ spec:
       enableServiceLinks: true
       hostNetwork: true
       hostPID: true
+      tolerations:
+        - key: "pool"
+          operator: "Exists"
+          effect: "NoSchedule"
       nodeSelector:
+        {{- if .Values.pool  }}
+        pool: {{ .Values.pool }}
+        {{- end }}
         {{- if eq .Values.architecture "x64" }}
         kubernetes.io/arch: amd64
         {{ end }}
