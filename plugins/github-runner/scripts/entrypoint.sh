@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+sleep infinity
+
 if [ -n "$CLEANUP" ]; then
   rm -rvf "$DESTINATION/$NAME"
   exit 0
