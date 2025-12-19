@@ -19,6 +19,10 @@ spec:
       enableServiceLinks: true
       hostNetwork: true
       hostPID: true
+      tolerations:
+        - key: "pool"
+          operator: "Exists"
+          effect: "NoSchedule"
       nodeSelector:
         {{- if .Values.pool  }}
         pool: {{ .Values.pool }}
