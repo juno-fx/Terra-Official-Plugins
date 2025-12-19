@@ -14,7 +14,6 @@ apt install -y \
   rsync
 
 # clean up any previous installation
-rm -rf /host/${DESTINATION}/${NAME}
 mkdir -pv /host/${DESTINATION}/${NAME}
 
 # fresh runner install
