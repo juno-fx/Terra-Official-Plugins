@@ -18,14 +18,14 @@ rules:
     - apiGroups: [""]
       resources: ["persistentvolumeclaims"]
       verbs: ["create", "get", "list", "watch", "delete"]
-    # grant permissions to create and manage datavolumes
-    - apiGroups: ["cdi.kubevirt.io"]
-      resources: ["datavolumes"]
-      verbs: ["create", "get", "list", "watch", "delete"]
     # grant permissions to list events
     - apiGroups: [""]
       resources: ["events"]
       verbs: ["list", "watch", "create"]
+    # grant permissions to create and manage datavolumes
+    - apiGroups: ["cdi.kubevirt.io"]
+      resources: ["datavolumes"]
+      verbs: ["create", "get", "list", "watch", "delete"]
     # grant permissions to create uploadtokenrequests in the upload.cdi.kubevirt.io API group
     - apiGroups: ["upload.cdi.kubevirt.io"]
       resources: ["uploadtokenrequests"]
