@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-kubevirt
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    - post-delete-finalizer.argocd.argoproj.io
+    - post-delete-finalizer.argocd.argoproj.io/cleanup
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubevirt
+  sources:
+    - path: plugins/kubevirt/releases/{{ .Values.version }}/
+      repoURL: https://github.com/juno-fx/Terra-Official-Plugins.git
+      targetRevision: main
+      directory:
+        recurse: true
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+      - ServerSideApply=true
+      - CreateNamespace=true
