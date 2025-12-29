@@ -19,6 +19,7 @@ spec:
   template:
     spec:
       restartPolicy: Never
+      serviceAccountName: {{ .Release.Name }}-installer-account
       nodeSelector:
         kubernetes.io/arch: amd64
       containers:
