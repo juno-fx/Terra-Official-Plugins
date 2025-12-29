@@ -17,6 +17,8 @@ apt install -y \
 mkdir -pv /${DESTINATION}/${NAME}
 mkdir -pv /host/opt/github/runners/${NAME}
 
+ls -la /${DESTINATION}/${NAME}/
+
 # fresh runner install
 if [ -n "${INSTALL}" ]; then
     # clean previous network install
