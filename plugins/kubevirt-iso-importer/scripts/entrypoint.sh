@@ -20,15 +20,12 @@ cd cache
 echo "System ready. Starting download..."
 
 # download the ISO file from the provided URL
-wget --progress=dot:giga "${URL}"
-
 FILENAME=$(basename "${URL}")
-
 # if there is a "?" in the filename, remove it and everything after it and rename the file
 if [[ "${FILENAME}" == *"?"* ]]; then
   FILENAME="${FILENAME%%\?*}"
-  mv "$(basename "${URL}")" "${FILENAME}"
 fi
+wget --progress=dot:giga "${URL}" -O "${FILENAME}"
 
 echo "Downloaded file: ${FILENAME}"
 ls -la
