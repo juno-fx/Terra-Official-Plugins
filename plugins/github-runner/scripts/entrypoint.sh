@@ -14,6 +14,7 @@ apt install -y \
   rsync
 
 # clean up any previous installation
+mkdir -pv /${DESTINATION}/${NAME}
 mkdir -pv /host/opt/github/runners/${NAME}
 
 # fresh runner install
