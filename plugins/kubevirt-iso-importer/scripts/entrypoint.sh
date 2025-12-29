@@ -23,6 +23,13 @@ echo "System ready. Starting download..."
 wget --progress=dot:giga "${URL}"
 
 FILENAME=$(basename "${URL}")
+
+# if there is a "?" in the filename, remove it and everything after it and rename the file
+if [[ "${FILENAME}" == *"?"* ]]; then
+  FILENAME="${FILENAME%%\?*}"
+  mv "$(basename "${URL}")" "${FILENAME}"
+fi
+
 echo "Downloaded file: ${FILENAME}"
 ls -la
 
