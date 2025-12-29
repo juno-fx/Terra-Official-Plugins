@@ -17,8 +17,6 @@ apt install -y \
 mkdir -pv /${DESTINATION}/${NAME}
 mkdir -pv /host/opt/github/runners/${NAME}
 
-sleep infinity
-
 # fresh runner install
 if [ -n "${INSTALL}" ]; then
     # change to workspace
