@@ -21,9 +21,6 @@ sleep infinity
 
 # fresh runner install
 if [ -n "${INSTALL}" ]; then
-    # clean previous network install
-    rm -rf /${DESTINATION}/${NAME}
-
     # change to workspace
     cd /host/opt/github/runners/${NAME}
 
