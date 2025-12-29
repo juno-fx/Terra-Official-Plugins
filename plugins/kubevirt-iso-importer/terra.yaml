@@ -1,0 +1,30 @@
+resource_id: kubevirt-iso-importer
+name: KubeVirt ISO Importer
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/kubevirt/scripts/assets/logo.png
+description: |
+  Import ISO images into KubeVirt Virtual Machines using the Containerized Data Importer (CDI). This plugin simplifies 
+  the process of creating VMs from ISO files, enabling users to easily set up and manage virtual machines within their 
+  Kubernetes clusters.
+  
+  For now, this only supports URL downloads, but support for other sources will be added in the future. Such as 
+  importing from existing Persistent Volume Claims (PVCs) or local file uploads.
+category: Virtualization
+tags:
+  - iso
+  - cdi-importer
+  - kubevirt
+  - kubernetes
+  - virtualization
+  - vm
+  - virtual-machine
+fields:
+  - name: url
+    description: URL to the ISO image to import
+    required: true
+  - name: dv_name
+    description: DataVolume name to create
+    required: true
+  - name: size
+    description: Size of the DataVolume to create (e.g., 10Gi)
+    required: true
+    default: 10Gi

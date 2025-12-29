@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Release.Name }}-installer-account
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ .Release.Name }}-installer-role
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+rules:
+    # grant permissions to create and manage persistent volume claims
+    - apiGroups: [""]
+      resources: ["persistentvolumeclaims"]
+      verbs: ["create", "get", "list", "watch", "delete"]
+    # grant permissions to list events
+    - apiGroups: [""]
+      resources: ["events"]
+      verbs: ["list", "watch", "create"]
+    # grant permissions to create and manage datavolumes
+    - apiGroups: ["cdi.kubevirt.io"]
+      resources: ["datavolumes"]
+      verbs: ["create", "get", "list", "watch", "delete"]
+    # grant permissions to create uploadtokenrequests in the upload.cdi.kubevirt.io API group
+    - apiGroups: ["upload.cdi.kubevirt.io"]
+      resources: ["uploadtokenrequests"]
+      verbs: ["create", "get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Release.Name }}-installer-rolebinding
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Release.Name }}-installer-account
+roleRef:
+  kind: Role
+  name: {{ .Release.Name }}-installer-role
+  apiGroup: rbac.authorization.k8s.io
+

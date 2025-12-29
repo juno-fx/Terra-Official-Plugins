@@ -2,4 +2,4 @@ branch:
 plugin:
 remote:
 name:
-project:
+environment: default
