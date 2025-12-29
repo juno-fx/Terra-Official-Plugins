@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: "{{ .Release.Name }}-cdi-proxy"
   annotations:
-    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-wave: "2"
     argocd.argoproj.io/hook-delete-policy: HookSucceeded
 spec:
   type: ExternalName

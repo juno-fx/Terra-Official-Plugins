@@ -9,7 +9,7 @@ metadata:
     # ArgoCD annotations to ensure this job runs in the correct order
     # in this case this is running in the first wave which is before
     # the 2nd and so on.
-    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-wave: "2"
     # This annotation ensures that the job is deleted after it has succeeded
     # This is useful to keep the cluster clean and not have old jobs
     # lying around.
