@@ -14,13 +14,18 @@ metadata:
     argocd.argoproj.io/sync-wave: "1"
     argocd.argoproj.io/hook-delete-policy: HookSucceeded
 rules:
-  # grant permissions to create and manage persistent volume claims
+    # grant permissions to create and manage persistent volume claims
     - apiGroups: [""]
       resources: ["persistentvolumeclaims"]
       verbs: ["create", "get", "list", "watch", "delete"]
+    # grant permissions to create and manage datavolumes
     - apiGroups: ["cdi.kubevirt.io"]
       resources: ["datavolumes"]
       verbs: ["create", "get", "list", "watch", "delete"]
+    # grant permissions to list events
+    - apiGroups: [""]
+      resources: ["events"]
+      verbs: ["list", "watch", "create"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
