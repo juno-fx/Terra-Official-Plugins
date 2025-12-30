@@ -1,0 +1,28 @@
+resource_id: storage-iscsi
+name: Storage iSCSI
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/storage-iscsi/scripts/assets/logo.png
+description: |
+    Mount an iSCSI target as a Persistent Volume in your Kubernetes cluster using the iSCSI volume type.
+    This plugin allows for operators to connect to existing iSCSI targets and make them available to Pods running in the 
+    cluster.
+category: storage
+tags:
+  - storage
+  - iscsi
+  - persistent-volume
+  - cluster-level
+fields:
+  - name: iqn
+    description: iSCSI Qualified Name of the target to connect to
+    required: true
+  - name: lun
+    description: Logical Unit Number of the iSCSI target
+    required: true
+    type: int
+    default: 0
+  - name: portal
+    description: IP address or hostname of the iSCSI target portal
+    required: true
+  - name: size
+    description: Size of the Persistent Volume to create (e.g., 10Gi). This is for scheduling purposes only.
+    required: true
