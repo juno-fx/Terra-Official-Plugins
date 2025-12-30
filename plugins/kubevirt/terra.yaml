@@ -1,0 +1,20 @@
+resource_id: kubevirt
+name: KubeVirt
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/kubevirt/scripts/assets/logo.png
+description: KubeVirt technology addresses the needs of development teams that have adopted or want to adopt Kubernetes but possess existing Virtual Machine-based workloads that cannot be easily containerized. More specifically, the technology provides a unified development platform where developers can build, modify, and deploy applications residing in both Application Containers as well as Virtual Machines in a common, shared environment.
+category: Virtualization
+tags:
+  - kubevirt
+  - kubernetes
+  - virtualization
+  - vm
+  - virtual-machine
+  - cluster-level
+fields:
+  - name: version
+    description: Version of KubeVirt to install
+    required: true
+    default: v1.7.0
+    type: select
+    options:
+      - v1.7.0
