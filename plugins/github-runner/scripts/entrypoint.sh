@@ -1,11 +1,6 @@
 #!/bin/bash
 set -e
 
-if [ -n "$CLEANUP" ]; then
-  rm -rvf "$DESTINATION/$NAME"
-  exit 0
-fi
-
 # install required tools
 apt update
 apt install -y \
