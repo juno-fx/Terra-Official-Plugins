@@ -145,6 +145,14 @@
          <lastmod>1980-01-01</lastmod>
     </url>
     <url>
+         <loc>https://juno-innovations.com/plugins/Virtualization/kubevirt-iso-importer/</loc>
+         <lastmod>1980-01-01</lastmod>
+    </url>
+    <url>
+         <loc>https://juno-innovations.com/plugins/Virtualization/kubevirt/</loc>
+         <lastmod>1980-01-01</lastmod>
+    </url>
+    <url>
          <loc>https://juno-innovations.com/plugins/Web/firefox/</loc>
          <lastmod>1980-01-01</lastmod>
     </url>
@@ -154,6 +162,10 @@
     </url>
     <url>
          <loc>https://juno-innovations.com/plugins/Workstations/lsio-webtop/</loc>
+         <lastmod>1980-01-01</lastmod>
+    </url>
+    <url>
+         <loc>https://juno-innovations.com/plugins/Workstations/vm-fedora/</loc>
          <lastmod>1980-01-01</lastmod>
     </url>
     <url>
