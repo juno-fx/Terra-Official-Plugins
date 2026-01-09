@@ -17,6 +17,6 @@ fields:
 plugins:
   - plugin: Helios
     name: helios-workstations
-  - plugin: Argocd-Dashboard
+  - plugin: ArgoCD Dashboard
     name: argocd
 
