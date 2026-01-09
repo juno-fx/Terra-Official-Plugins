@@ -9,6 +9,7 @@ tags:
   - helios
   - argocd
   - first time setup
+  - cluster-level
 fields:
   - name: host
     description: The DNS name of your Genesis host for Argocd
