@@ -1,0 +1,5 @@
+# configuration
+size: 10Gi
+iqn: ""
+lun: 0
+portal: ""

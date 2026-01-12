@@ -1,0 +1,4 @@
+# configuration
+size: 10Gi
+path:
+server:
