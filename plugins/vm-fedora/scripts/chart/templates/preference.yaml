@@ -2,6 +2,10 @@ apiVersion: instancetype.kubevirt.io/v1beta1
 kind: VirtualMachinePreference
 metadata:
   name: "{{ .Values.name }}"
+  annotations:
+    kuiper.juno-innovations.com/hidden: "true"
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: {{ .Values.name }}
 spec:
   devices:
     preferredDiskBus: virtio

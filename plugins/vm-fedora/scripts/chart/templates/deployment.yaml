@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Values.name }}"-console
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: "{{ .Values.name }}"-console
+  template:
+    metadata:
+      labels:
+        app: "{{ .Values.name }}"-console
+    spec:
+      serviceAccountName: "{{ .Values.name }}"-console
+      containers:
+        - name: kubevirt-console
+          image: junoinnovations/kubevirt-console:unstable
+          env:
+            - name: KUBEVIRT_VM
+              value: "{{ .Values.name }}"
+          ports:
+            - containerPort: 8080
+              name: endpoint

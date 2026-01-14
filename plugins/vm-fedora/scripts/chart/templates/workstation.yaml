@@ -1,7 +1,6 @@
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
-  creationTimestamp: null
   name: "{{ .Values.name }}"
 spec:
   instancetype:
@@ -13,17 +12,31 @@ spec:
   runStrategy: Always
   template:
     metadata:
-      creationTimestamp: null
+      labels:
+        kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
     spec:
       domain:
-        devices: {}
+        devices:
+          disks:
+            - name: containerdisk
+              disk:
+                bus: virtio
+            - name: emptydisk
+              disk:
+                bus: virtio
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
       volumes:
       - containerDisk:
-          image: quay.io/containerdisks/fedora:latest
+          image: kubevirt/fedora-cloud-container-disk-demo:latest
         name: containerdisk
-      - cloudInitNoCloud:
+      - name: emptydisk
+        emptyDisk:
+          capacity: "2Gi"
+      - name: cloudinitdisk
+        cloudInitNoCloud:
           userData: |-
             #cloud-config
             password: fedora
             chpasswd: { expire: False }
-        name: cloudinit
