@@ -15,7 +15,8 @@ spec:
   sources:
     - path: plugins/kubevirt/releases/{{ .Values.version }}/
       repoURL: https://github.com/juno-fx/Terra-Official-Plugins.git
-      targetRevision: main
+      # TODO: Change this
+      targetRevision: 446-kubevirt-settings
       helm:
         releaseName: kubevirt
         values: |
