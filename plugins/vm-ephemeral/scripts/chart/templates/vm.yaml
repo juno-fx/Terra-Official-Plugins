@@ -34,7 +34,6 @@ spec:
           disks:
             - name: iso
               cdrom:
-                readOnly: true
                 bus: sata
             - name: emptydisk
               disk:
