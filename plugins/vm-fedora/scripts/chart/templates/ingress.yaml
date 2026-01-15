@@ -7,7 +7,7 @@ metadata:
     nginx.ingress.kubernetes.io/auth-url: "http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/"
 spec:
   rules:
-    - host: "{{ .Values.name }}"
+    - host: {{ .Values.host }}
       http:
         paths:
           - path: "/kubevirt-console/{{ .Values.name }}/"
