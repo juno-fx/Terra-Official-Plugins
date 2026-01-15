@@ -18,3 +18,8 @@ fields:
     type: select
     options:
       - v1.7.0
+  - name: nested_virtualization
+    description: Enable nested virtualization support for VMs
+    default: false
+    required: true
+    type: boolean
