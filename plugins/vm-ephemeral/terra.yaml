@@ -1,8 +1,8 @@
 resource_id: vm-ephemeral
-name: VM Fedora Workstation
+name: Generic Ephemeral VM
 icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/vm-ephemeral/scripts/assets/logo.png
-description: kubevirt compatible VM Fedora Workstation
-category: Workstations
+description: A generic ephemeral Virtual Machine (VM) compatible with KubeVirt, designed for temporary use cases where persistent storage is not required. This VM can be quickly deployed and discarded, making it ideal for testing, development, or short-term workloads.
+category: VirtualMachine
 tags:
   - virtualization
   - virtual-machine
