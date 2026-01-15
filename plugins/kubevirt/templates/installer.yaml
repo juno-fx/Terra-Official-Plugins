@@ -20,7 +20,7 @@ spec:
       helm:
         releaseName: kubevirt
         values: |
-          nestedVirtualization: {{ .Values.nested_virtualization }}
+          nested_virtualization: {{ .Values.nested_virtualization }}
 
   syncPolicy:
     automated:
