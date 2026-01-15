@@ -1,0 +1,68 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: "{{ .Values.name }}"
+spec:
+  instancetype:
+    name: "{{ .Values.name }}"
+    kind: virtualMachineInstancetype
+  preference:
+    name: "{{ .Values.name }}"
+    kind: virtualMachinePreference
+  runStrategy: Always
+  template:
+    metadata:
+      labels:
+        kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+    spec:
+      networks:
+        - name: default
+          pod: {}
+        {{ if .Values.bridge_network }}
+        - name: bridge
+          bridge: {}
+        {{ end }}
+      domain:
+        devices:
+          interfaces:
+            - name: default
+              masquerade: {}
+            {{ if .Values.bridge_network }}
+            - name: bridge
+              bridge: {}
+            {{ end }}
+          disks:
+            - name: containerdisk
+              disk:
+                bus: virtio
+            - name: emptydisk
+              disk:
+                bus: virtio
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+      volumes:
+        - name: containerdisk
+          containerDisk:
+            image: kubevirt/fedora-cloud-container-disk-demo:latest
+        - name: emptydisk
+          emptyDisk:
+            capacity: {{ .Values.storage_size }}
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            userData: |-
+              #cloud-config
+              password: fedora
+              chpasswd: { expire: False }
+
+  dataVolumeTemplates:
+  - metadata:
+      name: "{{ .Values.iso_name }}"
+    spec:
+      storage:
+        resources:
+          requests:
+            storage: {{ .Values.iso_storage_size }}
+      source:
+        http:
+          url: {{ .Values.iso_url }}

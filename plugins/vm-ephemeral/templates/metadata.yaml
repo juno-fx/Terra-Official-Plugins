@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-terra-metadata"
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+data:
+  chart: "{{ .Release.Name }}-scripts-configmap"
+  description: "KubeVirt compatible ephemeral VM"
+  fields: |
+    - name: icon
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/vm-ephemeral/scripts/assets/logo.png"
+    - name: iso_storage_name
+      required: true
+      default: "fedora-38-workstation-live"
+      type: string
+    - name: iso_storage_size
+      required: true
+      default: "2Gi"
+      type: string
+    - name: iso_url
+      default: "https://download.fedoraproject.org/pub/fedora/linux/releases/38/Workstation/x86_64/iso/Fedora-Workstation-Live-x86_64-38-1.6.iso"
+    - name: secure_boot
+      description: Enable Secure Boot for the VM
+      default: false
+      required: true
+      type: boolean
+    - name: efi
+      description: Enable Secure Boot for the VM
+      default: false
+      required: true
+      type: boolean
+    - name: bridge_network
+      description: Use bridge networking for the VM
+      default: false
+      required: true
+      type: boolean
+    - name: prefered_disk_bus
+      description: Preferred disk bus for the VM
+      required: true
+      default: virtio
+      type: select
+      options:
+        - virtio
+    - name: storage_size
+      description: Size of the VM disk
+      required: true
+      default: 2Gi
+      type: string
