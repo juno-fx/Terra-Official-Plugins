@@ -28,15 +28,15 @@ spec:
                 bus: virtio
               name: cloudinitdisk
       volumes:
-      - containerDisk:
-          image: kubevirt/fedora-cloud-container-disk-demo:latest
-        name: containerdisk
-      - name: emptydisk
-        emptyDisk:
-          capacity: "2Gi"
-      - name: cloudinitdisk
-        cloudInitNoCloud:
-          userData: |-
-            #cloud-config
-            password: fedora
-            chpasswd: { expire: False }
+        - name: containerdisk
+          containerDisk:
+            image: kubevirt/fedora-cloud-container-disk-demo:latest
+        - name: emptydisk
+          emptyDisk:
+            capacity: "2Gi"
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            userData: |-
+              #cloud-config
+              password: fedora
+              chpasswd: { expire: False }

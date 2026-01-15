@@ -15,5 +15,5 @@ spec:
     preferredAcpi: {}
     preferredSmm: {}
   firmware:
-    preferredUseEfi: true
-    preferredUseSecureBoot: true
+    preferredUseEfi: false
+    preferredUseSecureBoot: false
