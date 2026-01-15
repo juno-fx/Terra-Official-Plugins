@@ -34,13 +34,15 @@ spec:
           disks:
             - name: containerdisk
               disk:
-                bus: virtio
+                bus: {{ .Values.prefered_disk_bus }}
             - name: emptydisk
               disk:
-                bus: virtio
+                bus: {{ .Values.prefered_disk_bus }}
+            {{ if .Values.cloud_init_enabled }}
             - disk:
-                bus: virtio
+                bus: {{ .Values.prefered_disk_bus }}
               name: cloudinitdisk
+            {{ end }}
       volumes:
         - name: containerdisk
           dataVolume:
@@ -48,12 +50,11 @@ spec:
         - name: emptydisk
           emptyDisk:
             capacity: {{ .Values.storage_size }}
+        {{ if .Values.cloud_init_enabled }}
         - name: cloudinitdisk
           cloudInitNoCloud:
-            userData: |-
-              #cloud-config
-              password: fedora
-              chpasswd: { expire: False }
+            userData: {{ .Values.cloud_init_user_data | nindent 12 }}
+        {{ end }}
 
   dataVolumeTemplates:
   - metadata:

@@ -47,3 +47,16 @@ data:
       required: true
       default: 2Gi
       type: string
+    - name: use_cloud_init
+      description: Enable Cloud-Init for the VM
+      default: false
+      required: true
+      type: boolean
+    - name: cloud_init
+      description: Cloud-Init user data
+      required: true
+      type: multi-line
+      default: |-
+        #cloud-config
+        password: fedora
+        chpasswd: { expire: False }
