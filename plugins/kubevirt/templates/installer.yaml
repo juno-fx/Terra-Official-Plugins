@@ -17,6 +17,7 @@ spec:
       repoURL: https://github.com/juno-fx/Terra-Official-Plugins.git
       targetRevision: main
       helm:
+        releaseName: kubevirt
         values: |
           nestedVirtualization: {{ .Values.nested_virtualization }}
 
