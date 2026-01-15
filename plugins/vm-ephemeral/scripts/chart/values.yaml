@@ -30,7 +30,6 @@ bridge_network: false
 storage_size: "2Gi"
 iso_url: "https://download.fedoraproject.org/pub/fedora/linux/releases/38/Workstation/x86_64/iso/Fedora-Workstation-Live-x86_64-38-1.6.iso"
 iso_storage_size: "2Gi"
-iso_name: "fedora-38-workstation-live"
 cloud_init: |-
   #cloud-config
   password: fedora

@@ -32,9 +32,10 @@ spec:
               bridge: {}
             {{ end }}
           disks:
-            - name: containerdisk
-              disk:
-                bus: {{ .Values.prefered_disk_bus }}
+            - name: iso
+              cdrom:
+                readOnly: true
+                bus: sata
             - name: emptydisk
               disk:
                 bus: {{ .Values.prefered_disk_bus }}
@@ -44,7 +45,7 @@ spec:
               name: cloudinitdisk
             {{ end }}
       volumes:
-        - name: containerdisk
+        - name: iso
           dataVolume:
             name: "{{ .Values.iso_name }}"
         - name: emptydisk
@@ -59,7 +60,7 @@ spec:
 
   dataVolumeTemplates:
   - metadata:
-      name: "{{ .Values.iso_name }}"
+      name: "{{ .Values.name }}"
     spec:
       storage:
         resources:
