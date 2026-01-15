@@ -38,7 +38,7 @@ spec:
             - name: emptydisk
               disk:
                 bus: {{ .Values.prefered_disk_bus }}
-            {{ if .Values.cloud_init_enabled }}
+            {{ if .Values.use_cloud_init }}
             - disk:
                 bus: {{ .Values.prefered_disk_bus }}
               name: cloudinitdisk
@@ -50,10 +50,10 @@ spec:
         - name: emptydisk
           emptyDisk:
             capacity: {{ .Values.storage_size }}
-        {{ if .Values.cloud_init_enabled }}
+        {{ if .Values.use_cloud_init }}
         - name: cloudinitdisk
           cloudInitNoCloud:
-            userData: {{ .Values.cloud_init_user_data | nindent 12 }}
+            userData: {{ .Values.cloud_init | nindent 12 }}
         {{ end }}
 
   dataVolumeTemplates:
