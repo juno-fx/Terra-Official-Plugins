@@ -53,7 +53,8 @@ spec:
         {{ if .Values.use_cloud_init }}
         - name: cloudinitdisk
           cloudInitNoCloud:
-            userData: {{ .Values.cloud_init | nindent 12 }}
+            userData: |-
+              {{ .Values.cloud_init | nindent 14 }}
         {{ end }}
 
   dataVolumeTemplates:
