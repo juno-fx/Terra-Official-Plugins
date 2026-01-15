@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: "{{ .Values.name }}"-console
+  name: {{ .Values.name }}-console
   labels:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
 spec:
@@ -9,13 +9,13 @@ spec:
   revisionHistoryLimit: 0
   selector:
     matchLabels:
-      app: "{{ .Values.name }}"-console
+      app: {{ .Values.name }}-console
   template:
     metadata:
       labels:
-        app: "{{ .Values.name }}"-console
+        app: {{ .Values.name }}-console
     spec:
-      serviceAccountName: "{{ .Values.name }}"-console
+      serviceAccountName: {{ .Values.name }}-console
       containers:
         - name: kubevirt-console
           image: junoinnovations/kubevirt-console:unstable
