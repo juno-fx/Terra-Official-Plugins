@@ -54,7 +54,7 @@ data:
       type: boolean
     - name: cloud_init
       description: Cloud-Init user data
-      required: true
+      required: false
       type: multi-line
       default: |-
         #cloud-config
