@@ -16,8 +16,10 @@ spec:
     - path: plugins/kubevirt/releases/{{ .Values.version }}/
       repoURL: https://github.com/juno-fx/Terra-Official-Plugins.git
       targetRevision: main
-      directory:
-        recurse: true
+      helm:
+        releaseName: kubevirt
+        values: |
+          nested_virtualization: {{ .Values.nested_virtualization }}
 
   syncPolicy:
     automated:

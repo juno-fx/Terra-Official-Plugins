@@ -8,7 +8,16 @@ spec:
   certificateRotateStrategy: {}
   configuration:
     developerConfiguration:
-      featureGates: []
+      featureGates:
+        - LiveMigration
+        - ExpandDisks
+        - HostDevices
+        - Snapshot
+        - VMExport
+        - HotplugVolumes
+        - HostDisk
+        - DecentralizedLiveMigration
+      useEmulation: {{ .Values.nested_virtualization }}
     imagePullPolicy: IfNotPresent
   customizeComponents: {}
   imagePullPolicy: IfNotPresent
