@@ -46,7 +46,7 @@ spec:
       volumes:
         - name: iso
           dataVolume:
-            name: "{{ .Values.iso_name }}"
+            name: "{{ .Values.name }}"
         - name: emptydisk
           emptyDisk:
             capacity: {{ .Values.storage_size }}
