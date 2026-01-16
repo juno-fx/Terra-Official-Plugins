@@ -1,0 +1,79 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: "{{ .Values.name }}"
+spec:
+  instancetype:
+    name: "{{ .Values.name }}"
+    kind: virtualMachineInstancetype
+  preference:
+    name: "{{ .Values.name }}"
+    kind: virtualMachinePreference
+  runStrategy: Always
+  template:
+    metadata:
+      labels:
+        kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+    spec:
+      networks:
+        - name: default
+          pod: {}
+        {{ if .Values.bridge_network }}
+        - name: bridge
+          bridge: {}
+        {{ end }}
+      domain:
+        devices:
+          interfaces:
+            - name: default
+              masquerade: {}
+            {{ if .Values.bridge_network }}
+            - name: bridge
+              bridge: {}
+            {{ end }}
+          disks:
+            - name: iso
+              cdrom:
+                bus: sata
+            - name: data
+              disk:
+                bus: sata
+            {{ if .Values.use_cloud_init }}
+            - disk:
+                bus: {{ .Values.prefered_disk_bus }}
+              name: cloudinitdisk
+            {{ end }}
+      volumes:
+        - name: iso
+          dataVolume:
+            name: "{{ .Values.name }}"
+        - name: data
+          dataVolume:
+            name: "{{ .Values.name }}-data"
+        {{ if .Values.use_cloud_init }}
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            userData: |-
+              {{ .Values.cloud_init | nindent 14 }}
+        {{ end }}
+
+  dataVolumeTemplates:
+  - metadata:
+      name: "{{ .Values.name }}"
+    spec:
+      storage:
+        resources:
+          requests:
+            storage: {{ .Values.iso_storage_size }}
+      source:
+        http:
+          url: {{ .Values.iso_url }}
+  - metadata:
+      name: "{{ .Values.name }}-data"
+    spec:
+      source:
+        blank: {}
+      storage:
+        resources:
+          requests:
+            storage: {{ .Values.storage_size }}
