@@ -35,7 +35,7 @@ spec:
             - name: iso
               cdrom:
                 bus: sata
-            - name: emptydisk
+            - name: data
               disk:
                 bus: sata
             {{ if .Values.use_cloud_init }}
@@ -47,9 +47,9 @@ spec:
         - name: iso
           dataVolume:
             name: "{{ .Values.name }}"
-        - name: emptydisk
-          emptyDisk:
-            capacity: {{ .Values.storage_size }}
+        - name: data
+          dataVolume:
+            name: "{{ .Values.name }}-data"
         {{ if .Values.use_cloud_init }}
         - name: cloudinitdisk
           cloudInitNoCloud:
@@ -68,3 +68,10 @@ spec:
       source:
         http:
           url: {{ .Values.iso_url }}
+  - metadata:
+      name: "{{ .Values.name }}-data"
+    spec:
+      storage:
+        resources:
+          requests:
+            storage: {{ .Values.storage_size }}
