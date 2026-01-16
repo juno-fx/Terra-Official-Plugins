@@ -71,6 +71,8 @@ spec:
   - metadata:
       name: "{{ .Values.name }}-data"
     spec:
+      source:
+        blank: {}
       storage:
         resources:
           requests:
