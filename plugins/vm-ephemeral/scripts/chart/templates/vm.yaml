@@ -30,9 +30,9 @@ spec:
         {{ end }}
         devices:
           {{ if .Values.gpu }}
-            gpus:
-              - name: gpu0
-                deviceName: "{{ .Values.gpu_device_name }}"
+          gpus:
+            - name: gpu0
+              deviceName: "{{ .Values.gpu_device_name }}"
           {{ end }}
           interfaces:
             - name: default
