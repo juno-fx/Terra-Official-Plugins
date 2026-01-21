@@ -35,3 +35,4 @@ cloud_init: |-
   password: fedora
   chpasswd: { expire: False }
 use_cloud_init: false
+gpu_device_name: ""

@@ -10,6 +10,9 @@ data:
   fields: |
     - name: icon
       default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/vm-ephemeral/scripts/assets/logo.png"
+    - name: gpu_device_name
+      required: false
+      type: string
     - name: iso_storage_size
       required: true
       default: "2Gi"
