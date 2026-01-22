@@ -8,6 +8,6 @@ metadata:
     kuiper.juno-innovations.com/kuiper-instance: {{ .Values.name }}
 spec:
   cpu:
-    guest: "{{ .Values.cpu }}000"
+    guest: {{ .Values.cpu }}000
   memory:
     guest: "{{ .Values.memory }}"
