@@ -42,6 +42,9 @@ spec:
               bridge: {}
             {{ end }}
           disks:
+            - name: virtio
+              cdrom:
+                bus: sata
             - name: iso
               cdrom:
                 bus: sata
@@ -54,6 +57,9 @@ spec:
               name: cloudinitdisk
             {{ end }}
       volumes:
+        - name: virtio
+          containerDisk:
+            image: kubevirt/virtio-container-disk
         - name: iso
           dataVolume:
             name: "{{ .Values.name }}"
