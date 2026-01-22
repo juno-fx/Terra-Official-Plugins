@@ -17,18 +17,18 @@ spec:
           pod: {}
       domain:
         cpu:
-          cores: "{{ .Values.cpu }}"
+          cores: {{ .Values.cpu }}
         memory:
           guest: "{{ .Values.memory }}"
         resources:
           requests:
-            cpu: "{{ .Values.cpu }}"
+            cpu: {{ .Values.cpu }}
             memory: "{{ .Values.memory }}"
             {{ if .Values.gpu }}
             {{ .Values.gpu_device_name }}: 1
             {{ end }}
           limits:
-            cpu: "{{ .Values.cpu }}"
+            cpu: {{ .Values.cpu }}
             memory: "{{ .Values.memory }}"
         devices:
           {{ if .Values.gpu }}
