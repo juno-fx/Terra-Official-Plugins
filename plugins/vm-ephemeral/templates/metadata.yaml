@@ -18,7 +18,7 @@ data:
       default: "2Gi"
       type: string
     - name: iso_url
-      default: "https://download.fedoraproject.org/pub/fedora/linux/releases/38/Workstation/x86_64/iso/Fedora-Workstation-Live-x86_64-38-1.6.iso"
+      required: true
     - name: secure_boot
       description: Enable Secure Boot for the VM
       default: false
@@ -59,3 +59,7 @@ data:
         #cloud-config
         password: fedora
         chpasswd: { expire: False }
+    - name: datavolume
+      description: dataVolume test
+      required: false
+      type: dataVolume
