@@ -73,6 +73,8 @@ spec:
     {{ if .Values.virtio_drivers }}
     - metadata:
         name: "{{ .Values.name }}-virtio-drivers"
+        labels:
+          kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
       spec:
         storage:
           accessModes:
@@ -86,6 +88,8 @@ spec:
     {{ end }}
     - metadata:
         name: "{{ .Values.name }}"
+        labels:
+          kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
       spec:
         storage:
           accessModes:
@@ -98,6 +102,8 @@ spec:
             url: {{ .Values.iso_url }}
     - metadata:
         name: "{{ .Values.name }}-data"
+        labels:
+          kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
       spec:
         source:
           blank: {}
