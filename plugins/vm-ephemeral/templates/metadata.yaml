@@ -59,7 +59,12 @@ data:
         #cloud-config
         password: fedora
         chpasswd: { expire: False }
-    - name: datavolume
-      description: dataVolume test
+    - name: volumes
+      description: List of target volumes to attach to the VM
       required: false
-      type: dataVolume
+      type: list
+      fields:
+        - name: datavolume
+          description: dataVolume test
+          required: false
+          type: dataVolume
