@@ -18,10 +18,6 @@ spec:
       networks:
         - name: default
           pod: {}
-        {{ if .Values.bridge_network }}
-        - name: bridge
-          bridge: {}
-        {{ end }}
       domain:
         {{ if .Values.gpu }}
         resources:
@@ -37,17 +33,15 @@ spec:
           interfaces:
             - name: default
               masquerade: {}
-            {{ if .Values.bridge_network }}
-            - name: bridge
-              bridge: {}
-            {{ end }}
           disks:
-            - name: virtio
-              cdrom:
-                bus: sata
             - name: iso
               cdrom:
                 bus: sata
+            {{ if .Values.virtio_drivers }}
+            - name: virtio
+              cdrom:
+                bus: sata
+            {{ end }}
             - name: data
               disk:
                 bus: sata
@@ -57,9 +51,11 @@ spec:
               name: cloudinitdisk
             {{ end }}
       volumes:
+        {{ if .Values.virtio_drivers }}
         - name: virtio
-          containerDisk:
-            image: kubevirt/virtio-container-disk
+          dataVolume:
+            name: "{{ .Values.name }}-virtio-drivers"
+        {{ end }}
         - name: iso
           dataVolume:
             name: "{{ .Values.name }}"
@@ -74,26 +70,40 @@ spec:
         {{ end }}
 
   dataVolumeTemplates:
-  - metadata:
-      name: "{{ .Values.name }}"
-    spec:
-      storage:
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: {{ .Values.iso_storage_size }}
-      source:
-        http:
-          url: {{ .Values.iso_url }}
-  - metadata:
-      name: "{{ .Values.name }}-data"
-    spec:
-      source:
-        blank: {}
-      storage:
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: {{ .Values.storage_size }}
+    {{ if .Values.virtio_drivers }}
+    - metadata:
+        name: "{{ .Values.name }}-virtio-drivers"
+      spec:
+        storage:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+        source:
+          http:
+            url: https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/virtio-win.iso
+    {{ end }}
+    - metadata:
+        name: "{{ .Values.name }}"
+      spec:
+        storage:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: {{ .Values.iso_storage_size }}
+        source:
+          http:
+            url: {{ .Values.iso_url }}
+    - metadata:
+        name: "{{ .Values.name }}-data"
+      spec:
+        source:
+          blank: {}
+        storage:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: {{ .Values.storage_size }}

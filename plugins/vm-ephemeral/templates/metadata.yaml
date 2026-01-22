@@ -29,10 +29,10 @@ data:
       default: false
       required: true
       type: boolean
-    - name: bridge_network
-      description: Use bridge networking for the VM
+    - name: virtio_drivers
+      description: Mount VirtIO drivers ISO to the VM
       default: false
-      required: true
+      required: false
       type: boolean
     - name: prefered_disk_bus
       description: Preferred disk bus for the VM

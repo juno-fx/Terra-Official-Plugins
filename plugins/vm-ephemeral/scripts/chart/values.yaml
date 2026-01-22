@@ -36,3 +36,4 @@ cloud_init: |-
   chpasswd: { expire: False }
 use_cloud_init: false
 gpu_device_name: ""
+virtio_drivers: false
