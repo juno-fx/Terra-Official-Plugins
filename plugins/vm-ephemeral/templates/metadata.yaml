@@ -13,15 +13,6 @@ data:
     - name: gpu_device_name
       required: false
       type: string
-    - name: volumes
-      description: List of target volumes to attach to the VM
-      required: false
-      type: list
-      fields:
-        - name: datavolume
-          description: dataVolume test
-          required: false
-          type: dataVolume
     - name: iso_storage_size
       required: true
       default: "2Gi"
