@@ -59,3 +59,12 @@ data:
         #cloud-config
         password: fedora
         chpasswd: { expire: False }
+    - name: volumes
+      description: Volume mount list for the VM.
+      required: false
+      type: list
+      fields:
+        - name: volume
+          description: Volume to mount
+          required: false
+          type: dataVolume
