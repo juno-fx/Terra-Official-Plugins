@@ -39,7 +39,13 @@ gpu_device_name: ""
 virtio_drivers: false
 
 mounts:
-  - volume:
-      name: test
-      storage_size: 5Gi
-      type: blank
+- volume:
+    name: test
+    storage_size: 5Gi
+    type: blank
+- volume:
+    iso_url: asdfasdf
+    name: asdf
+    storage_size: 1Gi
+    type: http
+
