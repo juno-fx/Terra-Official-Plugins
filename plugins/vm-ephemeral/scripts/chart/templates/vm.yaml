@@ -92,25 +92,6 @@ spec:
           http:
             url: https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/virtio-win.iso
     {{ end }}
-{{/*    {{- range .Values.mounts }}*/}}
-{{/*    {{- if ne .volume.type "none" }}*/}}
-{{/*    - metadata:*/}}
-{{/*        name: "{{ $.Values.name }}-{{ .volume.name }}"*/}}
-{{/*        labels:*/}}
-{{/*          kuiper.juno-innovations.com/kuiper-instance: "{{ $.Values.name }}"*/}}
-{{/*      spec:*/}}
-{{/*        storage:*/}}
-{{/*          accessModes:*/}}
-{{/*            - ReadWriteOnce*/}}
-{{/*          resources:*/}}
-{{/*            requests:*/}}
-{{/*              storage: {{ .volume.storage_size }}*/}}
-{{/*        {{ if eq .volume.type "blank" }}*/}}
-{{/*        source:*/}}
-{{/*          blank: {}*/}}
-{{/*        {{ end }}*/}}
-{{/*    {{- end }}*/}}
-{{/*    {{ end }}*/}}
     - metadata:
         name: "{{ .Values.name }}"
         labels:
