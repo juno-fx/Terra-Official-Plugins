@@ -1,4 +1,4 @@
-name: helios
+name: vm-ephemeral
 user:
 repo:
 tag:
@@ -23,13 +23,12 @@ env:
 selector:
 plugins: []
 _kuiper:
+
+# VM Specific Values
 secure_boot: false
 efi: false
 prefered_disk_bus: virtio
 bridge_network: false
-storage_size: "2Gi"
-iso_url:
-iso_storage_size: "2Gi"
 cloud_init: |-
   #cloud-config
   password: fedora
@@ -39,13 +38,19 @@ gpu_device_name: ""
 virtio_drivers: false
 
 mounts:
-- volume:
-    name: test
-    storage_size: 5Gi
-    type: blank
-- volume:
-    iso_url: asdfasdf
-    name: asdf
-    storage_size: 1Gi
-    type: http
+  - volume:
+      name: test
+      storage_size: 5Gi
+      type: blank
+  - volume:
+      iso_url: asdfasdf
+      name: asdf
+      storage_size: 1Gi
+      type: http
+  - volume:
+      name: debian-base
+      namespace: tdk
+      storage_size: 15Gi
+      type: clone
+
 

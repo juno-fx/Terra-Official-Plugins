@@ -40,34 +40,53 @@ spec:
             - name: default
               masquerade: {}
           disks:
-            - name: iso
+            {{ range .Values.mounts }}
+            {{- if eq .volume.type "blank" }}
+            - name: "{{ .volume.name }}"
+              disk:
+                bus: sata
+            {{- end }}
+            {{- if eq .volume.type "http" }}
+            - name: "{{ .volume.name }}"
               cdrom:
                 bus: sata
+            {{- end }}
+            {{- if eq .volume.type "clone" }}
+            - name: "{{ .volume.name }}"
+              disk:
+                bus: sata
+            {{- end }}
+            {{ end }}
+
+
             {{ if .Values.virtio_drivers }}
             - name: virtio
               cdrom:
                 bus: sata
             {{ end }}
-            - name: data
-              disk:
-                bus: sata
+
+
             {{ if .Values.use_cloud_init }}
             - disk:
                 bus: {{ .Values.prefered_disk_bus }}
               name: cloudinitdisk
             {{ end }}
+
       volumes:
+        {{ range .Values.mounts }}
+        - name: "{{ .volume.name }}"
+          dataVolume:
+            name: "{{ $.Values.name }}-{{ .volume.name }}"
+        {{ end }}
+
+
         {{ if .Values.virtio_drivers }}
         - name: virtio
           dataVolume:
             name: "{{ .Values.name }}-virtio-drivers"
         {{ end }}
-        - name: iso
-          dataVolume:
-            name: "{{ .Values.name }}"
-        - name: data
-          dataVolume:
-            name: "{{ .Values.name }}-data"
+
+
         {{ if .Values.use_cloud_init }}
         - name: cloudinitdisk
           cloudInitNoCloud:
@@ -76,6 +95,58 @@ spec:
         {{ end }}
 
   dataVolumeTemplates:
+    {{ range .Values.mounts }}
+    {{- if eq .volume.type "blank" }}
+    - metadata:
+        name: "{{ $.Values.name }}-{{ .volume.name }}"
+        labels:
+          kuiper.juno-innovations.com/kuiper-instance: "{{ $.Values.name }}"
+      spec:
+        source:
+          blank: {}
+        storage:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: {{ .volume.storage_size }}
+    {{- end }}
+    {{- if eq .volume.type "http" }}
+    - metadata:
+        name: "{{ $.Values.name }}-{{ .volume.name }}"
+        labels:
+          kuiper.juno-innovations.com/kuiper-instance: "{{ $.Values.name }}"
+      spec:
+        storage:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: {{ .volume.storage_size }}
+        source:
+          http:
+            url: {{ .volume.iso_url }}
+    {{- end }}
+    {{- if eq .volume.type "clone" }}
+    - metadata:
+        name: "{{ $.Values.name }}-{{ .volume.name }}"
+        labels:
+          kuiper.juno-innovations.com/kuiper-instance: "{{ $.Values.name }}"
+      spec:
+        storage:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: "{{ .volume.storage_size }}Gi"
+        source:
+          pvc:
+            name: {{ .volume.name }}
+            namespace: {{ .volume.namespace | default $.Values.name }}
+    {{- end }}
+    {{ end }}
+
+
     {{ if .Values.virtio_drivers }}
     - metadata:
         name: "{{ .Values.name }}-virtio-drivers"
@@ -92,30 +163,3 @@ spec:
           http:
             url: https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/virtio-win.iso
     {{ end }}
-    - metadata:
-        name: "{{ .Values.name }}"
-        labels:
-          kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
-      spec:
-        storage:
-          accessModes:
-            - ReadWriteOnce
-          resources:
-            requests:
-              storage: {{ .Values.iso_storage_size }}
-        source:
-          http:
-            url: {{ .Values.iso_url }}
-    - metadata:
-        name: "{{ .Values.name }}-data"
-        labels:
-          kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
-      spec:
-        source:
-          blank: {}
-        storage:
-          accessModes:
-            - ReadWriteOnce
-          resources:
-            requests:
-              storage: {{ .Values.storage_size }}

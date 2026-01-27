@@ -13,12 +13,6 @@ data:
     - name: gpu_device_name
       required: false
       type: string
-    - name: iso_storage_size
-      required: true
-      default: "2Gi"
-      type: string
-    - name: iso_url
-      required: true
     - name: secure_boot
       description: Enable Secure Boot for the VM
       default: false
@@ -41,24 +35,6 @@ data:
       type: select
       options:
         - virtio
-    - name: storage_size
-      description: Size of the VM disk
-      required: true
-      default: 2Gi
-      type: string
-    - name: use_cloud_init
-      description: Enable Cloud-Init for the VM
-      default: false
-      required: true
-      type: boolean
-    - name: cloud_init
-      description: Cloud-Init user data
-      required: false
-      type: multi-line
-      default: |-
-        #cloud-config
-        password: fedora
-        chpasswd: { expire: False }
     - name: mounts
       description: Volume mount list for the VM.
       required: false
