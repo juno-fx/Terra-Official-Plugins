@@ -29,3 +29,6 @@ data:
       type: string
       required: true
       default: "latest"
+    - name: icon
+      description: icon
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/lsio-webtop/scripts/assets/logo.png"
