@@ -35,7 +35,8 @@ spec:
         # hardware
         devices:
           # audio/video
-          sound: {}
+          sound:
+            model: ac97
           video:
             type: virtio
           {{ if .Values.gpu }}
