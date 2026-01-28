@@ -18,6 +18,8 @@ spec:
       domain:
         # requests
         cpu:
+          dedicatedCpuPlacement: true
+          model: "host-passthrough"
           cores: {{ .Values.cpu }}
         memory:
           guest: "{{ .Values.memory }}"
@@ -38,8 +40,6 @@ spec:
           sound:
             model: ich9
             name: sound0
-          video:
-            type: virtio
           {{ if .Values.gpu }}
           gpus:
             - name: gpu0
