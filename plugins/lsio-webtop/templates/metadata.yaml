@@ -18,7 +18,7 @@ data:
       description: "Registry to pull the image from"
       type: string
       required: true
-      default="lscr.io/linuxserver"
+      default: "lscr.io/linuxserver"
     - name: repo
       description: "Repository to pull the image from"
       type: string
