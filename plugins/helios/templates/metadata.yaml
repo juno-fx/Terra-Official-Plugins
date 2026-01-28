@@ -28,4 +28,4 @@ data:
       description: "Tag to pull the image from"
       type: string
       required: true
-      default="unstable-rocky-9"
+      default: "unstable-rocky-9"
