@@ -14,15 +14,21 @@ data:
       description: icon
       default: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/web-ide/scripts/assets/logo.png
     - name: registry
-      description: Registry to pull from
+      description: Registry to pull the image from
+      type: string
+      required: true
       default: lscr.io
     - name: repo
-      description: Repo to pull from
+      description: Repository to pull the image from
+      type: string
+      required: true
       default: linuxserver/code-server
     - name: tag
-      description: Tag to pull from
+      description: Tag to pull the image from
+      type: string
+      required: true
       default: latest
     - name: packages
       description: Additional packages to install. You can use spaces " " to install multiples.
       required: false
-      default: python3 python3-venv 
+      default: python3 python3-venv

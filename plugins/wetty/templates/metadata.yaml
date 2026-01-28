@@ -11,10 +11,19 @@ data:
   description: "Wetty terminal"
   fields: |
     - name: registry
+      description: "Registry to pull the image from"
+      type: string
+      required: true
       default: "wettyoss"
     - name: repo
+      description: "Repository to pull the image from"
+      type: string
+      required: true
       default: "wetty"
     - name: tag
+      description: "Tag to pull the image from"
+      type: string
+      required: true
       default: "latest"
     - name: icon
       default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/wetty/scripts/assets/logo.png"
