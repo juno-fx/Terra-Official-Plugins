@@ -10,4 +10,22 @@ data:
   fields: |
     - name: icon
       default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios/scripts/assets/helios-icon.png"
-
+    - name: gpu
+      description: "Use a GPU"
+      type: boolean
+      required: true
+    - name: registry
+      description: "Registry to pull the image from"
+      type: string
+      required: true
+      default="junoinnovations"
+    - name: repo
+      description: "Repository to pull the image from"
+      type: string
+      required: true
+      default="helios"
+    - name: tag
+      description: "Tag to pull the image from"
+      type: string
+      required: true
+      default="unstable-rocky-9"
