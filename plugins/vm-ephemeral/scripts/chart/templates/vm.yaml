@@ -16,6 +16,7 @@ spec:
         - name: default
           pod: {}
       domain:
+        # requests
         cpu:
           cores: {{ .Values.cpu }}
         memory:
@@ -30,15 +31,25 @@ spec:
           limits:
             cpu: {{ .Values.cpu }}
             memory: "{{ .Values.memory }}"
+
+        # hardware
         devices:
+          # audio/video
+          sound: {}
+          video:
+            type: virtio
           {{ if .Values.gpu }}
           gpus:
             - name: gpu0
               deviceName: "{{ .Values.gpu_device_name }}"
           {{ end }}
+
+          # networking
           interfaces:
             - name: default
               masquerade: {}
+
+          # storage
           disks:
             {{ range .Values.mounts }}
             {{- if eq .volume.type "blank" }}

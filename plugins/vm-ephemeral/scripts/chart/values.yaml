@@ -50,7 +50,7 @@ mounts:
   - volume:
       name: debian-base
       namespace: tdk
-      storage_size: 15Gi
+      storage_size: "15"
       type: clone
 
 
