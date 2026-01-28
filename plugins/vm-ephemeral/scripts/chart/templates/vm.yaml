@@ -36,7 +36,7 @@ spec:
         devices:
           # audio/video
           sound:
-            model: ac97
+            model: ich9
             name: sound0
           video:
             type: virtio
