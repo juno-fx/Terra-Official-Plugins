@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-terra-metadata"
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+data:
+  chart: "{{ .Release.Name }}-scripts-configmap"
+  description: "KubeVirt compatible ephemeral VM"
+  fields: |
+    - name: icon
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/vm-ephemeral/scripts/assets/logo.png"
+    - name: gpu_device_name
+      required: false
+      type: string
+    - name: secure_boot
+      description: Enable Secure Boot for the VM
+      default: false
+      required: true
+      type: boolean
+    - name: efi
+      description: Enable Secure Boot for the VM
+      default: false
+      required: true
+      type: boolean
+    - name: virtio_drivers
+      description: Mount VirtIO drivers ISO to the VM
+      default: false
+      required: false
+      type: boolean
+    - name: prefered_disk_bus
+      description: Preferred disk bus for the VM
+      required: true
+      default: virtio
+      type: select
+      options:
+        - virtio
+    - name: mounts
+      description: Volume mount list for the VM.
+      required: false
+      type: list
+      fields:
+        - name: volume
+          description: Volume to mount
+          required: false
+          type: dataVolume

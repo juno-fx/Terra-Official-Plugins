@@ -1,3 +1,0 @@
-apiVersion: v1
-name: kubevirt-iso-importer
-version: 0.0.1

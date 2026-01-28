@@ -15,7 +15,7 @@ spec:
   sources:
     - path: plugins/kubevirt/releases/{{ .Values.version }}/
       repoURL: https://github.com/juno-fx/Terra-Official-Plugins.git
-      targetRevision: main
+      targetRevision: 448-generic-ephemeral-vm  # TODO: Update to latest tag when releasing new version
       helm:
         releaseName: kubevirt
         values: |
