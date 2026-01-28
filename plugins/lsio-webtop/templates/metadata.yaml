@@ -23,9 +23,9 @@ data:
       description: "Repository to pull the image from"
       type: string
       required: true
-      default="chrome"
+      default: "chrome"
     - name: tag
       description: "Tag to pull the image from"
       type: string
       required: true
-      default="latest"
+      default: "latest"
