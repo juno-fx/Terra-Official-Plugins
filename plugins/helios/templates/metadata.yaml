@@ -23,7 +23,7 @@ data:
       description: "Repository to pull the image from"
       type: string
       required: true
-      default="helios"
+      default"helios"
     - name: tag
       description: "Tag to pull the image from"
       type: string
