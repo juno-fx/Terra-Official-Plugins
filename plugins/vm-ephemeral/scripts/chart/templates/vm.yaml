@@ -18,8 +18,8 @@ spec:
       domain:
         # requests
         cpu:
-          dedicatedCpuPlacement: true
-          model: "host-passthrough"
+          # dedicatedCpuPlacement: true
+          # model: "host-passthrough"
           cores: {{ .Values.cpu }}
         memory:
           guest: "{{ .Values.memory }}"
@@ -37,9 +37,9 @@ spec:
         # hardware
         devices:
           # audio/video
-          sound:
-            model: ich9
-            name: sound0
+          #sound:
+          #  model: ich9
+          #  name: sound0
           {{ if .Values.gpu }}
           gpus:
             - name: gpu0
@@ -114,8 +114,6 @@ spec:
         name: "{{ $.Values.name }}-{{ .volume.name }}"
         labels:
           kuiper.juno-innovations.com/kuiper-instance: "{{ $.Values.name }}"
-        annotations:
-          cdi.kubevirt.io/storage.bind.immediate.requested: "true"
       spec:
         source:
           blank: {}
@@ -131,8 +129,6 @@ spec:
         name: "{{ $.Values.name }}-{{ .volume.name }}"
         labels:
           kuiper.juno-innovations.com/kuiper-instance: "{{ $.Values.name }}"
-        annotations:
-          cdi.kubevirt.io/storage.bind.immediate.requested: "true"
       spec:
         storage:
           accessModes:
@@ -149,8 +145,6 @@ spec:
         name: "{{ $.Values.name }}-{{ .volume.name }}"
         labels:
           kuiper.juno-innovations.com/kuiper-instance: "{{ $.Values.name }}"
-        annotations:
-          cdi.kubevirt.io/storage.bind.immediate.requested: "true"
       spec:
         storage:
           accessModes:
@@ -171,8 +165,6 @@ spec:
         name: "{{ .Values.name }}-virtio-drivers"
         labels:
           kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
-        annotations:
-          cdi.kubevirt.io/storage.bind.immediate.requested: "true"
       spec:
         storage:
           accessModes:
