@@ -114,6 +114,8 @@ spec:
         name: "{{ $.Values.name }}-{{ .volume.name }}"
         labels:
           kuiper.juno-innovations.com/kuiper-instance: "{{ $.Values.name }}"
+        annotations:
+          cdi.kubevirt.io/storage.bind.immediate.requested: "true"
       spec:
         source:
           blank: {}
@@ -129,6 +131,8 @@ spec:
         name: "{{ $.Values.name }}-{{ .volume.name }}"
         labels:
           kuiper.juno-innovations.com/kuiper-instance: "{{ $.Values.name }}"
+        annotations:
+          cdi.kubevirt.io/storage.bind.immediate.requested: "true"
       spec:
         storage:
           accessModes:
@@ -145,6 +149,8 @@ spec:
         name: "{{ $.Values.name }}-{{ .volume.name }}"
         labels:
           kuiper.juno-innovations.com/kuiper-instance: "{{ $.Values.name }}"
+        annotations:
+          cdi.kubevirt.io/storage.bind.immediate.requested: "true"
       spec:
         storage:
           accessModes:
@@ -165,6 +171,8 @@ spec:
         name: "{{ .Values.name }}-virtio-drivers"
         labels:
           kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+        annotations:
+          cdi.kubevirt.io/storage.bind.immediate.requested: "true"
       spec:
         storage:
           accessModes:
