@@ -11,10 +11,19 @@ data:
   description: "Jupyter Notebook"
   fields: |
     - name: registry
+      description: "Registry to pull the image from"
+      type: string
+      required: true
       default: "quay.io/jupyter"
     - name: repo
+      description: "Repository to pull the image from"
+      type: string
+      required: true
       default: "datascience-notebook"
     - name: tag
+      description: "Tag to pull the image from"
+      type: string
+      required: true
       default: "lab-4.4.9"
     - name: icon
       default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/jupyter-notebook/scripts/assets/template-icon.png"
