@@ -55,7 +55,6 @@ mounts:
 ports:
   - name: ssh
     protocol: TCP
-    kube_proxy: false
     service_port: 22
     type: ClusterIP
     vm_port: 22
