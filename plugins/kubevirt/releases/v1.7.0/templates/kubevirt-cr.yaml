@@ -17,6 +17,7 @@ spec:
         - HotplugVolumes
         - HostDisk
         - DecentralizedLiveMigration
+        - VideoConfig
       useEmulation: {{ .Values.nested_virtualization }}
     imagePullPolicy: IfNotPresent
   customizeComponents: {}

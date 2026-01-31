@@ -8,12 +8,12 @@ metadata:
     kuiper.juno-innovations.com/kuiper-instance: {{ .Values.name }}
 spec:
   devices:
-    preferredDiskBus: virtio
+    preferredDiskBus: {{ .Values.prefered_disk_bus }}
     preferredInterfaceModel: virtio
     preferredRng: {}
   features:
     preferredAcpi: {}
     preferredSmm: {}
   firmware:
-    preferredUseEfi: false
-    preferredUseSecureBoot: false
+    preferredUseEfi: {{ .Values.efi }}
+    preferredUseSecureBoot: {{ .Values.secure_boot }}
