@@ -49,11 +49,11 @@ data:
           description: Type of port
           required: true
           type: select
-          default: internal
+          default: ClusterIP
           options:
-            - nodeport
-            - loadbalancer
-            - internal
+            - ClusterIP
+            - NodePort
+            - LoadBalancer
         - name: vm_port
           description: Port number inside the VM
           required: true
