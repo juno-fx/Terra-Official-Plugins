@@ -8,6 +8,11 @@ data:
   chart: "{{ .Release.Name }}-scripts-configmap"
   description: "KubeVirt compatible ephemeral VM"
   fields: |
+    - name: gpu
+      description: "Use a GPU"
+      type: boolean
+      required: true
+      default: false
     - name: icon
       default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/vm-ephemeral/scripts/assets/logo.png"
     - name: gpu_device_name
@@ -40,11 +45,6 @@ data:
       required: false
       type: list
       fields:
-        - name: gpu
-          description: "Use a GPU"
-          type: boolean
-          required: true
-          default: false
         - name: name
           description: Name of the port
           required: true
