@@ -10,6 +10,7 @@ spec:
   template:
     metadata:
       labels:
+        kuiper.juno-innovations.com/vm-instance: "{{ .Values.name }}"
         kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
     spec:
       networks:
@@ -151,7 +152,7 @@ spec:
             - ReadWriteOnce
           resources:
             requests:
-              storage: "{{ .volume.storage_size }}Gi"
+              storage: "{{ .volume.storage_size }}"
         source:
           pvc:
             name: {{ .volume.name }}

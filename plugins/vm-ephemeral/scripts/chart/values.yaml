@@ -52,5 +52,10 @@ mounts:
       namespace: tdk
       storage_size: "15"
       type: clone
-
+ports:
+  - name: ssh
+    protocol: TCP
+    service_port: 22
+    type: ClusterIP
+    vm_port: 22
 
