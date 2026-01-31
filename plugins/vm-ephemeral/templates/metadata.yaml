@@ -44,6 +44,7 @@ data:
           description: Name of the port
           required: true
           type: string
+          default: ssh
         - name: type
           description: Type of port
           required: true
