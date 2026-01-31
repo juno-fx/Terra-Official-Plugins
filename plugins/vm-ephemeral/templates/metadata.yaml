@@ -40,6 +40,11 @@ data:
       required: false
       type: list
       fields:
+        - name: gpu
+          description: "Use a GPU"
+          type: boolean
+          required: true
+          default: false
         - name: name
           description: Name of the port
           required: true
