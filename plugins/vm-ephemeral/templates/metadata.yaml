@@ -48,6 +48,7 @@ data:
           description: Type of port
           required: true
           type: select
+          default: internal
           options:
             - nodeport
             - loadbalancer
@@ -55,15 +56,18 @@ data:
         - name: vm_port
           description: Port number inside the VM
           required: true
+          default: 22
           type: int
         - name: service_port
           description: Port number to expose outside the VM
           required: true
+          default: 22
           type: int
         - name: protocol
           description: Protocol for the port
           required: true
           type: select
+          default: TCP
           options:
             - TCP
             - UDP
