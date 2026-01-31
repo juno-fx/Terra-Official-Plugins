@@ -55,11 +55,11 @@ data:
         - name: vm_port
           description: Port number inside the VM
           required: true
-          type: integer
+          type: int
         - name: service_port
           description: Port number to expose outside the VM
           required: true
-          type: integer
+          type: int
         - name: protocol
           description: Protocol for the port
           required: true
