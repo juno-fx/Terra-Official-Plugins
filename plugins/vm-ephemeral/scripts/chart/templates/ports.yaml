@@ -6,6 +6,10 @@ metadata:
   labels:
       kuiper.juno-innovations.com/kuiper-instance: {{ $.Values.name }}
 spec:
+  {{- if not .kube_proxy }}
+  clusterIP: None
+  sessionAffinity: ClientIP
+  {{- end }}
   type: {{ .type }}
   selector:
     kuiper.juno-innovations.com/vm-instance: {{ $.Values.name }}

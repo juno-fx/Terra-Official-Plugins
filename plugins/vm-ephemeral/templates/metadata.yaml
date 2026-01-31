@@ -50,6 +50,14 @@ data:
           required: true
           type: string
           default: ssh
+        - name: kube_proxy
+          description: |
+            Disable kube-proxy for the port (exposes port directly).
+            This is less secure, but can help with performance. Not
+            all port types support this.
+          required: true
+          type: boolean
+          default: false
         - name: type
           description: Type of port
           required: true
