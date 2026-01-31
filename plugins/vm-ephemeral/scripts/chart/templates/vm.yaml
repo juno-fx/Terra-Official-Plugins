@@ -38,9 +38,8 @@ spec:
         # hardware
         devices:
           # audio/video
-          #sound:
-          #  model: ich9
-          #  name: sound0
+          sound:
+            name: sound0
           {{ if .Values.gpu }}
           gpus:
             - name: gpu0
