@@ -35,6 +35,38 @@ data:
       type: select
       options:
         - virtio
+    - name: ports
+      description: Ports to expose from the VM.
+      required: false
+      type: list
+      fields:
+        - name: name
+          description: Name of the port
+          required: true
+          type: string
+        - name: type
+          description: Type of port
+          required: true
+          type: select
+          options:
+            - nodeport
+            - loadbalancer
+            - internal
+        - name: vm_port
+          description: Port number inside the VM
+          required: true
+          type: integer
+        - name: service_port
+          description: Port number to expose outside the VM
+          required: true
+          type: integer
+        - name: protocol
+          description: Protocol for the port
+          required: true
+          type: select
+          options:
+            - TCP
+            - UDP
     - name: mounts
       description: Volume mount list for the VM.
       required: false
