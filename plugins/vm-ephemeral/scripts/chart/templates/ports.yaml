@@ -6,7 +6,7 @@ metadata:
   labels:
       kuiper.juno-innovations.com/kuiper-instance: {{ $.Values.name }}
 spec:
-  {{- if not .kube_proxy }}
+  {{- if ne .kube_proxy "true" }}
   clusterIP: None
   sessionAffinity: ClientIP
   {{- end }}
