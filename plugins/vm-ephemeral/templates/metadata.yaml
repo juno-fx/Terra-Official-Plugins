@@ -1,0 +1,88 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-terra-metadata"
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+data:
+  chart: "{{ .Release.Name }}-scripts-configmap"
+  description: "KubeVirt compatible ephemeral VM"
+  fields: |
+    - name: gpu
+      description: "Use a GPU"
+      type: boolean
+      required: true
+      default: false
+    - name: icon
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/vm-ephemeral/scripts/assets/logo.png"
+    - name: gpu_device_name
+      required: false
+      type: string
+    - name: secure_boot
+      description: Enable Secure Boot for the VM
+      default: false
+      required: true
+      type: boolean
+    - name: efi
+      description: Enable Secure Boot for the VM
+      default: false
+      required: true
+      type: boolean
+    - name: virtio_drivers
+      description: Mount VirtIO drivers ISO to the VM
+      default: false
+      required: false
+      type: boolean
+    - name: prefered_disk_bus
+      description: Preferred disk bus for the VM
+      required: true
+      default: virtio
+      type: select
+      options:
+        - virtio
+    - name: ports
+      description: Ports to expose from the VM.
+      required: false
+      type: list
+      fields:
+        - name: name
+          description: Name of the port
+          required: true
+          type: string
+          default: ssh
+        - name: type
+          description: Type of port
+          required: true
+          type: select
+          default: ClusterIP
+          options:
+            - ClusterIP
+            - NodePort
+            - LoadBalancer
+        - name: vm_port
+          description: Port number inside the VM
+          required: true
+          default: 22
+          type: int
+        - name: service_port
+          description: Port number to expose outside the VM
+          required: true
+          default: 22
+          type: int
+        - name: protocol
+          description: Protocol for the port
+          required: true
+          type: select
+          default: TCP
+          options:
+            - TCP
+            - UDP
+    - name: mounts
+      description: Volume mount list for the VM.
+      required: false
+      type: list
+      fields:
+        - name: volume
+          description: Volume to mount
+          required: false
+          type: dataVolume

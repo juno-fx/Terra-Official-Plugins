@@ -5,6 +5,8 @@ metadata:
   labels:
     kuiper.juno-innovations.com/kuiper-instance: {{ .Values.name }}
 spec:
+  clusterIP: None
+  sessionAffinity: ClientIP
   selector:
     app: {{ .Values.name }}-console
   ports:

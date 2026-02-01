@@ -1,0 +1,17 @@
+{{ range .Values.ports }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $.Values.name }}-port-{{ .name }}
+  labels:
+      kuiper.juno-innovations.com/kuiper-instance: {{ $.Values.name }}
+spec:
+  type: {{ .type }}
+  selector:
+    kuiper.juno-innovations.com/vm-instance: {{ $.Values.name }}
+  ports:
+    - protocol: {{ .protocol }}
+      port: {{ .vm_port }}
+      targetPort: {{ .service_port }}
+---
+{{ end }}

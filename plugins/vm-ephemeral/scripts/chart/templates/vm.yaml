@@ -1,0 +1,178 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: "{{ .Values.name }}"
+spec:
+  preference:
+    name: "{{ .Values.name }}"
+    kind: virtualMachinePreference
+  runStrategy: Always
+  template:
+    metadata:
+      labels:
+        kuiper.juno-innovations.com/vm-instance: "{{ .Values.name }}"
+        kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+    spec:
+      networks:
+        - name: default
+          pod: {}
+      domain:
+        # requests
+        cpu:
+          # dedicatedCpuPlacement: true
+          # model: "host-passthrough"
+          cores: {{ .Values.cpu }}
+        memory:
+          guest: "{{ .Values.memory }}"
+        resources:
+          requests:
+            cpu: {{ .Values.cpu }}
+            memory: "{{ .Values.memory }}"
+            {{ if .Values.gpu }}
+            {{ .Values.gpu_device_name }}: 1
+            {{ end }}
+          limits:
+            cpu: {{ .Values.cpu }}
+            memory: "{{ .Values.memory }}"
+
+        # hardware
+        devices:
+          # audio/video
+          sound:
+            name: sound0
+          {{ if .Values.gpu }}
+          gpus:
+            - name: gpu0
+              deviceName: "{{ .Values.gpu_device_name }}"
+          {{ end }}
+
+          # networking
+          interfaces:
+            - name: default
+              masquerade: {}
+
+          # storage
+          disks:
+            {{ range .Values.mounts }}
+            {{- if eq .volume.type "blank" }}
+            - name: "{{ .volume.name }}"
+              disk:
+                bus: sata
+            {{- end }}
+            {{- if eq .volume.type "http" }}
+            - name: "{{ .volume.name }}"
+              cdrom:
+                bus: sata
+            {{- end }}
+            {{- if eq .volume.type "clone" }}
+            - name: "{{ .volume.name }}"
+              disk:
+                bus: sata
+            {{- end }}
+            {{ end }}
+
+
+            {{ if .Values.virtio_drivers }}
+            - name: virtio
+              cdrom:
+                bus: sata
+            {{ end }}
+
+
+            {{ if .Values.use_cloud_init }}
+            - disk:
+                bus: {{ .Values.prefered_disk_bus }}
+              name: cloudinitdisk
+            {{ end }}
+
+      volumes:
+        {{ range .Values.mounts }}
+        - name: "{{ .volume.name }}"
+          dataVolume:
+            name: "{{ $.Values.name }}-{{ .volume.name }}"
+        {{ end }}
+
+
+        {{ if .Values.virtio_drivers }}
+        - name: virtio
+          dataVolume:
+            name: "{{ .Values.name }}-virtio-drivers"
+        {{ end }}
+
+
+        {{ if .Values.use_cloud_init }}
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            userData: |-
+              {{ .Values.cloud_init | nindent 14 }}
+        {{ end }}
+
+  dataVolumeTemplates:
+    {{ range .Values.mounts }}
+    {{- if eq .volume.type "blank" }}
+    - metadata:
+        name: "{{ $.Values.name }}-{{ .volume.name }}"
+        labels:
+          kuiper.juno-innovations.com/kuiper-instance: "{{ $.Values.name }}"
+      spec:
+        source:
+          blank: {}
+        storage:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: {{ .volume.storage_size }}
+    {{- end }}
+    {{- if eq .volume.type "http" }}
+    - metadata:
+        name: "{{ $.Values.name }}-{{ .volume.name }}"
+        labels:
+          kuiper.juno-innovations.com/kuiper-instance: "{{ $.Values.name }}"
+      spec:
+        storage:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: {{ .volume.storage_size }}
+        source:
+          http:
+            url: {{ .volume.iso_url }}
+    {{- end }}
+    {{- if eq .volume.type "clone" }}
+    - metadata:
+        name: "{{ $.Values.name }}-{{ .volume.name }}"
+        labels:
+          kuiper.juno-innovations.com/kuiper-instance: "{{ $.Values.name }}"
+      spec:
+        storage:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: "{{ .volume.storage_size }}"
+        source:
+          pvc:
+            name: {{ .volume.name }}
+            namespace: {{ .volume.namespace | default $.Values.name }}
+    {{- end }}
+    {{ end }}
+
+
+    {{ if .Values.virtio_drivers }}
+    - metadata:
+        name: "{{ .Values.name }}-virtio-drivers"
+        labels:
+          kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+      spec:
+        storage:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+        source:
+          http:
+            url: https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/virtio-win.iso
+    {{ end }}
