@@ -23,12 +23,10 @@ for plugin in plugins:
     plugin_name = plugin.split('/')[1]
     plugin_path = f"plugins/{category}/{plugin_name}.md"
     with mkdocs_gen_files.open(plugin_path, "w") as f:
-        if icon:
-            print(f"![icon]({icon})" + '{width="100"}', file=f)
-            print("<br/>", file=f)
-        if description:
-            print(f"<p>{description}</p>", file=f)
-            print("---", file=f)
+        if icon or description:
+            print('|Deployment|About|', file=f)
+            print('|---|---|', file=f)
+            print(f'| ![icon]({icon})' + '{width=100}' + f' | {description} |', file=f)
         print(generate(plugin), file=f)
 
     nav["Plugins", plugin_name] = plugin_path
