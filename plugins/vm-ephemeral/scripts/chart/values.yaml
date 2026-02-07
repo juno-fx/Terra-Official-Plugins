@@ -15,13 +15,8 @@ puid: 0
 host:
 pullSecret:
 session:
-volumeMounts:
-  - name: test
-    mountPath: /test
-volumes:
-  - name: test
-    persistentVolumeClaim:
-      claimName: test-pvc
+volumeMounts: []
+volumes: []
 env:
   - name: JUNO
     value: "true"
