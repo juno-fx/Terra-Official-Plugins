@@ -106,6 +106,7 @@ spec:
           persistentVolumeClaim:
             claimName: {{ .persistentVolumeClaim.claimName }}
         {{- end }}
+        {{- end }}
 
 
         {{ if .Values.virtio_drivers }}
