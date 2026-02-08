@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-terra-metadata
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+  annotations:
+    juno-innovations.com/workload: "Application"  # mark this as a workload and it's type for the
+data:
+  chart: "{{ .Release.Name }}-scripts-configmap"
+  description: "Open WebUI"
+  fields: |
+    - name: registry
+      default: "dyrnq"
+    - name: repo
+      default: "open-webui"
+    - name: tag
+      default: "main-ollama"
+    - name: icon
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/open-webui/scripts/assets/logo.png"
+    - name: gpu
+      default: false
+      type: boolean
