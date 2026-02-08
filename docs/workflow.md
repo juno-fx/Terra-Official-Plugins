@@ -1,6 +1,6 @@
 # Workflow
 
-## Overview
+## Deployment Development
 
 The development workflow is designed to focus on the raw Helm Chart development and then simulate the deployment
 via a local Kubernetes cluster installed with ArgoCD. This allows developers to iterate quickly on their plugins
@@ -77,6 +77,57 @@ locally without needing to deploy to a production environment until they are rea
 9. **Repeat**: Continue making changes and pushing them to the remote branch. ArgoCD will keep your local cluster in sync with the latest changes.
 
 10. **Clean Up**: When you are done testing, you can clean up the local cluster by running:
+
+    <!-- termynal -->
+
+    ```shell
+    $ make down
+    ```
+## Terra Integration Testing
+
+Once your plugin is tested and ready, you can integrate it into Terra by adding it to a Terra repository. 
+Follow the instructions in the [Terra Repositories](./repositories.md) documentation to add your plugin to a 
+repository and make it available for installation through the Terra UI. Once there, you can perform further 
+testing within the Terra environment to ensure compatibility and functionality. You can do this with the 
+following steps:
+
+1. **Clone the Bootstrap Repository**: Start by cloning the Juno Bootstrap repository, which contains the necessary configurations to launch the community version of Orion.
+
+    <!-- termynal -->
+
+    ```shell
+    $ git clone https://github.com/juno-fx/Juno-Bootstrap.git
+    $ cd Juno-Bootstrap
+    ```
+   
+2. **Start the Devbox Environment**: Activate the Devbox shell to ensure all dependencies are available.
+
+    <!-- termynal -->
+
+    ```shell
+    $ devbox shell
+    ```
+
+3. **Launch Orion**: Use the provided Makefile to launch Orion with the community configuration.
+
+    <!-- termynal -->
+
+    ```shell
+    $ make bootstrap
+    ```
+   
+4. **Login to Orion**: Open your web browser and navigate to `https://localhost`. Log in using the default credentials:
+
+    - Email: `test@email.com`
+    - Password: `juno`
+
+5. **Add Your Plugin Repository**: In the Orion UI, navigate to the Terra section and add your plugin repository as a new source. This will allow you to access and install your plugin within Terra.
+
+6. **Install Your Plugin**: Once the repository is added, locate your plugin in the Terra UI and proceed to install it. Follow any prompts to complete the installation process.
+
+7. **Iterate as Needed**: If you need to make changes to your plugin, repeat the development workflow steps to update and test your plugin locally. After making changes, push them to the remote branch, and then refresh the Terra UI to see the updates.
+
+8. **Clean Up**: When you are finished testing, you can stop the Orion instance by running:
 
     <!-- termynal -->
 

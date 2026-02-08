@@ -117,10 +117,12 @@ nav:
     - repositories.md
   - Development:
     - getting-started.md
-    - plugin-types.md
     - workflow.md
-    - workflow-tdk.md
+    - types.md
     - configuration.md
+    - kuiper-annotations.md
+    - fields.md
+    - fields-tutorials.md
     - advanced.md
   - Community:
     - contributing.md
@@ -149,8 +151,12 @@ nav:
     - 'plugins/Rendering Management/*.md'
   - Software Development:
     - 'plugins/Software Development/*.md'
+  - Storage:
+    - 'plugins/Storage/*.md'
   - Utility:
     - 'plugins/Utility/*.md'
+  - VDI:
+      - 'plugins/Virtualization/*.md'
   - VDI:
     - 'plugins/VDI/*.md'
   - Web:

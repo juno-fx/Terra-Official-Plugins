@@ -17,6 +17,35 @@ To use this feature, you can define the `metadata` field in your `plugins/<plugi
 Terra will find the Release Name with postfix `-terra-metadata` and load the data from the `ConfigMap` into the plugin's 
 metadata. This allows you to store additional information via the Terra REST API.
 
+## Dashboards
+Dashboards are special type of plugin that can be directly integrated into your Genesis front-end experience via an iFrame. 
+Any Terra plugin whose category or tags include "dashboard". These plugins also allow for special permission handling.
+Updating your plugins metadata.yaml the _permission_ field can be set to a specific titan group. Which will only allow users assigned
+to that Titan group access to the plugin.
+
+```yaml linenums="1" title="my-plugin/templates/metadata.yaml"
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-terra-metadata
+data:
+  chart: "{{ .Chart.Name }}"
+  ingress: "{{ .Values.prefix }}"
+  permission: "admin"  # only allow admin users access to this iFrame app
+```
+
+
+#### Examples
+- **Dashboard**: argocd-dashboard
+
+
+## Bundles
+Bundles are a way to install multiple plugins in one convenient and easy to setup bundle.
+You can learn more about how to create a bundle  [here](repositories.md#bundles).
+
+#### Examples
+- **Bundle**: orion-essentials
+
 ## ArgoCD Sync Waves
 
 In Kubernetes, the concept of "dependencies" is really not possible. ArgoCD allows you to define "sync waves" to control

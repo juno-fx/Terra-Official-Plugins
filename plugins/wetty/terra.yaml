@@ -2,7 +2,7 @@ resource_id: wetty
 name: wetty
 icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/wetty/scripts/assets/logo.png
 description: Terminal access in browser over http/https
-category: Development
+category: Software Development
 tags:
   - cluster-level
   - development

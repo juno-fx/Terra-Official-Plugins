@@ -2,7 +2,7 @@ resource_id: flow-production-tracking
 name: Autodesk Flow Production Tracking v2.1.0
 icon: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/flow-production-tracking/scripts/assets/flow.png?raw=true"
 description: Powerful cloud-based project management and production tracking tool designed for creative teams.
-category: Project Management
+category: CG
 tags:
   - flow
   - autodesk
