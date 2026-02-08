@@ -68,8 +68,8 @@ spec:
                   fieldPath: metadata.namespace
             - name: USER
               value: "{{ .Values.user }}"
-{{/*            - name: HOME*/}}
-{{/*              value: "/home/{{ .Values.user }}"*/}}
+            - name: HOME
+              value: "/home/{{ .Values.user }}"
             - name: PUID
               value: "{{ .Values.puid }}"
             - name: PGID
@@ -90,6 +90,7 @@ spec:
         - name: tooling
           configMap:
             name: "{{ .Values.name }}-tooling"
+            defaultMode: 0755
         - name: nginx
           configMap:
             name: "{{ .Values.name }}-web-ide"
