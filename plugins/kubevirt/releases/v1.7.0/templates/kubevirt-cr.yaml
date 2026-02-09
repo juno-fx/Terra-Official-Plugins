@@ -23,3 +23,7 @@ spec:
   customizeComponents: {}
   imagePullPolicy: IfNotPresent
   workloadUpdateStrategy: {}
+  infra:
+    nodePlacement:
+      nodeSelector:
+        juno-innovations.com/service: "true"
