@@ -9,7 +9,7 @@ description: |
   
   **Warning:** Using HostPath volumes can pose security risks, as they allow Pods to access and modify files on the host node. 
   Ensure that you understand the implications and restrict access appropriately.
-category: storage
+category: Storage
 tags:
   - storage
   - hostpath
