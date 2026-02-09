@@ -15,7 +15,7 @@ spec:
   sources:
     - path: plugins/kubevirt/releases/{{ .Values.version }}/
       repoURL: https://github.com/juno-fx/Terra-Official-Plugins.git
-      targetRevision: 459-adjust-node-placement-kubevirt
+      targetRevision: main
       helm:
         releaseName: kubevirt
         values: |
