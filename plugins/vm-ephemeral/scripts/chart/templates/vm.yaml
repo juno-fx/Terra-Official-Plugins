@@ -116,9 +116,9 @@ spec:
           kuiper.juno-innovations.com/kuiper-instance: "{{ $.Values.name }}"
       spec:
         source:
-          storageClassName: {{ $.Values.storage_class }}
           blank: {}
         storage:
+          storageClassName: {{ $.Values.storage_class }}
           accessModes:
             - ReadWriteOnce
           resources:
