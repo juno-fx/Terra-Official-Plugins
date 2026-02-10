@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-longhorn
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    - post-delete-finalizer.argocd.argoproj.io
+    - post-delete-finalizer.argocd.argoproj.io/cleanup
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: longhorn-system
+  sources:
+    - repoURL: https://github.com/longhorn/charts.git
+      path: ./charts/longhorn/
+      targetRevision: {{ .Values.release }}
+      helm:
+        releaseName: longhorn
+        values: |
+          persistence:
+            defaultClass: false
+            defaultClassReplicaCount: {{ .Values.default_replica_count }}
+            defaultFsType: {{ .Values.fs }}
+          defaultSettings:
+            defaultDataPath: {{ .Values.storage_path }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+      - ServerSideApply=true
+      - CreateNamespace=true
