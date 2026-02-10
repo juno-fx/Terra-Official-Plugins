@@ -23,8 +23,7 @@ spec:
             enabled: {{ .Values.expose_dashboard }}
             path: {{ .Values.prefix }}
             ingressClassName: nginx
-            host:
-              - {{ .Values.host }}
+            host: {{ .Values.host }}
           persistence:
             defaultClass: false
             defaultClassReplicaCount: {{ .Values.default_replica_count }}
