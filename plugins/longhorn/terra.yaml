@@ -1,5 +1,5 @@
 resource_id: longhorn
-name: Longhorn Local Storage Provider
+name: Longhorn Storage
 icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/longhorn/assets/logo.png
 description: Longhorn is a cloud-native distributed block storage system for Kubernetes. It provides highly available persistent storage for Kubernetes workloads, with features such as replication, snapshots, and backup/restore capabilities. Longhorn is designed to be easy to use and manage, making it a popular choice for Kubernetes users who need reliable storage solutions.
 category: Storage
@@ -26,3 +26,8 @@ fields:
     description: The version of Longhorn to install. You can specify a specific version (e.g., `v1.12.0`) or use a version range (e.g., `v1.12.x`) to always install the latest patch version of a specific minor release. Default is `v1.12.x`.
     required: true
     default: v1.12.x
+  - name: expose_dashboard
+    description: Whether to expose the Longhorn dashboard via an Ingress resource. If set to `true`, an Ingress will be created to allow access to the Longhorn dashboard from outside the cluster. Default is `false`.
+    required: false
+    default: false
+    type: boolean
