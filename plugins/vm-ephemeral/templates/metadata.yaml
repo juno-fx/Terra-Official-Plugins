@@ -40,6 +40,10 @@ data:
       type: select
       options:
         - virtio
+    - name: storage_class
+      description: Storage class to use for the VM's disk
+      required: true
+      type: k8sStorageClass
     - name: ports
       description: Ports to expose from the VM.
       required: false
