@@ -21,8 +21,10 @@ spec:
         values: |
           ingress:
             enabled: {{ .Values.expose_dashboard }}
-            path: /longhorn
+            path: {{ .Values.prefix }}
             ingressClassName: nginx
+            host:
+              - {{ .Values.host }}
           persistence:
             defaultClass: false
             defaultClassReplicaCount: {{ .Values.default_replica_count }}
