@@ -1,7 +1,7 @@
 resource_id: crossplane
 name: Crossplane
 icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/crossplane/assets/logo.png
-description: Crossplane is a control plane framework for platform engineering.k
+description: Crossplane is a control plane framework for platform engineering.
 category: Cloud Management
 tags:
   - crossplane
