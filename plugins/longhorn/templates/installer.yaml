@@ -19,11 +19,6 @@ spec:
       helm:
         releaseName: longhorn
         values: |
-          ingress:
-            enabled: {{ .Values.expose_dashboard }}
-            path: {{ .Values.prefix }}
-            ingressClassName: nginx
-            host: {{ .Values.host }}
           persistence:
             defaultClass: false
             defaultClassReplicaCount: {{ .Values.default_replica_count }}
