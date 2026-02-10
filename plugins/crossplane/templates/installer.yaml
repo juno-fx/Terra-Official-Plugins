@@ -21,6 +21,8 @@ spec:
         values: |
           metrics:
             enabled: true
+          serviceAccount:
+            customAnnotations: {}
   syncPolicy:
     automated:
       prune: true
