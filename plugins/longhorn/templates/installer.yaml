@@ -25,6 +25,9 @@ spec:
             defaultFsType: {{ .Values.fs }}
           defaultSettings:
             defaultDataPath: {{ .Values.storage_path }}
+          preUpgradeChecker:
+            jobEnabled: false
+            upgradeVersionCheck: false
   syncPolicy:
     automated:
       prune: true
