@@ -15,7 +15,7 @@ spec:
   sources:
     - repoURL: https://github.com/crossplane/crossplane.git
       path: ./cluster/charts/crossplane
-      targetRevision: { { .Values.version } }
+      targetRevision: "{{ .Values.version }}"
       helm:
         releaseName: crossplane
         values: |
