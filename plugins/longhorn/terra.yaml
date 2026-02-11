@@ -23,9 +23,12 @@ fields:
     required: true
     default: ext4
   - name: release
-    description: The version of Longhorn to install. You can specify a specific version (e.g., `v1.12.0`) or use a version range (e.g., `v1.12.x`) to always install the latest patch version of a specific minor release. Default is `v1.12.x`.
+    description: The version of Longhorn to install. Versions above v1.10.x are not supported due to an upstream issue with the Longhorn that can break CNI connections on k3s. https://github.com/longhorn/longhorn/issues/12642
     required: true
-    default: v1.12.x
+    default: v1.10.x
+    type: select
+    options:
+      - v1.10.x
   - name: expose_dashboard
     description: Whether to expose the Longhorn dashboard via an Ingress resource. If set to `true`, an Ingress will be created to allow access to the Longhorn dashboard from outside the cluster. Default is `false`.
     required: false
