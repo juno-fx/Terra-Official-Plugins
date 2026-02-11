@@ -19,13 +19,16 @@ spec:
       helm:
         releaseName: crossplane
         values: |
-          metrics:
-            enabled: true
           serviceAccount:
+            create: true
             customAnnotations: {}
           webhooks:
             enabled: true
-            port: 9443
+          metrics:
+            enabled: true
+          rbacManager:
+            enabled: true
+
   syncPolicy:
     automated:
       prune: true
