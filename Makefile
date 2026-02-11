@@ -93,7 +93,7 @@ cluster:
 dependencies: cluster
 	@kubectl create namespace argocd || echo "Argo namespace already exists..."
 	@echo " >> Installing ArgoCD << "
-	@kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+	@kubectl create -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 	@echo "Waiting for ArgoCD to be ready..."
 	@sleep 15
 	@kubectl wait --namespace argocd \

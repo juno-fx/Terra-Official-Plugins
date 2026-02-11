@@ -1,0 +1,41 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-crossplane
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    - post-delete-finalizer.argocd.argoproj.io
+    - post-delete-finalizer.argocd.argoproj.io/cleanup
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: crossplane
+  sources:
+    - repoURL: https://github.com/crossplane/crossplane.git
+      path: ./cluster/charts/crossplane
+      targetRevision: "{{ .Values.version }}"
+      helm:
+        releaseName: crossplane
+        values: |
+          serviceAccount:
+            create: true
+            name: crossplane
+          image:
+            repository: crossplane/crossplane
+            tag: {{ .Values.version }}
+            pullPolicy: IfNotPresent
+          webhooks:
+            enabled: true
+          metrics:
+            enabled: true
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+      - ServerSideApply=true
+      - CreateNamespace=true
