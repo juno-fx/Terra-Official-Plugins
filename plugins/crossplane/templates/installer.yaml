@@ -23,6 +23,9 @@ spec:
             enabled: true
           serviceAccount:
             customAnnotations: {}
+          webhooks:
+            enabled: true
+            port: 9443
   syncPolicy:
     automated:
       prune: true
