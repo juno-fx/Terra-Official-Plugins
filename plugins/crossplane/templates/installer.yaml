@@ -19,6 +19,15 @@ spec:
       helm:
         releaseName: crossplane
         values: |
+          serviceAccount:
+            create: true
+            name: crossplane
+          image:
+            repository: crossplane/crossplane
+            tag: {{ .Values.version }}
+            pullPolicy: IfNotPresent
+          webhooks:
+            enabled: true
           metrics:
             enabled: true
 
