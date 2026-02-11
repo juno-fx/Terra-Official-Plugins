@@ -11,6 +11,6 @@ tags:
 
 fields:
   - name: version
-    description: Version of crossplane to install. (defaults to release-1.9)
+    description: Version of crossplane to install. (defaults to v2.1.4)
     required: false
-    default: release-1.9
+    default: v2.1.4

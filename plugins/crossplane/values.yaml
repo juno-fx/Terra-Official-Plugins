@@ -1,4 +1,2 @@
 # configuration
-version: "release-1.9"
-serviceAccount:
-  customAnnotations: {}
+version: "v2.1.4"

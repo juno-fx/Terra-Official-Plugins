@@ -19,14 +19,7 @@ spec:
       helm:
         releaseName: crossplane
         values: |
-          serviceAccount:
-            create: true
-            customAnnotations: {}
-          webhooks:
-            enabled: true
           metrics:
-            enabled: true
-          rbacManager:
             enabled: true
 
   syncPolicy:
