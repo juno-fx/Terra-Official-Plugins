@@ -20,15 +20,17 @@ spec:
           - name: "driver.enabled"
             value: "{{ .Values.install_driver }}"
           - name: "driver.nvidiaDriverCRD.enabled"
-            value: "true"
+            value: "{{ .Values.install_driver_crd }}"
           - name: "devicePlugin.config.name"
             value: "{{ .Values.slicing_config }}"
           - name: "devicePlugin.config.default"
-            value: "any"
+            value: "{{ .Values.default_config }}"
           - name: "driver.useOpenKernelModules"
-            value: "true"
+            value: "{{ .Values.open_kernel_modules }}"
           - name: "nfd.enabled"
-            value: "true"
+            value: "{{ .Values.nfd_enabled }}"
+          - name: "dcgm.enabled"
+            value: "{{ .Values.dcgm_enabled }}"
   syncPolicy:
     automated:
       prune: true

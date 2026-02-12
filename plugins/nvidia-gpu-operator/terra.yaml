@@ -10,15 +10,40 @@ tags:
   - cluster-level
 fields:
   - name: install_toolkit
-    description: true or false. Not needed if the toolkit is preinstalled on the nodes.
+    description: Not needed if the toolkit is preinstalled on the nodes.
     required: false
     default: false
     type: boolean
   - name: install_driver
-    description: true or false. Not needed if the driver is preinstalled on the nodes.
+    description: Not needed if the driver is preinstalled on the nodes.
     required: false
     default: false
     type: boolean
+  - name: install_driver_crd
+    description: Whether to install the NVIDIADriver CRD. This is required if you want to use the NVIDIADriver custom resource to manage the NVIDIA driver installation on the nodes. Not needed if you are using the device plugin to manage the driver installation.
+    required: false
+    default: false
+    type: boolean
+  - name: open_kernel_modules
+    description: Whether to use open kernel modules for the NVIDIA driver. This is required if you want to use the open kernel modules for the NVIDIA driver. Not needed if you are using the device plugin to manage the driver installation.
+    required: false
+    default: false
+    type: boolean
+  - name: nfd_enabled
+    description: Whether to enable the NVIDIA GPU Operator's Node Feature Discovery (NFD) component. This is required if you want to use the NFD component to discover the NVIDIA GPU features on the nodes. Not needed if you are using the device plugin to manage the driver installation.
+    required: false
+    default: false
+    type: boolean
+  - name: dcgm_enabled
+    description: Whether to enable the NVIDIA GPU Operator's Data Center GPU Manager (DCGM) component. This is required if you want to use the DCGM component to monitor the NVIDIA GPU health and performance on the nodes. Not needed if you are using the device plugin to manage the driver installation.
+    required: false
+    default: false
+    type: boolean
+  - name: default_config
+    description: Name of the ConfigMap to use for the default time-slicing configuration. The default is "default-time-slicing-config". This ConfigMap will be used if no other ConfigMap is specified for a node or if the node does not have any labels that match the time-slicing configuration rules.
+    required: false
+    default: "any"
+    type: string
   - name: slicing_config
     description: Name of the ConfigMap to use for time-slicing configuration. The default is "time-slicing-config".
     required: false
