@@ -118,6 +118,7 @@ spec:
         source:
           blank: {}
         storage:
+          storageClassName: {{ $.Values.storage_class }}
           accessModes:
             - ReadWriteOnce
           resources:
@@ -131,6 +132,7 @@ spec:
           kuiper.juno-innovations.com/kuiper-instance: "{{ $.Values.name }}"
       spec:
         storage:
+          storageClassName: {{ $.Values.storage_class }}
           accessModes:
             - ReadWriteOnce
           resources:
@@ -147,6 +149,7 @@ spec:
           kuiper.juno-innovations.com/kuiper-instance: "{{ $.Values.name }}"
       spec:
         storage:
+          storageClassName: {{ $.Values.storage_class }}
           accessModes:
             - ReadWriteOnce
           resources:
@@ -167,6 +170,7 @@ spec:
           kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
       spec:
         storage:
+          storageClassName: {{ $.Values.storage_class }}
           accessModes:
             - ReadWriteOnce
           resources:

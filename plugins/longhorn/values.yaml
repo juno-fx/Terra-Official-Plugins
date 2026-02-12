@@ -1,0 +1,5 @@
+# configuration
+storage_path: /var/lib/longhorn
+default_replica_count: 3
+fs: ext4
+release: v1.10.x
