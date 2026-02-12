@@ -12,12 +12,12 @@ fields:
   - name: install_toolkit
     description: true or false. Not needed if the toolkit is preinstalled on the nodes.
     required: false
-    default: "false"
+    default: false
     type: boolean
   - name: install_driver
     description: true or false. Not needed if the driver is preinstalled on the nodes.
     required: false
-    default: "false"
+    default: false
     type: boolean
   - name: slicing_config
     description: Name of the ConfigMap to use for time-slicing configuration. The default is "time-slicing-config".
