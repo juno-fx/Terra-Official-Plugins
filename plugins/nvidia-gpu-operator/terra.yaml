@@ -40,7 +40,7 @@ fields:
     default: false
     type: boolean
   - name: default_config
-    description: Name of the ConfigMap to use for the default time-slicing configuration. The default is "default-time-slicing-config". This ConfigMap will be used if no other ConfigMap is specified for a node or if the node does not have any labels that match the time-slicing configuration rules.
+    description: Name of the default configuration to use for the NVIDIA GPU Operator. The default is "any", which means that the operator will use the default configuration provided by NVIDIA. You can also specify a custom configuration by creating a ConfigMap with the desired configuration and specifying its name here.
     required: false
     default: "any"
     type: string
