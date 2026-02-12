@@ -71,6 +71,13 @@ spec:
             {{- end }}
             {{ end }}
 
+            {{- if .Values.volumeMounts }}
+            {{- range .Values.volumeMounts }}
+            - name: "{{ .name }}"
+              disk: {}
+            {{- end }}
+            {{- end }}
+
 
             {{ if .Values.virtio_drivers }}
             - name: virtio
@@ -91,6 +98,15 @@ spec:
           dataVolume:
             name: "{{ $.Values.name }}-{{ .volume.name }}"
         {{ end }}
+
+
+        {{- if .Values.volumes }}
+        {{- range .Values.volumes }}
+        - name: "{{ .name }}"
+          persistentVolumeClaim:
+            claimName: {{ .persistentVolumeClaim.claimName }}
+        {{- end }}
+        {{- end }}
 
 
         {{ if .Values.virtio_drivers }}
