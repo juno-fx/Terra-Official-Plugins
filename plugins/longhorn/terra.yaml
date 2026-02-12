@@ -29,15 +29,3 @@ fields:
     type: select
     options:
       - v1.10.x
-  - name: expose_dashboard
-    description: Whether to expose the Longhorn dashboard via an Ingress resource. If set to `true`, an Ingress will be created to allow access to the Longhorn dashboard from outside the cluster. Default is `false`.
-    required: false
-    default: false
-    type: boolean
-  - name: host
-    description: The DNS name of your genesis host.
-    required: false
-  - name: prefix
-    description: Connection URL prefix. i.e. `/argocd`. Will default to `/argocd` if not set. This doesn't need changing in most cases.
-    required: false
-    default: /longhorn
