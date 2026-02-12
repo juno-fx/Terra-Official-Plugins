@@ -10,11 +10,47 @@ tags:
   - cluster-level
 fields:
   - name: install_toolkit
-    description: true or false. Not needed if the toolkit is preinstalled on the nodes.
+    description: Not needed if the toolkit is preinstalled on the nodes.
     required: false
+    default: false
+    type: boolean
   - name: install_driver
-    description: true or false. Not needed if the driver is preinstalled on the nodes.
+    description: Not needed if the driver is preinstalled on the nodes.
     required: false
+    default: false
+    type: boolean
+  - name: install_driver_crd
+    description: Whether to install the NVIDIADriver CRD. This is required if you want to use the NVIDIADriver custom resource to manage the NVIDIA driver installation on the nodes. Not needed if you are using the device plugin to manage the driver installation.
+    required: false
+    default: false
+    type: boolean
+  - name: open_kernel_modules
+    description: Whether to use open kernel modules for the NVIDIA driver. This is required if you want to use the open kernel modules for the NVIDIA driver. Not needed if you are using the device plugin to manage the driver installation.
+    required: false
+    default: false
+    type: boolean
+  - name: nfd_enabled
+    description: Whether to enable the NVIDIA GPU Operator's Node Feature Discovery (NFD) component. This is required if you want to use the NFD component to discover the NVIDIA GPU features on the nodes. Not needed if you are using the device plugin to manage the driver installation.
+    required: false
+    default: false
+    type: boolean
+  - name: dcgm_enabled
+    description: Whether to enable the NVIDIA GPU Operator's Data Center GPU Manager (DCGM) component. This is required if you want to use the DCGM component to monitor the NVIDIA GPU health and performance on the nodes. Not needed if you are using the device plugin to manage the driver installation.
+    required: false
+    default: false
+    type: boolean
+  - name: default_config
+    description: Name of the default configuration to use for the NVIDIA GPU Operator. The default is "any", which means that the operator will use the default configuration provided by NVIDIA. You can also specify a custom configuration by creating a ConfigMap with the desired configuration and specifying its name here.
+    required: false
+    default: "any"
+    type: string
   - name: slicing_config
     description: Name of the ConfigMap to use for time-slicing configuration. The default is "time-slicing-config".
     required: false
+    default: time-slicing-config
+    type: string
+  - name: version
+    description: Version of the GPU Operator to install.
+    required: false
+    default: v25.10.1
+    type: string
