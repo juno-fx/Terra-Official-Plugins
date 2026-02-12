@@ -25,6 +25,8 @@ spec:
 {{/*            value: "{{ .Values.slicing_config }}"*/}}
 {{/*          - name: "devicePlugin.config.default"*/}}
 {{/*            value: "{{ .Values.default_config }}"*/}}
+          - name: "sandboxWorkloads.enabled"
+            value: "true"
           - name: "driver.useOpenKernelModules"
             value: "{{ .Values.open_kernel_modules }}"
           - name: "nfd.enabled"
