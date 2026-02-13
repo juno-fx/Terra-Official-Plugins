@@ -3,7 +3,7 @@ kind: Provider
 metadata:
   name: {{ .Release.Name }}-crossplane-aws-provider
 spec:
-  package: "xpkg.upbound.io/crossplane-contrib/provider-upjet-aws:{{ .Values.version }}"
+  package: "xpkg.upbound.io/upbound/provider-aws-eks:{{ .Values.version }}"
 
 ---
 
