@@ -1,9 +1,9 @@
 apiVersion: pkg.crossplane.io/v1
 kind: Provider
 metadata:
-  name: {{ .Release.Name }}-crossplane-aws-provider-s3
+  name: {{ .Release.Name }}-crossplane-aws-provider
 spec:
-  package: "xpkg.crossplane.io/crossplane-contrib/provider-aws-s3:{{ .Values.version }}"
+  package: "xpkg.upbound.io/crossplane-contrib/provider-upjet-aws:{{ .Values.version }}"
 
 ---
 
