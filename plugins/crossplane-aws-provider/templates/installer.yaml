@@ -3,9 +3,10 @@ kind: Provider
 metadata:
   name: {{ .Release.Name }}-crossplane-aws-provider
 spec:
-  package: xpkg.upbound.io/crossplane-contrib/provider-aws:{{.Values.version}}}
+  package: "xpkg.upbound.io/crossplane-contrib/provider-aws:{{ .Values.version }}"
 
 ---
+
 apiVersion: aws.crossplane.io/v1beta1
 kind: ProviderConfig
 metadata:
