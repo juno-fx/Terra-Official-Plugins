@@ -26,7 +26,7 @@ jobs:
           repository: juno-fx/ci
           ref: main
           path: .juno-ci
-          token: ${{ secrets.RO_CI_REPO_TOKEN }}
+          token: ${{ steps.generate-token.outputs.token }}
       - name: Run PR on branch creation
         uses: ./.juno-ci/actions/workflow/pr-on-branch-creation
         with:
