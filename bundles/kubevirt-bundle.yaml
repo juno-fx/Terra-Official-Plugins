@@ -1,0 +1,50 @@
+resource_id: kubevirt-bundle
+name: Kubevirt Bundle
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/kubevirt/scripts/assets/logo.png
+description: |
+  A single install bundle for both Kubevirt and our Generic Ephemeral VM plugins.
+  
+  KubeVirt technology addresses the needs of development teams that have 
+  adopted or want to adopt Kubernetes but possess existing Virtual Machine-based 
+  workloads that cannot be easily containerized. More specifically, the technology 
+  provides a unified development platform where developers can build, modify, and 
+  deploy applications residing in both Application Containers as well as Virtual Machines 
+  in a common, shared environment. (This is currently in Alpha. Use at your own risk.)
+  
+  A generic ephemeral Virtual Machine (VM) compatible with KubeVirt, designed for temporary use 
+  cases where persistent storage is not required. This VM can be quickly deployed and discarded, 
+  making it ideal for testing, development, or short-term workloads. (This is currently in Alpha. Use at your own risk.)
+
+category: Bundle
+tags:
+  - virtualization
+  - virtual-machine
+  - kubevirt
+  - cluster-level
+  - kubernetes
+  - vm
+fields:
+  - name: version
+    description: Version of KubeVirt to install
+    required: true
+    default: v1.7.0
+    type: select
+    options:
+      - v1.7.0
+  - name: nested_virtualization
+    description: Enable nested virtualization support for VMs
+    default: false
+    required: true
+    type: boolean
+
+plugins:
+  - plugin: kubevirt
+    name: kubevirt
+    values:
+      version:
+        reference: version
+      nested_virtualization:
+        reference: nested_virtualization
+  - plugin: vm-ephemeral
+    name: Generic VM
+
