@@ -38,7 +38,7 @@ fields:
     type: boolean
 
 plugins:
-  - plugin: Kubevirt
+  - plugin: KubeVirt
     name: kubevirt
     values:
       version:
