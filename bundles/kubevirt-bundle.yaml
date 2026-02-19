@@ -46,5 +46,5 @@ plugins:
       nested_virtualization:
         reference: nested_virtualization
   - plugin: Generic Ephemeral VM
-    name: Generic VM
+    name: generic-virtual-machine
 
