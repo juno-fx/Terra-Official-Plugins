@@ -38,13 +38,13 @@ fields:
     type: boolean
 
 plugins:
-  - plugin: kubevirt
+  - plugin: Kubevirt
     name: kubevirt
     values:
       version:
         reference: version
       nested_virtualization:
         reference: nested_virtualization
-  - plugin: vm-ephemeral
+  - plugin: Generic Ephemeral VM
     name: Generic VM
 
