@@ -11,7 +11,7 @@ spec:
   project: default
   destination:
     server: https://kubernetes.default.svc
-    namespace: crossplane
+    namespace: crossplane-system
   sources:
     - repoURL: https://github.com/crossplane/crossplane.git
       path: ./cluster/charts/crossplane
