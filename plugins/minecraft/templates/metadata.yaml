@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-terra-metadata"
+data:
+  description: "A popular sandbox game that allows players to build and explore virtual worlds made of blocks."
