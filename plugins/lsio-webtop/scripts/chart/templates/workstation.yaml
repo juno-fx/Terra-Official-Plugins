@@ -2,17 +2,8 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: "{{ .Values.name }}"
-  annotations:
-    # comma separated list of users that can access this workstation as read only.
-    juno-innovations.com/shared: "none"
-    juno-innovations.com/kuiper-state: "{{ .Values._kuiper }}"
-    juno-innovations.com/workload: "Workspace"  # mark this as a workload and it's type for the
-
   labels:
-    juno-innovations.com/app: "polaris"
-    juno-innovations.com/workstation: "{{ .Values.name }}"
-    juno-innovations.com/user: "{{ .Values.user }}"
-    juno-innovations.com/session: "{{ .Values.session }}"
+    kuiper.juno-innovations.com/workstation: "{{ .Values.name }}"
 
 
 spec:
@@ -20,14 +11,12 @@ spec:
 
   selector:
     matchLabels:
-      juno-innovations.com/workstation: "{{ .Values.name }}"
+      kuiper.juno-innovations.com/workstation: "{{ .Values.name }}"
 
   template:
     metadata:
       labels:
-        juno-innovations.com/app: polaris
-        juno-innovations.com/user: "{{ .Values.user }}"
-        juno-innovations.com/workstation: "{{ .Values.name }}"
+        kuiper.juno-innovations.com/workstation: "{{ .Values.name }}"
       annotations:
         # This will block the cluster autoscaler from evicting this pod in the case
         # it can move to a cheaper instance. This does come at a cost, but ideally
@@ -38,30 +27,19 @@ spec:
       automountServiceAccountToken: false
       hostname: "{{ .Values.name }}"
 
-      # workstation nodes will require juno-innovations.com/workstation: "true"
+      {{- if .Values.selector }}
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
               - matchExpressions:
-                  - key: juno-innovations.com/workstation
-                    operator: In
-                    values:
-                      - "true"
-                  {{- if .Values.selector }}
                   {{- range .Values.selector }}
                   - key: {{ .key | quote }}
                     operator: In
                     values:
                       - {{ .value | quote }}
                   {{- end }}
-                  {{- end }}
-
-      # allow for this pod to work on nodes reserved for workstations
-      tolerations:
-        - key: "juno-innovations.com/workstation"
-          operator: "Exists"
-          effect: "NoSchedule"
+      {{- end }}
 
       {{- if .Values.gpu }}
       runtimeClassName: nvidia
@@ -93,19 +71,6 @@ spec:
               memory: "{{ .Values.memoryLimit }}"
             {{- end }}
             {{- end }}
-{{/*          startupProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              path: "/polaris/{{ .Values.name }}/"*/}}
-{{/*              port: 3000*/}}
-{{/*            initialDelaySeconds: 2 # webtop boots very fast*/}}
-{{/*            failureThreshold: 60  # start up totals 2 * 60 = 2 mins*/}}
-{{/*            periodSeconds: 2*/}}
-{{/*          livenessProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              path: "/polaris/{{ .Values.name }}/"*/}}
-{{/*              port: 3000*/}}
-{{/*            failureThreshold: 24*/}}
-{{/*            periodSeconds: 5*/}}
           ports:
             - containerPort: 3001
               name: viewer
