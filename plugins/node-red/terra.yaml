@@ -1,0 +1,36 @@
+resource_id: node-red
+name: Node Red
+icon: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/node-red/assets/logo.png?raw=true"
+description: Installs Node Red flow runner on your cluster.
+category: Workflows
+tags:
+  - node-red
+  - dashboard
+  - infrastructure
+  - automation
+
+fields:
+  - name: registry
+    description: Container registry to pull from
+    default: "nodered"
+  - name: repo
+    description: Repository to pull from
+    default: "node-red"
+  - name: tag
+    description: Tag to pull
+    default: "latest"
+  - name: host
+    description: Connection URL. i.e. `node-red.example.com`. Keep in mind you must set up a DNS record for this host to point to your cluster's ingress controller.
+    required: true
+  - name: prefix
+    description: Connection URL prefix. i.e. `/node-red`.
+    required: false
+    default: "/node-red"
+  - name: destination
+    description: Destination directory defaults to /node-red
+    required: false
+    default: "/node-red"
+  - name: install_volume
+    description: The name of the install volume
+    required: true
+    type: shared-volume

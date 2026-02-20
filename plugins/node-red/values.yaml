@@ -1,0 +1,11 @@
+# configuration
+registry: nodered
+repo: node-red
+tag: latest
+host:
+destination: /node-red
+prefix: "/node-red"
+install_volume:
+  name: apps-pv-claim
+  sub_path:
+  container_path: /apps
