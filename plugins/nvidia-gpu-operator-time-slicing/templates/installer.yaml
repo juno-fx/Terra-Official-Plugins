@@ -33,7 +33,8 @@ spec:
             upgradeCRD: {{ .Values.install_crds }}
 
           sandboxWorkloads:
-            enabled: false
+            enabled: true
+            defaultWorkload: containers
 
           devicePlugin:
             config:
