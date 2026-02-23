@@ -3,7 +3,7 @@ kind: StatefulSet
 metadata:
   name: "{{ .Release.Name }}"
 spec:
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
       kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
