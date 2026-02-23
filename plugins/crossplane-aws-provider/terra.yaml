@@ -13,9 +13,9 @@ tags:
 
 fields:
   - name: version
-    description: Version of AWS provider plugin to install. (defaults to v2.4.0)
+    description: Version of AWS provider plugin to install. (defaults to v0.55.0)
     required: false
-    default: v2.4.0
+    default: v0.55.0
   - name: secret_namespace
     description: Namespace where your AWS secret is stored
     required: true

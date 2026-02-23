@@ -2,6 +2,7 @@ apiVersion: pkg.crossplane.io/v1
 kind: Provider
 metadata:
   name: {{ .Release.Name }}-crossplane-aws-provider
+  namespace: crossplane-system
 spec:
   package: "xpkg.crossplane.io/crossplane-contrib/provider-aws:{{ .Values.version }}"
 
@@ -11,6 +12,7 @@ apiVersion: aws.crossplane.io/v1beta1
 kind: ProviderConfig
 metadata:
   name: {{ .Release.Name }}-crossplane-aws-provider-config
+  namespace: crossplane-system
 spec:
   credentials:
     source: Secret
