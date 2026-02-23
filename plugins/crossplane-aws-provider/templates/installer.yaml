@@ -3,6 +3,8 @@ kind: Provider
 metadata:
   name: {{ .Release.Name }}-crossplane-aws-provider
   namespace: crossplane-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   package: "xpkg.crossplane.io/crossplane-contrib/provider-aws:{{ .Values.version }}"
 
@@ -13,6 +15,8 @@ kind: ProviderConfig
 metadata:
   name: {{ .Release.Name }}-crossplane-aws-provider-config
   namespace: crossplane-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   credentials:
     source: Secret
