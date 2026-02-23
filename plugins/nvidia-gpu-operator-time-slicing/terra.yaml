@@ -33,15 +33,6 @@ fields:
     required: false
     default: false
     type: boolean
-  - name: nfd_enabled
-    description: |
-      Whether to enable the NVIDIA GPU Operator's Node Feature Discovery (NFD) component. 
-      This is required if you want to use the NFD component to discover the NVIDIA GPU 
-      features on the nodes. Not needed if you are using the device plugin to manage the 
-      driver installation.
-    required: false
-    default: false
-    type: boolean
   - name: slice_count
     description: |
       Number of time-slices to create for each GPU. This is required for time-slicing 
