@@ -40,22 +40,22 @@ fields:
     required: false
     default: false
     type: boolean
-#  - name: multi-line
-#    description: Name of the default configuration to use for the NVIDIA GPU Operator. The default is "any", which means that the operator will use the default configuration provided by NVIDIA. You can also specify a custom configuration by creating a ConfigMap with the desired configuration and specifying its name here.
-#    required: false
-#    default: |
-#      default: |-
-#        version: v1
-#        flags:
-#          migStrategy: none
-#        sharing:
-#          timeSlicing:
-#            renameByDefault: false
-#            failRequestsGreaterThanOne: false
-#            resources:
-#              - name: nvidia.com/gpu
-#                replicas: 6
-#    type: multi-line
+  - name: multi-line
+    description: Name of the default configuration to use for the NVIDIA GPU Operator. The default is "any", which means that the operator will use the default configuration provided by NVIDIA. You can also specify a custom configuration by creating a ConfigMap with the desired configuration and specifying its name here.
+    required: false
+    default: |
+      default: |-
+        version: v1
+        flags:
+          migStrategy: none
+        sharing:
+          timeSlicing:
+            renameByDefault: false
+            failRequestsGreaterThanOne: false
+            resources:
+              - name: nvidia.com/gpu
+                replicas: 6
+    type: multi-line
 #  - name: slicing_config
 #    description: Name of the ConfigMap to use for time-slicing configuration. The default is "time-slicing-config".
 #    required: false
