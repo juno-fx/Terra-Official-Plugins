@@ -14,16 +14,6 @@ tags:
   - operator
   - cluster-level
 fields:
-  - name: install_toolkit
-    description: Not needed if the toolkit is preinstalled on the nodes.
-    required: false
-    default: false
-    type: boolean
-  - name: install_driver
-    description: Not needed if the driver is preinstalled on the nodes.
-    required: false
-    default: false
-    type: boolean
   - name: install_crds
     description: |
       Install the NVIDIA GPU Operator's Custom Resource Definitions (CRDs). 
@@ -49,15 +39,6 @@ fields:
       This is required if you want to use the NFD component to discover the NVIDIA GPU 
       features on the nodes. Not needed if you are using the device plugin to manage the 
       driver installation.
-    required: false
-    default: false
-    type: boolean
-  - name: dcgm_enabled
-    description: |
-      Whether to enable the NVIDIA GPU Operator's Data Center GPU Manager (DCGM) component. 
-      This is required if you want to use the DCGM component to monitor the NVIDIA GPU 
-      health and performance on the nodes. Not needed if you are using the device plugin 
-      to manage the driver installation.
     required: false
     default: false
     type: boolean
