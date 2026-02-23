@@ -14,14 +14,14 @@ data:
       description: "Registry to pull the image from"
       type: string
       required: true
-      default: "junoinnovations"
+      default: "itzg"
     - name: repo
       description: "Repository to pull the image from"
       type: string
       required: true
-      default: "helios"
+      default: "minecraft-server"
     - name: tag
       description: "Tag to pull the image from"
       type: string
       required: true
-      default: "unstable-rocky-9"
+      default: "latest"

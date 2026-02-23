@@ -16,7 +16,7 @@ spec:
       containers:
         - name: minecraft
           imagePullPolicy: IfNotPresent
-          image: "itzg/minecraft-server"
+          image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
           resources:
             requests:
               memory: "{{ .Values.memory }}"
