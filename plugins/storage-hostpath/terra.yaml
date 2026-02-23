@@ -1,0 +1,25 @@
+resource_id: storage-hostpath
+name: Storage HostPath
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/storage-hostpath/scripts/assets/logo.png
+description: | 
+  Mount a location on the host node as a Persistent Volume in your Kubernetes cluster using the HostPath volume type.
+  This plugin allows for operators to mount existing directories on the hosts into running Pods which means you can 
+  reuse existing legacy tools such as Ansible. It is important to note that HostPath volumes are only local to the node, 
+  so if you need access to a tool or library, you must ensure that all target nodes have this path available.
+  
+  **Warning:** Using HostPath volumes can pose security risks, as they allow Pods to access and modify files on the host node. 
+  Ensure that you understand the implications and restrict access appropriately.
+category: storage
+tags:
+  - storage
+  - hostpath
+  - persistent-volume
+  - cluster-level
+fields:
+  - name: path
+    description: Path on the host node to mount into the Persistent Volume
+    required: true
+  - name: size
+    description: Size of the Persistent Volume to create (e.g., 10Gi). This is for scheduling purposes only.
+    required: true
+    default: 10Gi

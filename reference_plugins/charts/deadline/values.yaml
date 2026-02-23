@@ -1,5 +1,0 @@
-client_mount:
-start_service: false
-claim_name:
-claim_name_mongo:
-destination:

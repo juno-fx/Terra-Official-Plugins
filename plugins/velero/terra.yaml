@@ -1,0 +1,36 @@
+resource_id: velero
+name: Velero
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/velero/assets/logo.png
+description: Backup operator for Kubernetes, using S3 as your storage.
+category: Infrastructure
+tags:
+  - cluster-level
+  - backup
+fields:
+  - name: chart_version
+    description: Version of the Velero chart to install.
+    required: true
+    default: 11.1.1
+    type: string
+  - name: bucket
+    description: Name of the S3 bucket to store backups in
+    required: true
+    type: string
+  - name: region
+    description: S3 Region - check your provider's documentation for the appropriate value. Single-location providers such as minio will have it as well.
+    required: false
+    type: string
+  - name: s3Url
+    description: S3-compatible storage URL, eg. https://s3.us-east-2.amazonaws.com
+    default: "https://s3.us-east-2.amazonaws.com"
+    required: true
+    type: string
+  - name: access_key_id
+    description: Access key ID for S3 authentication
+    required: true
+    type: string
+  - name: secret_access_key
+    description: Secret access key for S3 authentication
+    required: true
+    type: string
+    secret: true

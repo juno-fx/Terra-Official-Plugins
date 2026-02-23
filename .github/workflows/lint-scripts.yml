@@ -1,0 +1,14 @@
+name: Lint scripts
+on:
+  push:
+jobs:
+  lint:
+    name: Lint scripts
+    runs-on: X64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Run the lint target
+        shell: bash
+        run: |
+          devbox run make lint-scripts

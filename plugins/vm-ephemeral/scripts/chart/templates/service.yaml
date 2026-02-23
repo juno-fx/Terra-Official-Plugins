@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.name }}-console
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: {{ .Values.name }}
+spec:
+  clusterIP: None
+  sessionAffinity: ClientIP
+  selector:
+    app: {{ .Values.name }}-console
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: endpoint

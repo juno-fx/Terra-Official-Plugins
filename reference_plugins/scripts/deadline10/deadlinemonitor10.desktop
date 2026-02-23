@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Version=0.9.4
-Name=Deadline Monitor 10
-Comment=Launch the Deadline Monitor
-Icon=DESTINATION/deadline10client.png
-Exec=DESTINATION/client/bin/deadlinelauncher -monitor
-Terminal=false
-Path=DESTINATION/client/bin

@@ -15,4 +15,4 @@ jobs:
         with:
           clean: 'true'
       - name: Verify linting
-        run: make lint
+        run: devbox run make lint

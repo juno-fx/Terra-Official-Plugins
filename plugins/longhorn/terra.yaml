@@ -1,0 +1,31 @@
+resource_id: longhorn
+name: Longhorn Storage
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/longhorn/assets/logo.png
+description: Longhorn is a cloud-native distributed block storage system for Kubernetes. It provides highly available persistent storage for Kubernetes workloads, with features such as replication, snapshots, and backup/restore capabilities. Longhorn is designed to be easy to use and manage, making it a popular choice for Kubernetes users who need reliable storage solutions.
+category: Storage
+tags:
+  - storage
+  - longhorn
+  - cluster-level
+  - dashboard
+fields:
+  - name: storage_path
+    description: Path where Longhorn will store its data on the host. This should be a path that is not used by any other process and has enough storage capacity to hold your data. Default is `/var/lib/longhorn`.
+    required: true
+    default: /var/lib/longhorn
+  - name: default_replica_count
+    description: The default number of replicas for each volume. This determines how many copies of your data will be stored across the cluster. A higher replica count provides better data redundancy and availability, but also consumes more storage space. Default is `3`.
+    required: true
+    default: 3
+    type: int
+  - name: fs
+    description: The default filesystem type for volumes created by Longhorn. This determines the type of filesystem that will be used when formatting the volumes. Common options include `ext4`, `xfs`, and `btrfs`. Default is `ext4`.
+    required: true
+    default: ext4
+  - name: release
+    description: The version of Longhorn to install. Versions above v1.10.x are not supported due to an upstream issue with the Longhorn that can break CNI connections on k3s. https://github.com/longhorn/longhorn/issues/12642
+    required: true
+    default: v1.10.x
+    type: select
+    options:
+      - v1.10.x

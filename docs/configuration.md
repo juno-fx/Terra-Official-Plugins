@@ -23,19 +23,27 @@ UI uses to display storage options, connection settings, and configuration param
 
 #### Field Metadata
 
-| Key         | Type             | Description                                                       |
-|-------------|------------------|-------------------------------------------------------------------|
-| name        | String           | Key in the values.yaml file this will be mapped to                |
-| description | String           | Description that will be displayed to the user in the UI on Terra |
-| required    | String           | 'true' or 'false' if this field is required                       |
-| type        | String           | Options: string, shared-volume, exclusive-volume                  |
-
+| Key         | Type   | Description                                                       |
+|-------------|--------|-------------------------------------------------------------------|
+| name        | String | Key in the values.yaml file this will be mapped to                |
+| description | String | Description that will be displayed to the user in the UI on Terra |
+| required    | String | 'true' or 'false' if this field is required                       |
+| type        | String | The type of field. See below for available options                |
+| default     | string | A default value for a field                                       |
+| options     | list   | A list of options for the multi, and select field types           |
 
 ## Field Types
 
 - **string**: A simple text input field
+- **int**: A simple integer text input field
+- **boolean**: A True/False Boolean Field
+- **multi**: A multi selection box, This will require the options property
+- **select**: A single selection box, This will require the options property
 - **shared-volume**: A shared volume input field, allowing multiple plugins to access the same storage
 - **exclusive-volume**: An exclusive volume input field, ensuring only this plugin can access the storage
+
+Please note: Not all Genesis/Terra release versions have full field support. Field type and support is continuously 
+added in newer release version as we find the need for additional field handling.
 
 ### String
 

@@ -1,21 +1,25 @@
 resource_id: orion-essentials
 name: Orion Essentials
-icon: https://junovfx.com/dog.png
-description: Orion Essentials is a collection of essential plugins for the Orion platform.
+icon: https://github.com/juno-fx/Terra-Official-Plugins/blob/main/bundles/assets/orion-icon.png?raw=true
+description: Orion Essentials is a collection of essential plugins for the Orion platform. Intended to help get new users up and running at first time start up.
 category: Bundle
 tags:
   - orion
   - juno
+  - helios
+  - argocd
+  - first time setup
+  - cluster-level
 fields:
-  - name: install_volume
-    description: The name of the install volume
+  - name: host
+    description: The DNS name of your Genesis host for Argocd
     required: true
-    type: shared-volume
 plugins:
-  - plugin: Firefox
-    name: firefox
+  - plugin: Helios
+    name: helios-workstations
+  - plugin: ArgoCD Dashboard
+    name: argocd
     values:
-      install_volume:
-        reference: install_volume
-      destination:
-        hardcoded: '/firefox'
+      host:
+        reference: host
+

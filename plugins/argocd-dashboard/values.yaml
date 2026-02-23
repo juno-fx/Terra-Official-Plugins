@@ -1,0 +1,7 @@
+# configuration
+host:
+prefix: "/argocd"
+
+# This will be autopopulated by Terra in airgapped envs. The default here will be overriden on Terra versions > v1.0.4
+_juno_terra_image_pull_secrets: []
+_juno_terra_image: "junoinnovations/terra@sha256:7a39b5cee9772db6eed0f1d37b22a46a9f18e6a917cf3fa9f4316bb312a4be5a"

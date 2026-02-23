@@ -1,2 +1,5 @@
 branch:
 plugin:
+remote:
+name:
+environment: default

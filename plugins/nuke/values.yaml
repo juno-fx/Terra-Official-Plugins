@@ -1,5 +1,5 @@
 # configuration
-version: Nuke14.0v2
+version: 16.0v5
 destination: /nuke
 install_volume:
   name: apps-pv-claim

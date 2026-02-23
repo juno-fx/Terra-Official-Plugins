@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Version=0.9.4
-Name=Deadline Worker 10
-Comment=Launch the Deadline Worker
-Icon=DESTINATION/client/icons/Deadline_Worker.png
-Exec=DESTINATION/client/bin/deadlinelauncher -slave
-Terminal=false
-Path=DESTINATION/client/bin

@@ -1,21 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: terra-test
+  name: {{ .Values.name }}
   namespace: argocd
+  finalizers:
+    - "resources-finalizer.argocd.argoproj.io"
 spec:
   project: default
   destination:
     server: https://kubernetes.default.svc
-    namespace: argocd
+    namespace: {{ .Values.environment }}
   sources:
-    - repoURL: https://github.com/juno-fx/Terra-Official-Plugins.git
+    - repoURL: {{ .Values.remote }}
       path: ./plugins/{{ .Values.plugin }}/
       targetRevision: {{ .Values.branch }}
-      helm:
-        parameters:
-          - name: "namespace"
-            value: ""
   syncPolicy:
     automated:
       prune: true

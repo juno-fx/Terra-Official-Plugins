@@ -1,0 +1,8 @@
+operation:
+  initiatedBy:
+    username: tdk
+  sync:
+    prune: true
+    syncStrategy:
+      apply:
+        force: true

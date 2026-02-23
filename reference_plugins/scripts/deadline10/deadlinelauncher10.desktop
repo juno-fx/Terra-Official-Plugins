@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Version=0.9.4
-Name=Deadline Launcher 10
-Comment=Launch the Deadline Launcher
-Icon=DESTINATION/client/icons/Deadline_Launcher.png
-Exec=DESTINATION/client/bin/deadlinelauncher
-Terminal=false
-Path=DESTINATION/client/bin

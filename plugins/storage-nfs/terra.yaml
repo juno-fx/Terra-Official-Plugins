@@ -1,0 +1,22 @@
+resource_id: storage-nfs
+name: Storage NFS
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/storage-nfs/scripts/assets/logo.png
+description: |
+    Mount an NFS share as a Persistent Volume in your Kubernetes cluster using the NFS volume type.
+    This plugin allows for operators to connect to existing NFS shares and make them available to Pods running in the cluster.
+category: storage
+tags:
+  - storage
+  - nfs
+  - persistent-volume
+  - cluster-level
+fields:
+  - name: server
+    description: IP address or hostname of the NFS server
+    required: true
+  - name: path
+    description: Exported path on the NFS server to mount
+    required: true
+  - name: size
+    description: Size of the Persistent Volume to create (e.g., 10Gi). This is for scheduling purposes only.
+    required: true

@@ -1,0 +1,4 @@
+apiVersion: v1
+name: flow-production-tracking
+version: 0.0.1
+icon: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/flow-production-tracking/scripts/assets/flow.png?raw=true"

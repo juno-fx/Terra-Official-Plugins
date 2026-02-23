@@ -1,0 +1,39 @@
+---
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: "{{ .Release.Name }}-entire-cluster"
+  namespace: velero-system
+  labels:
+    juno-innovations.com/velero-backup: entire-cluster
+spec:
+  paused: false
+  # SkipImmediately specifies whether to skip backup if schedule is due immediately when unpaused or created.
+  # This is a one-time flag that will be automatically reset to false after being consumed.
+  # When true, the controller will skip the immediate backup, set LastSkipped timestamp, and reset this to false.
+  skipImmediately: false
+  # Schedule is a Cron expression defining when to run the Backup
+  schedule: "{{ .Values.schedule }}"
+  # Specifies whether to use OwnerReferences on backups created by this Schedule. 
+  # Notice: if set to true, when schedule is deleted, backups will be deleted too. Optional.
+  # This is better left off for now, with ArgoCD (https://github.com/vmware-tanzu/velero/issues/4093) 
+  useOwnerReferencesInBackup: false 
+  # Template is the spec that should be used for each backup triggered by this schedule.
+  template:
+    includedNamespaces:
+    - '*'
+    includedResources:
+    - '*'
+    includeClusterResources: true
+    # Whether to snapshot volumes. Valid values are true, false, and null/unset. If unset, Velero performs snapshots as long as
+    # a persistent volume provider is configured for Velero.
+    snapshotVolumes: false
+    # Where to store the tarball and logs.
+    storageLocation: default
+    # The amount of time before backups created on this schedule are eligible for garbage collection. If not specified,
+    # a default value of 30 days will be used. The default can be configured on the velero server
+    # by passing the flag --default-backup-ttl.
+    ttl: "{{ .Values.retention }}" 
+    uploaderConfig:
+        # ParallelFilesUpload is the number of files parallel uploads to perform when using the uploader.
+        parallelFilesUpload: 10

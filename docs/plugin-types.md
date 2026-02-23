@@ -7,18 +7,41 @@ see below for our different types, along with examples you can reference directl
 ## Plugin & Application
 
 Our most basic types are our Plugin and Application types. The only difference between these, is an application requires either a "shared-volume" or "exclusive-volume" to install too.
-Where a plugin does not require any traditional storage space. You can learn more about our different plugin field types [here](plugin-fields.md).
+Where a plugin does not require any traditional storage space. You can learn more about our different plugin field types [here](configuration.md#field-types).
 
 #### Examples
 - **Application**: Firefox
 - **Plugin**: theme-enforcer-xfce
 
-## Workstation & Workload
+## Workload
 
-Our Workstation and Workload plugins are intended to be schemas, which can be integrate directly with our Kuiper container orchestration manager. These type of plugins should either have their category, or include a tag
-that specifies they either a "workload" or "workstation". They should include a helm chart for the schema install. The schema will then be installed as a configMap. Once the schemas are installed, they can be used to create custom templates via Genesis in our Workstation/Workloads table. Once a template is created
-users can launch their workstation or workload within a project deployment. While fundamentally Workstations and Workloads work in the same way, we do provide ways to organize and differentiate them both via the backend, and frontend.
+Our Workload plugins are intended to be schemas, which can be integrate directly with our Kuiper workload orchestration manager. These type of plugins should either have their category, or include a tag
+that specifies they either "workload", this is how it will be categorized in the Terra app store. They should also include a helm chart for the schema install. The schema will then be installed as a configMap. Once the schemas are installed, they can be used to create custom templates via Genesis in our Workloads table. Once a template is created
+users can launch their workload within a project deployment. For UI organization purposes, you will want to be sure to include a `juno-innovations.com/workload` annotation in both the metadata.yaml and the charts workstation.yaml.
+The metadata annotation will be used to categorize the workload type within the workload table (Workstation, Application, Workspace, etc.) . The charts workstation.yaml annotation is how Hubble will display the workload type once it has been launched.
 Please see below for examples that can be referenced on what these type of plugins look like, and how they can be created/customized to fit your needs.
+
+For additional information about our Workload schemas see our [Genesis Instances](https://juno-fx.github.io/Orion-Documentation/latest/genesis/workloads/#schema-field-types) documentation
+
+```yaml linenums="1" title="my-workload/templates/metadata.yaml"
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-terra-metadata"
+  annotations:
+    juno-innovations.com/workload: "Application"  # mark this as a workload and it's type for the frontend UI
+```
+
+```yaml linenums="1" title="my-workload/scripts/chart/templates/workstation.yaml"
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{ .Values.name }}"
+  annotations:
+    juno-innovations.com/shared: "none"    # comma separated list of users that can access this workload as read only.
+    juno-innovations.com/workload: "Application"  # mark this as a workload and it's type for the frontend UI
+    juno-innovations.com/kuiper-state: "{{ .Values._kuiper }}"
+```
 
 #### Examples
 - **Workload**: ComfyUI
@@ -44,7 +67,7 @@ data:
 
 
 #### Examples
-- **Dashboard**: argocd-ingress
+- **Dashboard**: argocd-dashboard
 
 
 ## Bundles

@@ -14,11 +14,15 @@ tags:
   - rendering
 fields:
   - name: version
-    description: Version of Nuke to install. i.e. Nuke14.0v2
+    description: Version of Nuke to install. i.e. 16.0v5
     required: true
+    default: 16.0v5
+    type: string
   - name: destination
     description: Destination directory
     required: true
+    default: /nuke
+    type: string
   - name: install_volume
     description: The name of the install volume
     required: true

@@ -1,0 +1,15 @@
+resource_id: jupyter-notebook
+name: jupyter-notebook
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/jupyter-notebook/scripts/assets/logo.png
+description: >
+  JupyterLab is the latest web-based interactive development environment for notebooks, code, and data. Its flexible interface allows users to configure and arrange workflows in data science, scientific computing, computational journalism, and machine learning. A modular design invites extensions to expand and enrich functionality. When creating your workload template, use an image compliant with Jupyter's docker-stacks, eg. https://quay.io/repository/jupyter/datascience-notebook.
+
+  Keep in mind your data will NOT be persisted unless you add appropriate storage mounts for /home/
+  The notebooks run as your project's user and inherit their UIDs. The notebooks assume the home directory is mounted at /home/<username>
+category: "Data Science"
+tags:
+  - workload
+  - data-science
+  - development
+  - cluster-level
+fields: []
