@@ -25,3 +25,12 @@ data:
       type: string
       required: true
       default: "latest"
+    - name: storage_class
+      description: Storage class to use for the game disk
+      required: true
+      type: k8sStorageClass
+    - name: storage_size
+      description: Storage size to use for the game disk
+      default: 10Gi
+      required: true
+      type: string
