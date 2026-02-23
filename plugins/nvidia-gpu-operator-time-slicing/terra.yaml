@@ -1,7 +1,11 @@
 resource_id: nvidia-gpu-operator
 name: NVIDIA Time Slicing
 icon: https://www.nvidia.com/content/nvidiaGDC/us/en_US/about-nvidia/legal-info/logo-brand-usage/_jcr_content/root/responsivegrid/nv_container_392921705/nv_container/nv_image.coreimg.100.410.png/1703060329053/nvidia-logo-vert.png
-description: Enable GPU acceleration for compute workloads on NVIDIA GPUs. This configuration is specifically designed for time-slicing of GPU resources. After installed, make sure to follow the time-slicing configuration steps on the official NVIDIA documentation. https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/gpu-sharing.html
+description: |
+  Enable GPU acceleration for compute workloads on NVIDIA GPUs. This configuration 
+  is specifically designed for time-slicing of GPU resources. After installed, 
+  make sure to follow the time-slicing configuration steps on the official NVIDIA 
+  documentation. https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/gpu-sharing.html
 category: Hardware
 tags:
   - gpu
@@ -21,46 +25,52 @@ fields:
     default: false
     type: boolean
   - name: install_crds
-    description: Install the NVIDIA GPU Operator's Custom Resource Definitions (CRDs). If this is the first or only install of the NVIDIA GPU Operator in the cluster, you should set this to true to install the necessary CRDs. If you have already installed the NVIDIA GPU Operator with CRD installation enabled, you can set this to false for subsequent installations to avoid trying to reinstall the CRDs.
+    description: |
+      Install the NVIDIA GPU Operator's Custom Resource Definitions (CRDs). 
+      If this is the first or only install of the NVIDIA GPU Operator in 
+      the cluster, you should set this to true to install the necessary CRDs. 
+      If you have already installed the NVIDIA GPU Operator with CRD installation 
+      enabled, you can set this to false for subsequent installations to avoid 
+      trying to reinstall the CRDs.
     required: false
     default: false
     type: boolean
   - name: open_kernel_modules
-    description: Whether to use open kernel modules for the NVIDIA driver. This is required if you want to use the open kernel modules for the NVIDIA driver. Not needed if you are using the device plugin to manage the driver installation.
+    description: |
+      Whether to use open kernel modules for the NVIDIA driver. This is required 
+      if you want to use the open kernel modules for the NVIDIA driver. Not needed 
+      if you are using the device plugin to manage the driver installation.
     required: false
     default: false
     type: boolean
   - name: nfd_enabled
-    description: Whether to enable the NVIDIA GPU Operator's Node Feature Discovery (NFD) component. This is required if you want to use the NFD component to discover the NVIDIA GPU features on the nodes. Not needed if you are using the device plugin to manage the driver installation.
+    description: |
+      Whether to enable the NVIDIA GPU Operator's Node Feature Discovery (NFD) component. 
+      This is required if you want to use the NFD component to discover the NVIDIA GPU 
+      features on the nodes. Not needed if you are using the device plugin to manage the 
+      driver installation.
     required: false
     default: false
     type: boolean
   - name: dcgm_enabled
-    description: Whether to enable the NVIDIA GPU Operator's Data Center GPU Manager (DCGM) component. This is required if you want to use the DCGM component to monitor the NVIDIA GPU health and performance on the nodes. Not needed if you are using the device plugin to manage the driver installation.
+    description: |
+      Whether to enable the NVIDIA GPU Operator's Data Center GPU Manager (DCGM) component. 
+      This is required if you want to use the DCGM component to monitor the NVIDIA GPU 
+      health and performance on the nodes. Not needed if you are using the device plugin 
+      to manage the driver installation.
     required: false
     default: false
     type: boolean
-  - name: multi-line
-    description: Name of the default configuration to use for the NVIDIA GPU Operator. The default is "any", which means that the operator will use the default configuration provided by NVIDIA. You can also specify a custom configuration by creating a ConfigMap with the desired configuration and specifying its name here.
-    required: false
-    default: |
-      default: |-
-        version: v1
-        flags:
-          migStrategy: none
-        sharing:
-          timeSlicing:
-            renameByDefault: false
-            failRequestsGreaterThanOne: false
-            resources:
-              - name: nvidia.com/gpu
-                replicas: 6
-    type: multi-line
-#  - name: slicing_config
-#    description: Name of the ConfigMap to use for time-slicing configuration. The default is "time-slicing-config".
-#    required: false
-#    default: time-slicing-config
-#    type: multiline
+  - name: slice_count
+    description: |
+      Number of time-slices to create for each GPU. This is required for time-slicing 
+      configuration and determines how many slices each GPU will be divided into. The 
+      default is 4, which means that each GPU will be divided into 4 time-slices. You 
+      can adjust this number based on your workload requirements and the capabilities 
+      of your GPUs.
+    required: true
+    default: 4
+    type: int
   - name: version
     description: Version of the GPU Operator to install.
     required: true
