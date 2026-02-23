@@ -1,0 +1,4 @@
+version: "v25.10.0"
+install_crds: "true"
+nfd_enabled: "true"
+dcgm_enabled: "false"

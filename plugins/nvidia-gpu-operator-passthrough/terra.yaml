@@ -1,0 +1,29 @@
+resource_id: nvidia-gpu-operator
+name: NVIDIA Passthrough
+icon: https://www.nvidia.com/content/nvidiaGDC/us/en_US/about-nvidia/legal-info/logo-brand-usage/_jcr_content/root/responsivegrid/nv_container_392921705/nv_container/nv_image.coreimg.100.410.png/1703060329053/nvidia-logo-vert.png
+description: Enable GPU acceleration for compute workloads on NVIDIA GPUs. This configuration is specifically designed for GPU passthrough to virtual machines. After installed, make sure to follow the time-slicing configuration steps on the official NVIDIA documentation. https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/gpu-sharing.html
+category: Hardware
+tags:
+  - gpu
+  - nvidia
+  - operator
+  - vm-passthrough
+  - cluster-level
+fields:
+  - name: version
+    description: Version of the GPU Operator to install.
+    required: true
+    type: select
+    options:
+      - v25.10.1
+      - v25.3.4
+  - name: install_crds
+    description: Install the NVIDIA GPU Operator's Custom Resource Definitions (CRDs). If this is the first or only install of the NVIDIA GPU Operator in the cluster, you should set this to true to install the necessary CRDs. If you have already installed the NVIDIA GPU Operator with CRD installation enabled, you can set this to false for subsequent installations to avoid trying to reinstall the CRDs.
+    required: false
+    default: false
+    type: boolean
+  - name: dcgm_enabled
+    description: Whether to enable the NVIDIA GPU Operator's Data Center GPU Manager (DCGM) component. This is required if you want to use the DCGM component to monitor the NVIDIA GPU health and performance on the nodes. Not needed if you are using the device plugin to manage the driver installation.
+    required: false
+    default: false
+    type: boolean

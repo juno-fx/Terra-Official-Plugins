@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-nvidia-gpu-operator
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {{ .Release.Name }}
+  sources:
+    - repoURL: https://helm.ngc.nvidia.com/nvidia
+      chart: gpu-operator
+      targetRevision: {{ .Values.version }}
+      helm:
+        releaseName: {{ .Release.Name }}-nvidia-gpu-operator
+        values: |
+          toolkit:
+            enabled: true
+          driver:
+            enabled: true
+            nvidiaDriverCRD:
+              enabled: {{ .Values.install_crds }}
+
+          operator:
+            cleanupCRD: {{ .Values.install_crds }}
+            upgradeCRD: {{ .Values.install_crds }}
+
+          sandboxWorkloads:
+            enabled: true
+            defaultWorkload: vm-passthrough
+          nfd:
+            enabled: {{ .Values.nfd_enabled }}
+          dcgm:
+            enabled: {{ .Values.dcgm_enabled }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+      - CreateNamespace=true
