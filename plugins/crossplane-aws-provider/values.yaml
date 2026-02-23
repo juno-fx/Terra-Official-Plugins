@@ -1,0 +1,5 @@
+# configuration
+version: "v0.55.0"
+secret_namespace:
+secret_name:
+secret_key:
