@@ -40,7 +40,7 @@ fields:
     required: false
     default: false
     type: boolean
-  - name: default_config
+  - name: multi-line
     description: Name of the default configuration to use for the NVIDIA GPU Operator. The default is "any", which means that the operator will use the default configuration provided by NVIDIA. You can also specify a custom configuration by creating a ConfigMap with the desired configuration and specifying its name here.
     required: false
     default: |
