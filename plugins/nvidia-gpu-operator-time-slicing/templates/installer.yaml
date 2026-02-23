@@ -34,7 +34,7 @@ spec:
 
           sandboxWorkloads:
             enabled: true
-            defaultWorkload: containers
+            defaultWorkload: container
 
           devicePlugin:
             config:
