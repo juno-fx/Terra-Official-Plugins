@@ -7,32 +7,48 @@ spec:
   project: default
   destination:
     server: https://kubernetes.default.svc
-    namespace: gpu-operator
+    namespace: {{ .Release.Name }}-gpu-operator
   sources:
     - repoURL: https://helm.ngc.nvidia.com/nvidia
       chart: gpu-operator
       targetRevision: {{ .Values.version }}
       helm:
-        releaseName: gpu-operator
-        parameters:
-          - name: "toolkit.enabled"
-            value: "{{ .Values.install_toolkit }}"
-          - name: "driver.enabled"
-            value: "{{ .Values.install_driver }}"
-          - name: "driver.nvidiaDriverCRD.enabled"
-            value: "{{ .Values.install_driver_crd }}"
-          - name: "devicePlugin.config.name"
-            value: "{{ .Values.slicing_config }}"
-          - name: "devicePlugin.config.default"
-            value: "{{ .Values.default_config }}"
-          - name: "sandboxWorkloads.enabled"
-            value: "true"
-          - name: "driver.useOpenKernelModules"
-            value: "{{ .Values.open_kernel_modules }}"
-          - name: "nfd.enabled"
-            value: "{{ .Values.nfd_enabled }}"
-          - name: "dcgm.enabled"
-            value: "{{ .Values.dcgm_enabled }}"
+        releaseName: {{ .Release.Name }}-nvidia-gpu-operator
+        values: |
+          toolkit:
+            enabled: true
+          driver:
+            enabled: true
+            useOpenKernelModules: {{ .Values.open_kernel_modules }}
+            nvidiaDriverCRD:
+              enabled: {{ .Values.install_crds }}
+          operator:
+            cleanupCRD: {{ .Values.install_crds }}
+            upgradeCRD: {{ .Values.install_crds }}
+          sandboxWorkloads:
+            enabled: true
+            defaultWorkload: container
+          devicePlugin:
+            config:
+              name: device-plugin-config
+              create: true
+              default: default
+              data:
+                default: |-
+                  version: v1
+                  flags:
+                    migStrategy: none
+                  sharing:
+                    timeSlicing:
+                      renameByDefault: false
+                      failRequestsGreaterThanOne: false
+                      resources:
+                        - name: nvidia.com/gpu
+                          replicas: {{ .Values.slice_count }}
+          nfd:
+            enabled: true
+          dcgm:
+            enabled: {{ .Values.dcgm_enabled }}
   syncPolicy:
     automated:
       prune: true
