@@ -13,7 +13,7 @@ spec:
       chart: gpu-operator
       targetRevision: {{ .Values.version }}
       helm:
-        releaseName: gpu-operator
+        releaseName: {{ .Release.Name }}-nvidia-gpu-operator
         values: |
           toolkit:
             enabled: true
