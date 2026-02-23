@@ -50,7 +50,7 @@ spec:
                       failRequestsGreaterThanOne: false
                       resources:
                         - name: nvidia.com/gpu
-                          replicas: 6
+                          replicas: {{ .Values.slicing_config }}
             nodeSelector:
               juno-innotations.com/gpu-mode: {{ .Values.selector }}
 
