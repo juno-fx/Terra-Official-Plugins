@@ -56,11 +56,11 @@ fields:
               - name: nvidia.com/gpu
                 replicas: 6
     type: multi-line
-  - name: slicing_config
-    description: Name of the ConfigMap to use for time-slicing configuration. The default is "time-slicing-config".
-    required: false
-    default: time-slicing-config
-    type: multiline
+#  - name: slicing_config
+#    description: Name of the ConfigMap to use for time-slicing configuration. The default is "time-slicing-config".
+#    required: false
+#    default: time-slicing-config
+#    type: multiline
   - name: version
     description: Version of the GPU Operator to install.
     required: true
