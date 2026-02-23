@@ -5,6 +5,7 @@ metadata:
   namespace: crossplane-system
   annotations:
     argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   package: "xpkg.crossplane.io/crossplane-contrib/provider-aws:{{ .Values.version }}"
 
@@ -17,6 +18,7 @@ metadata:
   namespace: crossplane-system
   annotations:
     argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   credentials:
     source: Secret
