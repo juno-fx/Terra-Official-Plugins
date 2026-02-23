@@ -4,6 +4,7 @@ icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/head
 description: The Crossplane AWS Provider lets you provision and manage AWS resources directly from Kubernetes.
   This plugin requires Crossplane to be installed and an AWS secret inside your cluster. You can learn more about Kuberenetes secrets
   via the official documentation https://kubernetes.io/docs/tasks/configmap-secret/managing-secret-using-kubectl/
+category: Cloud Management
 tags:
   - crossplane
   - cloud
