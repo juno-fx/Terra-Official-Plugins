@@ -17,25 +17,17 @@ spec:
         values: |
           toolkit:
             enabled: true
-            nodeSelector:
-              juno-innotations.com/gpu-mode: {{ .Values.selector }}
-
           driver:
             enabled: true
             useOpenKernelModules: {{ .Values.open_kernel_modules }}
             nvidiaDriverCRD:
               enabled: {{ .Values.install_crds }}
-              nodeSelector:
-                juno-innotations.com/gpu-mode: {{ .Values.selector }}
-
           operator:
             cleanupCRD: {{ .Values.install_crds }}
             upgradeCRD: {{ .Values.install_crds }}
-
           sandboxWorkloads:
             enabled: true
             defaultWorkload: container
-
           devicePlugin:
             config:
               name: device-plugin-config
@@ -52,17 +44,11 @@ spec:
                       failRequestsGreaterThanOne: false
                       resources:
                         - name: nvidia.com/gpu
-                          replicas: "{{ .Values.slicing_config }}"
-            nodeSelector:
-              juno-innotations.com/gpu-mode: {{ .Values.selector }}
-
+                          replicas: {{ .Values.slice_count }}
           nfd:
             enabled: true
-
           dcgm:
             enabled: {{ .Values.dcgm_enabled }}
-            nodeSelector:
-              juno-innotations.com/gpu-mode: {{ .Values.selector }}
   syncPolicy:
     automated:
       prune: true
