@@ -17,7 +17,7 @@ fields:
 plugins:
   - plugin: fake-plugin
     name: helios-workstations
-  - plugin: ArgoCD Dashboard
+  - plugin: fake-plugin
     name: argocd
     values:
       host:
