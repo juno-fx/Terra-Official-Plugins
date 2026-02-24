@@ -44,7 +44,7 @@ spec:
             - name: START_DOCKER
               value: "false"
             - name: CHROME_CLI
-              value: "--force-dark-mode http://localhost:3000/"
+              value: "--force-dark-mode http://localhost:8080/"
           volumeMounts:
             - mountPath: /dev/shm
               name: dshm
@@ -63,7 +63,7 @@ spec:
               memory: "{{ .Values.memoryLimit }}"
             {{- end }}
           ports:
-            - containerPort: 3000
+            - containerPort: 8080
               name: ui
           volumeMounts:
             - name: data
