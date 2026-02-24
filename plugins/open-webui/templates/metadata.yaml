@@ -11,13 +11,34 @@ data:
   description: "Open WebUI"
   fields: |
     - name: registry
-      default: "dyrnq"
+      default: "ghcr.io/open-webui"
     - name: repo
       default: "open-webui"
     - name: tag
-      default: "main-ollama"
+      default: "main"
     - name: icon
       default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/open-webui/scripts/assets/logo.png"
-    - name: gpu
-      default: false
-      type: boolean
+    - name: webtop_registry
+      description: "Registry to pull the webtop image from"
+      type: string
+      required: true
+      default: "lscr.io/linuxserver"
+    - name: webtop_repo
+      description: "Repository to pull the webtop image from"
+      type: string
+      required: true
+      default: "chromium"
+    - name: webtop_tag
+      description: "Tag to pull the webtop image from"
+      type: string
+      required: true
+      default: "latest"
+    - name: storage_class
+      description: Storage class to use for the game disk
+      required: true
+      type: k8sStorageClass
+    - name: storage_size
+      description: Storage size to use for the game disk
+      default: 10Gi
+      required: true
+      type: string

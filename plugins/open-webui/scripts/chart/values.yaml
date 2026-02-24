@@ -1,5 +1,8 @@
 name: webui
 user:
+webtop_repo:
+webtop_tag:
+webtop_registry:
 repo:
 tag:
 registry:
@@ -23,6 +26,6 @@ env:
 selector:
 plugins: []
 _kuiper:
-
-proxy_namespace: ingress-nginx
-
+timezone: "America/New_York"
+storage_class:
+storage_size: "1Gi"
