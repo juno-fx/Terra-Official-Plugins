@@ -14,6 +14,40 @@ spec:
     spec:
       automountServiceAccountToken: false
       containers:
+        - name: webtop
+          imagePullPolicy: IfNotPresent
+          image: "{{ .Values.webtop_registry }}/{{ .Values.webtop_repo }}:{{ .Values.webtop_tag }}"
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "1"
+            # gotmpl's or is a function taking 2 args - this is "X or Y or Z" translated to python
+            {{- if or (or .Values.gpu .Values.memoryLimit) .Values.cpuLimit }}
+            limits:
+            {{- if .Values.cpuLimit }}
+              cpu: "{{ .Values.cpuLimit }}"
+            {{- end }}
+            {{- if .Values.memoryLimit }}
+              memory: "{{ .Values.memoryLimit }}"
+            {{- end }}
+            {{- end }}
+          ports:
+            - containerPort: 3001
+              name: viewer
+          env:
+            - name: PUID
+              value: "{{ .Values.puid }}"
+            - name: PGID
+              value: "{{ .Values.guid }}"
+            - name: SUBFOLDER
+              value: "/webtop/{{ .Values.name }}/"
+            - name: START_DOCKER
+              value: "false"
+            - name: CHROME_CLI
+              value: "http://localhost:5678/"
+          volumeMounts:
+            - mountPath: /dev/shm
+              name: dshm
         - name: n8n
           imagePullPolicy: IfNotPresent
           image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
@@ -40,20 +74,13 @@ spec:
               value: "true"
             - name: N8N_RUNNERS_ENABLED
               value: "true"
-            - name: N8N_HOST
-              value: "{{ .Values.host }}"
-            - name: N8N_PROTOCOL
-              value: "https"
-            - name: WEBHOOK_URL
-              value: "https://{{ .Values.host }}/n8n/{{ .Values.name }}/"
-            - name: N8N_PATH
-              value: "/n8n/{{ .Values.name }}/"
-            - name: N8N_EDITOR_BASE_URL
-              value: "https://{{ .Values.host }}/n8n/{{ .Values.name }}/"
           volumeMounts:
             - name: data
               mountPath: /data
       volumes:
+        - name: dshm
+          emptyDir:
+            medium: Memory
         - name: data
           persistentVolumeClaim:
             claimName: "{{ .Release.Name }}"

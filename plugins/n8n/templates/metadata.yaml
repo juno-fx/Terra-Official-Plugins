@@ -25,6 +25,21 @@ data:
       type: string
       required: true
       default: "latest"
+    - name: webtop_registry
+      description: "Registry to pull the webtop image from"
+      type: string
+      required: true
+      default: "lscr.io/linuxserver"
+    - name: webtop_repo
+      description: "Repository to pull the webtop image from"
+      type: string
+      required: true
+      default: "chromium"
+    - name: webtop_tag
+      description: "Tag to pull the webtop image from"
+      type: string
+      required: true
+      default: "latest"
     - name: timezone
       description: "Timezone to use for the n8n instance"
       type: string

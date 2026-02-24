@@ -1,5 +1,8 @@
 name: helios
 user:
+webtop_repo:
+webtop_tag:
+webtop_registry:
 repo:
 tag:
 registry:
@@ -24,3 +27,5 @@ selector:
 plugins: []
 _kuiper:
 timezone: "America/New_York"
+storage_class:
+storage_size: "1Gi"
