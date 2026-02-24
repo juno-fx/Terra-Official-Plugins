@@ -42,6 +42,8 @@ spec:
               value: "true"
             - name: N8N_PATH
               value: "/n8n/{{ .Values.name }}/"
+            - name: N8N_EDITOR_BASE_URL
+              value: "https://{{ .Values.host }}/n8n/{{ .Values.name }}/"
           volumeMounts:
             - name: data
               mountPath: /data
