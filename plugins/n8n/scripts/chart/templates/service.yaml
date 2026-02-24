@@ -3,7 +3,6 @@ kind: Service
 metadata:
   name: "{{ .Release.Name }}-ui"
 spec:
-  type: NodePort
   selector:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
   ports:
