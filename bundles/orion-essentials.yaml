@@ -15,7 +15,7 @@ fields:
     description: The DNS name of your Genesis host for Argocd
     required: true
 plugins:
-  - plugin: Helios
+  - plugin: fake-plugin
     name: helios-workstations
   - plugin: ArgoCD Dashboard
     name: argocd
