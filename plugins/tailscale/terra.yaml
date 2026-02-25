@@ -8,6 +8,7 @@ tags:
   - vpn
   - tailscale
   - cluster-level
+editable: true
 fields:
   - name: client_id
     description: Tailscale Client ID.

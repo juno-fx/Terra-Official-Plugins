@@ -11,7 +11,7 @@ tags:
   - cluster-level
   - control plane
   - AWS
-
+editable: true
 fields:
   - name: version
     description: Version of AWS provider plugin to install. (defaults to v0.55.0)

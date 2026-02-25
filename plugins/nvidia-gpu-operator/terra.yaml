@@ -11,6 +11,7 @@ tags:
   - vm-passthrough
   - operator
   - cluster-level
+editable: true
 fields:
   - name: install_crds
     description: |
