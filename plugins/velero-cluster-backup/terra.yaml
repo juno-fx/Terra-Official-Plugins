@@ -6,7 +6,6 @@ category: Infrastructure
 tags:
   - cluster-level
   - backup
-editable: true
 fields:
   - name: retention
     description: "Rotation interval after which old backups are deleted. Defaults to 30 days."
