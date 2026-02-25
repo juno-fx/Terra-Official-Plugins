@@ -6,6 +6,7 @@ category: Web
 tags:
   - firefox
   - browser
+editable: true
 fields:
   - name: destination
     description: Destination directory

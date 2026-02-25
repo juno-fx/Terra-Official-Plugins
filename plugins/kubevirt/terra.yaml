@@ -16,6 +16,7 @@ tags:
   - vm
   - virtual-machine
   - cluster-level
+editable: true
 fields:
   - name: version
     description: Version of KubeVirt to install
