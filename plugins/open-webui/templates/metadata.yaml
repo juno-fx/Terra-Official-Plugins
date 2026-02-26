@@ -5,7 +5,7 @@ metadata:
   labels:
     kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
   annotations:
-    juno-innovations.com/workload: "Application"  # mark this as a workload and it's type for the
+    juno-innovations.com/workload: "Application"
 data:
   chart: "{{ .Release.Name }}-scripts-configmap"
   description: "Open WebUI"
