@@ -4,6 +4,7 @@ metadata:
   name: "{{ .Release.Name }}-terra-metadata"
   labels:
     kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+    juno-innovations.com/workload: "Workspace"
 data:
   chart: "{{ .Release.Name }}-scripts-configmap"
   description: "n8n is an open-source workflow automation tool that allows you to connect various applications and services to automate tasks and processes. It provides a visual interface for creating workflows, making it easy to integrate different systems without the need for coding. With n8n, you can automate repetitive tasks, streamline data processing, and enhance productivity by connecting APIs, databases, and other services in a seamless manner."
