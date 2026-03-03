@@ -4,6 +4,5 @@ metadata:
   name: {{.Values.name}}-ec2
   namespace: {{.Release.Namespace}}
 spec:
-  compositionSelector:
-    matchLabels:
-      kuiper.juno-innovations.com/kuiper-instance: "{{.Values.name}}"
+  compositionRef:
+    name: "{{ .Values.name }}-composition"

@@ -19,7 +19,11 @@ spec:
             spec:
               type: object
               properties:
-                instanceType:
-                  type: string
-                ami:
-                  type: string
+                parameters:
+                  type: object
+                  properties:
+                    instanceType:
+                      type: string
+                    ami:
+                      type: string
+              additionalProperties: true
