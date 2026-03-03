@@ -10,7 +10,7 @@ data:
   fields: |
     - name: icon
       default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/crossplane-ec2/scripts/assets/logo.png"
-    - name: ami_image
+    - name: ami_image_id
       required: true
       type: string
     - name: security_group_ids

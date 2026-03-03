@@ -25,7 +25,7 @@ plugins: []
 _kuiper:
 
 # Plugin Specific Values
-ami_img:
+ami_image_id:
 security_group_ids: []
 subnet_id:
 provider_config_ref:

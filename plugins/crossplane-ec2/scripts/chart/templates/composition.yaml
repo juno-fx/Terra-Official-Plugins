@@ -25,7 +25,7 @@ spec:
               spec:
                 forProvider:
                   region: {{.Values.region}}
-                  imageId: {{.Values.ami_img}}
+                  imageId: {{.Values.ami_image_id}}
                   blockDeviceMappings:
                    - deviceName: /dev/sdx
                      ebs:
