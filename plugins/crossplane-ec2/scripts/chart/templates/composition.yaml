@@ -17,7 +17,7 @@ spec:
         kind: Resources
         resources:
           # EC2 Instance
-          - name: ec2-instance
+          - name: {{.Values.name}}-instance
             base:
               apiVersion: ec2.aws.crossplane.io/v1alpha1
               kind: Instance
