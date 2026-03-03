@@ -2,6 +2,8 @@ apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
   name: "{{ .Values.name }}-composition"
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{.Values.name}}"
 spec:
   compositeTypeRef:
     apiVersion: crossplane.juno-innovations.com/v1alpha1
