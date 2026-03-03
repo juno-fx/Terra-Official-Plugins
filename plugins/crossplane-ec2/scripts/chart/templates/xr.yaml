@@ -3,4 +3,6 @@ kind: EC2Instance
 metadata:
   name: {{.Values.name}}-ec2
   namespace: {{.Release.Namespace}}
-spec: {}
+spec:
+  compositionRef:
+    name: "{{ .Values.name }}-composition"
