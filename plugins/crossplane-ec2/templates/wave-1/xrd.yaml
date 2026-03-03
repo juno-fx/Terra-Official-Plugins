@@ -18,6 +18,7 @@ spec:
           properties:
             spec:
               type: object
+              x-kubernetes-preserve-unknown-fields: true
               properties:
                 parameters:
                   type: object
@@ -26,4 +27,3 @@ spec:
                       type: string
                     ami:
                       type: string
-              additionalProperties: true
