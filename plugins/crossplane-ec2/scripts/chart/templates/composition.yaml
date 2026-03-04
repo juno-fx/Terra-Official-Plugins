@@ -28,6 +28,9 @@ spec:
                 forProvider:
                   region: {{.Values.region}}
                   imageId: {{.Values.ami_image_id}}
+                  tags:
+                    - key: Name
+                      value: "{{.Release.Namespace}}-{{.Values.name}}-instance"
                   blockDeviceMappings:
                    - deviceName: /dev/sdx
                      ebs:
