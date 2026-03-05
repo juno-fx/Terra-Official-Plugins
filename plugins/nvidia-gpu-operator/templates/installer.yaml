@@ -19,7 +19,7 @@ spec:
             enabled: true
             {{ if .Values.k3s }}
             env:
-              - name: CONTAINERD_SOCK
+              - name: CONTAINERD_SOCKET
                 value: /run/k3s/containerd/containerd.sock
               - name: CONTAINERD_CONFIG
                 value: /var/lib/rancher/k3s/agent/etc/containerd/config.toml
