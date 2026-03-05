@@ -17,7 +17,7 @@ spec:
         values: |
           toolkit:
             enabled: true
-            {{ if eq .Values.k3s "true" }}
+            {{ if .Values.k3s }}
             env:
               - name: CONTAINERD_SOCK
                 value: /run/k3s/containerd/containerd.sock
