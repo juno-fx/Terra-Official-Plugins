@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.name }}-web-ide
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+spec:
+  selector:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+  ports:
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
+      name: nginx

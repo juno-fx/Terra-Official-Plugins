@@ -1,0 +1,34 @@
+resource_id: miniconda
+name: Miniconda
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/miniconda/scripts/assets/logo.png
+description: |
+  The Miniconda plugin provides a lightweight Python environment for users to manage their 
+  Python dependencies and environments. It allows users to create isolated Python environments, 
+  install packages, and manage their Python projects efficiently.
+category: Development
+tags:
+  - miniconda
+  - python
+fields:
+  - name: destination
+    description: Destination directory
+    required: false
+    default: /miniconda
+  - name: install_volume
+    description: The name of the install volume
+    required: true
+    type: shared-volume
+  - name: environment_name
+    description: Name of the conda environment to create
+    required: true
+    default: base
+  - name: packages
+    description: Additional packages to install. You can use spaces " " to install multiples.
+    required: false
+    default: ""
+  - name: source_url
+    description: | 
+      URL to the Miniconda installer script. If not provided, the plugin will use the default 
+      Miniconda installer for Linux.
+    required: false
+    default: "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"

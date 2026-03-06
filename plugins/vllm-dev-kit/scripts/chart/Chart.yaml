@@ -1,0 +1,9 @@
+apiVersion: v1
+description: |
+    The vLLM Dev Kit plugin provides a seamless development environment for building and testing
+    vLLM-based applications. It includes tools for deploying a mini vLLM environment for rapid development
+    and testing.
+name: vllm-dev-kit
+version: 0.0.0
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/vllm-dev-kit/scripts/assets/logo.png
+
