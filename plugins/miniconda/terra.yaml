@@ -26,6 +26,10 @@ fields:
     description: Additional packages to install. You can use spaces " " to install multiples.
     required: false
     default: ""
+  - name: python_version
+    description: Python version to install in the conda environment (e.g., 3.8, 3.9, 3.10)
+    required: true
+    default: "3.12"
   - name: source_url
     description: | 
       URL to the Miniconda installer script. If not provided, the plugin will use the default 

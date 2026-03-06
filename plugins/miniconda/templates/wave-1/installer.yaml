@@ -23,7 +23,7 @@ spec:
             - name: ENVIRONMENT_NAME
               value: "{{ .Values.environment_name }}"
             - name: PACKAGES
-              value: "{{ .Values.packages }}"
+              value: {{ .Values.packages }}
             - name: PYTHON_VERSION
               value: "{{ .Values.python_version }}"
           command: [ "/terra/bootstrap.sh" ]
