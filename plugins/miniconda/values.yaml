@@ -1,0 +1,10 @@
+# configuration
+destination: /miniconda
+source_url: "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
+install_volume:
+  name: apps-pv-claim
+  sub_path:
+  container_path: /apps
+environment_name: base
+packages: ""
+python_version: "3.12"
