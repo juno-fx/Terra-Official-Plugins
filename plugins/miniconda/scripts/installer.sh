@@ -21,7 +21,7 @@ conda config --set channel_priority strict
 # create the environment and install the packages.
 conda create -p $DESTINATION/envs/$ENVIRONMENT_NAME python=$PYTHON_VERSION -y
 conda activate $DESTINATION/envs/$ENVIRONMENT_NAME
-pip install $PACKAGES
+pip install "$PACKAGES"
 conda deactivate
 
 # set permissions to be shared.
