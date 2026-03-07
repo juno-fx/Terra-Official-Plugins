@@ -1,0 +1,4 @@
+apiVersion: v1
+name: n8n
+version: 0.0.0
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/n8n/scripts/assets/icon.png
