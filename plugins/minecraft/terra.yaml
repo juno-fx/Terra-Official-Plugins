@@ -1,0 +1,12 @@
+resource_id: minecraft
+name: Minecraft
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/minecraft/scripts/assets/icon.png
+description: A popular sandbox game that allows players to build and explore virtual worlds made of blocks.
+category: Gaming
+tags:
+  - minecraft
+  - sandbox
+  - multiplayer
+  - block-building
+  - cluster-level
+fields: []
