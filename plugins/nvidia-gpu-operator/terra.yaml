@@ -32,6 +32,15 @@ fields:
     required: false
     default: false
     type: boolean
+  - name: k3s
+    description: |
+      When installing in a k3s cluster, the NVIDIA GPU Operator needs to be configured 
+      to point to the correct containerd socket. The path is: /run/k3s/containerd/containerd.sock. 
+      Setting this to true will configure the NVIDIA GPU Operator to use this socket path for 
+      containerd, which is necessary for it to function properly in a k3s environment.
+    required: false
+    default: true
+    type: boolean
   - name: slice_count
     description: |
       Number of time-slices to create for each GPU. This is required for time-slicing 

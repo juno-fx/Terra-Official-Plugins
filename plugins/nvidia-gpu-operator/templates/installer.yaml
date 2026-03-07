@@ -17,6 +17,13 @@ spec:
         values: |
           toolkit:
             enabled: true
+            {{ if .Values.k3s }}
+            env:
+              - name: CONTAINERD_SOCKET
+                value: /run/k3s/containerd/containerd.sock
+              - name: CONTAINERD_CONFIG
+                value: /var/lib/rancher/k3s/agent/etc/containerd/config.toml
+            {{ end }}
           driver:
             enabled: true
             useOpenKernelModules: {{ .Values.open_kernel_modules }}
