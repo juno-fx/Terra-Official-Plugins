@@ -1,0 +1,32 @@
+name: crossplane-ec2
+user:
+repo:
+tag:
+registry:
+group:
+cpu: "1"
+memory: "1Gi"
+cpuLimit: null
+memoryLimit: null
+gpu: false
+idx: 0
+guid: 0
+puid: 0
+host:
+pullSecret:
+session:
+volumeMounts: []
+volumes: []
+env:
+  - name: JUNO
+    value: "true"
+selector:
+plugins: []
+_kuiper:
+
+# Plugin Specific Values
+ami_image_id:
+security_group_ids: []
+subnet_id:
+provider_config_ref:
+region: ""

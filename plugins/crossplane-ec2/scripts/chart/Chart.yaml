@@ -1,0 +1,4 @@
+apiVersion: v1
+name: crossplane-ec2
+version: 0.0.0
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/crossplane-ec2/scripts/assets/logo.png

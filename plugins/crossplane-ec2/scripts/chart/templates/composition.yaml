@@ -1,0 +1,49 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: "{{ .Values.name }}-composition"
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{.Values.name}}"
+spec:
+  compositeTypeRef:
+    apiVersion: crossplane.juno-innovations.com/v1alpha1
+    kind: EC2Instance
+  pipeline:
+    - step: patch-and-transform
+      functionRef:
+        name: function-patch-and-transform
+      input:
+        apiVersion: pt.fn.crossplane.io/v1beta1
+        kind: Resources
+        resources:
+          # EC2 Instance
+          - name: {{.Values.name}}-instance
+            base:
+              apiVersion: ec2.aws.crossplane.io/v1alpha1
+              kind: Instance
+              metadata:
+                name: {{.Values.name}}
+                namespace: {{ .Release.Namespace }}
+              spec:
+                forProvider:
+                  region: {{.Values.region}}
+                  imageId: {{.Values.ami_image_id}}
+                  tags:
+                    - key: Name
+                      value: "{{.Release.Namespace}}-{{.Values.name}}-instance"
+                  blockDeviceMappings:
+                   - deviceName: /dev/sdx
+                     ebs:
+                       volumeSize: 100
+                  securityGroupIds:
+                  {{ range .Values.security_group_ids}}
+                    - {{.id}}
+                  {{end}}
+                  subnetId: {{.Values.subnet_id}}
+                providerConfigRef:
+                  name: {{.Values.provider_config_ref}}
+            patches:
+              # Same label propagated to EC2 instance
+              - type: FromCompositeFieldPath
+                fromFieldPath: "metadata.labels"
+                toFieldPath: "metadata.labels"
