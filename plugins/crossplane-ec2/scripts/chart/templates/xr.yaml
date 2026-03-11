@@ -3,6 +3,9 @@ kind: EC2Instance
 metadata:
   name: {{.Values.name}}-ec2
   namespace: {{.Release.Namespace}}
+  annotations:
+    kuiper.juno-innovations.com/use-private-dns: "true"
+    kuiper.juno-innovations.com/expose: "22"
 spec:
   compositionRef:
     name: "{{ .Values.name }}-composition"

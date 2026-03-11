@@ -3,6 +3,7 @@ name: wetty
 icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/wetty/scripts/assets/logo.png
 description: Terminal access in browser over http/https
 category: Development
+compatibility: genesis-deployment>=1.5.0,orion-deployment>=1.5.0
 tags:
   - cluster-level
   - development

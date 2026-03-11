@@ -34,7 +34,7 @@ spec:
                   blockDeviceMappings:
                    - deviceName: /dev/sdx
                      ebs:
-                       volumeSize: 100
+                       volumeSize: 50
                   securityGroupIds:
                   {{ range .Values.security_group_ids}}
                     - {{.id}}
@@ -47,3 +47,6 @@ spec:
               - type: FromCompositeFieldPath
                 fromFieldPath: "metadata.labels"
                 toFieldPath: "metadata.labels"
+              - type: FromCompositeFieldPath
+                fromFieldPath: "metadata.annotations"
+                toFieldPath: "metadata.annotations"
