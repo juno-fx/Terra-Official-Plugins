@@ -7,5 +7,6 @@ metadata:
     kuiper.juno-innovations.com/use-private-dns: "true"
     kuiper.juno-innovations.com/expose: "22"
 spec:
-  compositionRef:
-    name: "{{ .Values.name }}-composition"
+  compositionSelector:
+    matchLabels:
+      kuiper.juno-innovations.com/kuiper-instance: "{{.Values.name}}"
