@@ -40,4 +40,4 @@ data:
       description: EBS volume size defaults to 50
       required: true
       type: int
-      defaultValue: 50
+      default: 50
