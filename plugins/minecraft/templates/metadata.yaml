@@ -4,6 +4,8 @@ metadata:
   name: "{{ .Release.Name }}-terra-metadata"
   labels:
     kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+  annotations:
+    juno-innovations.com/workload: "Server"
 data:
   chart: "{{ .Release.Name }}-scripts-configmap"
   description: "Minecraft server deployment with desktop streaming."
