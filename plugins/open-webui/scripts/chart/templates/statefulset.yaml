@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{ .Release.Name }}"
+  annotations:
+    juno-innovations.com/workload: "Application"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+  template:
+    metadata:
+      labels:
+        kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: webtop
+          imagePullPolicy: IfNotPresent
+          image: "{{ .Values.webtop_registry }}/{{ .Values.webtop_repo }}:{{ .Values.webtop_tag }}"
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "1"
+            # gotmpl's or is a function taking 2 args - this is "X or Y or Z" translated to python
+            {{- if or (or .Values.gpu .Values.memoryLimit) .Values.cpuLimit }}
+            limits:
+            {{- if .Values.cpuLimit }}
+              cpu: "{{ .Values.cpuLimit }}"
+            {{- end }}
+            {{- if .Values.memoryLimit }}
+              memory: "{{ .Values.memoryLimit }}"
+            {{- end }}
+            {{- end }}
+          ports:
+            - containerPort: 3001
+              name: viewer
+          env:
+            - name: PUID
+              value: "{{ .Values.puid }}"
+            - name: PGID
+              value: "{{ .Values.guid }}"
+            - name: SUBFOLDER
+              value: "/webtop/{{ .Values.name }}/"
+            - name: START_DOCKER
+              value: "false"
+            - name: CHROME_CLI
+              value: "--force-dark-mode http://localhost:8080/"
+          volumeMounts:
+            - mountPath: /dev/shm
+              name: dshm
+        - name: open-webui
+          imagePullPolicy: IfNotPresent
+          image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
+          resources:
+            requests:
+              memory: "{{ .Values.memory }}"
+              cpu: "{{ .Values.cpu }}"
+            limits:
+            {{- if .Values.cpuLimit }}
+              cpu: "{{ .Values.cpuLimit }}"
+            {{- end }}
+            {{- if .Values.memoryLimit }}
+              memory: "{{ .Values.memoryLimit }}"
+            {{- end }}
+          ports:
+            - containerPort: 8080
+              name: ui
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: dshm
+          emptyDir:
+            medium: Memory
+        - name: data
+          persistentVolumeClaim:
+            claimName: "{{ .Release.Name }}"
