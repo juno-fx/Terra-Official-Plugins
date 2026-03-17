@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-terra-metadata"
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+  annotations:
+    juno-innovations.com/workload: "Server"
+data:
+  chart: "{{ .Release.Name }}-scripts-configmap"
+  description: "Minecraft server deployment with desktop streaming."
+  fields: |
+    - name: icon
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/minecraft/scripts/assets/icon.png"
+    - name: registry
+      description: "Registry to pull the image from"
+      type: string
+      required: true
+      default: "itzg"
+    - name: repo
+      description: "Repository to pull the image from"
+      type: string
+      required: true
+      default: "minecraft-server"
+    - name: tag
+      description: "Tag to pull the image from"
+      type: string
+      required: true
+      default: "latest"
+    - name: storage_class
+      description: Storage class to use for the game disk
+      required: true
+      type: k8sStorageClass
+    - name: storage_size
+      description: Storage size to use for the game disk
+      default: 10Gi
+      required: true
+      type: string
