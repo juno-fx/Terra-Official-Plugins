@@ -4,6 +4,8 @@ metadata:
   name: "{{ .Release.Name }}-terra-metadata"
   labels:
     kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+  annotations:
+    juno-innovations.com/workload: "Virtual Machine"
 data:
   chart: "{{ .Release.Name }}-scripts-configmap"
   description: "Crossplane AWS EC2 Instance"

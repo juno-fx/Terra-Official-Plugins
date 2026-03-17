@@ -6,6 +6,7 @@ metadata:
   annotations:
     kuiper.juno-innovations.com/use-private-dns: "true"
     kuiper.juno-innovations.com/expose: "22"
+    juno-innovations.com/workload: "Virtual Machine"
 spec:
   compositionSelector:
     matchLabels:
