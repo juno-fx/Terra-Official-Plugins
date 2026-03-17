@@ -34,7 +34,7 @@ spec:
                   blockDeviceMappings:
                    - deviceName: /dev/sdx
                      ebs:
-                       volumeSize: 50
+                       volumeSize: {{.Values.ebs_size}}
                   securityGroupIds:
                   {{ range .Values.security_group_ids}}
                     - {{.id}}
