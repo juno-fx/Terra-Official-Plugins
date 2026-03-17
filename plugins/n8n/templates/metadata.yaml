@@ -4,6 +4,7 @@ metadata:
   name: "{{ .Release.Name }}-terra-metadata"
   labels:
     kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+  annotations:
     juno-innovations.com/workload: "Workspace"
 data:
   chart: "{{ .Release.Name }}-scripts-configmap"

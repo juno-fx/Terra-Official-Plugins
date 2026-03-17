@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: "{{ .Release.Name }}"
-  labels:
+  annotations:
     juno-innovations.com/workload: "Workspace"
 spec:
   replicas: 1
