@@ -1,0 +1,10 @@
+registry:
+repo:
+tag:
+group:
+cpu:
+cpuLimit:
+memory:
+memoryLimit:
+gpu:
+env:
