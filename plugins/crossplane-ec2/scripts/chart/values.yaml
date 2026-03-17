@@ -30,3 +30,4 @@ security_group_ids: []
 subnet_id:
 provider_config_ref:
 region: ""
+ebs_size: 50
