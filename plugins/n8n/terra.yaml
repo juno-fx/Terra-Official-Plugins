@@ -1,6 +1,6 @@
 resource_id: n8n
 name: n8n
-icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/n8n/scripts/assets/icon.png
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/n8n/scripts/assets/logo.png
 description: n8n is an open-source workflow automation tool that allows you to connect various applications and services to automate tasks and processes. It provides a visual interface for creating workflows, making it easy to integrate different systems without the need for coding. With n8n, you can automate repetitive tasks, streamline data processing, and enhance productivity by connecting APIs, databases, and other services in a seamless manner.
 category: Automation
 compatibility: genesis-deployment>=3.0.0-beta.1, orion-deployment>=3.0.0-beta.1
