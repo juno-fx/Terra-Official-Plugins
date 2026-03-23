@@ -3,7 +3,7 @@ set -e
 
 cd /usr/src/app
 
-addgroup -g "$PGID" wettyusers
+addgroup -g "$PGID" wettyusers || echo "group already exists"
 
 adduser -D -u "$PUID" -G wettyusers "$USER"
 
