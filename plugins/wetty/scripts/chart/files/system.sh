@@ -5,7 +5,7 @@ cd /usr/src/app
 
 addgroup -g "$PGID" wettyusers || echo "group already exists"
 
-adduser -D -u "$PUID" -G wettyusers "$USER"
+adduser -D -u "$PUID" -G wettyusers "$USER" || echo "user already exists"
 
 echo "$USER:$USER_PASS" | chpasswd
 
