@@ -15,6 +15,10 @@ data:
       type: string
       required: true
       default: "quay.io/jupyter"
+    - name: gpu
+      description: "Use a GPU"
+      type: boolean
+      required: true
     - name: repo
       description: "Repository to pull the image from"
       type: string
