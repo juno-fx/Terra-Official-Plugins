@@ -3,9 +3,12 @@ set -e
 
 cd /usr/src/app
 
-addgroup -g "$PGID" wettyusers
+# delete default node user to avoid uid issues for users/groups with uids of 1000
+deluser --remove-home node || echo "user node doesn't exist"
 
-adduser -D -u "$PUID" -G wettyusers "$USER"
+addgroup -g "$PGID" wettyusers || echo "group already exists"
+
+adduser -D -u "$PUID" -G wettyusers "$USER" || echo "user already exists"
 
 echo "$USER:$USER_PASS" | chpasswd
 
