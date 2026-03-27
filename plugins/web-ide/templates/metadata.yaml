@@ -32,3 +32,18 @@ data:
       description: Additional packages to install. You can use spaces " " to install multiples.
       required: false
       default: python3 python3-venv
+    - name: nginx_registry
+      description: "Registry to pull the nginx image from"
+      type: string
+      required: true
+      default: "docker.io"
+    - name: nginx_repo
+      description: "Repository to pull the nginx image from"
+      type: string
+      required: true
+      default: "nginx"
+    - name: nginx_tag
+      description: "Tag to pull the nginx image from"
+      type: string
+      required: true
+      default: "latest"
