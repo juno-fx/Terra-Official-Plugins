@@ -34,7 +34,7 @@ spec:
       hostname: "{{ .Values.name }}"
       containers:
         - name: nginx
-          image: "nginx:1.29.3"
+          image: "{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}"
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3001
