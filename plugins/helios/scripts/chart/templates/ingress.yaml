@@ -25,6 +25,7 @@ kind: Ingress
 metadata:
   name: {{ .Values.name }}-view-only-ingress
   annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/permanent-redirect: "/polaris/{{ .Values.name }}/#shared"
 
 spec:
