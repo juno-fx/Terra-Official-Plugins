@@ -3,6 +3,9 @@ kind: StatefulSet
 metadata:
   name: "{{ .Values.name }}"
   annotations:
+    {{- if .Values.timeslice_config }}
+    liqid.com/gpu-sharing-profile: "{{ .Values.timeslice_config }}"
+    {{- end }}
     # comma separated list of users that can access this workstation as read only.
     juno-innovations.com/shared: "none"
     juno-innovations.com/kuiper-state: "{{ .Values._kuiper }}"
@@ -70,6 +73,12 @@ spec:
         - name: "{{ .Values.pullSecret }}"
       {{- end }}
 
+      {{- if .Values.product }}
+      nodeSelector:
+        nvidia.com/gpu.product: "{{ .Values.product }}"
+      {{- end }}
+
+
       containers:
         - name: jupyter
           imagePullPolicy: IfNotPresent
@@ -82,7 +91,7 @@ spec:
             {{- if or (or .Values.gpu .Values.memoryLimit) .Values.cpuLimit }}
             limits:
             {{- if .Values.gpu }}
-              nvidia.com/gpu: "1"
+              nvidia.com/gpu: "{{ .Values.slices }}"
             {{- end }}
             {{- if .Values.cpuLimit }}
               cpu: "{{ .Values.cpuLimit }}"

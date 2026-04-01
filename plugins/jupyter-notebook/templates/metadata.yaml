@@ -29,5 +29,17 @@ data:
       type: string
       required: true
       default: "lab-4.4.9"
+    - name: timeslice_config
+      description: "Support for for Liqid GPU sharing profiles."
+      type: string
+      required: false
+    - name: product
+      description: "GPU product to use if gpu is true"
+      type: string
+      required: true
+    - name: slices
+      description: "This is passed to nvidia.com/gpu: <slices> to enable GPU sharing with the specified number of slices or cards."
+      type: string
+      required: true
     - name: icon
       default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/jupyter-notebook/scripts/assets/template-icon.png"

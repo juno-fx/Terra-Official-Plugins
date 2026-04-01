@@ -23,6 +23,8 @@ env:
 selector:
 plugins: []
 _kuiper:
-
+product:
+timeslice_config:
+slices: 1
 proxy_namespace: ingress-nginx
 
