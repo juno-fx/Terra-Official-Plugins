@@ -28,7 +28,7 @@ metadata:
     kuiper.juno-innovations.com/ingress-extras: "/polaris/{{ .Values.name }}/#shared"
 spec:
   rules:
-    - host: "{{ .Values.host }}-shared"
+    - host: "{{ .Values.host }}"
       http:
         paths:
           - path: "/polaris/{{ .Values.name }}/shared"
