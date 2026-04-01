@@ -19,3 +19,23 @@ spec:
                 name: {{ .Values.name }}
                 port:
                   number: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.name }}-view-only-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    kuiper.juno-innovations.com/ingress-extras: "/kubevirt-console/{{ .Values.name }}/#shared"
+spec:
+  rules:
+    - host: {{ .Values.host }}-view-only
+      http:
+        paths:
+          - path: "/polaris/{{ .Values.name }}/#shared"
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.name }}-console
+                port:
+                  number: 8080
