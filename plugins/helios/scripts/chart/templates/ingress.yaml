@@ -33,7 +33,7 @@ spec:
     - host: {{ .Values.host }}-view-only
       http:
         paths:
-          - path: "/polaris/{{ .Values.name }}/shared"
+          - path: "/polaris/{{ .Values.name }}/?shared=shared"
             pathType: Prefix
             backend:
               service:
