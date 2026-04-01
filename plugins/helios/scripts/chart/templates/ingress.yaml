@@ -25,13 +25,14 @@ kind: Ingress
 metadata:
   name: {{ .Values.name }}-view-only-ingress
   annotations:
-    kuiper.juno-innovations.com/ingress-extras: "/polaris/{{ .Values.name }}/#shared"
+    nginx.ingress.kubernetes.io/permanent-redirect: "/polaris/{{ .Values.name }}/#shared"
+
 spec:
   rules:
     - host: "{{ .Values.host }}"
       http:
         paths:
-          - path: "/polaris/{{ .Values.name }}/"
+          - path: "/polaris/{{ .Values.name }}/shared"
             pathType: Prefix
             backend:
               service:
