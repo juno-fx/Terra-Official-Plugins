@@ -1,4 +1,4 @@
-resource_id: ingress_certificate
+resource_id: ingress-certificate
 name: ingress-certificate
 icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/ingress-certificate/scripts/assets/logo.png
 description: |
