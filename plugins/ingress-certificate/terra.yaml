@@ -8,10 +8,14 @@ tags:
   - cluster-level
 fields:
   - name: certificate
-    description: Certificate
+    description: Base64 encoded certificate string
     required: true
     type: string
   - name: key
-    description: Key
+    description: Base64 encoded private key string
+    required: true
+    type: string
+  - name: project
+    description: Which project to install the certificate into
     required: true
     type: string
