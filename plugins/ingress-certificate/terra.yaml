@@ -6,7 +6,9 @@ description: |
   Selecting "argocd" as project will install the certificate in Genesis rather than a project.
 category: Infrastructure
 tags:
-  - cluster-level
+  - certificates
+  - SSL
+  - security
 fields:
   - name: certificate
     description: Base64 encoded certificate string
@@ -16,8 +18,3 @@ fields:
     description: Base64 encoded private key string
     required: true
     type: string
-  - name: project
-    description: Which project to install the certificate into
-    required: true
-    type: string
-    default: argocd
