@@ -33,7 +33,7 @@ spec:
     - host: "{{ .Values.host }}"
       http:
         paths:
-          - path: "{{ .Values.name }}/view-only"
+          - path: "/{{ .Values.name }}/view-only"
             pathType: Prefix
             backend:
               service:
