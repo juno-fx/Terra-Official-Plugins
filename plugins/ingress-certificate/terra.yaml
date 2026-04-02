@@ -1,8 +1,8 @@
-resource_id:
+resource_id: ingress_certificate
 name: ingress-certificate
 icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/ingress-certificate/scripts/assets/logo.png
 description: |
-  Upload a SSL Certificate and Key pair into your kubernetes cluster and configure projects to use it as the ingress certificate
+  Upload a SSL Certificate and Key pair into your kubernetes cluster
 category: Infrastructure
 tags:
   - cluster-level
