@@ -27,13 +27,13 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: "https://{{ .Values.host }}/polaris/{{ .Values.name }}/#shared"
+    nginx.ingress.kubernetes.io/rewrite-target: "/polaris/{{ .Values.name }}/#shared"
 spec:
   rules:
     - host: "{{ .Values.host }}"
       http:
         paths:
-          - path: "/polaris/{{ .Values.name }}/shared"
+          - path: "/polaris/{{ .Values.name }}/"
             pathType: Prefix
             backend:
               service:
