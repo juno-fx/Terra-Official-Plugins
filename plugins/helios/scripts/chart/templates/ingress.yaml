@@ -27,7 +27,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: "/polaris/{{ .Values.name }}/#shared"
+    nginx.ingress.kubernetes.io/permanent-redirect: "/polaris/{{ .Values.name }}/#shared"
 spec:
   rules:
     - host: "{{ .Values.host }}"
