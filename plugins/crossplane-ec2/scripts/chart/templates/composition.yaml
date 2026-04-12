@@ -28,11 +28,12 @@ spec:
                 forProvider:
                   region: {{.Values.region}}
                   imageId: {{.Values.ami_image_id}}
+                  instanceType: {{.Values.instance_type}}
                   tags:
                     - key: Name
                       value: "{{.Release.Namespace}}-{{.Values.name}}-instance"
                   blockDeviceMappings:
-                   - deviceName: /dev/sdx
+                   - deviceName: {{ .Values.device_name }}
                      ebs:
                        volumeSize: {{.Values.ebs_size}}
                   securityGroupIds:

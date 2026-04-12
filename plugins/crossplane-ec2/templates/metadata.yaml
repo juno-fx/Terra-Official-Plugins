@@ -28,6 +28,11 @@ data:
       description: AWS Subnet ID
       required: true
       type: string
+    - name: instance_type
+      description: AWS EC2 instance type (e.g. t3.micro)
+      required: true
+      type: string
+      default: t3.micro
     - name: region
       description: AWS Region
       required: true
