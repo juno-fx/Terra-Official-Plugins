@@ -24,6 +24,8 @@ spec:
               metadata:
                 name: {{.Values.name}}
                 namespace: {{ .Release.Namespace }}
+                labels:
+                  kuiper.juno-innovations.com/aws-remote-connection: "true"
               spec:
                 forProvider:
                   region: {{.Values.region}}
