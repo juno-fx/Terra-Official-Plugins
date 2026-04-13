@@ -27,9 +27,8 @@ _kuiper:
 # Plugin Specific Values
 ami_image_id:
 security_group_ids: []
+block_device_mappings: []
 subnet_id:
 provider_config_ref:
 region: ""
-ebs_size: 50
 instance_type: t3.micro
-device_name: /dev/sdx

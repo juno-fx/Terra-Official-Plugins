@@ -33,9 +33,11 @@ spec:
                     - key: Name
                       value: "{{.Release.Namespace}}-{{.Values.name}}-instance"
                   blockDeviceMappings:
-                   - deviceName: {{ .Values.device_name }}
-                     ebs:
-                       volumeSize: {{.Values.ebs_size}}
+                  {{ range .Values.block_device_mappings }}
+                    - deviceName: {{.mount_path}}
+                      ebs:
+                        volumeSize: {{.size}}
+                  {{end}}
                   securityGroupIds:
                   {{ range .Values.security_group_ids}}
                     - {{.id}}
