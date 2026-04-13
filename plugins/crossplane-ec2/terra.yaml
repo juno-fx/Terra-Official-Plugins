@@ -6,6 +6,7 @@ description: |
   Providing both a Crossplane Composition and EC2Instance claim. Allowing for Kuiper to launch and track AWS EC2
   resources via Crossplane.
 category: VirtualMachine
+compatibility: genesis-deployment>=3.0.2,orion-deployment>=3.1.0
 tags:
   - virtualization
   - virtual-machine

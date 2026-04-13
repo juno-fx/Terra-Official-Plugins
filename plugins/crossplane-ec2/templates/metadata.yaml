@@ -36,7 +36,7 @@ data:
         - name: size
           description: Block device size in GB
           required: true
-          type: string
+          type: int
     - name: subnet_id
       description: AWS Subnet ID
       required: true
