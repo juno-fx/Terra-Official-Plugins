@@ -4,8 +4,7 @@ metadata:
   name: {{.Values.name}}-ec2
   namespace: {{.Release.Namespace}}
   annotations:
-    kuiper.juno-innovations.com/use-private-dns: "true"
-    kuiper.juno-innovations.com/expose: "22"
+    kuiper.juno-innovations.com/use-private-dns: "false"
     juno-innovations.com/workload: "Virtual Machine"
     kuiper.juno-innovations.com/aws-remote-connection: "true"
 spec:
