@@ -24,6 +24,19 @@ data:
           description: Security group id
           required: true
           type: string
+    - name: block_device_mappings
+      description: List of block device mappings for the EC2 instance
+      required: true
+      type: list
+      fields:
+        - name: mount_path
+          description: Mount path for the block device (e.g. /dev/sdx)
+          required: true
+          type: string
+        - name: size
+          description: Block device size in GB
+          required: true
+          type: string
     - name: subnet_id
       description: AWS Subnet ID
       required: true
@@ -41,8 +54,4 @@ data:
       description: Name of the providerConfig for connecting to AWS
       required: true
       type: string
-    - name: ebs_size
-      description: EBS volume size defaults to 50
-      required: true
-      type: int
-      default: 50
+      default: "aws-provider-argocd-crossplane-aws-provider-config"
