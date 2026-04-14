@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-terra-metadata"
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+  annotations:
+    juno-innovations.com/workload: "Virtual Machine"
+data:
+  chart: "{{ .Release.Name }}-scripts-configmap"
+  description: "Crossplane AWS EC2 Instance"
+  fields: |
+    - name: icon
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/crossplane-ec2/scripts/assets/logo.png"
+    - name: ami_image_id
+      required: true
+      type: string
+    - name: security_group_ids
+      description: List of AWS security group ids
+      required: true
+      type: list
+      fields:
+        - name: id
+          description: Security group id
+          required: true
+          type: string
+    - name: block_device_mappings
+      description: List of block device mappings for the EC2 instance
+      required: true
+      type: list
+      fields:
+        - name: mount_path
+          description: Mount path for the block device (e.g. /dev/sdx)
+          required: true
+          type: string
+        - name: size
+          description: Block device size in GB
+          required: true
+          type: int
+    - name: subnet_id
+      description: AWS Subnet ID
+      required: true
+      type: string
+    - name: instance_type
+      description: AWS EC2 instance type (e.g. t3.micro)
+      required: true
+      type: string
+      default: t3.micro
+    - name: region
+      description: AWS Region
+      required: true
+      type: string
+    - name: provider_config_ref
+      description: Name of the providerConfig for connecting to AWS
+      required: true
+      type: string
+      default: "aws-provider-argocd-crossplane-aws-provider-config"

@@ -1,0 +1,16 @@
+resource_id: crossplane-ec2
+name: Crossplane EC2
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/crossplane-ec2/scripts/assets/logo.png
+description: |
+  A Crossplane AWS EC2 workload. This plugin will install a Crossplane EC2 XRD, as well as a EC2 workload schema.
+  Providing both a Crossplane Composition and EC2Instance claim. Allowing for Kuiper to launch and track AWS EC2
+  resources via Crossplane.
+category: VirtualMachine
+compatibility: genesis-deployment>=3.0.2,orion-deployment>=3.1.0
+tags:
+  - virtualization
+  - virtual-machine
+  - crossplane
+  - cluster-level
+  - AWS
+fields: []

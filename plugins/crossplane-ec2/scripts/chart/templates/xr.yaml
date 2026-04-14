@@ -1,0 +1,14 @@
+apiVersion: crossplane.juno-innovations.com/v1alpha1
+kind: EC2Instance
+metadata:
+  name: {{.Values.name}}-ec2
+  namespace: {{.Release.Namespace}}
+  annotations:
+    kuiper.juno-innovations.com/use-private-dns: "false"
+    juno-innovations.com/workload: "Virtual Machine"
+    kuiper.juno-innovations.com/aws-remote-connection: "true"
+spec:
+  compositionSelector:
+    matchLabels:
+      kuiper.juno-innovations.com/kuiper-instance: "{{.Values.name}}"
+      crossplane.juno-innovations.com/instance-namespace: "{{.Release.Namespace}}"
