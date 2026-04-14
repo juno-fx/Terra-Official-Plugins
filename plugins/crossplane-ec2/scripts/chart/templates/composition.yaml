@@ -1,9 +1,9 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: "{{ .Values.name }}-composition"
+  name: "{{.Release.Namespace}}-{{ .Values.name }}-composition"
   labels:
-    crossplane.juno-innovations.com/instance: "{{.Release.Namespace}}-{{.Values.name}}"
+    crossplane.juno-innovations.com/instance-namespace: "{{.Release.Namespace}}"
 spec:
   compositeTypeRef:
     apiVersion: crossplane.juno-innovations.com/v1alpha1

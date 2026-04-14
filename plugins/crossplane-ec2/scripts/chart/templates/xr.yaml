@@ -8,6 +8,5 @@ metadata:
     juno-innovations.com/workload: "Virtual Machine"
     kuiper.juno-innovations.com/aws-remote-connection: "true"
 spec:
-  compositionSelector:
-    matchLabels:
-      crossplane.juno-innovations.com/instance: "{{.Release.Namespace}}-{{.Values.name}}"
+  compositionRef:
+    name: "{{.Release.Namespace}}-{{ .Values.name }}-composition"
