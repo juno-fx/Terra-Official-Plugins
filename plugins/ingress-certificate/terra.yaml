@@ -5,7 +5,7 @@ description: |
   Upload a SSL Certificate and Key pair into your kubernetes cluster.
   Selecting "argocd" as project will install the certificate in Genesis rather than a project.
 category: Infrastructure
-compatibility: TBD
+compatibility: genesis-deployment>=3.0.2,orion-deployment>=3.1.0
 tags:
   - certificates
   - SSL
