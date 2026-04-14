@@ -10,5 +10,4 @@ metadata:
 spec:
   compositionSelector:
     matchLabels:
-      kuiper.juno-innovations.com/kuiper-instance: "{{.Values.name}}"
-      crossplane.juno-innovations.com/instance-namespace: "{{.Release.Namespace}}"
+      crossplane.juno-innovations.com/instance: "{{.Release.Namespace}}-{{.Values.name}}"

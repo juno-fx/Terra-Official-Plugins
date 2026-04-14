@@ -3,8 +3,7 @@ kind: Composition
 metadata:
   name: "{{ .Values.name }}-composition"
   labels:
-    kuiper.juno-innovations.com/kuiper-instance: "{{.Values.name}}"
-    crossplane.juno-innovations.com/instance-namespace: "{{.Release.Namespace}}"
+    crossplane.juno-innovations.com/instance: "{{.Release.Namespace}}-{{.Values.name}}"
 spec:
   compositeTypeRef:
     apiVersion: crossplane.juno-innovations.com/v1alpha1
