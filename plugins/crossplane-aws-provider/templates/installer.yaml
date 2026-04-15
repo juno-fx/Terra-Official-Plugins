@@ -1,7 +1,7 @@
 apiVersion: pkg.crossplane.io/v1
 kind: Provider
 metadata:
-  name: {{ .Release.Name }}-crossplane-aws-provider
+  name: {{ .Release.Name }}-provider
   namespace: crossplane-system
   annotations:
     argocd.argoproj.io/sync-wave: "1"
@@ -14,7 +14,7 @@ spec:
 apiVersion: aws.crossplane.io/v1beta1
 kind: ProviderConfig
 metadata:
-  name: {{ .Release.Name }}-crossplane-aws-provider-config
+  name: {{ .Release.Name }}-provider-config
   namespace: crossplane-system
   annotations:
     argocd.argoproj.io/sync-wave: "2"

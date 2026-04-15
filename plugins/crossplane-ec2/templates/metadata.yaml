@@ -54,4 +54,4 @@ data:
       description: Name of the providerConfig for connecting to AWS
       required: true
       type: string
-      default: "aws-provider-argocd-crossplane-aws-provider-config"
+      default: "aws-provider-argocd-provider-config"
