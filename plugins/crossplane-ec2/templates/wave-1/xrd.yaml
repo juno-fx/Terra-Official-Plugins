@@ -19,13 +19,6 @@ spec:
             spec:
               type: object
               x-kubernetes-preserve-unknown-fields: true
-              required:
-                - name
-                - region
-                - amiImageId
-                - instanceType
-                - subnetId
-                - providerConfigRef
               properties:
                 name:
                   type: string
