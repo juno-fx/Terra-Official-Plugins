@@ -19,11 +19,46 @@ spec:
             spec:
               type: object
               x-kubernetes-preserve-unknown-fields: true
+              required:
+                - name
+                - region
+                - amiImageId
+                - instanceType
+                - subnetId
+                - providerConfigRef
               properties:
-                parameters:
-                  type: object
-                  properties:
-                    instanceType:
-                      type: string
-                    ami:
-                      type: string
+                name:
+                  type: string
+                  description: "Unique name for the EC2 instance, used for metadata.name and Name tag"
+                region:
+                  type: string
+                  description: "AWS region for the EC2 instance"
+                amiImageId:
+                  type: string
+                  description: "AMI image ID for the EC2 instance"
+                instanceType:
+                  type: string
+                  description: "EC2 instance type (e.g., t3.micro)"
+                subnetId:
+                  type: string
+                  description: "Subnet ID for the EC2 instance"
+                securityGroupIds:
+                  type: array
+                  items:
+                    type: string
+                  description: "List of security group IDs"
+                blockDeviceMappings:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      deviceName:
+                        type: string
+                      size:
+                        type: integer
+                      mountPath:
+                        type: string
+                  description: "Block device mappings for the EC2 instance"
+                providerConfigRef:
+                  type: string
+                  description: "Provider config reference name"

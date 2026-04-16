@@ -1,7 +1,7 @@
 apiVersion: crossplane.juno-innovations.com/v1alpha1
 kind: EC2Instance
 metadata:
-  name: {{.Release.Namespace}}-{{.Values.name}}-ec2"
+  name: {{.Release.Namespace}}-{{.Values.name}}-ec2
   namespace: {{.Release.Namespace}}
   annotations:
     kuiper.juno-innovations.com/use-private-dns: "false"
@@ -10,5 +10,20 @@ metadata:
     kuiper.juno-innovations.com/sync-wave: "2"
 
 spec:
-  compositionRef:
-    name: "{{.Release.Namespace}}-{{ .Values.name }}-composition"
+  parameters:
+    name: "{{.Release.Namespace}}-{{.Values.name}}"
+    region: {{.Values.region}}
+    amiImageId: {{.Values.ami_image_id}}
+    instanceType: {{.Values.instance_type}}
+    subnetId: {{.Values.subnet_id}}
+    securityGroupIds:
+    {{- range .Values.security_group_ids}}
+      - {{.id}}
+    {{- end}}
+    blockDeviceMappings:
+    {{- range .Values.block_device_mappings}}
+      - deviceName: {{.mount_path}}
+        size: {{.size}}
+        mountPath: {{.mount_path}}
+    {{- end}}
+    providerConfigRef: {{.Values.provider_config_ref}}

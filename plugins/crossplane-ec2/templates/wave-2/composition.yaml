@@ -1,0 +1,65 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: "ec2-composition"
+spec:
+  compositeTypeRef:
+    apiVersion: crossplane.juno-innovations.com/v1alpha1
+    kind: EC2Instance
+  pipeline:
+    - step: patch-and-transform
+      functionRef:
+        name: function-patch-and-transform
+      input:
+        apiVersion: pt.fn.crossplane.io/v1beta1
+        kind: Resources
+        resources:
+          - name: ec2-instance
+            base:
+              apiVersion: ec2.aws.crossplane.io/v1alpha1
+              kind: Instance
+              metadata:
+                namespace: {{ .Release.Namespace }}
+              spec:
+                forProvider:
+                  imageId: ""
+                  instanceType: ""
+                  tags:
+                    - key: Name
+                      value: ""
+                providerConfigRef:
+                  name: ""
+            patches:
+              - type: FromCompositeFieldPath
+                fromFieldPath: "metadata.labels"
+                toFieldPath: "metadata.labels"
+              - type: FromCompositeFieldPath
+                fromFieldPath: "metadata.annotations"
+                toFieldPath: "metadata.annotations"
+              - type: FromCompositeFieldPath
+                fromFieldPath: "spec.parameters.name"
+                toFieldPath: "metadata.name"
+              - type: FromCompositeFieldPath
+                fromFieldPath: "spec.parameters.region"
+                toFieldPath: "spec.forProvider.region"
+              - type: FromCompositeFieldPath
+                fromFieldPath: "spec.parameters.amiImageId"
+                toFieldPath: "spec.forProvider.imageId"
+              - type: FromCompositeFieldPath
+                fromFieldPath: "spec.parameters.instanceType"
+                toFieldPath: "spec.forProvider.instanceType"
+              - type: FromCompositeFieldPath
+                fromFieldPath: "spec.parameters.subnetId"
+                toFieldPath: "spec.forProvider.subnetId"
+              - type: FromCompositeFieldPath
+                fromFieldPath: "spec.parameters.securityGroupIds"
+                toFieldPath: "spec.forProvider.securityGroupIds"
+              - type: FromCompositeFieldPath
+                fromFieldPath: "spec.parameters.blockDeviceMappings"
+                toFieldPath: "spec.forProvider.blockDeviceMappings"
+              - type: FromCompositeFieldPath
+                fromFieldPath: "spec.parameters.name"
+                toFieldPath: "spec.forProvider.tags[0].value"
+              - type: FromCompositeFieldPath
+                fromFieldPath: "spec.parameters.providerConfigRef"
+                toFieldPath: "spec.providerConfigRef.name"
