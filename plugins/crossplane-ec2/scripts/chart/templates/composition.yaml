@@ -4,6 +4,8 @@ metadata:
   name: "{{ .Values.name }}-composition"
   labels:
     crossplane.juno-innovations.com/instance-namespace: "{{.Release.Namespace}}"
+  annotations:
+    kuiper.juno-innovations.com/sync-wave: "1"
 spec:
   compositeTypeRef:
     apiVersion: crossplane.juno-innovations.com/v1alpha1

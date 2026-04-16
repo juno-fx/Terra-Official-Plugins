@@ -7,6 +7,8 @@ metadata:
     kuiper.juno-innovations.com/use-private-dns: "false"
     juno-innovations.com/workload: "Virtual Machine"
     kuiper.juno-innovations.com/aws-remote-connection: "true"
+    kuiper.juno-innovations.com/sync-wave: "2"
+
 spec:
   compositionSelector:
     matchLabels:
