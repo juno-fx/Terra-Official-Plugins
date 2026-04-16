@@ -29,3 +29,13 @@ data:
       type: string
       required: true
       default: "unstable-rocky-9"
+    - name: rheaRepo
+      description: "Tag to pull rhea the image from"
+      type: string
+      required: true
+      default: "rhea"
+    - name: rheaTag      
+      description: "Tag to pull rhea the image from"
+      type: string
+      required: true
+      default: "9-feat-Backend-permissions-phase-2"
