@@ -19,11 +19,3 @@ spec:
             spec:
               type: object
               x-kubernetes-preserve-unknown-fields: true
-              properties:
-                parameters:
-                  type: object
-                  properties:
-                    instanceType:
-                      type: string
-                    ami:
-                      type: string

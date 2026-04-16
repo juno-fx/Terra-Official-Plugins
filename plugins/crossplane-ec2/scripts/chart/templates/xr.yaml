@@ -1,14 +1,27 @@
 apiVersion: crossplane.juno-innovations.com/v1alpha1
 kind: EC2Instance
 metadata:
-  name: {{.Values.name}}-ec2
+  name: {{.Release.Namespace}}-{{.Values.name}}-ec2
   namespace: {{.Release.Namespace}}
   annotations:
     kuiper.juno-innovations.com/use-private-dns: "false"
     juno-innovations.com/workload: "Virtual Machine"
     kuiper.juno-innovations.com/aws-remote-connection: "true"
 spec:
-  compositionSelector:
-    matchLabels:
-      kuiper.juno-innovations.com/kuiper-instance: "{{.Values.name}}"
-      crossplane.juno-innovations.com/instance-namespace: "{{.Release.Namespace}}"
+  parameters:
+    name: "{{.Release.Namespace}}-{{.Values.name}}"
+    region: {{.Values.region}}
+    amiImageId: {{.Values.ami_image_id}}
+    instanceType: {{.Values.instance_type}}
+    subnetId: {{.Values.subnet_id}}
+    securityGroupIds:
+    {{- range .Values.security_group_ids}}
+      - {{.id}}
+    {{- end}}
+    blockDeviceMappings:
+    {{- range .Values.block_device_mappings}}
+      - deviceName: {{.mount_path}}
+        ebs:
+          volumeSize: {{.size}}
+    {{- end}}
+    providerConfigRef: {{.Values.provider_config_ref}}
