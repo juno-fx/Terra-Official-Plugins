@@ -23,7 +23,7 @@ spec:
     blockDeviceMappings:
     {{- range .Values.block_device_mappings}}
       - deviceName: {{.mount_path}}
-        size: {{.size}}
-        mountPath: {{.mount_path}}
+        ebs:
+          volumeSize: {{.size}}
     {{- end}}
     providerConfigRef: {{.Values.provider_config_ref}}
