@@ -1,7 +1,7 @@
 apiVersion: crossplane.juno-innovations.com/v1alpha1
 kind: EC2Instance
 metadata:
-  name: {{.Values.name}}-ec2
+  name: "{{.Release.Namespace}}-{{.Values.name}}-ec2"
   namespace: {{.Release.Namespace}}
   annotations:
     kuiper.juno-innovations.com/use-private-dns: "false"
