@@ -1,6 +1,7 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
+  name: "{{.Release.Namespace}}-{{ .Values.name }}-composition"
   labels:
     crossplane.juno-innovations.com/instance-namespace: "{{.Release.Namespace}}"
   annotations:
@@ -54,5 +55,3 @@ spec:
               - type: FromCompositeFieldPath
                 fromFieldPath: "metadata.annotations"
                 toFieldPath: "metadata.annotations"
-              - fromFieldPath: "metadata.name"
-                toFieldPath: "metadata.name"
