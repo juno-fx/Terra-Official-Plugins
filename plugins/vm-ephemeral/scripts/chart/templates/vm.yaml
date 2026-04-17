@@ -47,7 +47,7 @@ spec:
           {{ end }}
           {{ if .Values.tpm }}
           tpm:
-            - persistent: true
+            persistent: true
           {{ end }}
 
           # networking
