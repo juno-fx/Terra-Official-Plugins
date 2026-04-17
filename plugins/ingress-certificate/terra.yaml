@@ -1,0 +1,21 @@
+resource_id: ingress-certificate
+name: ingress-certificate
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/ingress-certificate/scripts/assets/logo.png
+description: |
+  Upload a SSL Certificate and Key pair into your kubernetes cluster.
+  Selecting "argocd" as project will install the certificate in Genesis rather than a project.
+category: Infrastructure
+compatibility: genesis-deployment>=3.0.2,orion-deployment>=3.1.0
+tags:
+  - certificates
+  - SSL
+  - security
+fields:
+  - name: certificate
+    description: Base64 encoded certificate string
+    required: true
+    type: string
+  - name: key
+    description: Base64 encoded private key string
+    required: true
+    type: string
