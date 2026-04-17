@@ -29,6 +29,11 @@ data:
       type: string
       required: true
       default: "unstable-rocky-9"
+    - name: enableAPI
+      description: "Enable system-to-system communication"
+      type: boolean
+      required: false
+      default: false
     - name: rheaRepo
       description: "Tag to pull rhea the image from"
       type: string
@@ -38,4 +43,4 @@ data:
       description: "Tag to pull rhea the image from"
       type: string
       required: true
-      default: "9-feat-Backend-permissions-phase-2"
+      default: "36-feat-include-orionpy-in-rhea"

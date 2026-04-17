@@ -143,6 +143,7 @@ spec:
               mountPath: "/etc/helios/init.d/{{ .name }}/{{ .file }}"
             {{- end }}
             {{- end }}
+        {{- if .Values.enableAPI }}
         - name: rhea
           image: "{{ .Values.registry }}/{{ .Values.rheaRepo }}:{{ .Values.rheaTag }}"
           imagePullPolicy: IfNotPresent
@@ -172,9 +173,6 @@ spec:
             # gotmpl's or is a function taking 2 args - this is "X or Y or Z" translated to python
             {{- if or (or .Values.gpu .Values.memoryLimit) .Values.cpuLimit }}
             limits:
-            {{- if .Values.gpu }}
-              nvidia.com/gpu: "1"
-            {{- end }}
             {{- if .Values.cpuLimit }}
               cpu: "{{ .Values.cpuLimit }}"
             {{- end }}
@@ -182,6 +180,7 @@ spec:
               memory: "{{ .Values.memoryLimit }}"
             {{- end }}
             {{- end }}
+        {{- end }}
       volumes:
         - name: shm
           emptyDir:
