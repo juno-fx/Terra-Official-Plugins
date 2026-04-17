@@ -28,6 +28,11 @@ data:
       default: false
       required: true
       type: boolean
+    - name: tpm
+      description: Enable TPM 2.0. (required for Windows 11 installation)
+      default: false
+      required: true
+      type: boolean
     - name: virtio_drivers
       description: Mount VirtIO drivers ISO to the VM
       default: false

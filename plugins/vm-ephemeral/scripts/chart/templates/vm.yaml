@@ -45,6 +45,10 @@ spec:
             - name: gpu0
               deviceName: "{{ .Values.gpu_device_name }}"
           {{ end }}
+          {{ if .Values.tpm }}
+          tpm:
+            - persistent: true
+          {{ end }}
 
           # networking
           interfaces:
