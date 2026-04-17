@@ -8,4 +8,9 @@ tags:
   - vdi
   - juno
   - cluster-level
-fields: []
+fields:
+  - name: Enable system-to-system
+    description: "Enable system-to-system communication"
+    type: boolean
+    required: true
+    default: false
