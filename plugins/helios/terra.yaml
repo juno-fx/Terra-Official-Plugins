@@ -9,8 +9,7 @@ tags:
   - juno
   - cluster-level
 fields:
-  - name: enableAPI
-    description: "Enable system-to-system communication"
-    type: boolean
-    required: false
+  - name: system-to-system communication"
+    description: "Enable system API access from within helios"
+    required: true
     default: false
