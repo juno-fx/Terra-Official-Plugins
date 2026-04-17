@@ -32,7 +32,7 @@ data:
     - name: enableAPI
       description: "Enable system-to-system communication"
       type: boolean
-      required: false
+      required: true
       default: false
     - name: rheaRepo
       description: "Tag to pull rhea the image from"
