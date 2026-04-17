@@ -9,6 +9,7 @@ memory: "1Gi"
 cpuLimit: null
 memoryLimit: null
 gpu: false
+enableAPI: false
 idx: 0
 guid: 0
 puid: 0
