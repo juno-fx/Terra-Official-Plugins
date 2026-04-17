@@ -8,8 +8,4 @@ tags:
   - vdi
   - juno
   - cluster-level
-fields:
-  - name: System-to-System access
-    description: "Allow Orion API communication from within Helios"
-    type: boolean
-    default: false
+fields: []
