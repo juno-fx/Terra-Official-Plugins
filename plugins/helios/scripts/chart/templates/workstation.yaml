@@ -33,6 +33,7 @@ spec:
         cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
 
     spec:
+      serviceAccountName: helios
       automountServiceAccountToken: false
       hostname: "{{ .Values.name }}"
 
