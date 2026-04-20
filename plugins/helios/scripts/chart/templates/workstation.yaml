@@ -148,8 +148,10 @@ spec:
           image: "{{ .Values.registry }}/{{ .Values.rheaRepo }}:{{ .Values.rheaTag }}"
           # TODO put this back
           imagePullPolicy: Always
-          {{- with .Values.env }}
           env:
+            - name: NAMESPACED
+              value: "true"
+          {{- with .Values.env }}
             {{- toYaml .Values.env | nindent 12 }}
           {{- end }}
           # ports:
