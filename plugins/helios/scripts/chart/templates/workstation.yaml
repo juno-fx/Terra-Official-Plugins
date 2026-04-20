@@ -151,6 +151,8 @@ spec:
           env:
             - name: NAMESPACED
               value: "true"
+            - name: NAMESPACE
+              value: {{ .Release.Namespace }}
           {{- with .Values.env }}
             {{- toYaml .Values.env | nindent 12 }}
           {{- end }}
