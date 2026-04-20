@@ -146,7 +146,8 @@ spec:
         {{- if .Values.enableAPI }}
         - name: rhea
           image: "{{ .Values.registry }}/{{ .Values.rheaRepo }}:{{ .Values.rheaTag }}"
-          imagePullPolicy: IfNotPresent
+          # TODO put this back
+          imagePullPolicy: Always
           {{- with .Values.env }}
           env:
             {{- toYaml .Values.env | nindent 12 }}
@@ -168,17 +169,14 @@ spec:
             periodSeconds: 10
           resources:
             requests:
-              memory: "{{ .Values.memory }}"
-              cpu: "{{ .Values.cpu }}"
-            # gotmpl's or is a function taking 2 args - this is "X or Y or Z" translated to python
-            {{- if or (or .Values.gpu .Values.memoryLimit) .Values.cpuLimit }}
+              memory: "{{ .Values.rheaMemory }}"
+              cpu: "{{ .Values.rheaCpu }}"
             limits:
-            {{- if .Values.cpuLimit }}
-              cpu: "{{ .Values.cpuLimit }}"
+            {{- if .Values.rheaCpuLimit }}
+              cpu: "{{ .Values.rheaCpuLimit }}"
             {{- end }}
-            {{- if .Values.memoryLimit }}
-              memory: "{{ .Values.memoryLimit }}"
-            {{- end }}
+            {{- if .Values.rheaMemoryLimit }}
+              memory: "{{ .Values.rheaMemoryLimit }}"
             {{- end }}
         {{- end }}
       volumes:
