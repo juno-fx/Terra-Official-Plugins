@@ -59,3 +59,4 @@ ports:
     type: ClusterIP
     vm_port: 22
 storage_class:
+tpm: false
