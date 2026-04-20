@@ -34,7 +34,6 @@ spec:
 
     spec:
       serviceAccountName: helios
-      automountServiceAccountToken: false
       hostname: "{{ .Values.name }}"
 
       # workstation nodes will require juno-innovations.com/workstation: "true"
