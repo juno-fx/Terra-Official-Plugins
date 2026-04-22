@@ -72,6 +72,8 @@ spec:
         - name: "{{ .Values.pullSecret }}"
       {{- end }}
 
+      hostNetwork: true
+
       containers:
         - name: webtop
           imagePullPolicy: IfNotPresent
