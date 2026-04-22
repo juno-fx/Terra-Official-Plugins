@@ -1,13 +1,13 @@
-{{/*apiVersion: v1*/}}
-{{/*kind: Service*/}}
-{{/*metadata:*/}}
-{{/*  name: "{{ .Values.name }}"*/}}
-{{/*spec:*/}}
-{{/*  type: NodePort*/}}
-{{/*  selector:*/}}
-{{/*    juno-innovations.com/workstation: "{{ .Values.name }}"*/}}
-{{/*  ports:*/}}
-{{/*    - port: 3001*/}}
-{{/*      targetPort: 3001*/}}
-{{/*      protocol: TCP*/}}
-{{/*      name: webtop*/}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Values.name }}"
+spec:
+  type: NodePort
+  selector:
+    juno-innovations.com/workstation: "{{ .Values.name }}"
+  ports:
+    - port: 3001
+      targetPort: 3001
+      protocol: TCP
+      name: webtop
