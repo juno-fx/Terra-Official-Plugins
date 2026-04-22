@@ -58,3 +58,7 @@ fields:
     options:
       - v25.10.1
       - v25.3.4
+  - name: helm_repo
+    description: Helm repository URL for the NVIDIA GPU Operator chart.
+    required: true
+    default: "https://helm.ngc.nvidia.com/nvidia"

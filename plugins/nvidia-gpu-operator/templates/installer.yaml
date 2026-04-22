@@ -9,7 +9,7 @@ spec:
     server: https://kubernetes.default.svc
     namespace: {{ .Release.Name }}-gpu-operator
   sources:
-    - repoURL: https://helm.ngc.nvidia.com/nvidia
+    - repoURL: ${{ .Values.helm_repo }}
       chart: gpu-operator
       targetRevision: {{ .Values.version }}
       helm:
