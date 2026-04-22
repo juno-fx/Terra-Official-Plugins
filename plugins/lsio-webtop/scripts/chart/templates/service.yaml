@@ -3,7 +3,6 @@ kind: Service
 metadata:
   name: "{{ .Values.name }}"
 spec:
-  type: NodePort
   selector:
     juno-innovations.com/workstation: "{{ .Values.name }}"
   ports:
