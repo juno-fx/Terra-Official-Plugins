@@ -43,4 +43,4 @@ data:
       description: "Tag to pull rhea the image from"
       type: string
       required: true
-      default: "36-feat-include-orionpy-in-rhea"
+      default: "v1.2.0"
