@@ -33,7 +33,9 @@ spec:
         cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
 
     spec:
+      {{- if .Values.enableAPI }}
       serviceAccountName: helios
+      {{- end }}
       hostname: "{{ .Values.name }}"
 
       # workstation nodes will require juno-innovations.com/workstation: "true"
@@ -146,8 +148,7 @@ spec:
         {{- if .Values.enableAPI }}
         - name: rhea
           image: "{{ .Values.registry }}/{{ .Values.rheaRepo }}:{{ .Values.rheaTag }}"
-          # TODO put this back
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           env:
             - name: NAMESPACED
               value: "true"
@@ -156,9 +157,6 @@ spec:
           {{- with .Values.env }}
             {{- toYaml .Values.env | nindent 12 }}
           {{- end }}
-          # ports:
-          #   - containerPort: 13000
-          #     name: auth
           livenessProbe:
             httpGet:
               path: /.health
