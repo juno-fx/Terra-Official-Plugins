@@ -35,12 +35,12 @@ data:
       required: true
       default: false
     - name: rheaRepo
-      description: "Tag to pull rhea the image from"
+      description: "Repo to pull the rhea image from"
       type: string
       required: true
       default: "rhea"
     - name: rheaTag      
-      description: "Tag to pull rhea the image from"
+      description: "Tag to pull the rhea image from"
       type: string
       required: true
       default: "v1.2.0"
