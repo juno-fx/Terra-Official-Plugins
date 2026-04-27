@@ -169,8 +169,9 @@ spec:
               value: "true"
             - name: NAMESPACE
               value: {{ .Release.Namespace }}
-          {{- with .Values.env }}
-            {{- toYaml .Values.env | nindent 12 }}
+          {{- range .Values.env }}
+            - name: {{ .name | quote }}
+              value: {{ .value | quote }}
           {{- end }}
           livenessProbe:
             httpGet:
