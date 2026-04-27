@@ -18,7 +18,7 @@ data:
             f"/kuiper/shutdown/{workstation}",
         )
     except Exception as e:
-    print(e)
+      print(e)
 
   custom.sh: |
     #!/bin/bash
