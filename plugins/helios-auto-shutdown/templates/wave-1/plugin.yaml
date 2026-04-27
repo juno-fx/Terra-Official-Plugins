@@ -45,7 +45,7 @@ data:
     echo "JUNO_WORKSTATION: $JUNO_WORKSTATION"
     echo
     cp -v /etc/helios/init.d/helios-auto-shutdown-0/custom.sh /etc/helios/idle.d/custom.sh
-    cp -v /etc/helios/init.d/helios-auto-shutdown-0/shutdown.py /etc/helios/idle.d/shutdown.py
+    cp -v /etc/helios/init.d/helios-auto-shutdown-2/shutdown.py /etc/helios/idle.d/shutdown.py
     chmod +x /etc/helios/idle.d/custom.sh
 
     echo "Helios Auto Shutdown Plugin installed successfully."
