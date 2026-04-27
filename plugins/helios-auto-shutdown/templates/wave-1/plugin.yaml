@@ -7,16 +7,18 @@ metadata:
 data:
   shutdown.py: |
     from orionpy.network.orionhttpx import OrionHttpx
+    import os
 
+    workstation=os.environ.get("JUNO_WORKSTATION")
     try: 
         response = OrionHttpx().delete(
-            "{{ .Release.Namespace }}",
+            "cat",
             "kuiper",
             8000,
-            f"/kuiper/shutdown/{os.environ.get("JUNO_WORKSTATION")}",
+            f"/kuiper/shutdown/{workstation}",
         )
-    except Exception as e:
-        print(e)
+except Exception as e:
+    print(e)
 
   custom.sh: |
     #!/bin/bash
