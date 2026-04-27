@@ -10,11 +10,11 @@ data:
     permit (
       principal,
       action in [Action::"DELETE"],
-      resource == argocd::Service::"kuiper"
+      resource == argocd::Service::"{{ .Release.Namespace }}"
     )
     when 
     {
-    principal.serviceAccountName == "{{ .Release.Namespace }}"
+    principal.serviceAccountName == "kuiper"
     }
     ;
     
