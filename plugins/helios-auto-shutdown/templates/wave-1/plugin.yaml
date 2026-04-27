@@ -8,17 +8,22 @@ data:
   shutdown.py: |
     from orionpy.network.orionhttpx import OrionHttpx
     import os
+    import asyncio
 
-    workstation=os.environ.get("JUNO_WORKSTATION")
-    try: 
-        response = OrionHttpx().delete(
-            "{{ .Release.Namespace }}",
-            "kuiper",
-            8000,
-            f"/kuiper/shutdown/{workstation}",
-        )
-    except Exception as e:
-      print(e)
+    workstation = os.environ.get("JUNO_WORKSTATION")
+
+    async def main():
+        try:
+            await OrionHttpx().delete(
+                "{{ .Release.Namespace }}",
+                "kuiper",
+                8000,
+                f"/kuiper/shutdown/{workstation}",
+            )
+        except Exception as e:
+            print(e)
+
+    asyncio.run(main())
 
   custom.sh: |
     #!/bin/bash
