@@ -12,7 +12,7 @@ data:
     workstation=os.environ.get("JUNO_WORKSTATION")
     try: 
         response = OrionHttpx().delete(
-            "cat",
+            "{{ .Release.Namespace }}",
             "kuiper",
             8000,
             f"/kuiper/shutdown/{workstation}",
