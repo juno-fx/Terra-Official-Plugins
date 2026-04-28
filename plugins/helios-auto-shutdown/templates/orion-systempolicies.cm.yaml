@@ -14,8 +14,7 @@ data:
     )
     when 
     {
-    principal.serviceAccountName == "helios"
-    }
-    ;
+      principal.serviceAccountName == "helios"
+    };
     
     
