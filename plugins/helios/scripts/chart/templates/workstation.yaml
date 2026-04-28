@@ -33,7 +33,9 @@ spec:
         cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
 
     spec:
-      automountServiceAccountToken: false
+      {{- if .Values.enableAPI }}
+      serviceAccountName: helios
+      {{- end }}
       hostname: "{{ .Values.name }}"
 
       # workstation nodes will require juno-innovations.com/workstation: "true"
@@ -143,6 +145,42 @@ spec:
               mountPath: "/etc/helios/init.d/{{ .name }}/{{ .file }}"
             {{- end }}
             {{- end }}
+        {{- if .Values.enableAPI }}
+        - name: rhea
+          image: "{{ .Values.registry }}/{{ .Values.rheaRepo }}:{{ .Values.rheaTag }}"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NAMESPACED
+              value: "true"
+            - name: NAMESPACE
+              value: {{ .Release.Namespace }}
+          {{- with .Values.env }}
+            {{- toYaml .Values.env | nindent 12 }}
+          {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /.health
+              port: 13000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /.health
+              port: 13000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: "{{ .Values.rheaMemory }}"
+              cpu: "{{ .Values.rheaCpu }}"
+            limits:
+            {{- if .Values.rheaCpuLimit }}
+              cpu: "{{ .Values.rheaCpuLimit }}"
+            {{- end }}
+            {{- if .Values.rheaMemoryLimit }}
+              memory: "{{ .Values.rheaMemoryLimit }}"
+            {{- end }}
+        {{- end }}
       volumes:
         - name: shm
           emptyDir:

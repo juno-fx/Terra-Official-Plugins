@@ -29,3 +29,18 @@ data:
       type: string
       required: true
       default: "unstable-rocky-9"
+    - name: enableAPI
+      description: "Enable system-to-system communication"
+      type: boolean
+      required: true
+      default: false
+    - name: rheaRepo
+      description: "Repo to pull the rhea image from"
+      type: string
+      required: true
+      default: "rhea"
+    - name: rheaTag      
+      description: "Tag to pull the rhea image from"
+      type: string
+      required: true
+      default: "v1.2.0"
