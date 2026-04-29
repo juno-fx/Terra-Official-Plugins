@@ -72,6 +72,17 @@ spec:
         - name: "{{ .Values.pullSecret }}"
       {{- end }}
 
+      {{- if .Values.enableAPI }}
+      initContainers:
+        - name: copy-orionpy   # Identifies this init container within the Pod
+          # Image used to run this init container - must contain the orionpy package
+          image: "{{ .Values.registry }}/{{ .Values.rheaRepo }}:{{ .Values.rheaTag }}"
+          command: ['sh', '-c', 'cp -r /opt/juno/orion /mnt/shared/']
+          volumeMounts:
+            - name: orionpy-volume
+              mountPath: /mnt/shared
+      {{- end }}
+
       containers:
         - name: helios
           imagePullPolicy: IfNotPresent
@@ -145,6 +156,10 @@ spec:
               mountPath: "/etc/helios/init.d/{{ .name }}/{{ .file }}"
             {{- end }}
             {{- end }}
+            {{- if .Values.enableAPI }}
+            - name: orionpy-volume
+              mountPath: /opt/juno 
+            {{- end }}
         {{- if .Values.enableAPI }}
         - name: rhea
           image: "{{ .Values.registry }}/{{ .Values.rheaRepo }}:{{ .Values.rheaTag }}"
@@ -196,4 +211,8 @@ spec:
             name: {{ .config | quote }}
             defaultMode: 0777
         {{- end }}
+        {{- end }}
+        {{- if .Values.enableAPI }}
+        - name: orionpy-volume
+          emptyDir: {}
         {{- end }}
