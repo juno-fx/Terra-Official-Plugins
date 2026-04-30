@@ -1,0 +1,25 @@
+resource_id: hermes-agent
+name: hermes-agent
+icon: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/assets/banner.png
+description: The self-improving AI agent built by Nous Research. Exposes an OpenAI-compatible API for other services to call.
+category: AI
+tags:
+- llm
+- ai-agent
+- hermes
+- openai-compatible
+fields:
+- name: install_volume
+  description: The shared volume to store persistent Hermes data (config, memory, skills, sessions).
+  required: true
+  type: shared-volume
+- name: sub_path
+  description: Subdirectory on the volume to store Hermes data.
+  required: true
+  default: "hermes-agent"
+- name: llm_provider_key
+  description: Your OpenRouter API key (https://openrouter.ai/keys). Hermes uses this to call LLMs.
+  required: true
+- name: api_server_key
+  description: Auth token that other pods use to call the Hermes OpenAI-compatible API at port 8642.
+  required: true
