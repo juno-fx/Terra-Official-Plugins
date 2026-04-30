@@ -24,17 +24,6 @@ spec:
         juno-innovations.com/workstation: "{{ .Values.name }}"
     spec:
       automountServiceAccountToken: false
-      initContainers:
-        - name: write-env
-          image: busybox
-          command:
-            - sh
-            - -c
-          env:
-            - name: API_SERVER_KEY
-              value: {{ .Values.api_server_key }}
-            - name: OPENROUTER_API_KEY
-              value: {{ .Values.llm_provider_key }}
       containers:
         - name: hermes-agent
           image: nousresearch/hermes-agent:latest
@@ -47,10 +36,14 @@ spec:
           env:
             - name: API_SERVER_HOST
               value: "0.0.0.0"
+            - name: API_SERVER_KEY
+              value: {{ .Values.api_server_key | quote }}
+            - name: OPENROUTER_API_KEY
+              value: {{ .Values.llm_provider_key | quote }}
           resources:
             requests:
-              memory: "{{ .Values.memory }}"
-              cpu: "{{ .Values.cpu }}"
+              memory: {{ .Values.memory }}
+              cpu: {{ .Values.cpu }}
             limits:
-              memory: "{{ .Values.memoryLimit }}"
-              cpu: "{{ .Values.cpuLimit }}"
+              memory: {{ .Values.memoryLimit }}
+              cpu: {{ .Values.cpuLimit }}
