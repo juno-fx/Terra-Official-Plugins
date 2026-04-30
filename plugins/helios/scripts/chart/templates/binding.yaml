@@ -3,14 +3,14 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: helios
+  name: helios-{{ .Release.Namespace }}
   namespace: {{ .Release.Namespace }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: helios
+  name: helios-{{ .Release.Namespace }}
 subjects:
   - kind: ServiceAccount
-    name: helios
+    name: helios-{{ .Release.Namespace }}
     namespace: {{ .Release.Namespace }}
 {{- end }}
