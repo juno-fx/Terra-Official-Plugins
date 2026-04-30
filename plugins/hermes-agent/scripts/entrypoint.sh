@@ -1,4 +1,1 @@
-#!/bin/bash
-
-set -e
-echo "skip"
+echo "This is intended to be used via Kuiper."

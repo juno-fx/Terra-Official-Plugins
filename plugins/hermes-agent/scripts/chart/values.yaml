@@ -1,0 +1,12 @@
+name: hermes-agent
+user:
+session:
+llm_provider_key: ""
+api_server_key: ""
+install_volume: tdk-home
+sub_path: hermes-agent
+cpu: "500m"
+memory: "1Gi"
+cpuLimit: "2000m"
+memoryLimit: "4Gi"
+_kuiper:

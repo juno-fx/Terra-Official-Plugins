@@ -1,8 +1,1 @@
-# configuration
-sub_path: "hermes-agent"
-llm_provider_key: ""
-api_server_key: ""
-install_volume:
-  name: tdk-home
-  sub_path: hermes-agent
-  container_path: /apps # ignored
+# Outer chart values - minimal; workload params live in scripts/chart/values.yaml

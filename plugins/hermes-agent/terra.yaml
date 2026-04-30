@@ -8,18 +8,4 @@ tags:
 - ai-agent
 - hermes
 - openai-compatible
-fields:
-- name: install_volume
-  description: The shared volume to store persistent Hermes data (config, memory, skills, sessions).
-  required: true
-  type: shared-volume
-- name: sub_path
-  description: Subdirectory on the volume to store Hermes data.
-  required: true
-  default: "hermes-agent"
-- name: llm_provider_key
-  description: Your OpenRouter API key (https://openrouter.ai/keys). Hermes uses this to call LLMs.
-  required: true
-- name: api_server_key
-  description: Auth token that other pods use to call the Hermes OpenAI-compatible API at port 8642.
-  required: true
+fields: []
