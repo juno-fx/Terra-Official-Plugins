@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Release.Name }}"
+  labels:
+    terra.juno-innovations.com/app: "{{ .Release.Name }}"
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      terra.juno-innovations.com/app: "{{ .Release.Name }}"
+  template:
+    metadata:
+      name: "{{ .Release.Name }}"
+      labels:
+        terra.juno-innovations.com/app: "{{ .Release.Name }}"
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: hermes-agent
+          image: nousresearch/hermes-agent:latest
+          imagePullPolicy: IfNotPresent
+          command: ["gateway", "run"]
+          ports:
+            - name: api
+              containerPort: 8642
+              protocol: TCP
+          env:
+            - name: API_SERVER_HOST
+              value: "0.0.0.0"
+            - name: API_SERVER_KEY
+              value: {{ .Values.api_server_key | quote }}
+            - name: OPENROUTER_API_KEY
+              value: {{ .Values.llm_provider_key | quote }}
+          resources:
+            limits:
+              memory: "4Gi"
+              cpu: "2000m"
+            requests:
+              memory: "1Gi"
+              cpu: "500m"
+          volumeMounts:
+            - name: mount
+              mountPath: "/opt/data"
+              subPath: {{ .Values.sub_path }}
+      volumes:
+        - name: mount
+          persistentVolumeClaim:
+            claimName: {{ .Values.install_volume.name }}
