@@ -18,12 +18,3 @@ data:
       description: "Auth token that other pods use to call the Hermes OpenAI-compatible API at port 8642."
       type: string
       required: true
-    - name: install_volume
-      description: "The shared volume to store persistent Hermes data (config, memory, skills, sessions)."
-      type: shared-volume
-      required: true
-    - name: sub_path
-      description: "Subdirectory on the volume to store Hermes data."
-      type: string
-      required: true
-      default: "hermes-agent"

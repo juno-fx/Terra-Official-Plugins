@@ -40,10 +40,6 @@ spec:
               value: {{ .Values.api_server_key | quote }}
             - name: OPENROUTER_API_KEY
               value: {{ .Values.llm_provider_key | quote }}
-          volumeMounts:
-            - name: mount
-              mountPath: "/opt/data"
-              subPath: "{{ .Values.sub_path }}/{{ .Values.user }}"
       containers:
         - name: hermes-agent
           image: nousresearch/hermes-agent:latest
@@ -63,11 +59,3 @@ spec:
             limits:
               memory: "{{ .Values.memoryLimit }}"
               cpu: "{{ .Values.cpuLimit }}"
-          volumeMounts:
-            - name: mount
-              mountPath: "/opt/data"
-              subPath: "{{ .Values.sub_path }}/{{ .Values.user }}"
-      volumes:
-        - name: mount
-          persistentVolumeClaim:
-            claimName: "{{ .Values.install_volume }}"
