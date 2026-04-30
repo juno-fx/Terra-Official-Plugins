@@ -42,8 +42,14 @@ spec:
               value: {{ .Values.llm_provider_key | quote }}
           resources:
             requests:
-              memory: {{ .Values.memory }}
-              cpu: {{ .Values.cpu }}
+              memory: "{{ .Values.memory }}"
+              cpu: "{{ .Values.cpu }}"
+            {{- if or .Values.memoryLimit .Values.cpuLimit }}
             limits:
-              memory: {{ .Values.memoryLimit }}
-              cpu: {{ .Values.cpuLimit }}
+            {{- if .Values.cpuLimit }}
+              cpu: "{{ .Values.cpuLimit }}"
+            {{- end }}
+            {{- if .Values.memoryLimit }}
+              memory: "{{ .Values.memoryLimit }}"
+            {{- end }}
+            {{- end }}
