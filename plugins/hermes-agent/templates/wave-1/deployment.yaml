@@ -32,6 +32,8 @@ spec:
               value: {{ .Values.api_server_key | quote }}
             - name: OPENROUTER_API_KEY
               value: {{ .Values.llm_provider_key | quote }}
+            - name: GATEWAY_ALLOW_ALL_USERS
+              value: "true"
           resources:
             limits:
               memory: "4Gi"
