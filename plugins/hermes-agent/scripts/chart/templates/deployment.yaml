@@ -30,12 +30,6 @@ spec:
           command:
             - sh
             - -c
-            - |
-              cat > /opt/data/.env << EOF
-              API_SERVER_KEY=${API_SERVER_KEY}
-              OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
-              GATEWAY_ALLOW_ALL_USERS=true
-              EOF
           env:
             - name: API_SERVER_KEY
               value: {{ .Values.api_server_key }}
