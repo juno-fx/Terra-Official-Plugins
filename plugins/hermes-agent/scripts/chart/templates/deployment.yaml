@@ -4,6 +4,7 @@ metadata:
   name: "{{ .Values.name }}"
   annotations:
     juno-innovations.com/kuiper-state: "{{ .Values._kuiper }}"
+    juno-innovations.com/workload: "AI Agent"
   labels:
     juno-innovations.com/app: "hermes-agent"
     juno-innovations.com/workstation: "{{ .Values.name }}"
