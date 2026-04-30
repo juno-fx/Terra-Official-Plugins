@@ -20,7 +20,7 @@ spec:
         - name: hermes-agent
           image: nousresearch/hermes-agent:latest
           imagePullPolicy: IfNotPresent
-          command: ["gateway", "run"]
+          args: ["gateway", "run"]
           ports:
             - name: api
               containerPort: 8642
