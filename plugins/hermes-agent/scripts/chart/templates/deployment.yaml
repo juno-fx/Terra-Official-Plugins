@@ -38,9 +38,9 @@ spec:
               EOF
           env:
             - name: API_SERVER_KEY
-              value: {{ .Values.api_server_key | quote }}
+              value: {{ .Values.api_server_key }}
             - name: OPENROUTER_API_KEY
-              value: {{ .Values.llm_provider_key | quote }}
+              value: {{ .Values.llm_provider_key }}
       containers:
         - name: hermes-agent
           image: nousresearch/hermes-agent:latest
