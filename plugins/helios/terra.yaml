@@ -1,7 +1,7 @@
 resource_id: helios
 name: Helios
 icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios/scripts/assets/helios-icon.png
-description: Helios containerized workstation from Juno
+description:   Helios containerized workstation from Juno
 category: Workstations
 tags:
   - kasm
