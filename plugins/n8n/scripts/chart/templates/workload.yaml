@@ -15,6 +15,14 @@ spec:
         kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
     spec:
       automountServiceAccountToken: false
+      initContainers:
+        - name: permissions
+          image: busybox
+          imagePullPolicy: IfNotPresent
+          command: ['sh', '-c', 'chmod -R 777 /data']
+          volumeMounts:
+            - name: data
+              mountPath: /data
       containers:
         - name: webtop
           imagePullPolicy: IfNotPresent
