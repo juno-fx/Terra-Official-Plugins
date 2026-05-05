@@ -23,5 +23,5 @@ data:
     - name: model
       description: "OpenRouter model slug (e.g. meta-llama/llama-3.1-8b-instruct:free)"
       type: string
-      required: false
+      required: true
       default: "meta-llama/llama-3.1-8b-instruct:free"
