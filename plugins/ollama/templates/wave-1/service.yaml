@@ -10,3 +10,19 @@ spec:
       name: api
   selector:
     terra.juno-innovations.com/app: "{{ .Release.Name }}"
+---
+{{- if .Values.enable_node_port }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Release.Name }}-nodeport"
+spec:
+  type: NodePort
+  ports:
+    - port: 11434
+      targetPort: 11434
+      protocol: TCP
+      name: api
+  selector:
+    terra.juno-innovations.com/app: "{{ .Release.Name }}"
+{{- end }}
