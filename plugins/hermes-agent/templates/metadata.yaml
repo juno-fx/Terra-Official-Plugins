@@ -20,3 +20,8 @@ data:
       description: "Auth token that other pods use to call the Hermes OpenAI-compatible API at port 8642."
       type: string
       required: true
+    - name: model
+      description: "OpenRouter model slug (e.g. meta-llama/llama-3.1-8b-instruct:free)"
+      type: string
+      required: false
+      default: "meta-llama/llama-3.1-8b-instruct:free"

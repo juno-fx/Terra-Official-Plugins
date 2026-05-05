@@ -37,11 +37,17 @@ spec:
               GATEWAY_ALLOW_ALL_USERS=true
               EOF
               chmod 644 /opt/data/.env
+              cat > /opt/data/config.yaml << EOF
+              model: "${MODEL}"
+              EOF
+              chmod 644 /opt/data/config.yaml
           env:
             - name: API_SERVER_KEY
               value: {{ .Values.api_server_key | quote }}
             - name: OPENROUTER_API_KEY
               value: {{ .Values.llm_provider_key | quote }}
+            - name: MODEL
+              value: {{ .Values.model | quote }}
           volumeMounts:
             - name: hermes-data
               mountPath: /opt/data
