@@ -53,6 +53,10 @@ spec:
               value: {{ .Values.llm_provider_key | quote }}
             - name: MODEL
               value: {{ .Values.model | quote }}
+            {{- range .Values.env }}
+            - name: {{ .name | quote }}
+              value: {{ .value | quote }}
+            {{- end }}
           volumeMounts:
             - name: hermes-data
               mountPath: /opt/data
