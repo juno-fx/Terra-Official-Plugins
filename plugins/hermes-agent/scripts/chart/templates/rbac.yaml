@@ -4,6 +4,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: "{{ .Values.name }}"
+  namespace: "{{ .Release.Namespace }}"
   annotations:
     kuiper.juno-innovations.com/hidden: "true"
   labels:
@@ -12,9 +13,10 @@ metadata:
     juno-innovations.com/owner: "{{ .Values.name }}"
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+kind: Role
 metadata:
-  name: "{{ .Values.name }}-cluster-reader"
+  name: "{{ .Values.name }}-reader"
+  namespace: "{{ .Release.Namespace }}"
   annotations:
     kuiper.juno-innovations.com/hidden: "true"
   labels:
@@ -27,9 +29,10 @@ rules:
     verbs: ["get", "list", "watch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+kind: RoleBinding
 metadata:
-  name: "{{ .Values.name }}-cluster-reader"
+  name: "{{ .Values.name }}-reader"
+  namespace: "{{ .Release.Namespace }}"
   annotations:
     kuiper.juno-innovations.com/hidden: "true"
   labels:
@@ -38,8 +41,8 @@ metadata:
     juno-innovations.com/owner: "{{ .Values.name }}"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: "{{ .Values.name }}-cluster-reader"
+  kind: Role
+  name: "{{ .Values.name }}-reader"
 subjects:
   - kind: ServiceAccount
     name: "{{ .Values.name }}"
