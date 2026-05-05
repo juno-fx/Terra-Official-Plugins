@@ -23,5 +23,10 @@ data:
     - name: model
       description: "OpenRouter model slug (e.g. meta-llama/llama-3.1-8b-instruct:free)"
       type: string
-      required: true
+      required: false
       default: "meta-llama/llama-3.1-8b-instruct:free"
+    - name: cluster_read_access
+      description: "Grant this agent read-only access to the entire cluster (creates ClusterRole, ServiceAccount, ClusterRoleBinding)."
+      type: boolean
+      required: false
+      default: false

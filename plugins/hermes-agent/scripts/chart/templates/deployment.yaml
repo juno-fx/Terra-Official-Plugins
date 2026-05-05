@@ -23,7 +23,12 @@ spec:
         juno-innovations.com/user: "{{ .Values.user }}"
         juno-innovations.com/workstation: "{{ .Values.name }}"
     spec:
+      {{- if .Values.cluster_read_access }}
+      serviceAccountName: "{{ .Values.name }}"
+      automountServiceAccountToken: true
+      {{- else }}
       automountServiceAccountToken: false
+      {{- end }}
       initContainers:
         - name: write-env
           image: busybox
