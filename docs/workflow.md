@@ -13,7 +13,12 @@ locally without needing to deploy to a production environment until they are rea
 5. Log in to the ArgoCD UI and see your plugin listed as an Application.
 6. Make changes to your plugin locally and push them to the remote branch.
 7. ArgoCD will automatically detect the changes and update the application in the local cluster.
-8. If you are running a more complex Plugin that uses the `/scripts` directory, make sure to run `make package <plugin name>` to package your plugin before pushing changes. This will ensure that the scripts are included in the Helm Chart.
+8. If your plugin has a `scripts/` directory (or is a workload template with `scripts/chart/`), run `make package <plugin name>` before pushing. This repackages the scripts into the ConfigMap YAML that ArgoCD deploys. Skipping this step means the old version silently deploys.
+
+    !!! danger "Workload templates require packaging after every scripts/chart/ change"
+        Workload templates store their entire embedded Helm chart inside `scripts/chart/`. Any change to
+        `scripts/chart/` — templates, values, Chart.yaml — requires `make package <plugin>` before pushing.
+        Use `make watch <plugin>` to auto-repackage during development.
 9. Repeat the process until you are satisfied with your plugin.
 
 ## Workflow Steps
