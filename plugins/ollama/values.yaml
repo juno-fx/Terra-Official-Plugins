@@ -6,3 +6,4 @@ install_volume:
   container_path: /apps # ignored
 gpu: false
 runtime: ""
+enable_node_port: false

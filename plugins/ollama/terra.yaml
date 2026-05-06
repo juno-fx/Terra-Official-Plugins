@@ -6,6 +6,7 @@ category: AI
 tags:
 - llm
 - machine-learning
+editable: true
 fields:
 - name: runtime
   description: This is the underlying container runtime. Normally you need to set this to the container runtime that has access to the GPU. For example, "nvidia". You can also leave this empty which will default to CPU.
@@ -24,3 +25,8 @@ fields:
   description: The name of the install volume to store the persisted data.
   required: true
   type: shared-volume
+- name: enable_node_port
+  description: Expose a nodeport for the Ollama service. This is required if you want to access the Ollama API from outside the cluster. NOTE, you will need to get the assigned port for kubernetes directly.
+  required: true
+  type: boolean
+  default: false
