@@ -36,6 +36,20 @@ spec:
             - sh
             - -c
             - |
+              {{- if .Values.use_local_ollama }}
+              cat > /opt/data/.env << EOF
+              API_SERVER_KEY=${API_SERVER_KEY}
+              GATEWAY_ALLOW_ALL_USERS=true
+              EOF
+              chmod 644 /opt/data/.env
+              cat > /opt/data/config.yaml << EOF
+              model:
+                default: "${MODEL}"
+                provider: custom
+                base_url: "${OLLAMA_BASE_URL}"
+              EOF
+              chmod 644 /opt/data/config.yaml
+              {{- else }}
               cat > /opt/data/.env << EOF
               API_SERVER_KEY=${API_SERVER_KEY}
               OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
@@ -46,13 +60,16 @@ spec:
               model: "${MODEL}"
               EOF
               chmod 644 /opt/data/config.yaml
+              {{- end }}
           env:
             - name: API_SERVER_KEY
               value: {{ .Values.api_server_key | quote }}
-            - name: OPENROUTER_API_KEY
-              value: {{ .Values.llm_provider_key | quote }}
             - name: MODEL
               value: {{ .Values.model | quote }}
+            {{- if not .Values.use_local_ollama }}
+            - name: OPENROUTER_API_KEY
+              value: {{ .Values.llm_provider_key | quote }}
+            {{- end }}
             {{- range .Values.env }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}

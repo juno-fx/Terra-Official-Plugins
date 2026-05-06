@@ -13,20 +13,25 @@ data:
     - name: icon
       default: "https://raw.githubusercontent.com/NousResearch/hermes-agent/main/assets/banner.png"
     - name: llm_provider_key
-      description: "Your OpenRouter API key (https://openrouter.ai/keys). Hermes uses this to call LLMs."
+      description: "Your OpenRouter API key (https://openrouter.ai/keys). Not needed when using a local Ollama instance."
       type: string
-      required: true
+      required: false
     - name: api_server_key
       description: "Auth token that other pods use to call the Hermes OpenAI-compatible API at port 8642."
       type: string
       required: true
     - name: model
-      description: "OpenRouter model slug (e.g. meta-llama/llama-3.1-8b-instruct:free)"
+      description: "Model name. For OpenRouter: e.g. meta-llama/llama-3.1-8b-instruct:free. For local Ollama: e.g. llama3.2"
       type: string
       required: false
       default: "meta-llama/llama-3.1-8b-instruct:free"
+    - name: use_local_ollama
+      description: "Route inference to a local Ollama instance instead of OpenRouter. Your software must inject OLLAMA_BASE_URL as a pod env var pointing at the Ollama service."
+      type: boolean
+      required: false
+      default: false
     - name: cluster_read_access
-      description: "Grant this agent read-only access to the entire cluster (creates ClusterRole, ServiceAccount, ClusterRoleBinding)."
+      description: "Grant this agent namespace-scoped read-only access (creates Role, ServiceAccount, RoleBinding in the current namespace)."
       type: boolean
       required: false
       default: false
