@@ -11,8 +11,8 @@ differently depending on plugin type.
 | Type | When to use | Install target | Example |
 |------|-------------|----------------|---------|
 | **Plugin / Application** | Any K8s workload in a user's namespace — Deployment, Job, StatefulSet, anything | User project namespace | `ollama`, `firefox`, `deadline10` |
-| **Cluster-level** | Same as above, but cluster-scoped infra that needs the `argocd` namespace | `argocd` namespace | `nvidia-gpu-operator`, `longhorn` |
-| **Workload Template** | Provide a reusable workload schema for Genesis/Kuiper | `argocd` namespace | `helios`, `web-ide` |
+| **Cluster-level** | Cluster-wide infrastructure installed into the `argocd` namespace — must be tagged `cluster-level` in `terra.yaml` | `argocd` namespace | `nvidia-gpu-operator`, `longhorn` |
+| **Workload Template** | Provide a reusable workload schema for Genesis/Kuiper — requires the `cluster-level` tag | `argocd` namespace | `helios`, `web-ide` |
 | **Dashboard** | Embed a web UI as an iFrame in Genesis | User project namespace | `argocd-dashboard` |
 
 Not sure which to use? Ask:

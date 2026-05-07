@@ -29,11 +29,12 @@ editable: true
 
 ### `compatibility`
 
-A pip-style version constraint string referencing named platform components. Terra evaluates this
-before allowing installation and blocks the install if the constraint is not satisfied.
+A pip-style version constraint string referencing named platform components. This value is shown on
+the install form in the Terra frontend — it is informational only. Terra does not perform a runtime
+check against the running platform version; no install is blocked based on this value.
 
 ```yaml title="terra.yaml"
-# Require genesis-deployment >= 3.0.2 AND orion-deployment >= 3.1.0
+# Document that genesis-deployment >= 3.0.2 AND orion-deployment >= 3.1.0 are required
 compatibility: genesis-deployment>=3.0.2,orion-deployment>=3.1.0
 ```
 
@@ -46,7 +47,9 @@ Terra plugins use two distinct sets of fields:
 1. **`terra.yaml` fields** — shown at **install time** in the Terra app store UI
 2. **`metadata.yaml` fields** — shown at **workload launch time** in the Genesis workload UI (workload templates only)
 
-They share most field types, but `metadata.yaml` fields support additional Kubernetes-aware types.
+The shared types (available in both) are: `string`, `int`, `boolean`, `select`, `multi`.
+`metadata.yaml` fields also support additional Kubernetes-aware types not available at install time.
+`shared-volume` and `exclusive-volume` are install-time only and cannot be used in `metadata.yaml`.
 
 ---
 
@@ -167,8 +170,11 @@ Multi-choice select. Requires an `options:` list.
 
 ### `shared-volume`
 
-Shared PVC picker. Multiple plugins can reference the same volume. The selected PVC is injected as
-an object with a `name` key.
+Shared PVC picker. Multiple plugins can reference the same volume. The selected PVC
+is injected as an object with a `name` key.
+
+!!! warning "Install-time only"
+    `shared-volume` is only valid in `terra.yaml`. It cannot be used in `metadata.yaml` workload launch fields.
 
 ```yaml
 # terra.yaml
@@ -195,8 +201,12 @@ volumes:
 
 ### `exclusive-volume`
 
-Exclusive PVC picker. Only one plugin can use the volume at a time. Usage is identical to
-`shared-volume` — the difference is enforced by Terra at install time.
+Exclusive PVC picker. A plugin using this type can only be installed into one project at a time —
+Terra enforces that no other plugin instance claims the same volume. Usage is otherwise identical to
+`shared-volume`.
+
+!!! warning "Install-time only"
+    `exclusive-volume` is only valid in `terra.yaml`. It cannot be used in `metadata.yaml` workload launch fields.
 
 ```yaml
 - name: install_volume
@@ -348,6 +358,12 @@ KubeVirt DataVolume picker. Used in VM workload templates to select boot disk im
 | `k8sIngressClass` | — | ✓ |
 | `k8sServiceAccount` | — | ✓ |
 | `dataVolume` | — | ✓ |
+
+!!! warning "Unknown field types on older Genesis"
+    If a `metadata.yaml` field uses a type that is not recognized by the running Genesis version,
+    the workload template is silently unavailable in the catalog — it will not appear for users.
+    Genesis logs an error internally but throws no exception. Always test new field types against
+    your target platform version.
 
 !!! info "Evolving support"
     Not all Genesis and Terra release versions support every field type. Types are added as the platform

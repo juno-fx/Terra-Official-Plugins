@@ -70,24 +70,15 @@ flowchart TD
 ## Directory Structure
 
 ```
-plugins/my-template/
-├── Chart.yaml                          # Helm metadata for the plugin wrapper
-├── terra.yaml                          # Terra app store descriptor
-│                                       # tags: [cluster-level], fields: []
-├── values.yaml                         # Install-time values (usually empty)
-├── templates/
-│   ├── metadata.yaml                   # ← THE CONTRACT (see below)
-│   ├── packaged-scripts.yaml           # GENERATED — never edit
-│   └── packaged-scripts-cleanup.yaml   # GENERATED — never edit
-└── scripts/
-    ├── entrypoint.sh                   # Required; not executed at launch
-    └── chart/                          # ← THE PAYLOAD
-        ├── Chart.yaml
-        ├── values.yaml                 # Must contain all fields from metadata.yaml
-        └── templates/
-            ├── workstation.yaml        # StatefulSet — the running workload
-            ├── service.yaml            # ClusterIP Service
-            └── ingress.yaml            # nginx Ingress with Hubble auth
+scripts/
+├── entrypoint.sh              # Required for packaging; not executed at launch
+└── chart/
+    ├── Chart.yaml
+    ├── values.yaml            # All field names from metadata.yaml must exist here
+    └── templates/
+        ├── workstation.yaml   # Primary workload resource (StatefulSet by convention; Crossplane plugins use xr.yaml)
+        ├── service.yaml       # ClusterIP Service
+        └── ingress.yaml       # nginx Ingress with Hubble auth
 ```
 
 ---
@@ -112,8 +103,10 @@ metadata:
     # Value MUST point to this plugin's scripts ConfigMap.
     kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
   annotations:
-    # REQUIRED: workload category in Genesis UI and Hubble running workload display.
-    # Valid values: Application | Terminal | Workspace | Server | Virtual Machine
+    # REQUIRED: workload category in Genesis catalog and Hubble running workload display.
+    # Value can be any string.
+    #   - This copy (metadata.yaml) is read by Genesis to categorize the template in the catalog.
+    #   - A matching copy on the StatefulSet in scripts/chart/templates/ is read by Hubble.
     juno-innovations.com/workload: "Application"
 data:
   # REQUIRED: must exactly match the label value above.
@@ -147,13 +140,20 @@ data:
 
 ### `juno-innovations.com/workload` Annotation Values
 
-| Value | Used for |
+The values in the table below are the conventional categories used in the Juno platform, but **this
+annotation accepts any string**. The value in `metadata.yaml` is read by Genesis to categorize the
+template in the workload catalog. The matching value in `scripts/chart/templates/` is read by Hubble
+to label the active running workload.
+
+| Value | Conventional use |
 |-------|---------|
 | `Application` | General GUI applications |
 | `Terminal` | Shell / terminal workloads |
 | `Workspace` | Full desktop or IDE environments |
 | `Server` | Headless server workloads |
 | `Virtual Machine` | KubeVirt VM workloads |
+
+These are examples — not an exhaustive list. Custom values are valid.
 
 !!! warning "Set this annotation in two places"
     The `juno-innovations.com/workload` annotation must appear in both:
@@ -235,8 +235,6 @@ scripts/  →  tar -czf scripts.tar  →  base64  →  injected into templates/p
 !!! danger "Always repackage after any scripts/ change"
     `templates/packaged-scripts.yaml` is a **generated file**. Editing `scripts/` without repackaging
     means the old version deploys. ArgoCD gives no error. This is the most common source of bugs.
-
-    The TDK (`make deploy`) runs `make package` automatically. The local workflow (`make test`) does not.
 
 ### The 1MiB Limit
 

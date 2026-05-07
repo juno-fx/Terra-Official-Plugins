@@ -120,9 +120,6 @@ Watches `scripts/` for changes and reruns `make package` automatically. Requires
     ConfigMap. This will repackage the scripts directory and update the ConfigMap with the new base64 encoded string. You will
     then need to push the changes to the remote branch for ArgoCD to pick up the changes.
 
-    !!! info "TDK"
-        The TDK will automatically do this for you if you are running the development environment with `make deploy`.
-
 ### Security Considerations
 
 The scripts directory is a powerful feature that allows you to run custom scripts during the plugin's installation process.

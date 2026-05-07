@@ -47,7 +47,7 @@ To set up your Terra plugin repository, follow these steps:
 
     Plugin type:
       1) namespaced    - deploys a workload into a user namespace (e.g. Ollama)
-      2) cluster       - cluster-wide operator via ArgoCD Application (e.g. nvidia-gpu-operator)
+      2) cluster       - installed into the argocd namespace; manages cluster-wide infrastructure (e.g. nvidia-gpu-operator)
       3) workload      - workload template consumed by Genesis/Kuiper (e.g. Helios)
 
     Select type [1/2/3]: 1

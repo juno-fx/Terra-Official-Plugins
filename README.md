@@ -20,11 +20,11 @@ Read the **[Full Documentation](https://juno-fx.github.io/Terra-Official-Plugins
 
 Choose the right type before you start:
 
-| Type | When to use | Example |
-|------|-------------|---------|
-| **Namespaced** | Deploy a service into a user's project namespace | `plugins/ollama/` |
-| **Cluster-level** | Install cluster-wide operators or infrastructure | `plugins/nvidia-gpu-operator/` |
-| **Workload Template** | Provide a reusable workload schema for Genesis/Kuiper | `plugins/helios/` |
+| Type | When to use                                                                              | Example |
+|------|------------------------------------------------------------------------------------------|---------|
+| **Namespaced** | Deploy a service into a project namespace                                                | `plugins/ollama/` |
+| **Cluster-level** | Install cluster-wide operators or infrastructure — installed into the `argocd` namespace | `plugins/nvidia-gpu-operator/` |
+| **Workload Template** | Provide a reusable workload schema for Genesis/Kuiper — requires the `cluster-level` tag | `plugins/helios/` |
 
 **Not sure?** Ask yourself:
 - Does it run inside a user's project? → **Namespaced**
@@ -67,7 +67,6 @@ make verify
 | `make check-size <name>` | Checks packaged size against the 1MiB Kubernetes ConfigMap limit |
 | `make watch <name>` | Auto-repackages when `scripts/` changes — useful during development |
 | `make test <name>` | Deploys plugin to a local Kind cluster with ArgoCD |
-| `make test-plugin <name>` | TDK workflow: deploys to a live cluster |
 | `make lint` | Helm lint all plugins |
 | `make down` | Destroys the local Kind cluster |
 
@@ -90,7 +89,7 @@ Kubernetes ConfigMap. If you skip repackaging, the old version deploys silently 
 plugins/                          # All plugins live here
 ├── ollama/                       # Namespaced plugin example
 ├── nvidia-gpu-operator/          # Cluster-level plugin example
-└── helios/                       # Workload template example
+└── helios/                       # Workload template example (cluster-level)
 
 template/                         # Scaffolding boilerplate
 ├── namespaced/                   # Boilerplate for namespaced plugins

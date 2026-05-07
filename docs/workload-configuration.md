@@ -32,6 +32,10 @@ annotations:
 
 **Namespaced and cluster-level plugins** authenticate via Genesis:
 
+!!! note
+    Workload templates must always be tagged `cluster-level` in `terra.yaml` — they are installed
+    into the `argocd` namespace by Terra.
+
 ```yaml
 annotations:
   nginx.ingress.kubernetes.io/auth-url: "http://genesis.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-service/{{ .Release.Name }}/"
@@ -46,8 +50,10 @@ Kuiper reads annotations on Kubernetes resources inside `scripts/chart/templates
 workload lifecycle, endpoint surfacing, and more. All keys use the
 `kuiper.juno-innovations.com/` prefix unless noted.
 
-**These annotations only apply to workload template plugins.** Namespaced and cluster-level plugins
-are synced directly by ArgoCD — Kuiper never processes them.
+**These annotations only apply to workload template plugins.** Workload templates are always
+cluster-level — they are installed into the `argocd` namespace, and Kuiper reads their embedded
+`scripts/chart/` at workload launch time. Namespaced and cluster-level plugins are synced directly
+by ArgoCD — Kuiper never processes them.
 
 ---
 
@@ -56,6 +62,23 @@ are synced directly by ArgoCD — Kuiper never processes them.
 Set these in your `scripts/chart/templates/` to control Kuiper behavior.
 
 #### General
+
+##### `juno-innovations.com/workload`
+
+**Applies to:** StatefulSet (or primary workload resource) in `scripts/chart/templates/`  
+**Value format:** any string
+
+Declares the workload category shown in the Hubble UI for running workloads. This annotation must
+also appear on `templates/metadata.yaml` with the same value — Genesis reads the `metadata.yaml`
+copy to categorize the template in the catalog; Hubble reads the copy on the running StatefulSet
+to label the active workload.
+
+```yaml
+annotations:
+  juno-innovations.com/workload: "Application"
+```
+
+---
 
 ##### `kuiper.juno-innovations.com/actions`
 

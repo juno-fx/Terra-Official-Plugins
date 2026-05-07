@@ -16,8 +16,10 @@ kind: StatefulSet
 metadata:
   name: {{ .Values.name }}
   annotations:
-    # Declare the workload category — must match templates/metadata.yaml.
-    # Valid values: Application | Terminal | Workspace | Server | Virtual Machine
+    # Declare the workload category for Hubble — shown on the running workload in the Hubble UI.
+    # This value can be any string. It must match the value in templates/metadata.yaml:
+    #   - metadata.yaml copy → read by Genesis to categorize the template in the catalog
+    #   - workstation.yaml copy → read by Hubble to label the active running workload
     juno-innovations.com/workload: "Application"
     # Whitelist which actions users can trigger on this StatefulSet via the Kuiper API.
     kuiper.juno-innovations.com/actions: "restart"
