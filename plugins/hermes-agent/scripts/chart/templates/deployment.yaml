@@ -61,6 +61,10 @@ spec:
               EOF
               chmod 644 /opt/data/config.yaml
               {{- end }}
+              cat > /opt/data/SOUL.md << EOF
+              ${PERSONALITY}
+              EOF
+              chmod 644 /opt/data/SOUL.md
           env:
             - name: API_SERVER_KEY
               value: {{ .Values.api_server_key | quote }}
@@ -89,6 +93,10 @@ spec:
           env:
             - name: API_SERVER_HOST
               value: "0.0.0.0"
+          {{- range .Values.env }}
+            - name: {{ .name | quote }}
+              value: {{ .value | quote }}
+          {{- end }}
           resources:
             requests:
               memory: "{{ .Values.memory }}"

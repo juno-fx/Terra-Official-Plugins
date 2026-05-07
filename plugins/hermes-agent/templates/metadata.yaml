@@ -35,3 +35,7 @@ data:
       type: boolean
       required: false
       default: false
+    - name: personality
+      description: "The personality you want for this agent."
+      type: multi-line
+      required: false

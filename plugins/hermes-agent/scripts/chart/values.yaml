@@ -10,4 +10,5 @@ cpu: 500m
 memory: 1Gi
 cpuLimit: 2000m
 memoryLimit: 4Gi
+personality: ""
 _kuiper:
