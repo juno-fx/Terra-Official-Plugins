@@ -8,16 +8,16 @@ differently depending on plugin type.
 
 ## Choosing a Plugin Type
 
-| Type | When to use | Install target | Example |
-|------|-------------|----------------|---------|
-| **Plugin / Application** | Any K8s workload in a user's namespace — Deployment, Job, StatefulSet, anything | User project namespace | `ollama`, `firefox`, `deadline10` |
-| **Cluster-level** | Cluster-wide infrastructure installed into the `argocd` namespace — must be tagged `cluster-level` in `terra.yaml` | `argocd` namespace | `nvidia-gpu-operator`, `longhorn` |
-| **Workload Template** | Provide a reusable workload schema for Genesis/Kuiper — requires the `cluster-level` tag | `argocd` namespace | `helios`, `web-ide` |
-| **Dashboard** | Embed a web UI as an iFrame in Genesis | User project namespace | `argocd-dashboard` |
+| Type                     | When to use                                                                                                        | Install target     | Example                           |
+|--------------------------|--------------------------------------------------------------------------------------------------------------------|--------------------|-----------------------------------|
+| **Plugin / Application** | Any K8s workload in a project namespace — Deployment, Job, StatefulSet, anything                                   | Project namespace  | `ollama`, `firefox`, `deadline10` |
+| **Cluster-level**        | Cluster-wide infrastructure installed into the `argocd` namespace — must be tagged `cluster-level` in `terra.yaml` | `argocd` namespace | `nvidia-gpu-operator`, `longhorn` |
+| **Workload Template**    | Provide a reusable workload schema for Genesis/Kuiper — requires the `cluster-level` tag                           | `argocd` namespace | `helios`, `web-ide`               |
+| **Dashboard**            | Embed a web UI as an iFrame in Genesis                                                                             | Project namespace  | `argocd-dashboard`                |
 
 Not sure which to use? Ask:
 
-- Does it install K8s objects into a user's project? → **Plugin / Application**
+- Does it install K8s objects into a project? → **Plugin / Application**
 - Does it need to install into the cluster root (`argocd` ns) and manage its own namespaces? → **Cluster-level**
 - Do users launch individual workloads from it (desktops, notebooks, terminals)? → **Workload Template**
 - Is it just a web UI you want to embed in Genesis? → **Dashboard**
@@ -27,12 +27,8 @@ Not sure which to use? Ask:
 ## Plugin & Application
 
 A standard Helm chart of **any contents**. Deploys any valid Kubernetes objects (Deployments, Jobs,
-CronJobs, StatefulSets, ConfigMaps, RBAC, etc.) into the user's project namespace. There is no required
+CronJobs, StatefulSets, ConfigMaps, RBAC, etc.) into the project namespace. There is no required
 directory structure beyond the standard Helm chart layout.
-
-The only difference between a **Plugin** and an **Application** is that an Application requires a volume
-field (`shared-volume` or `exclusive-volume`) in `terra.yaml`, giving users a storage location for the
-app's data.
 
 **Identifying marker:** no `cluster-level` tag in `terra.yaml`
 
@@ -44,7 +40,7 @@ app's data.
 
 Identical to a namespaced plugin mechanically — a standard Helm chart of any contents. The only
 difference is the install target: Terra installs cluster-level plugins into the `argocd` namespace
-instead of the user's project namespace. The plugin is expected to create and manage its own namespaces
+instead of the project namespace. The plugin is expected to create and manage its own namespaces
 if needed.
 
 A common pattern is to include an ArgoCD `Application` resource that delegates to an upstream Helm chart,
@@ -128,8 +124,8 @@ data:
     Every `name:` in `fields:` must have a matching key in `scripts/chart/values.yaml`.
     A mismatch causes Helm template rendering to fail silently when a workload is launched.
 
-!!! warning "Annotation required on StatefulSet too"
-    The `juno-innovations.com/workload` annotation must also appear on the StatefulSet in
+!!! warning "Annotation required on main workload too"
+    The `juno-innovations.com/workload` annotation must also appear on the main workload object (StatefulSet/Deployment/etc.) in
     `scripts/chart/templates/workstation.yaml`. This is how Hubble categorizes the running workload.
 
 ### `scripts/chart/` — The Embedded Helm Chart

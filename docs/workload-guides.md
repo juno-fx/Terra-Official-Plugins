@@ -5,7 +5,7 @@ annotations in context with inline comments explaining the purpose of each.
 
 ---
 
-## Example 1 — `simple-app`: Basic Web Application
+## Example 1: Basic Web Application
 
 A standard web application workload. Demonstrates actions, connection details, and ingress
 endpoint control.
@@ -65,7 +65,7 @@ metadata:
     nginx.ingress.kubernetes.io/auth-url: "http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/"
     nginx.ingress.kubernetes.io/use-regex: "true"
     # Hide internal paths from the Hubble endpoint list.
-    kuiper.juno-innovations.com/ingress-hide: "/healthz,/metrics"
+    kuiper.juno-innovations.com/ingress-hide: "/socket.io"
     # Surface additional deep-link paths as clickable endpoints in Hubble.
     kuiper.juno-innovations.com/ingress-extras: "/app/index.html"
 spec:
@@ -80,11 +80,18 @@ spec:
                 name: {{ .Values.name }}
                 port:
                   number: 8080
+          - path: /socket.io
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.name }}
+                port:
+                  number: 8088
 ```
 
 ---
 
-## Example 2 — `ec2-workstation`: EC2-backed Remote Desktop
+## Example 2: EC2-backed Remote Desktop
 
 A workload backed by a Crossplane-managed EC2 instance. Demonstrates EC2-specific annotations
 and the `adopt` pattern for resources Kuiper creates after launch.

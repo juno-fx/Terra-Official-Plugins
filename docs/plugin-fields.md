@@ -53,7 +53,7 @@ The shared types (available in both) are: `string`, `int`, `boolean`, `select`, 
 
 ---
 
-## `terra.yaml` Fields — Install-Time
+## `terra.yaml` Install Fields
 
 These fields are defined in `terra.yaml` under the `fields:` key. They are presented to users when
 they install the plugin from the Terra app store. The values become Helm values injected into
@@ -70,7 +70,7 @@ fields:
 
 ---
 
-## `metadata.yaml` Fields — Workload Launch-Time
+## `metadata.yaml` Workload Fields
 
 For workload template plugins only. Defined in `templates/metadata.yaml` under `data.fields:` as a
 YAML block scalar. These fields are presented in the Genesis workload creation form. The values become
@@ -341,23 +341,22 @@ KubeVirt DataVolume picker. Used in VM workload templates to select boot disk im
 
 ## Type Availability Summary
 
-| Type | `terra.yaml` | `metadata.yaml` |
-|------|:---:|:---:|
-| `string` | ✓ | ✓ |
-| `int` | ✓ | ✓ |
-| `boolean` | ✓ | ✓ |
-| `select` | ✓ | ✓ |
-| `multi` | ✓ | ✓ |
-| `shared-volume` | ✓ | — |
-| `exclusive-volume` | ✓ | — |
-| `env` | — | auto |
-| `multi-line` | — | ✓ |
-| `list` | — | ✓ |
-| `k8sPriority` | — | ✓ |
-| `k8sStorageClass` | — | ✓ |
-| `k8sIngressClass` | — | ✓ |
-| `k8sServiceAccount` | — | ✓ |
-| `dataVolume` | — | ✓ |
+| Type                | `terra.yaml` | `metadata.yaml` |
+|---------------------|:------------:|:---------------:|
+| `string`            |      ✓       |        ✓        |
+| `int`               |      ✓       |        ✓        |
+| `boolean`           |      ✓       |        ✓        |
+| `select`            |      ✓       |        ✓        |
+| `multi`             |      ✓       |        ✓        |
+| `shared-volume`     |      ✓       |        —        |
+| `exclusive-volume`  |      ✓       |        —        |
+| `multi-line`        |      —       |        ✓        |
+| `list`              |      —       |        ✓        |
+| `k8sPriority`       |      —       |        ✓        |
+| `k8sStorageClass`   |      —       |        ✓        |
+| `k8sIngressClass`   |      —       |        ✓        |
+| `k8sServiceAccount` |      —       |        ✓        |
+| `dataVolume`        |      —       |        ✓        |
 
 !!! warning "Unknown field types on older Genesis"
     If a `metadata.yaml` field uses a type that is not recognized by the running Genesis version,

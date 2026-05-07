@@ -31,12 +31,12 @@ locally without needing to deploy to a production environment until they are rea
     $ devbox shell
     ```
 
-2. **Create a Plugin**: Use the `make new-plugin <plugin name>` command to create a new plugin scaffolding.
+2. **Create a Plugin**: Use the `make new-plugin` command to create a new plugin scaffolding.
 
     <!-- termynal -->
 
     ```shell
-    $ make new-plugin my-plugin
+    $ make new-plugin
     ```
 
 3. **Push to Remote Branch**: Commit your changes and push them to a remote branch.

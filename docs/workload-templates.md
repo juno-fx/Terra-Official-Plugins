@@ -83,17 +83,17 @@ scripts/
 
 ---
 
-## `templates/metadata.yaml` — The Contract
+## `templates/metadata.yaml`
 
 This ConfigMap does two jobs:
 
-**1. Discovery** — the `kuiper.juno-innovations.com/chart` label tells Genesis to include this plugin
+**1. Discovery** the `kuiper.juno-innovations.com/chart` label tells Genesis to include this plugin
 in the workload catalog.
 
-**2. Schema** — the `data.fields:` block defines what the user sees in the Genesis workload creation form.
+**2. Schema** the `data.fields:` block defines what the user sees in the Genesis workload creation form.
 Every field becomes a Helm value passed to `scripts/chart/` by Kuiper.
 
-```yaml linenums="1" title="templates/metadata.yaml — full annotated example"
+```yaml linenums="1" title="templates/metadata.yaml"
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -145,13 +145,13 @@ annotation accepts any string**. The value in `metadata.yaml` is read by Genesis
 template in the workload catalog. The matching value in `scripts/chart/templates/` is read by Hubble
 to label the active running workload.
 
-| Value | Conventional use |
-|-------|---------|
-| `Application` | General GUI applications |
-| `Terminal` | Shell / terminal workloads |
-| `Workspace` | Full desktop or IDE environments |
-| `Server` | Headless server workloads |
-| `Virtual Machine` | KubeVirt VM workloads |
+| Value             | Conventional use                 |
+|-------------------|----------------------------------|
+| `Application`     | General GUI applications         |
+| `Terminal`        | Shell / terminal workloads       |
+| `Workspace`       | Full desktop or IDE environments |
+| `Server`          | Headless server workloads        |
+| `Virtual Machine` | KubeVirt VM workloads            |
 
 These are examples — not an exhaustive list. Custom values are valid.
 
@@ -164,13 +164,13 @@ These are examples — not an exhaustive list. Custom values are valid.
 
 ---
 
-## `scripts/chart/values.yaml` — Matching the Fields Contract
+## `scripts/chart/values.yaml`
 
 Every field `name:` in `metadata.yaml` must exist as a key in `scripts/chart/values.yaml`.
 Kuiper passes user-provided values to Helm as `--set key=value`. If a key is missing from `values.yaml`,
 Helm rendering fails silently at workload launch time.
 
-```yaml linenums="1" title="scripts/chart/values.yaml — must mirror metadata.yaml fields"
+```yaml linenums="1" title="scripts/chart/values.yaml"
 # Kuiper-injected standard values — do not remove these
 name: my-template
 user:
@@ -201,9 +201,39 @@ tag: latest
 gpu: false
 ```
 
+### Kuiper-Injected Standard Values Reference
+
+| Key                        | Description                                                                                                                                                                                                              |
+|----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `name`                     | Unique name for this workload instance                                                                                                                                                                                   |
+| `user`                     | Username of the Juno user who launched the workload                                                                                                                                                                      |
+| `group`                    | Primary group of that user                                                                                                                                                                                               |
+| `cpu` / `memory`           | Resource requests from the Genesis launch form                                                                                                                                                                           |
+| `cpuLimit` / `memoryLimit` | Resource limits; `null` means no limit applied                                                                                                                                                                           |
+| `idx`                      | Instance index for multi-instance workloads                                                                                                                                                                              |
+| `guid` / `puid`            | Group ID / user ID of the launching user                                                                                                                                                                                 |
+| `host`                     | Hostname assigned to this workload at launch time — the same hostname registered with Hubble. Use this to construct the ingress `host:` rule and to pass the base URL into the container (e.g. via the `PREFIX` env var) |
+| `session`                  | Unique session token for this workload instance                                                                                                                                                                          |
+| `pullSecret`               | Image pull secret name if configured in the cluster                                                                                                                                                                      |
+| `volumeMounts` / `volumes` | PVC mounts requested at launch time                                                                                                                                                                                      |
+| `env`                      | User-defined environment variables from the Genesis launch form                                                                                                                                                          |
+| `selector`                 | Label selector injected by Kuiper for resource ownership tracking                                                                                                                                                        |
+| `plugins`                  | Helios plugin script mounts                                                                                                                                                                                              |
+| `_kuiper`                  | **Deprecated.** Internal Kuiper metadata — do not read or modify. May be removed in a future platform version.                                                                                                           |
+
+!!! warning "Ingress must not use the root path"
+    Juno platform services are served from `/` on the cluster ingress. A workload template must
+    **not** configure its ingress at the root path — doing so will clash with platform services and
+    break routing for the entire cluster.
+
+    Your workload must support a URL prefix (e.g. `/{{ .Values.name }}/`) or another sub-path
+    routing strategy. The `PREFIX` environment variable is the conventional way to pass the base
+    path into the container — set it from `{{ .Values.host }}` or your chosen sub-path in
+    `workstation.yaml`.
+
 ---
 
-## `scripts/chart/templates/workstation.yaml` — The Running Workload
+## `scripts/chart/templates/workstation.yaml`
 
 This StatefulSet is what Kuiper deploys when a user launches a workload. Key conventions:
 
@@ -262,7 +292,7 @@ This requires `inotifywait` (available in the devbox shell).
 
 ---
 
-## Creating a Workload Template — Checklist
+## Creating a Workload Template
 
 1. `make new-plugin` → select type `3` (workload) → select workload category
 2. Edit `terra.yaml` — set `name`, `description`, `category`, `icon`
@@ -286,14 +316,14 @@ This requires `inotifywait` (available in the devbox shell).
 
 ## Common Mistakes
 
-| Mistake | Symptom | Fix |
-|---------|---------|-----|
-| `fields:` name ≠ `values.yaml` key | Workload fails at launch; no visible error | Align names exactly |
-| Forgot `make package` | Old workload behavior after deploy | `make package <plugin>` |
-| Missing `kuiper.juno.../chart` label | Plugin absent from Genesis catalog | Add label to `metadata.yaml` |
-| Missing `juno-innovations.com/workload` annotation | Not categorized in Hubble | Add to both `metadata.yaml` and `workstation.yaml` |
-| `packaged-scripts.yaml` hand-edited | Overwritten on next `make package` | Edit `scripts/` instead |
-| Large assets in `scripts/` | Exceeds 1MiB ConfigMap limit | Use `make check-size`, trim assets |
+| Mistake                                            | Symptom                                    | Fix                                                |
+|----------------------------------------------------|--------------------------------------------|----------------------------------------------------|
+| `fields:` name ≠ `values.yaml` key                 | Workload fails at launch; no visible error | Align names exactly                                |
+| Forgot `make package`                              | Old workload behavior after deploy         | `make package <plugin>`                            |
+| Missing `kuiper.juno.../chart` label               | Plugin absent from Genesis catalog         | Add label to `metadata.yaml`                       |
+| Missing `juno-innovations.com/workload` annotation | Not categorized in Hubble                  | Add to both `metadata.yaml` and `workstation.yaml` |
+| `packaged-scripts.yaml` hand-edited                | Overwritten on next `make package`         | Edit `scripts/` instead                            |
+| Large assets in `scripts/`                         | Exceeds 1MiB ConfigMap limit               | Use `make check-size`, trim assets                 |
 
 ---
 
