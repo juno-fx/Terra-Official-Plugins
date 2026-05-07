@@ -5,11 +5,32 @@ metadata:
   labels:
     kuiper.juno-innovations.com/plugin: "true"
 data:
+  shutdown.py: |
+    from orionpy.network.orionhttpx import OrionHttpx
+    import os
+    import asyncio
+
+    workstation = os.environ.get("JUNO_WORKSTATION")
+
+    async def main():
+        try:
+            await OrionHttpx().delete(
+                "{{ .Release.Namespace }}",
+                "kuiper",
+                8000,
+                f"/kuiper/shutdown/{workstation}",
+            )
+        except Exception as e:
+            print(e)
+
+    asyncio.run(main())
+
   custom.sh: |
     #!/bin/bash
 
     set -e
-    curl -X "DELETE" "http://kuiper:8000/kuiper/$USER/shutdown/$JUNO_WORKSTATION" >> /tmp/locker.log
+    source /opt/juno/orion/venv/bin/activate
+    python /etc/helios/idle.d/shutdown.py >> /tmp/locker.log
 
   entrypoint.sh: |
     #!/bin/bash
@@ -29,9 +50,9 @@ data:
     echo "Installing Helios Auto Shutdown Plugin"
     echo "IDLE_TIME: $IDLE_TIME"
     echo "JUNO_WORKSTATION: $JUNO_WORKSTATION"
-    echo "USER: $USER"
     echo
     cp -v /etc/helios/init.d/helios-auto-shutdown-0/custom.sh /etc/helios/idle.d/custom.sh
+    cp -v /etc/helios/init.d/helios-auto-shutdown-2/shutdown.py /etc/helios/idle.d/shutdown.py
     chmod +x /etc/helios/idle.d/custom.sh
 
     echo "Helios Auto Shutdown Plugin installed successfully."

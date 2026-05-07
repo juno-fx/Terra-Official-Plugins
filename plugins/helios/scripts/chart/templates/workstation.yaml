@@ -33,7 +33,9 @@ spec:
         cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
 
     spec:
-      automountServiceAccountToken: false
+      {{- if .Values.enableAPI }}
+      serviceAccountName: helios
+      {{- end }}
       hostname: "{{ .Values.name }}"
 
       # workstation nodes will require juno-innovations.com/workstation: "true"
@@ -68,6 +70,17 @@ spec:
       {{- if .Values.pullSecret }}
       imagePullSecrets:
         - name: "{{ .Values.pullSecret }}"
+      {{- end }}
+
+      {{- if .Values.enableAPI }}
+      initContainers:
+        - name: copy-orionpy   # Identifies this init container within the Pod
+          # Image used to run this init container - must contain the orionpy package
+          image: "{{ .Values.registry }}/{{ .Values.rheaRepo }}:{{ .Values.rheaTag }}"
+          command: ['sh', '-c', 'cp -r /opt/juno/orion /mnt/shared/']
+          volumeMounts:
+            - name: orionpy-volume
+              mountPath: /mnt/shared
       {{- end }}
 
       containers:
@@ -143,6 +156,47 @@ spec:
               mountPath: "/etc/helios/init.d/{{ .name }}/{{ .file }}"
             {{- end }}
             {{- end }}
+            {{- if .Values.enableAPI }}
+            - name: orionpy-volume
+              mountPath: /opt/juno 
+            {{- end }}
+        {{- if .Values.enableAPI }}
+        - name: rhea
+          image: "{{ .Values.registry }}/{{ .Values.rheaRepo }}:{{ .Values.rheaTag }}"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NAMESPACED
+              value: "true"
+            - name: NAMESPACE
+              value: {{ .Release.Namespace }}
+          {{- range .Values.env }}
+            - name: {{ .name | quote }}
+              value: {{ .value | quote }}
+          {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /.health
+              port: 13000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /.health
+              port: 13000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: "{{ .Values.rheaMemory }}"
+              cpu: "{{ .Values.rheaCpu }}"
+            limits:
+            {{- if .Values.rheaCpuLimit }}
+              cpu: "{{ .Values.rheaCpuLimit }}"
+            {{- end }}
+            {{- if .Values.rheaMemoryLimit }}
+              memory: "{{ .Values.rheaMemoryLimit }}"
+            {{- end }}
+        {{- end }}
       volumes:
         - name: shm
           emptyDir:
@@ -158,4 +212,8 @@ spec:
             name: {{ .config | quote }}
             defaultMode: 0777
         {{- end }}
+        {{- end }}
+        {{- if .Values.enableAPI }}
+        - name: orionpy-volume
+          emptyDir: {}
         {{- end }}
