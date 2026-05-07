@@ -1,0 +1,7 @@
+# Default values — add your plugin's configurable parameters here.
+
+# Volume injected by Terra at install time
+install_volume: {}
+
+# Sub-path within the volume for this plugin's data
+destination: "PLUGIN"

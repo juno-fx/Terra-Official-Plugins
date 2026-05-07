@@ -1,0 +1,11 @@
+# Put any valid Kubernetes objects here.
+# This can be Deployments, StatefulSets, Jobs, CronJobs, ConfigMaps, RBAC, etc.
+# There are no structural requirements — organize however makes sense for the plugin.
+#
+# Cluster-level plugins install into the argocd namespace. They are expected to
+# create and manage their own namespaces if needed.
+#
+# A common pattern is to include an ArgoCD Application resource that delegates to
+# an upstream Helm chart, but any valid Kubernetes objects work.
+#
+# See docs/plugin-types.md for examples and guidance.
