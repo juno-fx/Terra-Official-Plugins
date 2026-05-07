@@ -89,9 +89,10 @@ The two generated files are committed to git and synced by ArgoCD. **Never edit 
 make verify
 ```
 
-Scans every plugin with a `scripts/` directory and checks whether any source file is newer than the
-generated `packaged-scripts.yaml`. Fails hard with a list of stale plugins. Runs automatically in CI
-on every push to `plugins/**`.
+Scans every plugin with a `scripts/` directory and checks whether any source file in `scripts/` is
+newer than the generated `packaged-scripts.yaml` — meaning the plugin has been edited but not yet
+repackaged. If any such plugins are found, it prints each plugin name and exits with a non-zero code,
+failing the CI run. Runs automatically in CI on every push to `plugins/**`.
 
 ### Development: Auto-Repackage on Save
 
