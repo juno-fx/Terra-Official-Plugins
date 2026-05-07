@@ -119,8 +119,12 @@ nav:
     - getting-started.md
     - plugin-types.md
     - workflow.md
-    - workflow-tdk.md
     - configuration.md
+    - plugin-fields.md
+    - Workload Templates:
+      - workload-templates.md
+      - workload-guides.md
+      - workload-configuration.md
     - advanced.md
   - Community:
     - contributing.md

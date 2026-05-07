@@ -1,0 +1,8 @@
+resource_id:
+name: PLUGIN
+icon:
+description:
+category:
+tags:
+  - cluster-level
+fields: []

@@ -41,7 +41,7 @@ Sync Wave 2
 In some cases, it is just easier to write a script that does the installation for you. Terra allows you to "package" a 
 "scripts" directory that contains any kind of data you need to run your plugin. For example, you may want to run an 
 installation script that downloads a binary or runs a series of commands to set up your plugin and then install an 
-image as an icon. This can be down by creating a "scripts" directory in your plugins root directory. Terra will then
+image as an icon. This can be done by creating a "scripts" directory in your plugins root directory. Terra will then
 take that directory and all of its contents and tar it up and then base64 encode it. This base64 encoded string will be
 added to a ConfigMap called `{{ .Release.Name }}-scripts-configmap` and `{{ .Release.Name }}-scripts-configmap-cleanup`.
 You can then mount these ConfigMaps in your plugin's templates and use the scripts as needed. Here is an example:
@@ -58,23 +58,68 @@ Mounted Job
 --8<-- "plugins/deadline10/templates/wave-2/downloader.yaml"
 ```
 
+### What `make package` Does
+
+```bash
+make package <plugin-name>
+```
+
+Internally:
+
+1. `tar --owner=0 --group=0 --mtime='1970-01-01' --sort=name -czf scripts.tar scripts/`
+   — creates a deterministic (reproducible) gzip tarball
+2. `base64 -w 0 scripts.tar` — encodes as a single-line base64 string
+3. Injects the string into `templates/packaged-scripts.yaml` and `templates/packaged-scripts-cleanup.yaml`
+4. Runs `make check-size <plugin-name>` to verify the result fits within the 1MiB limit
+
+The two generated files are committed to git and synced by ArgoCD. **Never edit them by hand.**
+
+### Generated vs Source Files
+
+| File | Status | Action |
+|------|--------|--------|
+| `scripts/` | Source — edit this | Edit freely |
+| `scripts/chart/` | Source — edit this (workload templates only) | Edit freely |
+| `templates/packaged-scripts.yaml` | **Generated** | Never edit; run `make package` |
+| `templates/packaged-scripts-cleanup.yaml` | **Generated** | Never edit; run `make package` |
+
+### Verifying All Plugins Are Up To Date
+
+```bash
+make verify
+```
+
+Scans every plugin with a `scripts/` directory and checks whether any source file in `scripts/` is
+newer than the generated `packaged-scripts.yaml` — meaning the plugin has been edited but not yet
+repackaged. If any such plugins are found, it prints each plugin name and exits with a non-zero code,
+failing the CI run. Runs automatically in CI on every push to `plugins/**`.
+
+### Development: Auto-Repackage on Save
+
+```bash
+make watch <plugin-name>
+```
+
+Watches `scripts/` for changes and reruns `make package` automatically. Requires `inotifywait`
+(available in the devbox shell). Useful when iterating on workload template charts.
+
 !!! danger "Scripts Directory Limitations"
     The scripts directory is not a full-fledged file system. It is a ConfigMap that is mounted as a volume in your plugin's
     templates. This means that you cannot use it to store large files or directories. It is meant for small scripts and
     configuration files that are needed to run your plugin.
 
 !!! danger "Size Limitations"
-    The scripts directory is limited to 1MB in size. This is a hard limit imposed by Kubernetes ConfigMaps. If you need to
+    The scripts directory is limited to 1MiB in size. This is a hard limit imposed by Kubernetes ConfigMaps. If you need to
     store larger files, you will need to use a different method, such as storing the files in a remote location and downloading
     them during the plugin's installation process.
+
+    `make package` automatically checks size and warns at 900KB / errors at 1MiB.
+    You can also check manually: `make check-size <plugin-name>`
 
 !!! danger "Repackage Scripts"
     Every time you make a change to the scripts directory, you will need to run `make package <plugin name>` to update the
     ConfigMap. This will repackage the scripts directory and update the ConfigMap with the new base64 encoded string. You will
     then need to push the changes to the remote branch for ArgoCD to pick up the changes.
-
-    !!! info "TDK"
-        The TDK will automatically do this for you if you are running the development environment with `make deploy`.
 
 ### Security Considerations
 
