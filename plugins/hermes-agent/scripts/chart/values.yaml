@@ -1,0 +1,14 @@
+name: hermes-agent
+user:
+session:
+llm_provider_key: ""
+api_server_key: ""
+model: "meta-llama/llama-3.1-8b-instruct:free"
+use_local_ollama: false
+cluster_read_access: false
+cpu: 500m
+memory: 1Gi
+cpuLimit: 2000m
+memoryLimit: 4Gi
+personality: ""
+_kuiper:

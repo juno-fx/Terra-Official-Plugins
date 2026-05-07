@@ -1,0 +1,5 @@
+apiVersion: v1
+description: Hermes AI agent deployment
+name: hermes-agent
+version: 0.0.1
+icon: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/assets/banner.png
