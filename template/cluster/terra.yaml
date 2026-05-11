@@ -1,0 +1,10 @@
+resource_id:
+name: PLUGIN
+icon:
+description:
+category:
+tags:
+  - cluster-level
+# editable: true  # Uncomment to allow users to edit field values after install
+# compatibility: genesis-deployment>=3.0.2,orion-deployment>=3.1.0  # Optional: block install on older platform versions
+fields: []
