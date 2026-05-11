@@ -43,4 +43,4 @@ data:
       description: "Tag to pull the rhea image from"
       type: string
       required: true
-      default: "v1.2.0"
+      default: "v1.2.3"
