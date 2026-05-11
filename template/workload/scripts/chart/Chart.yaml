@@ -1,0 +1,4 @@
+apiVersion: v1
+description: PLUGIN workload template
+name: PLUGIN
+version: 0.0.0

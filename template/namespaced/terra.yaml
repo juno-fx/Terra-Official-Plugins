@@ -1,0 +1,19 @@
+resource_id:
+name: PLUGIN
+icon:
+description:
+category:
+tags: []
+# editable: true  # Uncomment to allow users to edit field values after install
+# compatibility: genesis-deployment>=3.0.2,orion-deployment>=3.1.0  # Optional: block install on older platform versions
+# Fields are shown to users in the Terra app store at install time.
+# They become Helm values passed to templates/ at ArgoCD sync time.
+# Add fields as needed for your plugin. Common types: string, int, boolean,
+# select, multi, shared-volume, exclusive-volume.
+# Example:
+#   - name: image_tag
+#     description: "Container image tag to deploy"
+#     type: string
+#     required: true
+#     default: "latest"
+fields: []

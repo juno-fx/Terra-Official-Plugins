@@ -33,19 +33,32 @@ To set up your Terra plugin repository, follow these steps:
     $ devbox shell
     ```
 
-3. **Create Our Plugin**: Juno provides a `Makefile` target that creates the scaffolding for a new plugin. You can use it to create a new plugin:
+3. **Create Our Plugin**: Juno provides an interactive `Makefile` target that creates the scaffolding for a new plugin. It will ask for the plugin name and type, then generate the correct boilerplate:
 
     <!-- termynal -->
     
     ```shell
-    $ make new-plugin my-plugin
-   >> Building New Plugin: my-plugin <<
-   >> Setting up Plugin: my-plugin <<
-   >> New Plugin Setup <<
-   >> Added to git <<
-   >> Plugin Location: .../Terra-Official-Plugins/plugins/my-plugin <<
-   >> Ready to go <<
+    $ make new-plugin
+    ========================================
+      Terra Plugin Scaffolding
+    ========================================
+
+    Plugin name (lowercase, hyphens only): my-plugin
+
+    Plugin type:
+      1) namespaced    - deploys a workload into a user namespace (e.g. Ollama)
+      2) cluster       - installed into the argocd namespace; manages cluster-wide infrastructure (e.g. nvidia-gpu-operator)
+      3) workload      - workload template consumed by Genesis/Kuiper (e.g. Helios)
+
+    Select type [1/2/3]: 1
+
+    >> Building namespaced plugin: my-plugin <<
+    >> Plugin created at: .../Terra-Official-Plugins/plugins/my-plugin <<
+    >> Added to git staging <<
+    >> Ready to go <<
     ```
+
+    See [Plugin Types](plugin-types.md) to understand which type to choose.
 
 4. **Launch Development Environment**: Use `make test <plugin name>` this will communicate with ArgoCD and create an Application deployment that points to your local system.
 

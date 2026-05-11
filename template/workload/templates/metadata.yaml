@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-terra-metadata"
+  labels:
+    # This label tells Genesis to include this plugin in the workload template catalog.
+    # The value must point to the scripts ConfigMap for this release.
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+  annotations:
+    # Categorizes this workload in the Genesis UI workload table.
+    # Valid values: Application | Terminal | Workspace | Server | Virtual Machine
+    juno-innovations.com/workload: "WORKLOAD_TYPE"
+data:
+  # Must point to the scripts ConfigMap — Genesis reads packaged_scripts.base64 from it.
+  chart: "{{ .Release.Name }}-scripts-configmap"
+  description: "PLUGIN workload template"
+  # The fields schema drives the Genesis workload-creation UI.
+  # Every field here becomes a Helm value passed into scripts/chart/ by Kuiper at launch time.
+  # See docs/plugin-fields.md for the full type reference.
+  fields: |
+    - name: icon
+      default: ""
+    - name: registry
+      description: "Container registry"
+      type: string
+      required: true
+      default: "docker.io"
+    - name: repo
+      description: "Image repository"
+      type: string
+      required: true
+      default: "PLUGIN"
+    - name: tag
+      description: "Image tag"
+      type: string
+      required: true
+      default: "latest"
+    - name: gpu
+      description: "Attach a GPU to this workload"
+      type: boolean
+      required: true
