@@ -44,3 +44,8 @@ data:
       type: string
       required: true
       default: "v1.2.3"
+    - name: anonymousAccess
+      description: "Allow anonymous access (disable authentication)"
+      type: boolean
+      required: true
+      default: false

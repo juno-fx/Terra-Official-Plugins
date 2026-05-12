@@ -39,3 +39,8 @@ data:
       description: "Attach a GPU to this workload"
       type: boolean
       required: true
+    - name: anonymousAccess
+      description: "Allow anonymous access (disable authentication)"
+      type: boolean
+      required: true
+      default: false
