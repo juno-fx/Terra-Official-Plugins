@@ -17,7 +17,7 @@ spec:
       automountServiceAccountToken: false
       initContainers:
         - name: permissions
-          image: busybox
+          image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
           imagePullPolicy: IfNotPresent
           command: ['sh', '-c', 'chmod -R 777 /data']
           volumeMounts:
