@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: orion-systempolicy
+  namespace: {{ .Release.Namespace }}
+  labels:
+    juno.cedar.system: "true"
+data:
+  policies.cedar: |
+    permit (
+      principal,
+      action in [Action::"DELETE"],
+      resource == {{ .Release.Namespace }}::Service::"kuiper"
+    )
+    when 
+    {
+      principal.serviceAccountName == "helios"
+    };
+    
+    
