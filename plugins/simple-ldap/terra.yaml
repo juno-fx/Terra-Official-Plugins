@@ -8,12 +8,13 @@ tags:
   - openldap
   - directory-service
   - cluster-level
+editable: true
 fields:
   - name: domain
-    description: LDAP domain (base DN). e.g. `dc=example,dc=org`
+    description: LDAP domain name. e.g. `example.org` or `hatfieldfx.com`. Automatically converted to base DN by the container.
     type: string
     required: true
-    default: "dc=example,dc=org"
+    default: "example.org"
   - name: adminPassword
     description: LDAP admin password
     type: string

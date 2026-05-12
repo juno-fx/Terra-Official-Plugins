@@ -1,5 +1,5 @@
 # configuration
-domain: "dc=example,dc=org"
+domain: "example.org"
 adminPassword: ""
 organization: "Example Inc"
 ldapPort: 389
