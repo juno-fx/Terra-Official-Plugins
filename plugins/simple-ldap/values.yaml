@@ -1,0 +1,17 @@
+# configuration
+domain: "dc=example,dc=org"
+adminPassword: ""
+organization: "Example Inc"
+ldapPort: 389
+ldapNodePort: 30389
+adminNodePort: 30080
+openldapCpu: "500m"
+openldapMemory: "256Mi"
+openldapCpuLimit: ""
+openldapMemoryLimit: ""
+adminCpu: "200m"
+adminMemory: "128Mi"
+adminCpuLimit: ""
+adminMemoryLimit: ""
+storageSize: "1Gi"
+storageClass: ""

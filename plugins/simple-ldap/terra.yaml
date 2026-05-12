@@ -1,0 +1,82 @@
+resource_id: simple-ldap
+name: Simple LDAP
+icon: https://www.openldap.org/images/logo_small.png
+description: Simple OpenLDAP server with phpLDAPadmin web management interface
+category: Identity & Security
+tags:
+  - ldap
+  - openldap
+  - directory-service
+  - cluster-level
+fields:
+  - name: domain
+    description: LDAP domain (base DN). e.g. `dc=example,dc=org`
+    type: string
+    required: true
+    default: "dc=example,dc=org"
+  - name: adminPassword
+    description: LDAP admin password
+    type: string
+    required: true
+  - name: organization
+    description: Organization name
+    type: string
+    required: true
+  - name: ldapPort
+    description: Internal LDAP port (ClusterIP). Standard is 389.
+    type: int
+    required: true
+    default: 389
+  - name: ldapNodePort
+    description: External LDAP NodePort. Must be in range 30000-32767. Opened on ALL cluster nodes for external LDAP access.
+    type: int
+    required: true
+  - name: adminNodePort
+    description: External phpLDAPadmin web UI NodePort. Must be in range 30000-32767. Opened on ALL cluster nodes for browser access.
+    type: int
+    required: true
+  - name: openldapCpu
+    description: CPU request for OpenLDAP container (e.g. "500m", "1")
+    type: string
+    required: false
+    default: "500m"
+  - name: openldapMemory
+    description: Memory request for OpenLDAP container (e.g. "256Mi", "1Gi")
+    type: string
+    required: false
+    default: "256Mi"
+  - name: openldapCpuLimit
+    description: CPU limit for OpenLDAP container (leave empty for no limit)
+    type: string
+    required: false
+  - name: openldapMemoryLimit
+    description: Memory limit for OpenLDAP container (leave empty for no limit)
+    type: string
+    required: false
+  - name: adminCpu
+    description: CPU request for phpLDAPadmin container
+    type: string
+    required: false
+    default: "200m"
+  - name: adminMemory
+    description: Memory request for phpLDAPadmin container
+    type: string
+    required: false
+    default: "128Mi"
+  - name: adminCpuLimit
+    description: CPU limit for phpLDAPadmin container (leave empty for no limit)
+    type: string
+    required: false
+  - name: adminMemoryLimit
+    description: Memory limit for phpLDAPadmin container (leave empty for no limit)
+    type: string
+    required: false
+  - name: storageSize
+    description: Persistent volume size for LDAP data (e.g. "1Gi", "10Gi")
+    type: string
+    required: false
+    default: "1Gi"
+  - name: storageClass
+    description: StorageClass for LDAP data PVC (leave empty for cluster default)
+    type: k8sStorageClass
+    required: false
