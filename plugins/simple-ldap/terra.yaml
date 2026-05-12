@@ -78,5 +78,5 @@ fields:
     default: "1Gi"
   - name: storageClass
     description: StorageClass for LDAP data PVC (leave empty for cluster default)
-    type: k8sStorageClass
+    type: string
     required: false
