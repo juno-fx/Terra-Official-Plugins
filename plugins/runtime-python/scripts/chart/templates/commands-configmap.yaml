@@ -19,7 +19,8 @@ data:
     mkdir -p "$TARGET_DIR"
     python -m venv /workspace/.venv
     if [ -n "$BUILD_COMMAND" ]; then
-      cd "$TARGET_DIR" && /workspace/.venv/bin/pip install --upgrade pip && eval "$BUILD_COMMAND"
+      source /workspace/.venv/bin/activate
+      cd "$TARGET_DIR" && eval "$BUILD_COMMAND"
     fi
 
   run-app.sh: |
