@@ -31,6 +31,7 @@ data:
       description: "Git repository URL to clone"
       type: string
       required: true
+      default: "https://github.com/aldmbmtl/runtimes.git"
     - name: git_ref
       description: "Git reference (branch, tag, commit)"
       type: string
@@ -40,15 +41,17 @@ data:
       description: "Working directory (relative to repo root, or absolute path)"
       type: string
       required: false
-      default: ""
+      default: "python"
     - name: build_command
       description: "Build command (e.g. pip install -r requirements.txt)"
       type: string
       required: false
+      default: "pip install -r requirements.txt"
     - name: run_command
       description: "Command to launch your application"
       type: string
       required: true
+      default: "python main.py"
     - name: port
       description: "Application port"
       type: int
