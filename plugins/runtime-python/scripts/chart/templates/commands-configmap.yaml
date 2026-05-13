@@ -6,6 +6,7 @@ data:
   init-clone.sh: |
     #!/bin/bash
     set -e
+    set -x
     git clone --branch "$GIT_REF" "$GIT_URL" /workspace
     if [ -n "$WORK_DIR" ]; then
       case "$WORK_DIR" in
@@ -23,6 +24,8 @@ data:
 
   run-app.sh: |
     #!/bin/bash
+    set -e
+    set -x
     source /workspace/.venv/bin/activate
     if [ -n "$WORK_DIR" ]; then
       case "$WORK_DIR" in
