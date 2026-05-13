@@ -7,6 +7,7 @@ data:
     #!/bin/bash
     set -e
     set -x
+    rm -rf /workspace/* /workspace/.[!.]* 2>/dev/null || true
     git clone --branch "$GIT_REF" "$GIT_URL" /workspace
     if [ -n "$WORK_DIR" ]; then
       case "$WORK_DIR" in
