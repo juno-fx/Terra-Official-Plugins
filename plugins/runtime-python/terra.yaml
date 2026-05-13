@@ -1,0 +1,15 @@
+resource_id: runtime-python
+name: Runtime: Python
+icon: https://www.python.org/static/community_logos/python-logo-generic.svg
+description: >
+  Python runtime environment. Clone a git repo, build, and run your Python
+  application. Configurable via env vars: git_url (repo to clone), git_ref
+  (branch/tag), work_dir (working directory), build_command (e.g. pip install),
+  run_command (e.g. python app.py), port, and network_mode
+  (ingress-auth/ingress-noauth/clusterip/nodeport).
+category: Development
+tags:
+  - cluster-level
+  - runtime
+  - python
+fields: []

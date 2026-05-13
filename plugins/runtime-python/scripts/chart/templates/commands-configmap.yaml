@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Values.name }}-runtime-commands"
+data:
+  init-clone.sh: |
+    #!/bin/bash
+    set -e
+    git clone --branch "$GIT_REF" "$GIT_URL" /workspace
+    if [ -n "$WORK_DIR" ]; then
+      case "$WORK_DIR" in
+        /*) TARGET_DIR="$WORK_DIR" ;;
+        *)  TARGET_DIR="/workspace/$WORK_DIR" ;;
+      esac
+    else
+      TARGET_DIR="/workspace"
+    fi
+    mkdir -p "$TARGET_DIR"
+    if [ -n "$BUILD_COMMAND" ]; then
+      cd "$TARGET_DIR" && eval "$BUILD_COMMAND"
+    fi
+
+  run-app.sh: |
+    #!/bin/bash
+    if [ -n "$WORK_DIR" ]; then
+      case "$WORK_DIR" in
+        /*) TARGET_DIR="$WORK_DIR" ;;
+        *)  TARGET_DIR="/workspace/$WORK_DIR" ;;
+      esac
+    else
+      TARGET_DIR="/workspace"
+    fi
+    cd "$TARGET_DIR"
+    eval "$RUN_COMMAND"
