@@ -7,5 +7,3 @@ database_volume:
   name: data-pv-claim
 destination: /deadline
 custom_plugins_path:
-juno_pluto_image:
-juno_pluto_worker_count: 0

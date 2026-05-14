@@ -27,9 +27,3 @@ fields:
   - name: custom_plugins_path
     description: Custom Plugins path
     required: false
-  - name: juno_pluto_image
-    description: Pluto Render Wrangler image
-    required: false
-  - name: juno_pluto_worker_count
-    description: Pluto Render Wrangler worker count
-    required: false
