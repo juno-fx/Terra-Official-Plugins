@@ -1,6 +1,6 @@
 resource_id: runtime-js
 name: Runtime JS
-icon: https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/main/plugins/runtime-js/assets/icon.png
 description: >
   JavaScript (Node.js) runtime environment. Clone a git repo, install
   dependencies, and run your Node.js application. Configurable via env vars:

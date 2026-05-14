@@ -11,7 +11,7 @@ data:
   description: "Go runtime environment — clone, build, and run your application"
   fields: |
     - name: icon
-      default: "https://go.dev/blog/go-brand/Go-Logo/SVG/Go-Logo_Blue.svg"
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/main/plugins/runtime-go/assets/icon.svg"
     - name: registry
       description: "Container registry"
       type: string

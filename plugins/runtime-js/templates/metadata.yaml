@@ -11,7 +11,7 @@ data:
   description: "JavaScript (Node.js) runtime environment — clone, build, and run your application"
   fields: |
     - name: icon
-      default: "https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png"
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/main/plugins/runtime-js/assets/icon.png"
     - name: registry
       description: "Container registry"
       type: string

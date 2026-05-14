@@ -1,6 +1,6 @@
 resource_id: runtime-cpp
 name: Runtime C++
-icon: https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/main/plugins/runtime-cpp/assets/icon.svg
 description: >
   C++ runtime environment. Clone a git repo, build, and run your C++
   application. Configurable via env vars: git_url (repo to clone), git_ref

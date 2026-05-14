@@ -11,7 +11,7 @@ data:
   description: "C++ runtime environment — clone, build, and run your application"
   fields: |
     - name: icon
-      default: "https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg"
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/main/plugins/runtime-cpp/assets/icon.svg"
     - name: registry
       description: "Container registry"
       type: string

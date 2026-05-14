@@ -1,6 +1,6 @@
 resource_id: runtime-go
 name: Runtime Go
-icon: https://go.dev/blog/go-brand/Go-Logo/SVG/Go-Logo_Blue.svg
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/main/plugins/runtime-go/assets/icon.svg
 description: >
   Go runtime environment. Clone a git repo, build, and run your Go
   application. Configurable via env vars: git_url (repo to clone), git_ref
