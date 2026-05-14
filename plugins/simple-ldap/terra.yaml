@@ -16,7 +16,7 @@ fields:
     required: true
     default: "example.org"
   - name: adminPassword
-    description: LDAP admin password
+    description: LDAP admin password (visible in plain text in Terra UI — no masked input type available)
     type: string
     required: true
   - name: organization
@@ -55,23 +55,53 @@ fields:
     type: string
     required: false
   - name: adminCpu
-    description: CPU request for phpLDAPadmin container
+    description: CPU request for phpLDAPadmin container (e.g. "200m", "1")
     type: string
     required: false
     default: "200m"
   - name: adminMemory
-    description: Memory request for phpLDAPadmin container
+    description: Memory request for phpLDAPadmin container (e.g. "128Mi", "512Mi")
     type: string
     required: false
     default: "128Mi"
   - name: adminCpuLimit
-    description: CPU limit for phpLDAPadmin container (leave empty for no limit)
+    description: CPU limit for phpLDAPadmin container (e.g. "500m", "2") (leave empty for no limit)
     type: string
     required: false
   - name: adminMemoryLimit
-    description: Memory limit for phpLDAPadmin container (leave empty for no limit)
+    description: Memory limit for phpLDAPadmin container (e.g. "256Mi", "1Gi") (leave empty for no limit)
     type: string
     required: false
+  - name: openldapRepo
+    description: Container registry for OpenLDAP image (e.g. "docker.io")
+    type: string
+    required: false
+    default: "docker.io"
+  - name: openldapImage
+    description: OpenLDAP image name (e.g. "osixia/openldap")
+    type: string
+    required: false
+    default: "osixia/openldap"
+  - name: openldapTag
+    description: OpenLDAP image tag (e.g. "latest")
+    type: string
+    required: false
+    default: "latest"
+  - name: adminRepo
+    description: Container registry for phpLDAPadmin image (e.g. "docker.io")
+    type: string
+    required: false
+    default: "docker.io"
+  - name: adminImage
+    description: phpLDAPadmin image name (e.g. "osixia/phpldapadmin")
+    type: string
+    required: false
+    default: "osixia/phpldapadmin"
+  - name: adminTag
+    description: phpLDAPadmin image tag (e.g. "latest")
+    type: string
+    required: false
+    default: "latest"
   - name: storageSize
     description: Persistent volume size for LDAP data (e.g. "1Gi", "10Gi")
     type: string

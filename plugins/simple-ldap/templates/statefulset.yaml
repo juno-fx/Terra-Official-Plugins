@@ -17,7 +17,7 @@ spec:
         juno-innovations.com/service: "true"
       containers:
         - name: openldap
-          image: osixia/openldap:latest
+          image: "{{ .Values.openldapRepo }}/{{ .Values.openldapImage }}:{{ .Values.openldapTag }}"
           ports:
             - containerPort: 389
               name: ldap
@@ -61,7 +61,7 @@ spec:
             - name: ldap-config
               mountPath: /etc/ldap/slapd.d
         - name: phpldapadmin
-          image: osixia/phpldapadmin:latest
+          image: "{{ .Values.adminRepo }}/{{ .Values.adminImage }}:{{ .Values.adminTag }}"
           ports:
             - containerPort: 80
               name: web
