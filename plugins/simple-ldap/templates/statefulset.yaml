@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: simple-ldap
+  namespace: simple-ldap
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: simple-ldap
+  template:
+    metadata:
+      labels:
+        app: simple-ldap
+    spec:
+      nodeSelector:
+        juno-innovations.com/service: "true"
+      containers:
+        - name: openldap
+          image: "{{ .Values.openldapRepo }}/{{ .Values.openldapImage }}:{{ .Values.openldapTag }}"
+          ports:
+            - containerPort: 389
+              name: ldap
+            - containerPort: 636
+              name: ldaps
+          env:
+            - name: LDAP_ORGANISATION
+              value: "{{ .Values.organization }}"
+            - name: LDAP_DOMAIN
+              value: "{{ .Values.domain }}"
+            - name: LDAP_ADMIN_PASSWORD
+              value: "{{ .Values.adminPassword }}"
+            - name: LDAP_PORT_NUMBER
+              value: "{{ .Values.ldapPort }}"
+          resources:
+            requests:
+              cpu: "{{ .Values.openldapCpu }}"
+              memory: "{{ .Values.openldapMemory }}"
+            {{- if or .Values.openldapCpuLimit .Values.openldapMemoryLimit }}
+            limits:
+              {{- if .Values.openldapCpuLimit }}
+              cpu: "{{ .Values.openldapCpuLimit }}"
+              {{- end }}
+              {{- if .Values.openldapMemoryLimit }}
+              memory: "{{ .Values.openldapMemoryLimit }}"
+              {{- end }}
+            {{- end }}
+          livenessProbe:
+            tcpSocket:
+              port: 389
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 389
+            initialDelaySeconds: 20
+            periodSeconds: 5
+          volumeMounts:
+            - name: ldap-data
+              mountPath: /var/lib/ldap
+            - name: ldap-config
+              mountPath: /etc/ldap/slapd.d
+        - name: phpldapadmin
+          image: "{{ .Values.adminRepo }}/{{ .Values.adminImage }}:{{ .Values.adminTag }}"
+          ports:
+            - containerPort: 80
+              name: web
+          env:
+            - name: PHPLDAPADMIN_LDAP_HOSTS
+              value: "127.0.0.1"
+            - name: PHPLDAPADMIN_HTTPS
+              value: "false"
+          resources:
+            requests:
+              cpu: "{{ .Values.adminCpu }}"
+              memory: "{{ .Values.adminMemory }}"
+            {{- if or .Values.adminCpuLimit .Values.adminMemoryLimit }}
+            limits:
+              {{- if .Values.adminCpuLimit }}
+              cpu: "{{ .Values.adminCpuLimit }}"
+              {{- end }}
+              {{- if .Values.adminMemoryLimit }}
+              memory: "{{ .Values.adminMemoryLimit }}"
+              {{- end }}
+            {{- end }}
+          livenessProbe:
+            tcpSocket:
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 80
+            initialDelaySeconds: 20
+            periodSeconds: 5
+      volumes:
+        - name: ldap-data
+          persistentVolumeClaim:
+            claimName: ldap-data
+        - name: ldap-config
+          emptyDir: {}
