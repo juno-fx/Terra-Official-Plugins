@@ -1,0 +1,23 @@
+# configuration
+domain: "example.org"
+adminPassword: ""
+organization: "Example Inc"
+ldapPort: 389
+ldapNodePort: 30389
+adminNodePort: 30080
+openldapCpu: "500m"
+openldapMemory: "256Mi"
+openldapCpuLimit: ""
+openldapMemoryLimit: ""
+openldapRepo: "docker.io"
+openldapImage: "osixia/openldap"
+openldapTag: "latest"
+adminRepo: "docker.io"
+adminImage: "osixia/phpldapadmin"
+adminTag: "latest"
+adminCpu: "200m"
+adminMemory: "128Mi"
+adminCpuLimit: ""
+adminMemoryLimit: ""
+storageSize: "1Gi"
+storageClass: ""

@@ -1,0 +1,18 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: simple-ldap
+  namespace: simple-ldap
+spec:
+  type: NodePort
+  ports:
+    - port: {{ .Values.ldapPort }}
+      targetPort: 389
+      nodePort: {{ .Values.ldapNodePort }}
+      name: ldap
+    - port: 80
+      targetPort: 80
+      nodePort: {{ .Values.adminNodePort }}
+      name: web
+  selector:
+    app: simple-ldap
