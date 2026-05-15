@@ -29,34 +29,9 @@ spec:
                 repository: ghcr.io/slinkyproject/slurmrestd
                 tag: 25.11-ubuntu24.04
           nodesets:
-            slinky:
-              enabled: false
-            cpu:
+            default:
               enabled: true
-              replicas: {{ .Values.cpu_nodes }}
-              scalingMode: StatefulSet
-              updateStrategy:
-                type: RollingUpdate
-                rollingUpdate:
-                  maxUnavailable: 25%
-              slurmd:
-                image:
-                  repository: ghcr.io/slinkyproject/slurmd
-                  tag: 25.11-ubuntu24.04
-              logfile:
-                image:
-                  repository: docker.io/library/alpine
-                  tag: latest
-                resources: {}
-              partition:
-                enabled: true
-                configMap:
-                  State: UP
-                  Default: "NO"
-                  MaxTime: UNLIMITED
-            gpu:
-              enabled: {{ .Values.enable_gpu }}
-              replicas: {{ .Values.gpu_nodes }}
+              replicas: {{ .Values.worker_count }}
               scalingMode: StatefulSet
               updateStrategy:
                 type: RollingUpdate
@@ -76,7 +51,10 @@ spec:
                 Features: gpu
               podSpec:
                 nodeSelector:
-                  kubernetes.io/os: linux
+                  {{- range $pair := splitList "," .Values.node_selector }}
+                  {{- $parts := splitList "=" $pair }}
+                  {{ trim (index $parts 0) }}: {{ trim (index $parts 1) }}
+                  {{- end }}
                 tolerations:
                   - key: nvidia.com/gpu
                     operator: Exists
@@ -85,7 +63,7 @@ spec:
                 enabled: true
                 configMap:
                   State: UP
-                  Default: "NO"
+                  Default: "YES"
                   MaxTime: UNLIMITED
           loginsets:
             login:
