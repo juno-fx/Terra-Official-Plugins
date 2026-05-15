@@ -5,6 +5,7 @@ metadata:
   labels:
     kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
   annotations:
+    argocd.argoproj.io/sync-wave: "1"
     juno-innovations.com/workload: "Application"
 data:
   chart: "{{ .Release.Name }}-scripts-configmap"
