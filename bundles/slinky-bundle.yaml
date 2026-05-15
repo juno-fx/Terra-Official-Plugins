@@ -44,7 +44,7 @@ fields:
   - name: gpu_node_selector
     description: Node labels for GPU workers (key=value, comma-separated)
     required: false
-    default: "nvidia.com/gpu=true"
+    default: "nvidia.com/gpu=true,nvidia.com/gpu.present=true"
     type: string
 plugins:
   - plugin: Certificate Manager

@@ -7,4 +7,4 @@ cpu_replicas: 2
 cpu_node_selector: "kubernetes.io/os=linux"
 gpu_enabled: true
 gpu_replicas: 1
-gpu_node_selector: "nvidia.com/gpu.present=true"
+gpu_node_selector: "nvidia.com/gpu=true,nvidia.com/gpu.present=true"

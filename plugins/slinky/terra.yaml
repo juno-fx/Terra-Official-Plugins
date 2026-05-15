@@ -60,5 +60,5 @@ fields:
     description: Node labels for GPU workers (key=value, comma-separated)
     required: false
     type: string
-    default: "nvidia.com/gpu.present=true"
+    default: "nvidia.com/gpu=true,nvidia.com/gpu.present=true"
 

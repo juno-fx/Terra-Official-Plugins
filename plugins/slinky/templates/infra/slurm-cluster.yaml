@@ -13,7 +13,7 @@ spec:
   sources:
     - repoURL: oci://ghcr.io/slinkyproject/charts/slurm
       chart: slurm
-      targetRevision: {{ .Values.slurm_version | default "1.0.0" }}
+      targetRevision: {{ .Values.slurm_version | default "1.1.0" }}
       helm:
         releaseName: {{ .Release.Name }}-cluster
         values: |
@@ -79,11 +79,17 @@ spec:
                 Gres: gpu:nvidia:1
                 Features: gpu
               podSpec:
-                nodeSelector:
-                  {{- range $pair := splitList "," .Values.gpu_node_selector }}
-                  {{- $parts := splitList "=" $pair }}
-                  {{ trim (index $parts 0) }}: {{ trim (index $parts 1) | quote }}
-                  {{- end }}
+                affinity:
+                  nodeAffinity:
+                    requiredDuringSchedulingIgnoredDuringExecution:
+                      nodeSelectorTerms:
+                        {{- range $pair := splitList "," .Values.gpu_node_selector }}
+                        - matchExpressions:
+                            - key: {{ trim (index (splitList "=" $pair) 0) }}
+                              operator: In
+                              values:
+                                - {{ trim (index (splitList "=" $pair) 1) | quote }}
+                        {{- end }}
                 tolerations:
                   - key: nvidia.com/gpu
                     operator: Exists
