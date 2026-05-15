@@ -37,6 +37,11 @@ spec:
                 image:
                   repository: ghcr.io/slinkyproject/slurmd
                   tag: 25.11-ubuntu24.04
+              logfile:
+                image:
+                  repository: docker.io/library/alpine
+                  tag: latest
+                resources: {}
               partition:
                 enabled: true
                 configMap:
@@ -51,6 +56,11 @@ spec:
                 image:
                   repository: ghcr.io/slinkyproject/slurmd
                   tag: 25.11-ubuntu24.04
+              logfile:
+                image:
+                  repository: docker.io/library/alpine
+                  tag: latest
+                resources: {}
               extraConfMap:
                 Gres: gpu:nvidia:1
                 Features: gpu
