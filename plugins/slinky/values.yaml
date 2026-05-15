@@ -1,4 +1,3 @@
-cert_manager_version: v1.16.3
 operator_version: ""
 slurm_version: ""
 slinky_namespace: slinky

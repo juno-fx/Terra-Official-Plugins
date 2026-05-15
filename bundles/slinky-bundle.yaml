@@ -1,0 +1,31 @@
+resource_id: slinky-bundle
+name: Slinky Bundle
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/slinky/assets/icon.svg
+description: |
+  A single install bundle for Slinky — Slurm HPC on Kubernetes.
+
+  Installs cert-manager (prerequisite) and the full Slinky stack:
+  slurm-operator CRDs, slurm-operator, and a Slurm cluster with
+  CPU and GPU worker nodes.
+
+category: Bundle
+tags:
+  - slurm
+  - hpc
+  - slinky
+  - schedmd
+  - cluster-level
+fields:
+  - name: cert_manager_version
+    description: Version of cert-manager to install
+    required: true
+    default: v1.16.3
+    type: string
+plugins:
+  - plugin: Certificate Manager
+    name: cert-manager
+    values:
+      chart_version:
+        reference: cert_manager_version
+  - plugin: Slinky
+    name: slinky

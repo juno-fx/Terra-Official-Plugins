@@ -1,7 +1,7 @@
 resource_id: slinky
 name: Slinky
 icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/slinky/assets/icon.svg
-description: Slurm HPC cluster on Kubernetes, powered by SchedMD's Slinky project. Installs cert-manager, slurm-operator, and a Slurm cluster with CPU + GPU nodes.
+description: Slurm HPC cluster on Kubernetes, powered by SchedMD's Slinky project. Installs slurm-operator and a Slurm cluster with CPU + GPU nodes.
 category: HPC
 tags:
   - slurm
@@ -10,11 +10,6 @@ tags:
   - schedmd
   - cluster-level
 fields:
-  - name: cert_manager_version
-    description: Version of cert-manager to install (prerequisite for slurm-operator webhooks)
-    required: true
-    type: string
-    default: v1.16.3
   - name: operator_version
     description: Version of slurm-operator chart to install (leave empty for latest)
     required: false
