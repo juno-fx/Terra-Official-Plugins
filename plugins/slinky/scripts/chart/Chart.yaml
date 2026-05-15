@@ -1,0 +1,4 @@
+apiVersion: v1
+description: Slurm job submission workload — clone, build, and submit sbatch jobs to a Slinky Slurm cluster
+name: slinky
+version: 0.0.1

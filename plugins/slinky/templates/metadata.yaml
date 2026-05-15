@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-terra-metadata"
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+  annotations:
+    juno-innovations.com/workload: "Application"
+data:
+  chart: "{{ .Release.Name }}-scripts-configmap"
+  description: "Slurm job submission workload — clone a git repo with your sbatch script, build, and submit to the Slurm cluster"
+  fields: |
+    - name: icon
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/slinky/assets/icon.svg"
+    - name: registry
+      description: "Container registry"
+      type: string
+      required: true
+      default: "ghcr.io"
+    - name: repo
+      description: "Slurm CLI image repository"
+      type: string
+      required: true
+      default: "slinkyproject/login"
+    - name: tag
+      description: "Slurm CLI image tag"
+      type: string
+      required: true
+      default: "25.11-ubuntu24.04"
+    - name: git_url
+      description: "Git repository URL with your sbatch script"
+      type: string
+      required: true
+    - name: git_ref
+      description: "Git reference (branch, tag, commit)"
+      type: string
+      required: true
+      default: "main"
+    - name: work_dir
+      description: "Working directory (relative to repo root, or absolute path)"
+      type: string
+      required: false
+      default: ""
+    - name: build_command
+      description: "Build command (e.g. chmod +x job.sh)"
+      type: string
+      required: false
+      default: ""
+    - name: run_command
+      description: "Command to submit the Slurm job (e.g. sbatch job.sh)"
+      type: string
+      required: true
+      default: "sbatch job.sh"
+    - name: partition
+      description: "Slurm partition to submit to"
+      type: string
+      required: false
+      default: "all"
+    - name: gpu
+      description: "Request a GPU for the Slurm job"
+      type: boolean
+      required: true
+    - name: network_mode
+      description: "How to expose the job monitor"
+      type: select
+      required: true
+      default: "ingress-auth"
+      options:
+        - ingress-auth
+        - ingress-noauth
+        - clusterip
+        - nodeport
+    - name: port
+      description: "Job monitor port"
+      type: int
+      required: true
+      default: 8080

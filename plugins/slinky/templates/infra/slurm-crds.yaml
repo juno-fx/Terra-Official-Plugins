@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-slurm-crds
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {{ .Values.slinky_namespace }}
+  sources:
+    - repoURL: oci://ghcr.io/slinkyproject/charts/slurm-operator-crds
+      chart: slurm-operator-crds
+      targetRevision: {{ .Values.operator_version | default "1.0.0" }}
+      helm:
+        releaseName: {{ .Release.Name }}-crds
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+      - CreateNamespace=true

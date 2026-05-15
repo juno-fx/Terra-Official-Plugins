@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Values.name }}-slurm-commands"
+data:
+  init-clone.sh: |
+    #!/bin/bash
+    set -e
+    set -x
+    rm -rf /workspace/* /workspace/.[!.]* 2>/dev/null || true
+    git clone --branch "$GIT_REF" "$GIT_URL" /workspace
+    if [ -n "$WORK_DIR" ]; then
+      case "$WORK_DIR" in
+        /*) TARGET_DIR="$WORK_DIR" ;;
+        *)  TARGET_DIR="/workspace/$WORK_DIR" ;;
+      esac
+    else
+      TARGET_DIR="/workspace"
+    fi
+    mkdir -p "$TARGET_DIR"
+    cd "$TARGET_DIR"
+    if [ -n "$BUILD_COMMAND" ]; then
+      eval "$BUILD_COMMAND"
+    fi
+
+  run-sbatch.sh: |
+    #!/bin/bash
+    set -e
+    set -x
+    if [ -n "$WORK_DIR" ]; then
+      case "$WORK_DIR" in
+        /*) TARGET_DIR="$WORK_DIR" ;;
+        *)  TARGET_DIR="/workspace/$WORK_DIR" ;;
+      esac
+    else
+      TARGET_DIR="/workspace"
+    fi
+    cd "$TARGET_DIR"
+    echo "Submitting Slurm job..."
+    eval "$RUN_COMMAND" || echo "Job submission completed (exit code: $?)"
+    echo "Monitoring loop active. Pod will stay running for interactive access."
+    tail -f /dev/null
