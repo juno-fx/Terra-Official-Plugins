@@ -2,5 +2,9 @@ operator_version: ""
 slurm_version: ""
 slinky_namespace: slinky
 slurm_namespace: slurm
-worker_count: 2
-node_selector: "kubernetes.io/os=linux"
+cpu_enabled: true
+cpu_replicas: 2
+cpu_node_selector: "kubernetes.io/os=linux"
+gpu_enabled: true
+gpu_replicas: 1
+gpu_node_selector: "nvidia.com/gpu=true"

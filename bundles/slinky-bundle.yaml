@@ -21,6 +21,31 @@ fields:
     required: true
     default: v1.16.3
     type: string
+  - name: cpu_replicas
+    description: Number of CPU worker replicas
+    required: true
+    default: 2
+    type: int
+  - name: cpu_node_selector
+    description: Node labels for CPU workers (key=value, comma-separated)
+    required: false
+    default: "kubernetes.io/os=linux"
+    type: string
+  - name: gpu_enabled
+    description: Enable GPU worker pool
+    required: true
+    default: true
+    type: boolean
+  - name: gpu_replicas
+    description: Number of GPU worker replicas
+    required: true
+    default: 1
+    type: int
+  - name: gpu_node_selector
+    description: Node labels for GPU workers (key=value, comma-separated)
+    required: false
+    default: "nvidia.com/gpu=true"
+    type: string
 plugins:
   - plugin: Certificate Manager
     name: cert-manager
@@ -29,3 +54,14 @@ plugins:
         reference: cert_manager_version
   - plugin: Slinky
     name: slinky
+    values:
+      cpu_replicas:
+        reference: cpu_replicas
+      cpu_node_selector:
+        reference: cpu_node_selector
+      gpu_enabled:
+        reference: gpu_enabled
+      gpu_replicas:
+        reference: gpu_replicas
+      gpu_node_selector:
+        reference: gpu_node_selector

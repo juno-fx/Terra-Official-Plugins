@@ -16,6 +16,96 @@ spec:
       targetRevision: {{ .Values.slurm_version | default "1.0.0" }}
       helm:
         releaseName: {{ .Release.Name }}-cluster
+        values: |
+          controller:
+            slurmctld:
+              image:
+                repository: ghcr.io/slinkyproject/slurmctld
+                tag: 25.11-ubuntu24.04
+          restapi:
+            replicas: 1
+            slurmrestd:
+              image:
+                repository: ghcr.io/slinkyproject/slurmrestd
+                tag: 25.11-ubuntu24.04
+          nodesets:
+            cpu:
+              enabled: {{ .Values.cpu_enabled }}
+              replicas: {{ .Values.cpu_replicas }}
+              scalingMode: StatefulSet
+              updateStrategy:
+                type: RollingUpdate
+                rollingUpdate:
+                  maxUnavailable: 25%
+              slurmd:
+                image:
+                  repository: ghcr.io/slinkyproject/slurmd
+                  tag: 25.11-ubuntu24.04
+              logfile:
+                image:
+                  repository: docker.io/library/alpine
+                  tag: latest
+                resources: {}
+              podSpec:
+                nodeSelector:
+                  {{- range $pair := splitList "," .Values.cpu_node_selector }}
+                  {{- $parts := splitList "=" $pair }}
+                  {{ trim (index $parts 0) }}: {{ trim (index $parts 1) }}
+                  {{- end }}
+              partition:
+                enabled: true
+                configMap:
+                  State: UP
+                  Default: "NO"
+                  MaxTime: UNLIMITED
+            gpu:
+              enabled: {{ .Values.gpu_enabled }}
+              replicas: {{ .Values.gpu_replicas }}
+              scalingMode: StatefulSet
+              updateStrategy:
+                type: RollingUpdate
+                rollingUpdate:
+                  maxUnavailable: 25%
+              slurmd:
+                image:
+                  repository: ghcr.io/slinkyproject/slurmd
+                  tag: 25.11-ubuntu24.04
+              logfile:
+                image:
+                  repository: docker.io/library/alpine
+                  tag: latest
+                resources: {}
+              extraConfMap:
+                Gres: gpu:nvidia:1
+                Features: gpu
+              podSpec:
+                nodeSelector:
+                  {{- range $pair := splitList "," .Values.gpu_node_selector }}
+                  {{- $parts := splitList "=" $pair }}
+                  {{ trim (index $parts 0) }}: {{ trim (index $parts 1) }}
+                  {{- end }}
+                tolerations:
+                  - key: nvidia.com/gpu
+                    operator: Exists
+                    effect: NoSchedule
+              partition:
+                enabled: true
+                configMap:
+                  State: UP
+                  Default: "NO"
+                  MaxTime: UNLIMITED
+          partitions:
+            all:
+              enabled: true
+              nodesets:
+                - ALL
+              configMap:
+                State: UP
+                Default: "YES"
+                MaxTime: UNLIMITED
+          configFiles:
+            gres.conf: |
+              AutoDetect=nvidia
   syncPolicy:
     automated:
       prune: true

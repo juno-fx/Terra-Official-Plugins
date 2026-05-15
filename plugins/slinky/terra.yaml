@@ -9,6 +9,7 @@ tags:
   - slinky
   - schedmd
   - cluster-level
+editable: true
 fields:
   - name: operator_version
     description: Version of slurm-operator chart to install (leave empty for latest)
@@ -30,14 +31,34 @@ fields:
     required: true
     type: string
     default: slurm
-  - name: worker_count
-    description: Number of Slurm worker replicas
+  - name: cpu_enabled
+    description: Enable CPU worker pool
+    required: true
+    type: boolean
+    default: true
+  - name: cpu_replicas
+    description: Number of CPU worker replicas
     required: true
     type: int
     default: 2
-  - name: node_selector
-    description: Node labels for workers (key=value, comma-separated)
+  - name: cpu_node_selector
+    description: Node labels for CPU workers (key=value, comma-separated)
     required: false
     type: string
     default: "kubernetes.io/os=linux"
+  - name: gpu_enabled
+    description: Enable GPU worker pool
+    required: true
+    type: boolean
+    default: true
+  - name: gpu_replicas
+    description: Number of GPU worker replicas
+    required: true
+    type: int
+    default: 1
+  - name: gpu_node_selector
+    description: Node labels for GPU workers (key=value, comma-separated)
+    required: false
+    type: string
+    default: "nvidia.com/gpu=true"
 
