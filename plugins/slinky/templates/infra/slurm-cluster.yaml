@@ -50,7 +50,7 @@ spec:
                 nodeSelector:
                   {{- range $pair := splitList "," .Values.cpu_node_selector }}
                   {{- $parts := splitList "=" $pair }}
-                  {{ trim (index $parts 0) }}: {{ trim (index $parts 1) }}
+                  {{ trim (index $parts 0) }}: {{ trim (index $parts 1) | quote }}
                   {{- end }}
               partition:
                 enabled: true
@@ -82,7 +82,7 @@ spec:
                 nodeSelector:
                   {{- range $pair := splitList "," .Values.gpu_node_selector }}
                   {{- $parts := splitList "=" $pair }}
-                  {{ trim (index $parts 0) }}: {{ trim (index $parts 1) }}
+                  {{ trim (index $parts 0) }}: {{ trim (index $parts 1) | quote }}
                   {{- end }}
                 tolerations:
                   - key: nvidia.com/gpu
