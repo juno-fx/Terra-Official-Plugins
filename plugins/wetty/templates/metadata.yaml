@@ -50,8 +50,8 @@ data:
       type: string
       required: true
       default: "1.29.3"
-    - name: anonymousAccess
-      description: "Allow anonymous access (disable authentication)"
+    - name: publicAccess
+      description: "Allow public access (disable authentication)"
       type: boolean
       required: true
       default: false

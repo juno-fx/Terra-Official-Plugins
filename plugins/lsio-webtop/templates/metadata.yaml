@@ -32,8 +32,8 @@ data:
     - name: icon
       description: icon
       default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/lsio-webtop/scripts/assets/logo.png"
-    - name: anonymousAccess
-      description: "Allow anonymous access (disable authentication)"
+    - name: publicAccess
+      description: "Allow public access (disable authentication)"
       type: boolean
       required: true
       default: false

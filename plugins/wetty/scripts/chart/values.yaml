@@ -9,7 +9,7 @@ memory: "1Gi"
 cpuLimit: null
 memoryLimit: null
 gpu: false
-anonymousAccess: false
+publicAccess: false
 idx: 0
 guid: 0
 puid: 0
