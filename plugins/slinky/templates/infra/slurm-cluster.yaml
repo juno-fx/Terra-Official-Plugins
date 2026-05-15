@@ -18,9 +18,6 @@ spec:
         releaseName: {{ .Release.Name }}-cluster
         values: |
           controller:
-            extraConf: |
-              CommunicationParameters=
-              AuthInfo=
             slurmctld:
               image:
                 repository: ghcr.io/slinkyproject/slurmctld
