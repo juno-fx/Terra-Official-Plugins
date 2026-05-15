@@ -25,8 +25,28 @@ data:
 
   run-sbatch.sh: |
     #!/bin/bash
-    set -e
     set -x
+
+    # Generate slurm.conf if sackd not available (fallback: direct client mode)
+    if ! command -v sackd &>/dev/null; then
+      mkdir -p /etc/slurm
+      cat > /etc/slurm/slurm.conf <<EOF
+    SlurmctldHost=${CONTROLLER_HOST}
+    SlurmctldPort=${CONTROLLER_PORT:-6817}
+    SlurmdPort=6818
+    AuthType=auth/munge
+    CryptoType=crypto/munge
+    EOF
+    fi
+
+    # Start sackd in background (Slinky login image) via configless mode
+    if command -v sackd &>/dev/null; then
+      export SACKD_OPTIONS="--conf-server ${CONTROLLER_HOST}:${CONTROLLER_PORT:-6817}"
+      sackd -Z &
+      sleep 2
+    fi
+
+    # cd to workspace
     if [ -n "$WORK_DIR" ]; then
       case "$WORK_DIR" in
         /*) TARGET_DIR="$WORK_DIR" ;;
@@ -36,7 +56,46 @@ data:
       TARGET_DIR="/workspace"
     fi
     cd "$TARGET_DIR"
+
+    # Submit the Slurm job
     echo "Submitting Slurm job..."
-    eval "$RUN_COMMAND" || echo "Job submission completed (exit code: $?)"
-    echo "Monitoring loop active. Pod will stay running for interactive access."
-    tail -f /dev/null
+    set +e
+    JOB_OUTPUT=$(eval "$RUN_COMMAND" 2>&1)
+    EXIT_CODE=$?
+    set -e
+    echo "$JOB_OUTPUT"
+
+    if [ $EXIT_CODE -ne 0 ]; then
+      echo "Submission failed with exit code $EXIT_CODE"
+      exit $EXIT_CODE
+    fi
+
+    # Extract Slurm job ID from "Submitted batch job NNN"
+    JOB_ID=$(echo "$JOB_OUTPUT" | grep -oP 'Submitted batch job \K\d+')
+    if [ -z "$JOB_ID" ]; then
+      echo "Command completed (not an sbatch submission). Exiting."
+      exit 0
+    fi
+
+    # Stream output while Slurm job runs
+    echo "Slurm job $JOB_ID submitted. Streaming output..."
+    OUTPUT_FILE=$(ls slurm-${JOB_ID}.out slurm-${JOB_ID}.err 2>/dev/null | head -1)
+    if [ -n "$OUTPUT_FILE" ]; then
+      tail -f "$OUTPUT_FILE" &
+      TAIL_PID=$!
+    fi
+
+    while squeue -j "$JOB_ID" -h 2>/dev/null | grep -q .; do
+      sleep 10
+    done
+
+    kill $TAIL_PID 2>/dev/null || true
+
+    # Check final state — mirror Slurm exit status to K8s Job
+    JOB_STATE=$(sacct -j "$JOB_ID" --format=State --noheader -X 2>/dev/null | tr -d ' ')
+    echo "Slurm job $JOB_ID final state: $JOB_STATE"
+
+    case "$JOB_STATE" in
+      COMPLETED) exit 0 ;;
+      *)         exit 1 ;;
+    esac
