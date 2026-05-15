@@ -22,6 +22,10 @@ spec:
               image:
                 repository: ghcr.io/slinkyproject/slurmctld
                 tag: 25.11-ubuntu24.04
+          slurmKey:
+            create: false
+          jwtKey:
+            create: false
           restapi:
             replicas: 1
             slurmrestd:
