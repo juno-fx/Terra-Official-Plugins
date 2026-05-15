@@ -114,6 +114,9 @@ spec:
                 ldap_search_base = dc=example,dc=com
                 ldap_user_search_base = ou=Users,dc=example,dc=com
                 ldap_group_search_base = ou=Groups,dc=example,dc=com
+              podSpec:
+                securityContext:
+                  fsGroup: 401
           partitions:
             all:
               enabled: true
@@ -133,3 +136,4 @@ spec:
       allowEmpty: true
     syncOptions:
       - CreateNamespace=true
+      - Replace=true
