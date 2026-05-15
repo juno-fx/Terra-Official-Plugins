@@ -29,10 +29,16 @@ spec:
                 repository: ghcr.io/slinkyproject/slurmrestd
                 tag: 25.11-ubuntu24.04
           nodesets:
+            slinky:
+              enabled: false
             cpu:
               enabled: true
               replicas: {{ .Values.cpu_nodes }}
               scalingMode: StatefulSet
+              updateStrategy:
+                type: RollingUpdate
+                rollingUpdate:
+                  maxUnavailable: 25%
               slurmd:
                 image:
                   repository: ghcr.io/slinkyproject/slurmd
@@ -52,6 +58,10 @@ spec:
               enabled: {{ .Values.enable_gpu }}
               replicas: {{ .Values.gpu_nodes }}
               scalingMode: StatefulSet
+              updateStrategy:
+                type: RollingUpdate
+                rollingUpdate:
+                  maxUnavailable: 25%
               slurmd:
                 image:
                   repository: ghcr.io/slinkyproject/slurmd
