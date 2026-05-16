@@ -52,6 +52,9 @@ data:
 
     # Submit the Slurm job
     echo "Submitting Slurm job..."
+    # Convert k8s memory format (1Gi -> 1G, 512Mi -> 512M) for Slurm
+    export SBATCH_MEM_PER_NODE=$(echo "${SLURM_MEMORY:-1G}" | sed 's/i//')
+    export SBATCH_CPUS_PER_TASK="${SLURM_CPUS:-1}"
     set +e
     JOB_OUTPUT=$(eval "$RUN_COMMAND" 2>&1)
     EXIT_CODE=$?

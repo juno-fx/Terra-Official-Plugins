@@ -120,6 +120,12 @@ spec:
                 Default: "YES"
                 MaxTime: UNLIMITED
           configFiles:
+            cgroup.conf: |
+              CgroupPlugin=cgroup/v2
+              IgnoreSystemd=yes
+              ConstrainRAMSpace=yes
+              ConstrainCores=yes
+              ConstrainDevices=yes
             gres.conf: |
               AutoDetect=nvidia
   syncPolicy:
