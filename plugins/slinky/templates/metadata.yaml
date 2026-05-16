@@ -73,3 +73,8 @@ data:
       type: string
       required: true
       default: "slurm"
+    - name: cluster_name
+      description: "Slurm cluster name (set in controller slurm.conf)"
+      type: string
+      required: true
+      default: "slurm_slinky-argocd-cluster-slurm"

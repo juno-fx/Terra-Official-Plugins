@@ -31,3 +31,4 @@ controller_host: "slinky-argocd-cluster-slurm-controller.slurm.svc.cluster.local
 controller_port: "6817"
 munge_secret_name: "slinky-argocd-cluster-slurm-auth-slurm"
 munge_secret_namespace: "slurm"
+cluster_name: "slurm_slinky-argocd-cluster-slurm"

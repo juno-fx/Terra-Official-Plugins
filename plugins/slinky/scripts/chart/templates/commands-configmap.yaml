@@ -42,6 +42,9 @@ data:
 
     # Start munged (required by sackd and sbatch for auth/munge)
     if [ -f /etc/munge/munge.key ]; then
+      echo "Setting up munge..."
+      mkdir -p /var/lib/munge
+      chown -R munge:munge /var/lib/munge /etc/munge 2>/dev/null || true
       echo "Starting munged..."
       munged -F --foreground &
       sleep 2
@@ -50,6 +53,7 @@ data:
     # Generate slurm.conf for direct client mode (always, as base config)
     mkdir -p /etc/slurm
     cat > /etc/slurm/slurm.conf <<EOF
+    ClusterName=${CLUSTER_NAME:-slurm_slinky-argocd-cluster-slurm}
     SlurmctldHost=${CONTROLLER_HOST}
     SlurmctldPort=${CONTROLLER_PORT:-6817}
     SlurmdPort=6818
