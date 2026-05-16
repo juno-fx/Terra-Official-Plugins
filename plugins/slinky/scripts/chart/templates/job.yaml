@@ -18,7 +18,6 @@ spec:
         kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
         juno-innovations.com/user: "{{ .Values.user }}"
     spec:
-      serviceAccountName: "{{ .Values.name }}-slurm-job"
       restartPolicy: OnFailure
       automountServiceAccountToken: true
       initContainers:
