@@ -18,8 +18,9 @@ spec:
         kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
         juno-innovations.com/user: "{{ .Values.user }}"
     spec:
+      serviceAccountName: "{{ .Values.name }}-slurm-job"
       restartPolicy: OnFailure
-      automountServiceAccountToken: false
+      automountServiceAccountToken: true
       initContainers:
         - name: clone-and-build
           imagePullPolicy: IfNotPresent
@@ -61,6 +62,10 @@ spec:
               value: "{{ .Values.controller_host }}"
             - name: CONTROLLER_PORT
               value: "{{ .Values.controller_port }}"
+            - name: MUNGE_SECRET_NAME
+              value: "{{ .Values.munge_secret_name }}"
+            - name: MUNGE_SECRET_NAMESPACE
+              value: "{{ .Values.munge_secret_namespace }}"
             {{- range .Values.env }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}

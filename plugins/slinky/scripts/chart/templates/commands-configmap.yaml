@@ -27,6 +27,19 @@ data:
     #!/bin/bash
     set -x
 
+    # Fetch the munge key from the Slurm cluster's secret
+    if [ -n "$MUNGE_SECRET_NAME" ] && [ -n "$MUNGE_SECRET_NAMESPACE" ]; then
+      echo "Fetching munge key from secret $MUNGE_SECRET_NAMESPACE/$MUNGE_SECRET_NAME..."
+      MUNGE_KEY=$(kubectl get secret "$MUNGE_SECRET_NAME" -n "$MUNGE_SECRET_NAMESPACE" -o jsonpath='{.data.slurm\.key}' 2>/dev/null || true)
+      if [ -n "$MUNGE_KEY" ]; then
+        echo "$MUNGE_KEY" | base64 -d > /etc/munge/munge.key
+        chmod 600 /etc/munge/munge.key
+        echo "Munge key written to /etc/munge/munge.key"
+      else
+        echo "WARNING: Could not fetch munge key. Sackd/sbatch may fail to authenticate."
+      fi
+    fi
+
     # Generate slurm.conf if sackd not available (fallback: direct client mode)
     if ! command -v sackd &>/dev/null; then
       mkdir -p /etc/slurm

@@ -57,9 +57,19 @@ data:
       description: "Slurm controller service DNS name"
       type: string
       required: true
-      default: "slinky-cluster-slurm-controller.slurm.svc.cluster.local"
+      default: "slinky-argocd-cluster-slurm-controller.slurm.svc.cluster.local"
     - name: controller_port
       description: "Slurm controller port"
       type: string
       required: true
       default: "6817"
+    - name: munge_secret_name
+      description: "Kubernetes secret name containing the Slurm munge key"
+      type: string
+      required: true
+      default: "slinky-argocd-cluster-slurm-auth-slurm"
+    - name: munge_secret_namespace
+      description: "Namespace of the munge key secret"
+      type: string
+      required: true
+      default: "slurm"
