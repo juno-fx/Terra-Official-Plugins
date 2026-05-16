@@ -46,7 +46,7 @@ data:
       chown -R munge:munge /etc/munge 2>/dev/null || true
       rm -rf /var/lib/munge 2>/dev/null || true
       echo "Starting munged..."
-      munged -F --foreground &
+      munged -F --foreground --seed-dir /tmp &
       sleep 3
     fi
 
