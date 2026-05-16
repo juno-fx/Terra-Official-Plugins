@@ -36,17 +36,17 @@ plugins:
     name: cert-manager
     values:
       chart_version:
-        value: "v1.16.3"
+        hardcoded: "v1.16.3"
   - plugin: Slinky
     name: slinky
     values:
       cpu_replicas:
-        value: cpu_replicas
+        hardcoded: cpu_replicas
       cpu_node_selector:
-        value: "kubernetes.io/os=linux"
+        hardcoded: "kubernetes.io/os=linux"
       gpu_enabled:
-        value: gpu_enabled
+        hardcoded: gpu_enabled
       gpu_replicas:
-        value: gpu_replicas
+        hardcoded: gpu_replicas
       gpu_node_selector:
-        value: "nvidia.com/gpu.present=true"
+        hardcoded: "nvidia.com/gpu.present=true"
