@@ -16,21 +16,11 @@ tags:
   - schedmd
   - cluster-level
 fields:
-  - name: cert_manager_version
-    description: Version of cert-manager to install
-    required: true
-    default: v1.16.3
-    type: string
   - name: cpu_replicas
     description: Number of CPU worker replicas
     required: true
     default: 2
     type: int
-  - name: cpu_node_selector
-    description: Node labels for CPU workers (key=value, comma-separated)
-    required: false
-    default: "kubernetes.io/os=linux"
-    type: string
   - name: gpu_enabled
     description: Enable GPU worker pool
     required: true
@@ -41,27 +31,19 @@ fields:
     required: true
     default: 1
     type: int
-  - name: gpu_node_selector
-    description: Node labels for GPU workers (key=value, comma-separated)
-    required: false
-    default: "nvidia.com/gpu=true,nvidia.com/gpu.present=true"
-    type: string
 plugins:
   - plugin: Certificate Manager
     name: cert-manager
     values:
-      chart_version:
-        reference: cert_manager_version
+      chart_version: "v1.16.3"
   - plugin: Slinky
     name: slinky
     values:
       cpu_replicas:
         reference: cpu_replicas
-      cpu_node_selector:
-        reference: cpu_node_selector
+      cpu_node_selector: "kubernetes.io/os=linux"
       gpu_enabled:
         reference: gpu_enabled
       gpu_replicas:
         reference: gpu_replicas
-      gpu_node_selector:
-        reference: gpu_node_selector
+      gpu_node_selector: "nvidia.com/gpu.present=true"
