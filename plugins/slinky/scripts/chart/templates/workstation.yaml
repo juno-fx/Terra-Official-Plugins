@@ -23,7 +23,7 @@ spec:
       initContainers:
         - name: clone-and-build
           imagePullPolicy: IfNotPresent
-          image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
+          image: "alpine/git:latest"
           command: ["/commands/init-clone.sh"]
           env:
             - name: GIT_URL
