@@ -12,7 +12,6 @@ rheaCpu: 200m
 rheaMemory: 100Mi
 rheaCpuLimit: 350m
 rheaMemoryLimit: 250Mi
-gpu: false
 enableAPI: false
 idx: 0
 guid: 0
