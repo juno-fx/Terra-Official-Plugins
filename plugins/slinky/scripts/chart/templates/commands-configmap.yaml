@@ -73,6 +73,17 @@ data:
       exit 0
     fi
 
+    # Persist job ID so the preStop hook and SIGTERM trap can cancel it
+    echo "$JOB_ID" > /tmp/slurm-job-id
+
+    # Cancel the Slurm job on SIGTERM (Kubernetes pod deletion)
+    _cancel() {
+      echo "Received termination signal — cancelling Slurm job $JOB_ID"
+      timeout 10 scancel "$JOB_ID" 2>/dev/null || true
+      exit 130
+    }
+    trap '_cancel' TERM INT
+
     # Poll until the job leaves the queue (COMPLETED, FAILED, CANCELLED, etc.)
     echo "Slurm job $JOB_ID submitted. Polling for completion..."
     while true; do
@@ -81,7 +92,7 @@ data:
       case "$JOB_STATE" in
         COMPLETED)           exit 0 ;;
         FAILED|CANCELLED|TIMEOUT|NODE_FAIL|PREEMPTED|OUT_OF_MEMORY) exit 1 ;;
-        ""|PENDING|RUNNING|COMPLETING) sleep 10 ;;
-        *)                   sleep 10 ;;
+        ""|PENDING|RUNNING|COMPLETING) sleep 10 & wait $! ;;
+        *)                   sleep 10 & wait $! ;;
       esac
     done

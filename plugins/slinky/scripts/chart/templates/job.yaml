@@ -19,6 +19,7 @@ spec:
         juno-innovations.com/user: "{{ .Values.user }}"
     spec:
       restartPolicy: OnFailure
+      terminationGracePeriodSeconds: 60
       automountServiceAccountToken: true
       initContainers:
         - name: clone-and-build
@@ -79,6 +80,18 @@ spec:
             limits:
               memory: "128Mi"
               cpu: "200m"
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /bin/bash
+                  - -c
+                  - |
+                    JOB_ID=$(cat /tmp/slurm-job-id 2>/dev/null)
+                    if [ -n "$JOB_ID" ]; then
+                      echo "preStop: cancelling Slurm job $JOB_ID"
+                      timeout 10 scancel "$JOB_ID" 2>/dev/null || true
+                    fi
           volumeMounts:
             - name: commands
               mountPath: /commands
