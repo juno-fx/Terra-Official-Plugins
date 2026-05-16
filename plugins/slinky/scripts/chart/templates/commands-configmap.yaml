@@ -40,20 +40,27 @@ data:
       fi
     fi
 
-    # Generate slurm.conf if sackd not available (fallback: direct client mode)
-    if ! command -v sackd &>/dev/null; then
-      mkdir -p /etc/slurm
-      cat > /etc/slurm/slurm.conf <<EOF
+    # Start munged (required by sackd and sbatch for auth/munge)
+    if [ -f /etc/munge/munge.key ]; then
+      echo "Starting munged..."
+      munged -F --foreground &
+      sleep 2
+    fi
+
+    # Generate slurm.conf for direct client mode (always, as base config)
+    mkdir -p /etc/slurm
+    cat > /etc/slurm/slurm.conf <<EOF
     SlurmctldHost=${CONTROLLER_HOST}
     SlurmctldPort=${CONTROLLER_PORT:-6817}
     SlurmdPort=6818
     AuthType=auth/munge
     CryptoType=crypto/munge
     EOF
-    fi
+    echo "slurm.conf written"
 
     # Start sackd in background (Slinky login image) via configless mode
     if command -v sackd &>/dev/null; then
+      echo "Starting sackd in configless mode..."
       sackd -D --conf-server ${CONTROLLER_HOST}:${CONTROLLER_PORT:-6817} &
       sleep 5
     fi
