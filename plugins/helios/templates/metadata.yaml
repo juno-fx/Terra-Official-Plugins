@@ -14,6 +14,10 @@ data:
       description: "Use a GPU"
       type: boolean
       required: true
+    - name: testing
+      description: "Use a GPU"
+      type: boolean
+      required: true
     - name: registry
       description: "Registry to pull the image from"
       type: string
