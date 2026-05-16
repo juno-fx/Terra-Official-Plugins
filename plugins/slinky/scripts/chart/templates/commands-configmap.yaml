@@ -41,9 +41,8 @@ data:
 
     # Start sackd in background (Slinky login image) via configless mode
     if command -v sackd &>/dev/null; then
-      export SACKD_OPTIONS="--conf-server ${CONTROLLER_HOST}:${CONTROLLER_PORT:-6817}"
-      sackd -Z &
-      sleep 2
+      sackd -D --conf-server ${CONTROLLER_HOST}:${CONTROLLER_PORT:-6817} &
+      sleep 5
     fi
 
     # cd to workspace
