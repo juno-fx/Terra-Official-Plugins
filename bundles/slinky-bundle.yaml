@@ -41,12 +41,12 @@ plugins:
     name: slinky
     values:
       cpu_replicas:
-        hardcoded: cpu_replicas
+        reference: cpu_replicas
       cpu_node_selector:
         hardcoded: "kubernetes.io/os=linux"
       gpu_enabled:
-        hardcoded: gpu_enabled
+        reference: true
       gpu_replicas:
-        hardcoded: gpu_replicas
+        reference: gpu_replicas
       gpu_node_selector:
         hardcoded: "nvidia.com/gpu.present=true"
