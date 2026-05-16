@@ -29,4 +29,5 @@ build_command: "chmod +x hello-world.sh gpu-test.sh"
 run_command: "sbatch hello-world.sh"
 controller_host: "slinky-argocd-cluster-slurm-controller.slurm.svc.cluster.local"
 controller_port: "6817"
+cluster_name: "slurm_slinky-argocd-cluster-slurm"
 

@@ -27,15 +27,15 @@ data:
     #!/bin/bash
     set -x
 
-    # Generate slurm.conf with auth/none (testing mode)
+    # Build a minimal slurm.conf pointing at the controller (auth/none cluster)
     mkdir -p /etc/slurm
     cat > /etc/slurm/slurm.conf <<EOF
-    ClusterName=slurm_slinky-argocd-cluster-slurm
+    ClusterName=${CLUSTER_NAME}
     SlurmctldHost=${CONTROLLER_HOST}
     SlurmctldPort=${CONTROLLER_PORT:-6817}
     SlurmdPort=6818
     AuthType=auth/none
-    CryptoType=crypto/none
+    CredType=cred/none
     EOF
     echo "slurm.conf written"
 
@@ -70,25 +70,15 @@ data:
       exit 0
     fi
 
-    # Stream output while Slurm job runs
-    echo "Slurm job $JOB_ID submitted. Streaming output..."
-    OUTPUT_FILE=$(ls slurm-${JOB_ID}.out slurm-${JOB_ID}.err 2>/dev/null | head -1)
-    if [ -n "$OUTPUT_FILE" ]; then
-      tail -f "$OUTPUT_FILE" &
-      TAIL_PID=$!
-    fi
-
-    while squeue -j "$JOB_ID" -h 2>/dev/null | grep -q .; do
-      sleep 10
+    # Poll until the job leaves the queue (COMPLETED, FAILED, CANCELLED, etc.)
+    echo "Slurm job $JOB_ID submitted. Polling for completion..."
+    while true; do
+      JOB_STATE=$(scontrol show job "$JOB_ID" 2>/dev/null | grep -oP 'JobState=\K\S+')
+      echo "  job state: ${JOB_STATE:-UNKNOWN}"
+      case "$JOB_STATE" in
+        COMPLETED)           exit 0 ;;
+        FAILED|CANCELLED|TIMEOUT|NODE_FAIL|PREEMPTED|OUT_OF_MEMORY) exit 1 ;;
+        ""|PENDING|RUNNING|COMPLETING) sleep 10 ;;
+        *)                   sleep 10 ;;
+      esac
     done
-
-    kill $TAIL_PID 2>/dev/null || true
-
-    # Check final state — mirror Slurm exit status to K8s Job
-    JOB_STATE=$(sacct -j "$JOB_ID" --format=State --noheader -X 2>/dev/null | tr -d ' ')
-    echo "Slurm job $JOB_ID final state: $JOB_STATE"
-
-    case "$JOB_STATE" in
-      COMPLETED) exit 0 ;;
-      *)         exit 1 ;;
-    esac

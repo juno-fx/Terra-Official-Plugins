@@ -63,4 +63,9 @@ data:
       type: string
       required: true
       default: "6817"
+    - name: cluster_name
+      description: "Slurm cluster name (from scontrol show config | grep ClusterName)"
+      type: string
+      required: true
+      default: "slurm_slinky-argocd-cluster-slurm"
 

@@ -21,6 +21,9 @@ spec:
         releaseName: {{ .Release.Name }}-cluster
         values: |
           controller:
+            extraConf: |
+              AuthType=auth/none
+              CredType=cred/none
             slurmctld:
               image:
                 repository: ghcr.io/slinkyproject/slurmctld
@@ -116,8 +119,6 @@ spec:
                 State: UP
                 Default: "YES"
                 MaxTime: UNLIMITED
-          extraConf: |
-            AuthType=auth/none
           configFiles:
             gres.conf: |
               AutoDetect=nvidia
