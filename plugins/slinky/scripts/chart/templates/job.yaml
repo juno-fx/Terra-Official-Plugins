@@ -61,12 +61,7 @@ spec:
               value: "{{ .Values.controller_host }}"
             - name: CONTROLLER_PORT
               value: "{{ .Values.controller_port }}"
-            - name: MUNGE_SECRET_NAME
-              value: "{{ .Values.munge_secret_name }}"
-            - name: MUNGE_SECRET_NAMESPACE
-              value: "{{ .Values.munge_secret_namespace }}"
-            - name: CLUSTER_NAME
-              value: "{{ .Values.cluster_name }}"
+
             {{- range .Values.env }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}

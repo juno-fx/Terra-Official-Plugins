@@ -117,6 +117,8 @@ spec:
                 Default: "YES"
                 MaxTime: UNLIMITED
           configFiles:
+            slurm.conf: |
+              AuthType=auth/none
             gres.conf: |
               AutoDetect=nvidia
   syncPolicy:
