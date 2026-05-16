@@ -4,7 +4,7 @@ metadata:
   name: "{{ .Values.name }}-slurm-commands"
 data:
   init-clone.sh: |
-    #!/bin/bash
+    #!/bin/sh
     set -e
     set -x
     rm -rf /workspace/* /workspace/.[!.]* 2>/dev/null || true
