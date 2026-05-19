@@ -2,11 +2,11 @@ resource_id: slinky-bundle
 name: Slinky Bundle
 icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/slinky/assets/icon.svg
 description: |
-  A single install bundle for Slinky — Slurm HPC on Kubernetes.
+  Cluster-level prerequisites for Slinky — Slurm HPC on Kubernetes.
 
-  Installs cert-manager (prerequisite), the Slinky operator and CRDs (cluster-level),
-  a Slurm cluster into your project namespace, and the Slinky Job workload template
-  for submitting sbatch jobs via Genesis.
+  Installs cert-manager and the Slurm operator CRDs and controller.
+  Once installed, deploy the Slinky plugin into your project namespace
+  to provision a Slurm cluster, and Slinky Job to submit workloads via Genesis.
 
 category: Bundle
 tags:
@@ -15,65 +15,11 @@ tags:
   - slinky
   - schedmd
   - cluster-level
-fields:
-  - name: operator_version
-    description: Version of slurm-operator chart to install (leave empty for default)
-    required: false
-    type: string
-    default: ""
-  - name: slurm_version
-    description: Version of slurm chart to install (leave empty for default)
-    required: false
-    type: string
-    default: ""
-  - name: slinky_namespace
-    description: Namespace for the slurm-operator and CRDs
-    required: true
-    type: string
-    default: slinky
-  - name: cpu_replicas
-    description: Number of CPU worker replicas
-    required: true
-    type: int
-    default: 2
-  - name: cpu_node_selector
-    description: Node labels for CPU workers (key=value, comma-separated)
-    required: false
-    type: string
-    default: "kubernetes.io/os=linux"
-  - name: gpu_enabled
-    description: Enable GPU worker pool
-    required: true
-    type: boolean
-    default: true
-  - name: gpu_replicas
-    description: Number of GPU worker replicas
-    required: true
-    type: int
-    default: 1
-  - name: gpu_node_selector
-    description: Node labels for GPU workers (key=value, comma-separated)
-    required: false
-    type: string
-    default: "nvidia.com/gpu=true,nvidia.com/gpu.present=true"
 plugins:
   - plugin: Certificate Manager
     name: cert-manager
     values:
       chart_version:
         hardcoded: "v1.16.3"
-  - plugin: Slinky
-    name: slinky
-    values:
-      slurm_version:
-        reference: slurm_version
-      cpu_replicas:
-        reference: cpu_replicas
-      cpu_node_selector:
-        reference: cpu_node_selector
-      gpu_enabled:
-        reference: gpu_enabled
-      gpu_replicas:
-        reference: gpu_replicas
-      gpu_node_selector:
-        reference: gpu_node_selector
+  - plugin: Slinky Operator
+    name: slinky-operator
