@@ -12,7 +12,7 @@ data:
   description: "Slurm job submission workload — clone a git repo with your sbatch script, build, and submit to the Slurm cluster via sbatch"
   fields: |
     - name: icon
-      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/slinky/assets/icon.svg"
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/slinky-job/assets/icon.svg"
     - name: registry
       description: "Container registry"
       type: string
@@ -32,7 +32,7 @@ data:
       description: "Git repository URL with your sbatch script"
       type: string
       required: true
-      default: "https://github.com/aldmbmtl/runtimes.git"
+      default: ""
     - name: git_ref
       description: "Git reference (branch, tag, commit)"
       type: string
@@ -42,30 +42,29 @@ data:
       description: "Working directory (relative to repo root, or absolute path)"
       type: string
       required: false
-      default: "slurm"
+      default: ""
     - name: build_command
-      description: "Build command (e.g. chmod +x job.sh)"
+      description: "Build command run before submission (e.g. chmod +x job.sh)"
       type: string
       required: false
-      default: "chmod +x hello-world.sh gpu-test.sh"
+      default: ""
     - name: run_command
       description: "Command to submit the Slurm job (e.g. sbatch job.sh)"
       type: string
       required: true
-      default: "sbatch hello-world.sh"
+      default: ""
     - name: controller_host
       description: "Slurm controller service DNS name"
       type: string
       required: true
-      default: "slinky-argocd-cluster-slurm-controller.slurm.svc.cluster.local"
+      default: "{{ .Values.controller_host }}"
     - name: controller_port
       description: "Slurm controller port"
       type: string
       required: true
-      default: "6817"
+      default: "{{ .Values.controller_port }}"
     - name: cluster_name
       description: "Slurm cluster name (from scontrol show config | grep ClusterName)"
       type: string
       required: true
-      default: "slurm_slinky-argocd-cluster-slurm"
-
+      default: "{{ .Values.cluster_name }}"

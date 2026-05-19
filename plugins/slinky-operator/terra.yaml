@@ -1,0 +1,23 @@
+resource_id: slinky-operator
+name: Slinky Operator
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/slinky-operator/assets/icon.svg
+description: Slurm operator and CRDs for the Slinky project. Cluster-level prerequisite for the Slinky plugin. Requires cert-manager.
+category: HPC
+tags:
+  - slurm
+  - hpc
+  - slinky
+  - schedmd
+  - cluster-level
+editable: true
+fields:
+  - name: operator_version
+    description: Version of slurm-operator chart to install (leave empty for default)
+    required: false
+    type: string
+    default: ""
+  - name: slinky_namespace
+    description: Namespace for the slurm-operator and CRDs
+    required: true
+    type: string
+    default: slinky

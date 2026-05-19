@@ -4,9 +4,9 @@ icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/head
 description: |
   A single install bundle for Slinky — Slurm HPC on Kubernetes.
 
-  Installs cert-manager (prerequisite) and the full Slinky stack:
-  slurm-operator CRDs, slurm-operator, and a Slurm cluster with
-  CPU and GPU worker nodes.
+  Installs cert-manager (prerequisite), the Slinky operator and CRDs (cluster-level),
+  a Slurm cluster into your project namespace, and the Slinky Job workload template
+  for submitting sbatch jobs via Genesis.
 
 category: Bundle
 tags:
@@ -16,37 +16,73 @@ tags:
   - schedmd
   - cluster-level
 fields:
+  - name: operator_version
+    description: Version of slurm-operator chart to install (leave empty for default)
+    required: false
+    type: string
+    default: ""
+  - name: slurm_version
+    description: Version of slurm chart to install (leave empty for default)
+    required: false
+    type: string
+    default: ""
+  - name: slinky_namespace
+    description: Namespace for the slurm-operator and CRDs
+    required: true
+    type: string
+    default: slinky
   - name: cpu_replicas
     description: Number of CPU worker replicas
     required: true
-    default: 2
     type: int
+    default: 2
+  - name: cpu_node_selector
+    description: Node labels for CPU workers (key=value, comma-separated)
+    required: false
+    type: string
+    default: "kubernetes.io/os=linux"
   - name: gpu_enabled
     description: Enable GPU worker pool
     required: true
-    default: true
     type: boolean
+    default: true
   - name: gpu_replicas
     description: Number of GPU worker replicas
     required: true
-    default: 1
     type: int
+    default: 1
+  - name: gpu_node_selector
+    description: Node labels for GPU workers (key=value, comma-separated)
+    required: false
+    type: string
+    default: "nvidia.com/gpu=true,nvidia.com/gpu.present=true"
 plugins:
   - plugin: Certificate Manager
     name: cert-manager
     values:
       chart_version:
         hardcoded: "v1.16.3"
+  - plugin: Slinky Operator
+    name: slinky-operator
+    values:
+      operator_version:
+        reference: operator_version
+      slinky_namespace:
+        reference: slinky_namespace
   - plugin: Slinky
     name: slinky
     values:
+      slurm_version:
+        reference: slurm_version
       cpu_replicas:
         reference: cpu_replicas
       cpu_node_selector:
-        hardcoded: "kubernetes.io/os=linux"
+        reference: cpu_node_selector
       gpu_enabled:
         reference: gpu_enabled
       gpu_replicas:
         reference: gpu_replicas
       gpu_node_selector:
-        hardcoded: "nvidia.com/gpu=true,nvidia.com/gpu.present=true"
+        reference: gpu_node_selector
+  - plugin: Slinky Job
+    name: slinky-job

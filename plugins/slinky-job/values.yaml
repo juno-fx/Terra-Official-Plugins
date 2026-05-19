@@ -1,0 +1,3 @@
+controller_host: "slinky-cluster-slurm-controller"
+controller_port: "6817"
+cluster_name: "slurm_slinky-cluster"

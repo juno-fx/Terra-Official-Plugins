@@ -1,36 +1,20 @@
 resource_id: slinky
 name: Slinky
 icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/slinky/assets/icon.svg
-description: Slurm HPC cluster on Kubernetes, powered by SchedMD's Slinky project. Installs slurm-operator and a Slurm cluster with GPU-accelerated worker nodes.
+description: Slurm HPC cluster on Kubernetes, powered by SchedMD's Slinky project. Installs a Slurm cluster with CPU and GPU worker nodes into your project namespace. Requires slinky-operator to be installed first.
 category: HPC
 tags:
   - slurm
   - hpc
   - slinky
   - schedmd
-  - cluster-level
 editable: true
 fields:
-  - name: operator_version
-    description: Version of slurm-operator chart to install (leave empty for latest)
-    required: false
-    type: string
-    default: ""
   - name: slurm_version
-    description: Version of slurm chart to install (leave empty for latest)
+    description: Version of slurm chart to install (leave empty for default)
     required: false
     type: string
     default: ""
-  - name: slinky_namespace
-    description: Namespace for the slurm-operator
-    required: true
-    type: string
-    default: slinky
-  - name: slurm_namespace
-    description: Namespace for the Slurm cluster
-    required: true
-    type: string
-    default: slurm
   - name: cpu_enabled
     description: Enable CPU worker pool
     required: true
@@ -61,4 +45,3 @@ fields:
     required: false
     type: string
     default: "nvidia.com/gpu=true,nvidia.com/gpu.present=true"
-
