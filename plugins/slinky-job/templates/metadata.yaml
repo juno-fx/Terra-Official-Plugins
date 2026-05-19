@@ -57,14 +57,14 @@ data:
       description: "Slurm controller service DNS name"
       type: string
       required: true
-      default: "{{ .Values.controller_host }}"
+      default: "slinky-cluster-slurm-controller"
     - name: controller_port
       description: "Slurm controller port"
       type: string
       required: true
-      default: "{{ .Values.controller_port }}"
+      default: "6817"
     - name: cluster_name
       description: "Slurm cluster name (from scontrol show config | grep ClusterName)"
       type: string
       required: true
-      default: "{{ .Values.cluster_name }}"
+      default: "slurm_slinky-cluster"

@@ -10,19 +10,4 @@ tags:
   - schedmd
   - cluster-level
 editable: true
-fields:
-  - name: controller_host
-    description: Slurm controller service DNS name (short name works within the same namespace)
-    required: true
-    type: string
-    default: "slinky-cluster-slurm-controller"
-  - name: controller_port
-    description: Slurm controller port
-    required: true
-    type: string
-    default: "6817"
-  - name: cluster_name
-    description: Slurm cluster name (must match ClusterName in slurmctld config)
-    required: true
-    type: string
-    default: "slurm_slinky-cluster"
+fields: []
