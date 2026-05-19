@@ -20,9 +20,6 @@ spec:
         releaseName: {{ .Release.Name }}-cluster
         values: |
           controller:
-            extraConf: |
-              AuthType=auth/none
-              CredType=cred/none
             slurmctld:
               image:
                 repository: ghcr.io/slinkyproject/slurmctld
@@ -38,6 +35,8 @@ spec:
                 repository: ghcr.io/slinkyproject/slurmrestd
                 tag: 25.11-ubuntu24.04
           nodesets:
+            slinky:
+              enabled: false
             cpu:
               enabled: {{ .Values.cpu_enabled | default true }}
               replicas: {{ .Values.cpu_replicas }}
@@ -127,6 +126,19 @@ spec:
               ConstrainDevices=yes
             gres.conf: |
               AutoDetect=nvidia
+          sssd:
+            conf: |
+              [sssd]
+              config_file_version = 2
+              services = nss
+              domains = local
+
+              [nss]
+              filter_groups = root,slurm
+              filter_users = root,slurm
+
+              [domain/local]
+              id_provider = files
   syncPolicy:
     automated:
       prune: true
