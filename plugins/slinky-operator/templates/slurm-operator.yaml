@@ -15,7 +15,7 @@ spec:
   sources:
     - repoURL: oci://ghcr.io/slinkyproject/charts/slurm-operator
       chart: slurm-operator
-      targetRevision: {{ .Values.operator_version | default "1.1.0" }}
+      targetRevision: {{ .Values.operator_version | default "1.1.0" | trimPrefix "v" }}
       helm:
         releaseName: {{ .Release.Name }}-operator
         values: |
