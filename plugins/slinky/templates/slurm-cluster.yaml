@@ -55,7 +55,7 @@ spec:
               metadata:
                 labels:
                   kuiper.juno-innovations.com/kuiper-instance: "{{ $.Release.Name }}-cluster"
-              enabled: {{ .Values.cpu_enabled | default true }}
+              enabled: {{ .Values.cpu_enabled }}
               replicas: {{ .Values.cpu_replicas }}
               scalingMode: StatefulSet
               updateStrategy:
@@ -87,7 +87,7 @@ spec:
               metadata:
                 labels:
                   kuiper.juno-innovations.com/kuiper-instance: "{{ $.Release.Name }}-cluster"
-              enabled: {{ .Values.gpu_enabled | default true }}
+              enabled: {{ .Values.gpu_enabled }}
               replicas: {{ .Values.gpu_replicas }}
               scalingMode: StatefulSet
               updateStrategy:
