@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: {{ .Release.Name }}-slurm-cluster
+  name: slurm-slurm-cluster
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-options: Replace=true
@@ -17,16 +17,16 @@ spec:
       chart: slurm
       targetRevision: {{ .Values.slurm_version | default "1.1.0" | trimPrefix "v" }}
       helm:
-        releaseName: {{ .Release.Name }}-cluster
+        releaseName: slurm-cluster
         values: |
           controller:
             metadata:
               labels:
-                kuiper.juno-innovations.com/kuiper-instance: "{{ $.Release.Name }}-cluster"
+                kuiper.juno-innovations.com/kuiper-instance: "slurm-cluster"
             service:
               metadata:
                 labels:
-                  kuiper.juno-innovations.com/kuiper-instance: "{{ $.Release.Name }}-cluster"
+                  kuiper.juno-innovations.com/kuiper-instance: "slurm-cluster"
             slurmctld:
               image:
                 repository: ghcr.io/slinkyproject/slurmctld
@@ -39,11 +39,11 @@ spec:
             replicas: 1
             metadata:
               labels:
-                kuiper.juno-innovations.com/kuiper-instance: "{{ $.Release.Name }}-cluster"
+                kuiper.juno-innovations.com/kuiper-instance: "slurm-cluster"
             service:
               metadata:
                 labels:
-                  kuiper.juno-innovations.com/kuiper-instance: "{{ $.Release.Name }}-cluster"
+                  kuiper.juno-innovations.com/kuiper-instance: "slurm-cluster"
             slurmrestd:
               image:
                 repository: ghcr.io/slinkyproject/slurmrestd
@@ -54,7 +54,7 @@ spec:
             cpu:
               metadata:
                 labels:
-                  kuiper.juno-innovations.com/kuiper-instance: "{{ $.Release.Name }}-cluster"
+                  kuiper.juno-innovations.com/kuiper-instance: "slurm-cluster"
               enabled: {{ .Values.cpu_enabled }}
               replicas: {{ .Values.cpu_replicas }}
               scalingMode: StatefulSet
@@ -86,7 +86,7 @@ spec:
             gpu:
               metadata:
                 labels:
-                  kuiper.juno-innovations.com/kuiper-instance: "{{ $.Release.Name }}-cluster"
+                  kuiper.juno-innovations.com/kuiper-instance: "slurm-cluster"
               enabled: {{ .Values.gpu_enabled }}
               replicas: {{ .Values.gpu_replicas }}
               scalingMode: StatefulSet
@@ -136,6 +136,7 @@ spec:
                 State: UP
                 Default: "YES"
                 MaxTime: UNLIMITED
+          clusterName: slurm-cluster
           configFiles:
             cgroup.conf: |
               CgroupPlugin=cgroup/v2

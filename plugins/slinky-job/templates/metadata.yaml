@@ -12,6 +12,8 @@ data:
   description: "Slurm job submission workload — clone a git repo with your sbatch script, build, and submit to the Slurm cluster via sbatch"
   fields: |
     - name: icon
+      description: "Template icon URL (platform metadata)"
+      type: string
       default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/slinky-job/assets/icon.svg"
     - name: registry
       description: "Container registry"
@@ -53,18 +55,3 @@ data:
       type: string
       required: true
       default: ""
-    - name: controller_host
-      description: "Slurm controller service DNS name"
-      type: string
-      required: true
-      default: "slinky-cluster-slurm-controller"
-    - name: controller_port
-      description: "Slurm controller port"
-      type: string
-      required: true
-      default: "6817"
-    - name: cluster_name
-      description: "Slurm cluster name (from scontrol show config | grep ClusterName)"
-      type: string
-      required: true
-      default: "slurm_slinky-cluster"

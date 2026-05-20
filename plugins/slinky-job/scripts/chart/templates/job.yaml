@@ -17,6 +17,7 @@ spec:
       labels:
         kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
         juno-innovations.com/user: "{{ .Values.user }}"
+        juno-innovations.com/session: "{{ .Values.session }}"
     spec:
       restartPolicy: OnFailure
       terminationGracePeriodSeconds: 60
@@ -58,12 +59,6 @@ spec:
               value: "{{ .Values.work_dir }}"
             - name: RUN_COMMAND
               value: "{{ .Values.run_command }}"
-            - name: CLUSTER_NAME
-              value: "{{ .Values.cluster_name }}"
-            - name: CONTROLLER_HOST
-              value: "{{ .Values.controller_host }}"
-            - name: CONTROLLER_PORT
-              value: "{{ .Values.controller_port }}"
             - name: SLURM_MEMORY
               value: "{{ .Values.memory }}"
             - name: SLURM_CPUS
@@ -80,23 +75,15 @@ spec:
             limits:
               memory: "128Mi"
               cpu: "200m"
-          lifecycle:
-            preStop:
-              exec:
-                command:
-                  - /bin/bash
-                  - -c
-                  - |
-                    JOB_ID=$(cat /tmp/slurm-job-id 2>/dev/null)
-                    if [ -n "$JOB_ID" ]; then
-                      echo "preStop: cancelling Slurm job $JOB_ID"
-                      timeout 10 scancel "$JOB_ID" 2>/dev/null || true
-                    fi
           volumeMounts:
             - name: commands
               mountPath: /commands
             - name: workspace
               mountPath: /workspace
+            - name: slurm-key
+              mountPath: /etc/slurm/slurm.key
+              subPath: slurm.key
+              readOnly: true
       volumes:
         - name: workspace
           emptyDir: {}
@@ -104,3 +91,7 @@ spec:
           configMap:
             name: "{{ .Values.name }}-slurm-commands"
             defaultMode: 0755
+        - name: slurm-key
+          secret:
+            secretName: slurm-cluster-slurm-auth-slurm
+            defaultMode: 0600

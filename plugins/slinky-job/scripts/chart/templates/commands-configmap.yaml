@@ -3,21 +3,31 @@ kind: ConfigMap
 metadata:
   name: "{{ .Values.name }}-slurm-commands"
 data:
+  lib.sh: |
+    # POSIX-shared library for slurm-job scripts
+    # shellcheck disable=SC3043
+    resolve_target_dir() {
+      _wd="$1"
+      if [ -n "$_wd" ]; then
+        case "$_wd" in
+          /*) _dir="$_wd" ;;
+          *)  _dir="/workspace/$_wd" ;;
+        esac
+      else
+        _dir="/workspace"
+      fi
+      mkdir -p "$_dir"
+      echo "$_dir"
+    }
+
   init-clone.sh: |
     #!/bin/sh
     set -e
     set -x
+    . /commands/lib.sh
     rm -rf /workspace/* /workspace/.[!.]* 2>/dev/null || true
     git clone --branch "$GIT_REF" "$GIT_URL" /workspace
-    if [ -n "$WORK_DIR" ]; then
-      case "$WORK_DIR" in
-        /*) TARGET_DIR="$WORK_DIR" ;;
-        *)  TARGET_DIR="/workspace/$WORK_DIR" ;;
-      esac
-    else
-      TARGET_DIR="/workspace"
-    fi
-    mkdir -p "$TARGET_DIR"
+    TARGET_DIR=$(resolve_target_dir "$WORK_DIR")
     cd "$TARGET_DIR"
     if [ -n "$BUILD_COMMAND" ]; then
       eval "$BUILD_COMMAND"
@@ -27,33 +37,44 @@ data:
     #!/bin/bash
     set -x
 
-    # Build a minimal slurm.conf pointing at the controller (auth/none cluster)
+    # Build slurm.conf pointing at the controller (auth/slurm with sackd)
     mkdir -p /etc/slurm
     cat > /etc/slurm/slurm.conf <<EOF
-    ClusterName=${CLUSTER_NAME}
-    SlurmctldHost=${CONTROLLER_HOST}
-    SlurmctldPort=${CONTROLLER_PORT:-6817}
+    ClusterName=slurm-cluster
+    SlurmctldHost=slurm-cluster-slurm-controller
+    SlurmctldPort=6817
     SlurmdPort=6818
-    AuthType=auth/none
-    CredType=cred/none
+    AuthType=auth/slurm
+    CredType=cred/slurm
     EOF
     echo "slurm.conf written"
 
-    # cd to workspace
-    if [ -n "$WORK_DIR" ]; then
-      case "$WORK_DIR" in
-        /*) TARGET_DIR="$WORK_DIR" ;;
-        *)  TARGET_DIR="/workspace/$WORK_DIR" ;;
-      esac
-    else
-      TARGET_DIR="/workspace"
+    # Start sackd for auth/slurm authentication
+    # (slurm.key is mounted at /etc/slurm/slurm.key with defaultMode 0600)
+    mkdir -p /run/slurm
+    chmod 0777 /run/slurm 2>/dev/null || true
+    sackd -D &
+    for _ in 1 2 3 4 5; do
+      if [ -S /run/slurm/sack.socket ]; then
+        echo "sackd ready (socket found)"
+        break
+      fi
+      sleep 1
+    done
+    if [ ! -S /run/slurm/sack.socket ]; then
+      echo "WARNING: sackd socket not detected after 5s — continuing anyway"
     fi
+
+    # cd to workspace
+    . /commands/lib.sh
+    TARGET_DIR=$(resolve_target_dir "$WORK_DIR")
     cd "$TARGET_DIR"
 
     # Submit the Slurm job
     echo "Submitting Slurm job..."
     # Convert k8s memory format (1Gi -> 1G, 512Mi -> 512M) for Slurm
-    export SBATCH_MEM_PER_NODE=$(echo "${SLURM_MEMORY:-1G}" | sed 's/i//')
+    memory="${SLURM_MEMORY:-1G}"
+    export SBATCH_MEM_PER_NODE="${memory//i/}"
     export SBATCH_CPUS_PER_TASK="${SLURM_CPUS:-1}"
     set +e
     JOB_OUTPUT=$(eval "$RUN_COMMAND" 2>&1)
@@ -72,9 +93,6 @@ data:
       echo "Command completed (not an sbatch submission). Exiting."
       exit 0
     fi
-
-    # Persist job ID so the preStop hook and SIGTERM trap can cancel it
-    echo "$JOB_ID" > /tmp/slurm-job-id
 
     # Cancel the Slurm job on SIGTERM (Kubernetes pod deletion)
     _cancel() {

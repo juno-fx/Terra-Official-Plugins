@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: "{{ .Release.Name }}-cluster-kuiper-config"
+  name: "slurm-cluster-kuiper-config"
   labels:
-    kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}-cluster"
+    kuiper.juno-innovations.com/kuiper-instance: "slurm-cluster"
 data:
   _kuiper: "deprecated"
-  name: "{{ .Release.Name }}-cluster"
+  name: "slurm-cluster"
   user: "system"
-  group: "{{ .Release.Namespace }}"
+  group: "system"
   template: "slinky"
   type: "HPC Cluster"
   description: "Slurm HPC cluster managed by Slinky"
