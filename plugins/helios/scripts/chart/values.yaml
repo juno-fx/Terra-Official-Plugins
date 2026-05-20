@@ -24,7 +24,7 @@ volumeMounts: []
 volumes: []
 env:
   - name: JUNO
-    value: "true"
+    value: "test"
 selector:
 plugins: []
 _kuiper:
