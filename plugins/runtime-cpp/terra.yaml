@@ -1,0 +1,15 @@
+resource_id: runtime-cpp
+name: Runtime C++
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/main/plugins/runtime-cpp/assets/icon.svg
+description: >
+  C++ runtime environment. Clone a git repo, build, and run your C++
+  application. Configurable via env vars: git_url (repo to clone), git_ref
+  (branch/tag), work_dir (working directory), build_command (e.g. g++ -o app main.cpp),
+  run_command (e.g. ./app), port, and network_mode
+  (ingress-auth/ingress-noauth/clusterip/nodeport).
+category: Development
+tags:
+  - cluster-level
+  - runtime
+  - cpp
+fields: []
