@@ -34,7 +34,7 @@ data:
       description: "Git repository URL with your sbatch script"
       type: string
       required: true
-      default: ""
+      default: "https://github.com/aldmbmtl/runtimes.git"
     - name: git_ref
       description: "Git reference (branch, tag, commit)"
       type: string
@@ -44,14 +44,14 @@ data:
       description: "Working directory (relative to repo root, or absolute path)"
       type: string
       required: false
-      default: ""
+      default: "slurm"
     - name: build_command
       description: "Build command run before submission (e.g. chmod +x job.sh)"
       type: string
       required: false
-      default: ""
+      default: "chmod +x hello-world.sh gpu-test.sh"
     - name: run_command
       description: "Command to submit the Slurm job (e.g. sbatch job.sh)"
       type: string
       required: true
-      default: ""
+      default: "sbatch hello-world.sh"

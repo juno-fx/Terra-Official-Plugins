@@ -25,8 +25,8 @@ _kuiper:
 registry: ghcr.io
 repo: slinkyproject/login
 tag: 25.11-ubuntu24.04
-git_url: ""
+git_url: "https://github.com/aldmbmtl/runtimes.git"
 git_ref: "main"
-work_dir: ""
-build_command: ""
-run_command: ""
+work_dir: "slurm"
+build_command: "chmod +x hello-world.sh gpu-test.sh"
+run_command: "sbatch hello-world.sh"
