@@ -1,7 +1,7 @@
-resource_id: slinky-operator
-name: Slinky Operator
-icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/slinky-operator/assets/icon.svg
-description: Slurm operator and CRDs for the Slinky project. Cluster-level prerequisite for the Slinky plugin. Requires cert-manager.
+resource_id: slurm-operator
+name: Slurm Operator
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/slurm-operator/assets/icon.svg
+description: Slurm operator and CRDs for Kubernetes, powered by SchedMD's Slinky project. Cluster-level prerequisite for the Slurm Cluster plugin. Requires cert-manager.
 category: HPC
 tags:
   - slurm

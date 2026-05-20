@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-scripts-configmap
+data:
+  bootstrap.sh: |
+    #!/bin/bash
+    echo "Unpacking scripts..."
+    # decode base64 encoded scripts mount at /terra/scripts.base64
+    base64 -d /terra/scripts.base64 > /terra/scripts.tar.gz
+    
+    # extract scripts to /terra/scripts
+    tar -xzvf /terra/scripts.tar.gz -C /terra/
+    
+    # make scripts executable
+    chmod +x -v /terra/scripts/*.sh
+    
+    # start entrypoint.sh
+    cd /terra/scripts
+    pwd
+    ./entrypoint.sh
+  packaged_scripts.base64: "H4sIAAAAAAAAA+3RWwrCMBCF4Ty7itAFaNKm7XqkFFqEpmTig7s3FgUpXhBaRPy/lxmYQA4caUI/RtmpFZmkLstpJvN5t7vC5mm3NreV0uWaoW6OEvdBaxW8j6/evbv/KLn23w4xnEbfD3Er3cJ/XJqtnHvev3Wz/ou6MkqbhXM89Of9t03ndSaHfsw2384CAAAAAAAAAAAAAAAA4DNnaB6bSAAoAAA="

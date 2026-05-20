@@ -1,7 +1,7 @@
-resource_id: slinky
-name: Slinky
-icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/slinky/assets/icon.svg
-description: Slurm HPC cluster on Kubernetes, powered by SchedMD's Slinky project. Installs a Slurm cluster with CPU and GPU worker nodes into your project namespace. Requires slinky-operator to be installed first.
+resource_id: slurm-cluster
+name: Slurm Cluster
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/slurm-cluster/assets/icon.svg
+description: Slurm HPC cluster on Kubernetes, powered by SchedMD's Slinky project. Installs a Slurm cluster with CPU and GPU worker nodes into your project namespace. Requires Slurm Operator to be installed first.
 category: HPC
 tags:
   - slurm
