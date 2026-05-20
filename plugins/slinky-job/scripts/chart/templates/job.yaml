@@ -93,5 +93,5 @@ spec:
             defaultMode: 0755
         - name: slurm-key
           secret:
-            secretName: slurm-cluster-slurm-auth-slurm
+            secretName: slurm-cluster-auth-slurm
             defaultMode: 0600
