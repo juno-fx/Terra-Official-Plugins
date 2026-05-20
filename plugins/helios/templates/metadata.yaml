@@ -6,7 +6,7 @@ metadata:
     kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
 data:
   chart: "{{ .Release.Name }}-scripts-configmap"
-  description: "Helios deployment with desktop streaming"
+  description: "Helios deployment with desktop streaming test"
   fields: |
     - name: icon
       default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios/scripts/assets/helios-icon.png"
