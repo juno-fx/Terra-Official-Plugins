@@ -22,6 +22,8 @@ plugins: []
 _kuiper:
 
 # User-facing fields
+# IMPORTANT: defaults here must mirror the defaults in templates/metadata.yaml data.fields.
+# Both must be updated together — values.yaml serves Helm rendering; metadata.yaml serves the Genesis UI.
 registry: ghcr.io
 repo: slinkyproject/login
 tag: 25.11-ubuntu24.04
@@ -29,4 +31,4 @@ git_url: "https://github.com/aldmbmtl/runtimes.git"
 git_ref: "main"
 work_dir: "slurm"
 build_command: "chmod +x hello-world.sh gpu-test.sh"
-run_command: "sbatch hello-world.sh"
+run_command: "sbatch --chdir /tmp hello-world.sh"

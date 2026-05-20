@@ -11,10 +11,6 @@ data:
   chart: "{{ .Release.Name }}-scripts-configmap"
   description: "Slurm job submission workload — clone a git repo with your sbatch script, build, and submit to the Slurm cluster via sbatch"
   fields: |
-    - name: icon
-      description: "Template icon URL (platform metadata)"
-      type: string
-      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/slinky-job/assets/icon.svg"
     - name: registry
       description: "Container registry"
       type: string
@@ -54,4 +50,4 @@ data:
       description: "Command to submit the Slurm job (e.g. sbatch job.sh)"
       type: string
       required: true
-      default: "sbatch hello-world.sh"
+      default: "sbatch --chdir /tmp hello-world.sh"
