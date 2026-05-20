@@ -1,8 +1,8 @@
-resource_id:
+resource_id: asdfasdf
 name: test
-icon:
-description:
-category:
+icon: asdf
+description: asdf
+category: asdf
 tags: []
 # editable: true  # Uncomment to allow users to edit field values after install
 # compatibility: genesis-deployment>=3.0.2,orion-deployment>=3.1.0  # Optional: block install on older platform versions
