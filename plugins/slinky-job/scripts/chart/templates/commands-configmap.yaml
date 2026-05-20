@@ -41,7 +41,7 @@ data:
     mkdir -p /etc/slurm
     cat > /etc/slurm/slurm.conf <<EOF
     ClusterName=slurm-cluster
-    SlurmctldHost=slurm-cluster-slurm-controller
+    SlurmctldHost=slurm-cluster-controller
     SlurmctldPort=6817
     SlurmdPort=6818
     AuthType=auth/slurm
@@ -53,6 +53,7 @@ data:
     # (slurm.key is mounted at /etc/slurm/slurm.key with defaultMode 0600)
     mkdir -p /run/slurm
     chmod 0777 /run/slurm 2>/dev/null || true
+    chown 0 /run/slurm 2>/dev/null || true
     sackd -D &
     for _ in 1 2 3 4 5; do
       if [ -S /run/slurm/sack.socket ]; then
