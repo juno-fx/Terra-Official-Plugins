@@ -20,6 +20,13 @@ spec:
         releaseName: {{ .Release.Name }}-cluster
         values: |
           controller:
+            metadata:
+              labels:
+                kuiper.juno-innovations.com/kuiper-instance: "{{ $.Release.Name }}-cluster"
+            service:
+              metadata:
+                labels:
+                  kuiper.juno-innovations.com/kuiper-instance: "{{ $.Release.Name }}-cluster"
             slurmctld:
               image:
                 repository: ghcr.io/slinkyproject/slurmctld
@@ -30,6 +37,13 @@ spec:
             create: false
           restapi:
             replicas: 1
+            metadata:
+              labels:
+                kuiper.juno-innovations.com/kuiper-instance: "{{ $.Release.Name }}-cluster"
+            service:
+              metadata:
+                labels:
+                  kuiper.juno-innovations.com/kuiper-instance: "{{ $.Release.Name }}-cluster"
             slurmrestd:
               image:
                 repository: ghcr.io/slinkyproject/slurmrestd
@@ -38,6 +52,9 @@ spec:
             slinky:
               enabled: false
             cpu:
+              metadata:
+                labels:
+                  kuiper.juno-innovations.com/kuiper-instance: "{{ $.Release.Name }}-cluster"
               enabled: {{ .Values.cpu_enabled | default true }}
               replicas: {{ .Values.cpu_replicas }}
               scalingMode: StatefulSet
@@ -67,6 +84,9 @@ spec:
                   Default: "NO"
                   MaxTime: UNLIMITED
             gpu:
+              metadata:
+                labels:
+                  kuiper.juno-innovations.com/kuiper-instance: "{{ $.Release.Name }}-cluster"
               enabled: {{ .Values.gpu_enabled | default true }}
               replicas: {{ .Values.gpu_replicas }}
               scalingMode: StatefulSet
@@ -84,7 +104,6 @@ spec:
                   tag: latest
                 resources: {}
               extraConfMap:
-                Gres: gpu:nvidia:1
                 Features: gpu
               podSpec:
                 affinity:
