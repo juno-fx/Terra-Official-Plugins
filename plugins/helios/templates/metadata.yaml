@@ -10,7 +10,7 @@ data:
   fields: |
     - name: icon
       default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios-test/scripts/assets/helios-test-icon.png"
-    - name: fake
+    - name: testingthis
       description: "Use a GPU"
       type: boolean
       required: true
