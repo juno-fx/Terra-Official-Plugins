@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-slurm-operator
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {{ .Values.slinky_namespace }}
+  sources:
+    - repoURL: oci://ghcr.io/slinkyproject/charts/slurm-operator
+      chart: slurm-operator
+      targetRevision: {{ .Values.operator_version | default "1.1.0" | trimPrefix "v" }}
+      helm:
+        releaseName: {{ .Release.Name }}-operator
+        values: |
+          operator:
+            image:
+              repository: ghcr.io/slinkyproject/slurm-operator
+              tag: {{ .Values.operator_version | default "" }}
+          webhook:
+            enabled: true
+            image:
+              repository: ghcr.io/slinkyproject/slurm-operator-webhook
+              tag: {{ .Values.operator_version | default "" }}
+          certManager:
+            enabled: true
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+      - CreateNamespace=true

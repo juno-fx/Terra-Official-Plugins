@@ -1,0 +1,5 @@
+# Put any valid Kubernetes objects here.
+# This can be Deployments, StatefulSets, Jobs, CronJobs, ConfigMaps, RBAC, etc.
+# There are no structural requirements — organize however makes sense for the plugin.
+#
+# See docs/plugin-types.md for examples and guidance.

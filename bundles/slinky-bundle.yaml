@@ -1,0 +1,25 @@
+resource_id: slurm-bundle
+name: Slurm Bundle
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/slinky/assets/icon.svg
+description: |
+  Cluster-level prerequisites for Slinky — Slurm HPC on Kubernetes.
+
+  Installs cert-manager and the Slurm operator CRDs and controller.
+  Once installed, deploy the Slinky plugin into your project namespace
+  to provision a Slurm cluster, and Slinky Job to submit workloads via Genesis.
+
+category: Bundle
+tags:
+  - slurm
+  - hpc
+  - slinky
+  - schedmd
+  - cluster-level
+plugins:
+  - plugin: Certificate Manager
+    name: cert-manager
+    values:
+      chart_version:
+        hardcoded: "v1.16.3"
+  - plugin: Slurm Operator
+    name: slurm-operator

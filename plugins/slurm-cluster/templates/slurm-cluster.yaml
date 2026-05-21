@@ -1,0 +1,168 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: slurm-slurm-cluster
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-options: Replace=true
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {{ .Release.Namespace }}
+  sources:
+    - repoURL: oci://ghcr.io/slinkyproject/charts/slurm
+      chart: slurm
+      targetRevision: {{ .Values.slurm_version | default "1.1.0" | trimPrefix "v" }}
+      helm:
+        releaseName: slurm-cluster
+        values: |
+          controller:
+            metadata:
+              labels:
+                kuiper.juno-innovations.com/kuiper-instance: "slurm-cluster"
+            service:
+              metadata:
+                labels:
+                  kuiper.juno-innovations.com/kuiper-instance: "slurm-cluster"
+            slurmctld:
+              image:
+                repository: ghcr.io/slinkyproject/slurmctld
+                tag: 25.11-ubuntu24.04
+          slurmKey:
+            create: false
+          jwtKey:
+            create: false
+          restapi:
+            replicas: 1
+            metadata:
+              labels:
+                kuiper.juno-innovations.com/kuiper-instance: "slurm-cluster"
+            service:
+              metadata:
+                labels:
+                  kuiper.juno-innovations.com/kuiper-instance: "slurm-cluster"
+            slurmrestd:
+              image:
+                repository: ghcr.io/slinkyproject/slurmrestd
+                tag: 25.11-ubuntu24.04
+          nodesets:
+            slinky:
+              enabled: false
+            cpu:
+              metadata:
+                labels:
+                  kuiper.juno-innovations.com/kuiper-instance: "slurm-cluster"
+              enabled: {{ .Values.cpu_enabled }}
+              replicas: {{ .Values.cpu_replicas }}
+              scalingMode: StatefulSet
+              updateStrategy:
+                type: RollingUpdate
+                rollingUpdate:
+                  maxUnavailable: 25%
+              slurmd:
+                image:
+                  repository: ghcr.io/slinkyproject/slurmd
+                  tag: 25.11-ubuntu24.04
+              logfile:
+                image:
+                  repository: docker.io/library/alpine
+                  tag: latest
+                resources: {}
+              podSpec:
+                nodeSelector:
+                  {{- range $pair := splitList "," .Values.cpu_node_selector }}
+                  {{- $parts := splitList "=" $pair }}
+                  {{ trim (index $parts 0) }}: {{ trim (index $parts 1) | quote }}
+                  {{- end }}
+              partition:
+                enabled: true
+                configMap:
+                  State: UP
+                  Default: "NO"
+                  MaxTime: UNLIMITED
+            gpu:
+              metadata:
+                labels:
+                  kuiper.juno-innovations.com/kuiper-instance: "slurm-cluster"
+              enabled: {{ .Values.gpu_enabled }}
+              replicas: {{ .Values.gpu_replicas }}
+              scalingMode: StatefulSet
+              updateStrategy:
+                type: RollingUpdate
+                rollingUpdate:
+                  maxUnavailable: 25%
+              slurmd:
+                image:
+                  repository: ghcr.io/slinkyproject/slurmd
+                  tag: 25.11-ubuntu24.04
+              logfile:
+                image:
+                  repository: docker.io/library/alpine
+                  tag: latest
+                resources: {}
+              extraConfMap:
+                Features: gpu
+              podSpec:
+                affinity:
+                  nodeAffinity:
+                    requiredDuringSchedulingIgnoredDuringExecution:
+                      nodeSelectorTerms:
+                        {{- range $pair := splitList "," .Values.gpu_node_selector }}
+                        - matchExpressions:
+                            - key: {{ trim (index (splitList "=" $pair) 0) }}
+                              operator: In
+                              values:
+                                - {{ trim (index (splitList "=" $pair) 1) | quote }}
+                        {{- end }}
+                tolerations:
+                  - key: nvidia.com/gpu
+                    operator: Exists
+                    effect: NoSchedule
+              partition:
+                enabled: true
+                configMap:
+                  State: UP
+                  Default: "NO"
+                  MaxTime: UNLIMITED
+          partitions:
+            all:
+              enabled: true
+              nodesets:
+                - ALL
+              configMap:
+                State: UP
+                Default: "YES"
+                MaxTime: UNLIMITED
+          clusterName: slurm-cluster
+          configFiles:
+            cgroup.conf: |
+              CgroupPlugin=cgroup/v2
+              IgnoreSystemd=yes
+              ConstrainRAMSpace=yes
+              ConstrainCores=yes
+              ConstrainDevices=yes
+            gres.conf: |
+              AutoDetect=nvidia
+          sssd:
+            conf: |
+              [sssd]
+              config_file_version = 2
+              services = nss
+              domains = local
+
+              [nss]
+              filter_groups = root,slurm
+              filter_users = root,slurm
+
+              [domain/local]
+              id_provider = files
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+      - CreateNamespace=true

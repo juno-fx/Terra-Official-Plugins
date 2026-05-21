@@ -1,0 +1,12 @@
+resource_id: slurm-job
+name: Slurm Job
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/slurm-job/assets/icon.svg
+description: Slurm job submission workload template for Genesis. Clone a git repo, build, and submit sbatch jobs to a Slurm cluster. Requires Slurm Cluster to be installed in the target project namespace.
+category: HPC
+tags:
+  - slurm
+  - hpc
+  - slinky
+  - schedmd
+  - cluster-level
+fields: []
