@@ -9,7 +9,7 @@ data:
   description: "Helios deployment with desktop streaming test"
   fields: |
     - name: icon
-      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios-test/scripts/assets/helios-test-icon.png"
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios/scripts/assets/helios-icon.png"
     - name: fake
       description: "Use a GPU"
       type: boolean
