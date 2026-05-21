@@ -1,5 +1,5 @@
-resource_id: slinky-bundle
-name: Slinky Bundle
+resource_id: slurm-bundle
+name: Slurm Bundle
 icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/slinky/assets/icon.svg
 description: |
   Cluster-level prerequisites for Slinky — Slurm HPC on Kubernetes.
@@ -21,5 +21,5 @@ plugins:
     values:
       chart_version:
         hardcoded: "v1.16.3"
-  - plugin: Slinky Operator
-    name: slinky-operator
+  - plugin: Slurm Operator
+    name: slurm-operator
