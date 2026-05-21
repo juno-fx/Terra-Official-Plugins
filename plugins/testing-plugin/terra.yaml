@@ -1,0 +1,11 @@
+resource_id: helios-test
+name: Helios Test
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios-test/scripts/assets/helios-test-icon.png
+description: Helios containerized workstation from Juno
+category: Workstations
+tags:
+  - kasm
+  - vdi
+  - juno
+  - cluster-level
+fields: []
