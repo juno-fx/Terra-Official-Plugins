@@ -46,23 +46,27 @@ spec:
               API_SERVER_PORT=8642
               GATEWAY_ALLOW_ALL_USERS=true
               EOF
-              {{- if eq .Values.provider "openrouter" }}
-              echo "OPENROUTER_API_KEY=${OPENROUTER_API_KEY}" >> /opt/data/.env
-              {{- else if eq .Values.provider "openai" }}
-              echo "OPENAI_API_KEY=${OPENAI_API_KEY}" >> /opt/data/.env
-              {{- else if eq .Values.provider "anthropic" }}
-              echo "ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}" >> /opt/data/.env
-              {{- end }}
+              PROVIDER_VALUE="${PROVIDER}"
+              case "${PROVIDER}" in
+                openrouter) KEY_NAME="OPENROUTER_API_KEY" ;;
+                openai)     KEY_NAME="OPENAI_API_KEY";    PROVIDER_VALUE="openai-codex" ;;
+                anthropic)  KEY_NAME="ANTHROPIC_API_KEY" ;;
+                ollama)     KEY_NAME="";                  PROVIDER_VALUE="custom" ;;
+                *)          KEY_NAME="" ;;
+              esac
+              if [ -n "${KEY_NAME}" ] && [ -n "${API_KEY}" ]; then
+                echo "${KEY_NAME}=${API_KEY}" >> /opt/data/.env
+              fi
 
               # --- Write config.yaml ---
               cat > /opt/data/config.yaml << EOF
               model:
-                default: "${MODEL}"{{- if eq .Values.provider "ollama" }}
-                provider: custom
-                base_url: "${OLLAMA_BASE_URL}"{{- else if eq .Values.provider "openai" }}
-                provider: openai-codex{{- else }}
-                provider: ${PROVIDER}{{- end }}
+                default: "${MODEL}"
+                provider: ${PROVIDER_VALUE}
               EOF
+              if [ "${PROVIDER}" = "ollama" ]; then
+                echo "  base_url: \"${OLLAMA_BASE_URL}\"" >> /opt/data/config.yaml
+              fi
 
               # --- Write SOUL.md ---
               cat > /opt/data/SOUL.md << EOF
@@ -101,16 +105,9 @@ spec:
               value: {{ .Values.personality | quote }}
             - name: NAME
               value: {{ .Values.name | quote }}
-            {{- if eq .Values.provider "openrouter" }}
-            - name: OPENROUTER_API_KEY
-              value: {{ .Values.openrouter_api_key | quote }}
-            {{- else if eq .Values.provider "openai" }}
-            - name: OPENAI_API_KEY
-              value: {{ .Values.openai_api_key | quote }}
-            {{- else if eq .Values.provider "anthropic" }}
-            - name: ANTHROPIC_API_KEY
-              value: {{ .Values.anthropic_api_key | quote }}
-            {{- else if eq .Values.provider "ollama" }}
+            - name: API_KEY
+              value: {{ .Values.api_key | quote }}
+            {{- if eq .Values.provider "ollama" }}
             - name: OLLAMA_BASE_URL
               value: {{ .Values.ollama_base_url | quote }}
             {{- end }}

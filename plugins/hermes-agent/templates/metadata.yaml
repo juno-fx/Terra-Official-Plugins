@@ -22,20 +22,12 @@ data:
         - openai
         - anthropic
         - ollama
-    - name: openrouter_api_key
-      description: "Your OpenRouter API key (https://openrouter.ai/keys). Required when provider is OpenRouter."
-      type: string
-      required: false
-    - name: openai_api_key
-      description: "Your OpenAI API key (https://platform.openai.com/api-keys). Required when provider is OpenAI."
-      type: string
-      required: false
-    - name: anthropic_api_key
-      description: "Your Anthropic API key (https://console.anthropic.com/). Required when provider is Anthropic."
+    - name: api_key
+      description: "API key for the selected provider. Not needed for Ollama."
       type: string
       required: false
     - name: ollama_base_url
-      description: "Ollama server URL (e.g. http://ollama:11434). Required when provider is Ollama."
+      description: "Ollama server URL (e.g. http://ollama:11434). Only used when provider is Ollama."
       type: string
       required: false
     - name: api_server_key

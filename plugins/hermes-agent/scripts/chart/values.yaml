@@ -2,9 +2,7 @@ name: hermes-agent
 user:
 session:
 provider: openrouter
-openrouter_api_key: ""
-openai_api_key: ""
-anthropic_api_key: ""
+api_key: ""
 ollama_base_url: ""
 api_server_key: ""
 model: "meta-llama/llama-3.1-8b-instruct:free"
