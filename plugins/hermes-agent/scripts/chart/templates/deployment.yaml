@@ -67,6 +67,10 @@ spec:
               if [ "${PROVIDER}" = "ollama" ]; then
                 echo "  base_url: \"${OLLAMA_BASE_URL}\"" >> /opt/data/config.yaml
               fi
+              cat >> /opt/data/config.yaml << EOF
+              dashboard:
+                theme: juno
+              EOF
 
               # --- Write SOUL.md ---
               cat > /opt/data/SOUL.md << EOF
@@ -74,6 +78,42 @@ spec:
               EOF
 
               chmod 644 /opt/data/*
+
+              # --- Write Juno theme ---
+              mkdir -p /opt/data/dashboard-themes
+              cat > /opt/data/dashboard-themes/juno.yaml << THEME
+              name: juno
+              label: Juno
+              description: Juno Innovations brand theme
+              palette:
+                background:
+                  hex: "#0f172a"
+                  alpha: 1.0
+                midground:
+                  hex: "#22d3ee"
+                  alpha: 1.0
+                foreground:
+                  hex: "#ffffff"
+                  alpha: 0.0
+                warmGlow: "rgba(6, 182, 212, 0.2)"
+                noiseOpacity: 0.4
+              typography:
+                fontSans: '"Inter", system-ui, -apple-system, sans-serif'
+                fontMono: '"JetBrains Mono", ui-monospace, monospace'
+                fontUrl: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+                baseSize: 14px
+                lineHeight: "1.5"
+                letterSpacing: "-0.006em"
+              layout:
+                radius: 0.5rem
+                density: comfortable
+              colorOverrides:
+                primary: "#22d3ee"
+                ring: "#22d3ee"
+                accent: "#06b6d4"
+                border: "rgba(34, 211, 238, 0.25)"
+              THEME
+              chmod 644 /opt/data/dashboard-themes/juno.yaml
 
               # --- Write nginx proxy config ---
               mkdir -p /opt/proxy
@@ -160,7 +200,7 @@ spec:
         - name: hermes-dashboard
           image: "nousresearch/hermes-agent:{{ .Values.tag }}"
           imagePullPolicy: IfNotPresent
-          args: ["dashboard", "--host", "127.0.0.1", "--port", "9120", "--no-open"]
+          args: ["dashboard", "--host", "127.0.0.1", "--port", "9120", "--no-open", "--tui"]
           ports:
             - name: dash-internal
               containerPort: 9120
