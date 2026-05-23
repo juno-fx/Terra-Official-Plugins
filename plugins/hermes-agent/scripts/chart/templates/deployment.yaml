@@ -83,10 +83,13 @@ spec:
                   server {
                       listen 9119;
 
-                      location /hermes/${NAME}/v1/ {
-                          proxy_pass http://127.0.0.1:8642/v1/;
-                          proxy_set_header Authorization "Bearer ${API_SERVER_KEY}";
-                          proxy_set_header Host \$host;
+                      location /hermes/${NAME}/api/chat {
+                          proxy_pass http://127.0.0.1:5000/chat;
+                          proxy_http_version 1.1;
+                          proxy_set_header Upgrade \$http_upgrade;
+                          proxy_set_header Connection "upgrade";
+                          proxy_buffering off;
+                          proxy_cache off;
                       }
 
                       location /hermes/${NAME}/ {
@@ -96,6 +99,61 @@ spec:
                   }
               }
               NGINXEOF
+
+              # --- Write chat proxy ---
+              cat > /opt/proxy/proxy.py << PYEOF
+              import http.server, json, os, urllib.request, urllib.error, sys
+
+              API_KEY = os.environ['API_SERVER_KEY']
+              BASE = 'http://127.0.0.1:8642/v1'
+
+              class Handler(http.server.BaseHTTPRequestHandler):
+                  def do_POST(self):
+                      if self.path != '/chat':
+                          self.send_error(404)
+                          return
+                      try:
+                          length = int(self.headers.get('Content-Length', 0))
+                          body = json.loads(self.rfile.read(length))
+                          msg = body.get('message', '')
+                          if not msg.strip():
+                              self.send_error(400, 'empty message')
+                              return
+                          payload = json.dumps({
+                              'model': 'hermes-agent',
+                              'messages': [{'role': 'user', 'content': msg}],
+                              'stream': True
+                          }).encode()
+                          req = urllib.request.Request(
+                              f'{BASE}/chat/completions', data=payload,
+                              headers={
+                                  'Content-Type': 'application/json',
+                                  'Authorization': f'Bearer {API_KEY}'
+                              }
+                          )
+                          self.send_response(200)
+                          self.send_header('Content-Type', 'text/event-stream')
+                          self.send_header('Cache-Control', 'no-cache')
+                          self.send_header('X-Accel-Buffering', 'no')
+                          self.end_headers()
+                          resp = urllib.request.urlopen(req, timeout=300)
+                          while True:
+                              chunk = resp.read(4096)
+                              if not chunk:
+                                  break
+                              self.wfile.write(chunk)
+                              self.wfile.flush()
+                      except urllib.error.HTTPError as e:
+                          self.send_error(e.code, str(e))
+                      except Exception as e:
+                          self.send_error(500, str(e))
+
+                  def log_message(self, fmt, *args):
+                      pass
+
+              if __name__ == '__main__':
+                  http.server.HTTPServer(('127.0.0.1', 5000), Handler).serve_forever()
+              PYEOF
 
               # --- Write chat.html ---
               mkdir -p /opt/www
@@ -170,9 +228,8 @@ spec:
               (function(){
                 'use strict';
                 var base = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
-                var apiUrl = window.location.origin + base + 'v1/chat/completions';
+                var chatUrl = window.location.origin + base + 'api/chat';
 
-                var messages = [];
                 var msgsEl = document.getElementById('messages');
                 var inputEl = document.getElementById('input');
                 var sendBtn = document.getElementById('send-btn');
@@ -207,7 +264,6 @@ spec:
                   inputEl.value = '';
                   sendBtn.disabled = true;
 
-                  messages.push({role:'user', content:text});
                   addMsg('user', text);
 
                   var cursorSpan = document.createElement('span');
@@ -219,14 +275,11 @@ spec:
 
                   var currentText = '';
 
-                  fetch(apiUrl, {
+                  fetch(chatUrl, {
                     method: 'POST',
+                    credentials: 'include',
                     headers: {'Content-Type':'application/json'},
-                    body: JSON.stringify({
-                      model:'hermes-agent',
-                      messages: messages,
-                      stream: true
-                    })
+                    body: JSON.stringify({message: text})
                   }).then(function(resp){
                     if (!resp.ok) {
                       return resp.text().then(function(t){ throw new Error(t || 'HTTP ' + resp.status); });
@@ -239,7 +292,6 @@ spec:
                       reader.read().then(function(result){
                         if (result.done) {
                           if (cursorSpan.parentNode) cursorSpan.remove();
-                          messages.push({role:'assistant', content:currentText});
                           sendBtn.disabled = false;
                           inputEl.focus();
                           return;
@@ -263,7 +315,7 @@ spec:
                                   assistantContent.appendChild(cursorSpan);
                                   msgsEl.scrollTop = msgsEl.scrollHeight;
                                 }
-                                if (delta.delta.reasoning_content) {
+                                if (delta.delta.reasoning_content && !assistantContent.querySelector('.thinking')) {
                                   var thinkDiv = document.createElement('div');
                                   thinkDiv.className = 'thinking';
                                   var summary = document.createElement('summary');
@@ -295,12 +347,6 @@ spec:
 
                 sendBtn.addEventListener('click', sendMessage);
                 inputEl.addEventListener('keydown', function(e){ if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }});
-
-                // Fetch model info
-                var infoUrl = window.location.origin + base + 'v1/models';
-                fetch(infoUrl).then(function(r){ return r.json(); }).then(function(d){
-                  if (d.data && d.data[0]) modelEl.textContent = d.data[0].id;
-                }).catch(function(){});
               })();
               </script>
               </body>
@@ -371,6 +417,21 @@ spec:
           volumeMounts:
             - name: hermes-data
               mountPath: /opt/data
+
+        - name: chat-proxy
+          image: python:3.12-alpine
+          imagePullPolicy: IfNotPresent
+          command: ["python3", "/opt/proxy/proxy.py"]
+          env:
+            - name: API_SERVER_KEY
+              value: {{ .Values.api_server_key | quote }}
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+          volumeMounts:
+            - name: proxy-config
+              mountPath: /opt/proxy
 
         - name: nginx
           image: nginx:alpine
