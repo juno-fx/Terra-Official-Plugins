@@ -30,49 +30,89 @@ spec:
       automountServiceAccountToken: false
       {{- end }}
       initContainers:
-        - name: write-env
+        - name: write-config
           image: busybox
           command:
             - sh
             - -c
             - |
-              {{- if .Values.use_local_ollama }}
+              set -e
+
+              # --- Write .env ---
               cat > /opt/data/.env << EOF
+              API_SERVER_ENABLED=true
               API_SERVER_KEY=${API_SERVER_KEY}
+              API_SERVER_HOST=127.0.0.1
+              API_SERVER_PORT=8642
               GATEWAY_ALLOW_ALL_USERS=true
               EOF
-              chmod 644 /opt/data/.env
+              {{- if eq .Values.provider "openrouter" }}
+              echo "OPENROUTER_API_KEY=${OPENROUTER_API_KEY}" >> /opt/data/.env
+              {{- else if eq .Values.provider "openai" }}
+              echo "OPENAI_API_KEY=${OPENAI_API_KEY}" >> /opt/data/.env
+              {{- else if eq .Values.provider "anthropic" }}
+              echo "ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}" >> /opt/data/.env
+              {{- end }}
+
+              # --- Write config.yaml ---
               cat > /opt/data/config.yaml << EOF
               model:
-                default: "${MODEL}"
+                default: "${MODEL}"{{- if eq .Values.provider "ollama" }}
                 provider: custom
-                base_url: "${OLLAMA_BASE_URL}"
+                base_url: "${OLLAMA_BASE_URL}"{{- else if eq .Values.provider "openai" }}
+                provider: openai-codex{{- else }}
+                provider: ${PROVIDER}{{- end }}
               EOF
-              chmod 644 /opt/data/config.yaml
-              {{- else }}
-              cat > /opt/data/.env << EOF
-              API_SERVER_KEY=${API_SERVER_KEY}
-              OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
-              GATEWAY_ALLOW_ALL_USERS=true
-              EOF
-              chmod 644 /opt/data/.env
-              cat > /opt/data/config.yaml << EOF
-              model: "${MODEL}"
-              EOF
-              chmod 644 /opt/data/config.yaml
-              {{- end }}
+
+              # --- Write SOUL.md ---
               cat > /opt/data/SOUL.md << EOF
               ${PERSONALITY}
               EOF
-              chmod 644 /opt/data/SOUL.md
+
+              chmod 644 /opt/data/*
+
+              # --- Write nginx proxy config for dashboard ---
+              mkdir -p /opt/proxy
+              cat > /opt/proxy/nginx.conf << NGINXEOF
+              events {}
+              http {
+                  server {
+                      listen 9119;
+                      location /hermes/${NAME}/ {
+                          proxy_pass http://127.0.0.1:9120/;
+                          proxy_set_header X-Forwarded-Prefix /hermes/${NAME};
+                          proxy_set_header Host \$host;
+                          proxy_set_header X-Real-IP \$remote_addr;
+                          proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+                          proxy_set_header X-Forwarded-Proto \$scheme;
+                      }
+                  }
+              }
+              NGINXEOF
+              chmod 644 /opt/proxy/nginx.conf
           env:
             - name: API_SERVER_KEY
               value: {{ .Values.api_server_key | quote }}
             - name: MODEL
               value: {{ .Values.model | quote }}
-            {{- if not .Values.use_local_ollama }}
+            - name: PROVIDER
+              value: {{ .Values.provider | quote }}
+            - name: PERSONALITY
+              value: {{ .Values.personality | quote }}
+            - name: NAME
+              value: {{ .Values.name | quote }}
+            {{- if eq .Values.provider "openrouter" }}
             - name: OPENROUTER_API_KEY
-              value: {{ .Values.llm_provider_key | quote }}
+              value: {{ .Values.openrouter_api_key | quote }}
+            {{- else if eq .Values.provider "openai" }}
+            - name: OPENAI_API_KEY
+              value: {{ .Values.openai_api_key | quote }}
+            {{- else if eq .Values.provider "anthropic" }}
+            - name: ANTHROPIC_API_KEY
+              value: {{ .Values.anthropic_api_key | quote }}
+            {{- else if eq .Values.provider "ollama" }}
+            - name: OLLAMA_BASE_URL
+              value: {{ .Values.ollama_base_url | quote }}
             {{- end }}
             {{- range .Values.env }}
             - name: {{ .name | quote }}
@@ -81,9 +121,11 @@ spec:
           volumeMounts:
             - name: hermes-data
               mountPath: /opt/data
+            - name: proxy-config
+              mountPath: /opt/proxy
       containers:
-        - name: hermes-agent
-          image: nousresearch/hermes-agent:latest
+        - name: hermes-gateway
+          image: "nousresearch/hermes-agent:{{ .Values.tag }}"
           imagePullPolicy: IfNotPresent
           args: ["gateway", "run"]
           ports:
@@ -91,8 +133,12 @@ spec:
               containerPort: 8642
               protocol: TCP
           env:
-            - name: API_SERVER_HOST
-              value: "0.0.0.0"
+            - name: HERMES_HOME
+              value: /opt/data
+            {{- if eq .Values.provider "ollama" }}
+            - name: OLLAMA_BASE_URL
+              value: {{ .Values.ollama_base_url | quote }}
+            {{- end }}
           {{- range .Values.env }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}
@@ -113,6 +159,48 @@ spec:
           volumeMounts:
             - name: hermes-data
               mountPath: /opt/data
+
+        - name: hermes-dashboard
+          image: "nousresearch/hermes-agent:{{ .Values.tag }}"
+          imagePullPolicy: IfNotPresent
+          args: ["dashboard", "--host", "127.0.0.1", "--port", "9120", "--no-open"]
+          ports:
+            - name: dashboard-internal
+              containerPort: 9120
+              protocol: TCP
+          env:
+            - name: HERMES_HOME
+              value: /opt/data
+          {{- range .Values.env }}
+            - name: {{ .name | quote }}
+              value: {{ .value | quote }}
+          {{- end }}
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "200m"
+          volumeMounts:
+            - name: hermes-data
+              mountPath: /opt/data
+
+        - name: nginx-proxy
+          image: nginx:alpine
+          imagePullPolicy: IfNotPresent
+          command: ["nginx", "-g", "daemon off;", "-c", "/opt/proxy/nginx.conf"]
+          ports:
+            - name: dashboard
+              containerPort: 9119
+              protocol: TCP
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+          volumeMounts:
+            - name: proxy-config
+              mountPath: /opt/proxy
+
       volumes:
         - name: hermes-data
+          emptyDir: {}
+        - name: proxy-config
           emptyDir: {}

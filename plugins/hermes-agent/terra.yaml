@@ -1,12 +1,14 @@
 resource_id: hermes-agent
 name: hermes-agent
 icon: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/assets/banner.png
-description: The self-improving AI agent built by Nous Research. Exposes an OpenAI-compatible API for other services to call.
+description: Hermes AI agent with multi-provider support (OpenRouter, OpenAI, Anthropic, Ollama) and web dashboard.
 category: AI
 tags:
 - llm
 - ai-agent
 - hermes
 - openai-compatible
+- multi-provider
+- dashboard
 - cluster-level
 fields: []

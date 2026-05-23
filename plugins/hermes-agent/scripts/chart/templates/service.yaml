@@ -6,7 +6,7 @@ spec:
   selector:
     juno-innovations.com/workstation: "{{ .Values.name }}"
   ports:
-    - port: 8642
-      targetPort: 8642
+    - port: 9119
+      targetPort: 9119
       protocol: TCP
-      name: api
+      name: dashboard
