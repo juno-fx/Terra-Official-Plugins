@@ -213,6 +213,8 @@ spec:
               value: /opt/data
             - name: HERMES_TUI_DIR
               value: /opt/hermes/ui-tui
+            - name: GATEWAY_HEALTH_URL
+              value: http://127.0.0.1:8642
           {{- range .Values.env }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}
