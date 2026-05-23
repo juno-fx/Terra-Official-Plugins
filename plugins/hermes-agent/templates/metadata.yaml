@@ -44,11 +44,6 @@ data:
       type: string
       required: false
       default: latest
-    - name: webui_tag
-      description: "Hermes WebUI container image tag."
-      type: string
-      required: false
-      default: latest
     - name: cluster_read_access
       description: "Grant this agent namespace-scoped read-only access (creates Role, ServiceAccount, RoleBinding in the current namespace)."
       type: boolean
