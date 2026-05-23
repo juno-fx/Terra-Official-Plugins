@@ -75,7 +75,7 @@ spec:
 
               chmod 644 /opt/data/*
 
-              # --- Write nginx proxy config for dashboard ---
+              # --- Write nginx proxy config ---
               mkdir -p /opt/proxy
               cat > /opt/proxy/nginx.conf << NGINXEOF
               events {}
@@ -83,7 +83,7 @@ spec:
                   server {
                       listen 9119;
                       location /hermes/${NAME}/ {
-                          proxy_pass http://127.0.0.1:9120/;
+                          proxy_pass http://127.0.0.1:8787/;
                           proxy_set_header X-Forwarded-Prefix /hermes/${NAME};
                           proxy_set_header X-Real-IP \$remote_addr;
                           proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
@@ -119,6 +119,20 @@ spec:
               mountPath: /opt/data
             - name: proxy-config
               mountPath: /opt/proxy
+
+        - name: copy-agent-source
+          image: "nousresearch/hermes-agent:{{ .Values.tag }}"
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - |
+              cp -r /opt/hermes/. /agent-source/
+              chmod -R a+rX /agent-source/
+          volumeMounts:
+            - name: agent-source
+              mountPath: /agent-source
+
       containers:
         - name: hermes-gateway
           image: "nousresearch/hermes-agent:{{ .Values.tag }}"
@@ -156,17 +170,27 @@ spec:
             - name: hermes-data
               mountPath: /opt/data
 
-        - name: hermes-dashboard
-          image: "nousresearch/hermes-agent:{{ .Values.tag }}"
+        - name: hermes-webui
+          image: "ghcr.io/nesquena/hermes-webui:{{ .Values.webui_tag }}"
           imagePullPolicy: IfNotPresent
-          args: ["dashboard", "--host", "127.0.0.1", "--port", "9120", "--no-open"]
+          command: ["python3", "/apptoo/server.py"]
           ports:
-            - name: dash-internal
-              containerPort: 9120
+            - name: webui
+              containerPort: 8787
               protocol: TCP
           env:
+            - name: HERMES_WEBUI_AGENT_DIR
+              value: /opt/hermes
             - name: HERMES_HOME
               value: /opt/data
+            - name: HERMES_WEBUI_HOST
+              value: 127.0.0.1
+            - name: HERMES_WEBUI_PORT
+              value: "8787"
+            - name: HERMES_WEBUI_PASSWORD
+              value: {{ .Values.api_server_key | quote }}
+            - name: HERMES_WEBUI_STATE_DIR
+              value: /opt/data/webui
           {{- range .Values.env }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}
@@ -178,13 +202,15 @@ spec:
           volumeMounts:
             - name: hermes-data
               mountPath: /opt/data
+            - name: agent-source
+              mountPath: /opt/hermes
 
         - name: nginx-proxy
           image: nginx:alpine
           imagePullPolicy: IfNotPresent
           command: ["nginx", "-g", "daemon off;", "-c", "/opt/proxy/nginx.conf"]
           ports:
-            - name: dashboard
+            - name: nginx
               containerPort: 9119
               protocol: TCP
           resources:
@@ -197,6 +223,8 @@ spec:
 
       volumes:
         - name: hermes-data
+          emptyDir: {}
+        - name: agent-source
           emptyDir: {}
         - name: proxy-config
           emptyDir: {}

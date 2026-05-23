@@ -9,4 +9,4 @@ spec:
     - port: 9119
       targetPort: 9119
       protocol: TCP
-      name: dashboard
+      name: nginx
