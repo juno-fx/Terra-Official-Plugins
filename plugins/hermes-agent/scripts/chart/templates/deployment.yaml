@@ -67,10 +67,6 @@ spec:
               if [ "${PROVIDER}" = "ollama" ]; then
                 echo "  base_url: \"${OLLAMA_BASE_URL}\"" >> /opt/data/config.yaml
               fi
-              cat >> /opt/data/config.yaml << EOF
-              dashboard:
-                theme: juno
-              EOF
 
               # --- Write SOUL.md ---
               cat > /opt/data/SOUL.md << EOF
@@ -113,7 +109,6 @@ spec:
                 accent: "#06b6d4"
                 border: "rgba(34, 211, 238, 0.25)"
               THEME
-              chmod 644 /opt/data/dashboard-themes/juno.yaml
 
               # --- Write nginx proxy config ---
               mkdir -p /opt/proxy
@@ -122,20 +117,23 @@ spec:
               http {
                   server {
                       listen 9119;
+
                       location /hermes/${NAME}/ {
-                          proxy_pass http://127.0.0.1:9120/;
+                          proxy_pass http://127.0.0.1:8787/;
                           proxy_http_version 1.1;
                           proxy_set_header Upgrade \$http_upgrade;
                           proxy_set_header Connection "upgrade";
-                          proxy_set_header X-Forwarded-Prefix /hermes/${NAME};
-                          proxy_set_header X-Real-IP \$remote_addr;
-                          proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-                          proxy_set_header X-Forwarded-Proto \$scheme;
+
+                          sub_filter_once off;
+                          sub_filter_types text/html text/javascript application/javascript;
+                          sub_filter '"/api/' '"/hermes/${NAME}/api/';
+                          sub_filter "'/api/" "'/hermes/${NAME}/api/";
+                          sub_filter '"/health' '"/hermes/${NAME}/health';
+                          sub_filter '"/login' '"/hermes/${NAME}/login';
                       }
                   }
               }
               NGINXEOF
-              chmod 644 /opt/proxy/nginx.conf
           env:
             - name: API_SERVER_KEY
               value: {{ .Values.api_server_key | quote }}
@@ -162,6 +160,19 @@ spec:
               mountPath: /opt/data
             - name: proxy-config
               mountPath: /opt/proxy
+
+        - name: copy-agent-source
+          image: "nousresearch/hermes-agent:{{ .Values.tag }}"
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - |
+              cp -r /opt/hermes/. /agent-source/
+              chmod -R a+rX /agent-source/
+          volumeMounts:
+            - name: agent-source
+              mountPath: /agent-source
 
       containers:
         - name: hermes-gateway
@@ -203,7 +214,7 @@ spec:
         - name: hermes-dashboard
           image: "nousresearch/hermes-agent:{{ .Values.tag }}"
           imagePullPolicy: IfNotPresent
-          args: ["dashboard", "--host", "127.0.0.1", "--port", "9120", "--no-open", "--tui"]
+          args: ["dashboard", "--host", "127.0.0.1", "--port", "9120", "--no-open"]
           ports:
             - name: dash-internal
               containerPort: 9120
@@ -211,8 +222,6 @@ spec:
           env:
             - name: HERMES_HOME
               value: /opt/data
-            - name: HERMES_TUI_DIR
-              value: /opt/hermes/ui-tui
             - name: GATEWAY_HEALTH_URL
               value: http://127.0.0.1:8642
           {{- range .Values.env }}
@@ -226,6 +235,36 @@ spec:
           volumeMounts:
             - name: hermes-data
               mountPath: /opt/data
+
+        - name: hermes-webui
+          image: "ghcr.io/nesquena/hermes-webui:{{ .Values.webui_tag }}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: webui
+              containerPort: 8787
+              protocol: TCP
+          env:
+            - name: HERMES_WEBUI_HOST
+              value: 0.0.0.0
+            - name: HERMES_WEBUI_PORT
+              value: "8787"
+            - name: HERMES_WEBUI_STATE_DIR
+              value: /home/hermeswebui/.hermes/webui
+            - name: HERMES_WEBUI_PASSWORD
+              value: {{ .Values.api_server_key | quote }}
+          {{- range .Values.env }}
+            - name: {{ .name | quote }}
+              value: {{ .value | quote }}
+          {{- end }}
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "200m"
+          volumeMounts:
+            - name: hermes-data
+              mountPath: /home/hermeswebui/.hermes
+            - name: agent-source
+              mountPath: /home/hermeswebui/.hermes/hermes-agent
 
         - name: nginx-proxy
           image: nginx:alpine
@@ -245,6 +284,8 @@ spec:
 
       volumes:
         - name: hermes-data
+          emptyDir: {}
+        - name: agent-source
           emptyDir: {}
         - name: proxy-config
           emptyDir: {}
