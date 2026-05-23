@@ -14,7 +14,7 @@ data:
       default: "https://raw.githubusercontent.com/NousResearch/hermes-agent/main/assets/banner.png"
     - name: provider
       description: "LLM provider to use."
-      type: string
+      type: select
       required: true
       default: openrouter
       options:
