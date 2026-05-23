@@ -162,7 +162,7 @@ spec:
           imagePullPolicy: IfNotPresent
           args: ["dashboard", "--host", "127.0.0.1", "--port", "9120", "--no-open"]
           ports:
-            - name: dashboard-internal
+            - name: dash-internal
               containerPort: 9120
               protocol: TCP
           env:
