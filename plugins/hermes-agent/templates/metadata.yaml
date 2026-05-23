@@ -40,12 +40,7 @@ data:
       required: false
       default: "meta-llama/llama-3.1-8b-instruct:free"
     - name: tag
-      description: "Hermes agent container image tag."
-      type: string
-      required: false
-      default: latest
-    - name: webui_tag
-      description: "Hermes WebUI container image tag."
+      description: "Container image tag."
       type: string
       required: false
       default: latest
