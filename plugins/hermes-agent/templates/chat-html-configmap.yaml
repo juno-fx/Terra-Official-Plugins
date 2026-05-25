@@ -1,0 +1,158 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-chat-html"
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+data:
+  chat.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title id="page-title">Chat</title>
+    <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#191919;--surface:#1e1e1e;--surface-alt:#272727;--border:rgba(255,255,255,0.15);
+      --accent:#f8aa5f;--accent-hover:#ea8a01;--text:#ffffff;--text-muted:#94a3b8;
+      --user-msg:#2e3440;--radius:8px;
+      --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,sans-serif}
+    html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.5}
+    ::-webkit-scrollbar{width:10px}
+    ::-webkit-scrollbar-track{background:#191919}
+    ::-webkit-scrollbar-thumb{background:#505050}
+    ::-webkit-scrollbar-thumb:hover{background:#ea8a01}
+    input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill-active{
+      -webkit-box-shadow:0 0 0 30px #191919 inset!important}
+    #app{display:flex;flex-direction:column;height:100%;padding:0 16px}
+    header{display:flex;align-items:center;gap:10px;padding:16px 0;border-bottom:1px solid var(--border);margin-bottom:16px}
+    header h1{font-size:16px;font-weight:600;color:var(--accent)}
+    .logo{width:28px;height:28px;border-radius:6px;background:var(--accent);display:flex;align-items:center;justify-content:center;
+      font-size:13px;font-weight:700;color:var(--bg)}
+    #header-right{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted)}
+    #messages{flex:1;overflow-y:auto;padding:8px 0;display:flex;flex-direction:column;gap:12px}
+    .msg{max-width:85%;padding:10px 14px;border-radius:var(--radius);line-height:1.5;white-space:pre-wrap;word-break:break-word}
+    .msg.user{align-self:flex-end;background:var(--user-msg);border:1px solid var(--border)}
+    .msg.assistant{align-self:flex-start;background:var(--surface);border:1px solid var(--border)}
+    .msg .label{font-size:11px;font-weight:600;margin-bottom:4px;color:var(--text-muted)}
+    .msg.assistant .label{color:var(--accent)}
+    .msg .content p{margin-bottom:8px}
+    .msg .content p:last-child{margin-bottom:0}
+    .msg .content code{background:rgba(0,0,0,0.3);padding:1px 4px;border-radius:3px;font-size:13px}
+    .msg .content pre{background:rgba(0,0,0,0.3);border-radius:var(--radius);padding:12px;overflow-x:auto;margin:8px 0;font-size:13px}
+    .msg .content pre code{background:none;padding:0}
+    .stream-cursor{animation:blink 0.8s infinite}
+    @keyframes blink{50%{opacity:0}}
+    #input-area{border-top:1px solid var(--border);padding:16px 0;display:flex;gap:8px}
+    #input{flex:1;padding:10px 14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface-alt);
+      color:var(--text);font-size:14px;font-family:var(--font);outline:none;transition:border-color 0.15s}
+    #input:focus{border-color:var(--accent)}
+    #input::placeholder{color:var(--text-muted)}
+    #send-btn{padding:10px 20px;border-radius:var(--radius);border:none;background:var(--accent);color:#000;
+      font-size:14px;font-weight:600;cursor:pointer;transition:background 0.15s;font-family:var(--font)}
+    #send-btn:hover{background:var(--accent-hover)}
+    #send-btn:disabled{opacity:0.4;cursor:not-allowed}
+    #error-bar{display:none;padding:8px 12px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);
+      border-radius:var(--radius);margin-top:8px;font-size:13px;color:#fca5a5}
+    @media(max-width:600px){.msg{max-width:95%}#app{padding:0 8px}}
+    </style>
+    </head>
+    <body>
+    <div id="app">
+      <header>
+        <div class="logo" id="logo-letter">H</div>
+        <h1 id="agent-name">Agent</h1>
+        <div id="header-right"></div>
+      </header>
+      <div id="messages"></div>
+      <div id="error-bar"></div>
+      <div id="input-area">
+        <input id="input" type="text" placeholder="Type a message..." autofocus>
+        <button id="send-btn">Send</button>
+      </div>
+    </div>
+    <script>
+    (function(){
+      'use strict';
+      var parts = window.location.pathname.split('/').filter(Boolean);
+      var agentName = parts[1] || 'Agent';
+      var base = '/' + parts.slice(0, 2).join('/') + '/';
+      var chatUrl = window.location.origin + base + 'api/chat';
+
+      document.getElementById('page-title').textContent = agentName;
+      document.getElementById('agent-name').textContent = agentName;
+      document.getElementById('logo-letter').textContent = agentName.charAt(0).toUpperCase();
+
+      var msgsEl = document.getElementById('messages');
+      var inputEl = document.getElementById('input');
+      var sendBtn = document.getElementById('send-btn');
+      var errorBar = document.getElementById('error-bar');
+
+      function showError(msg) {
+        errorBar.textContent = msg;
+        errorBar.style.display = 'block';
+        setTimeout(function(){ errorBar.style.display = 'none'; }, 8000);
+      }
+
+      function addMsg(role, text) {
+        var div = document.createElement('div');
+        div.className = 'msg ' + role;
+        var label = document.createElement('div');
+        label.className = 'label';
+        label.textContent = role === 'user' ? 'You' : agentName;
+        div.appendChild(label);
+        var content = document.createElement('div');
+        content.className = 'content';
+        content.textContent = text;
+        div.appendChild(content);
+        msgsEl.appendChild(div);
+        msgsEl.scrollTop = msgsEl.scrollHeight;
+        return content;
+      }
+
+      function sendMessage() {
+        var text = inputEl.value.trim();
+        if (!text) return;
+        inputEl.value = '';
+        sendBtn.disabled = true;
+
+        addMsg('user', text);
+
+        var cursorSpan = document.createElement('span');
+        cursorSpan.className = 'stream-cursor';
+        cursorSpan.textContent = '\u2588';
+
+        var assistantContent = addMsg('assistant', '');
+        assistantContent.appendChild(cursorSpan);
+
+        fetch(chatUrl, {
+          method: 'POST',
+          credentials: 'include',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({message: text})
+        }).then(function(resp){
+          if (!resp.ok) {
+            return resp.json().then(function(d){ throw new Error(d.error || 'HTTP ' + resp.status); });
+          }
+          return resp.json().then(function(d){
+            if (cursorSpan.parentNode) cursorSpan.remove();
+            assistantContent.textContent = d.content || '';
+            msgsEl.scrollTop = msgsEl.scrollHeight;
+            sendBtn.disabled = false;
+            inputEl.focus();
+          });
+        }).catch(function(err){
+          if (cursorSpan.parentNode) cursorSpan.remove();
+          assistantContent.textContent = 'Error: ' + err.message;
+          showError('Request failed: ' + err.message);
+          sendBtn.disabled = false;
+        });
+      }
+
+      sendBtn.addEventListener('click', sendMessage);
+      inputEl.addEventListener('keydown', function(e){ if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }});
+    })();
+    </script>
+    </body>
+    </html>

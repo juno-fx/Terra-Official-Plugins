@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-nginx-template"
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+data:
+  nginx.conf: |
+    events {}
+    http {
+        server {
+            listen 9119;
+            location /hermes/__NAME__/api/chat {
+                proxy_pass http://127.0.0.1:5000/chat;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+                proxy_buffering off;
+                proxy_cache off;
+            }
+            location /hermes/__NAME__/ {
+                alias /opt/www/;
+                index chat.html;
+            }
+        }
+    }
