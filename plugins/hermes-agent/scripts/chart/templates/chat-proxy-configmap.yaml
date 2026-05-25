@@ -6,7 +6,7 @@ metadata:
     kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
 data:
   proxy.py: |
-    import http.server, json, os, urllib.request, urllib.error
+    import http.server, json, os, urllib.request, urllib.error, time
 
     API_KEY = os.environ['API_SERVER_KEY']
     BASE = 'http://127.0.0.1:8642/v1'
@@ -38,14 +38,23 @@ data:
             self.wfile.write(json.dumps(data).encode())
 
         def _forward(self, endpoint, payload):
-            req = urllib.request.Request(
-                f'{BASE}/{endpoint}', data=payload,
-                headers={
-                    'Content-Type': 'application/json',
-                    'Authorization': f'Bearer {API_KEY}'
-                }
-            )
-            return urllib.request.urlopen(req, timeout=300)
+            last_err = None
+            for attempt in range(5):
+                try:
+                    req = urllib.request.Request(
+                        f'{BASE}/{endpoint}', data=payload,
+                        headers={
+                            'Content-Type': 'application/json',
+                            'Authorization': f'Bearer {API_KEY}'
+                        }
+                    )
+                    return urllib.request.urlopen(req, timeout=300)
+                except urllib.error.URLError as e:
+                    last_err = e
+                    if attempt < 4:
+                        time.sleep(3)
+                    else:
+                        raise last_err
 
         def _handle_chat(self):
             try:

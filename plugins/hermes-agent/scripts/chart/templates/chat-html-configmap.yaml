@@ -47,6 +47,10 @@ data:
     .typing-dots span:nth-child(2){animation-delay:0.2s}
     .typing-dots span:nth-child(3){animation-delay:0.4s}
     @keyframes dot-pulse{0%,60%,100%{opacity:0.3}30%{opacity:1}}
+    .cancel-btn{font-size:11px;color:var(--text-muted);cursor:pointer;border:none;background:none;
+      padding:2px 8px;border-radius:4px;margin-top:4px;transition:color 0.15s;font-family:var(--font)}
+    .cancel-btn:hover{color:var(--accent)}
+    .cancel-btn:disabled{opacity:0.3;cursor:default}
     #input-area{border-top:1px solid var(--border);padding:16px 0;display:flex;gap:8px}
     #input{flex:1;padding:10px 14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface-alt);
       color:var(--text);font-size:14px;font-family:var(--font);outline:none;transition:border-color 0.15s}
@@ -134,6 +138,18 @@ data:
         var assistantContent = addMsg('assistant', '');
         assistantContent.appendChild(dots);
 
+        var controller = new AbortController();
+        var cancelBtn = document.createElement('button');
+        cancelBtn.className = 'cancel-btn';
+        cancelBtn.textContent = 'Cancel';
+        assistantContent.parentNode.appendChild(cancelBtn);
+
+        cancelBtn.addEventListener('click', function(){
+            controller.abort();
+            cancelBtn.disabled = true;
+            cancelBtn.textContent = 'Stopping...';
+        });
+
         var messagesToSend = history.concat([{role:'user', content:text}]);
 
         function doFetch(attempt) {
@@ -141,7 +157,8 @@ data:
             method: 'POST',
             credentials: 'include',
             headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({messages: messagesToSend})
+            body: JSON.stringify({messages: messagesToSend}),
+            signal: controller.signal
           }).then(function(resp){
             return resp.text().then(function(t){
               if (t.charAt(0) === '<') {
@@ -172,7 +189,15 @@ data:
               localStorage.setItem(storageKey, JSON.stringify(history));
             });
           }).catch(function(err){
+            if (err.name === 'AbortError') {
+              dots.remove();
+              cancelBtn.remove();
+              assistantContent.textContent = '(Cancelled)';
+              sendBtn.disabled = false;
+              return;
+            }
             dots.remove();
+            cancelBtn.remove();
             assistantContent.textContent = 'Error: ' + err.message;
             showError('Request failed: ' + err.message);
             sendBtn.disabled = false;
