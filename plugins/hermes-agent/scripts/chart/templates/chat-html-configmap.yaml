@@ -42,8 +42,11 @@ data:
     .msg .content code{background:rgba(0,0,0,0.3);padding:1px 4px;border-radius:3px;font-size:13px}
     .msg .content pre{background:rgba(0,0,0,0.3);border-radius:var(--radius);padding:12px;overflow-x:auto;margin:8px 0;font-size:13px}
     .msg .content pre code{background:none;padding:0}
-    .stream-cursor{animation:blink 0.8s infinite}
-    @keyframes blink{50%{opacity:0}}
+    .typing-dots{display:inline-flex;gap:3px;padding:4px 0;vertical-align:middle}
+    .typing-dots span{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:dot-pulse 1.4s infinite;display:inline-block}
+    .typing-dots span:nth-child(2){animation-delay:0.2s}
+    .typing-dots span:nth-child(3){animation-delay:0.4s}
+    @keyframes dot-pulse{0%,60%,100%{opacity:0.3}30%{opacity:1}}
     #input-area{border-top:1px solid var(--border);padding:16px 0;display:flex;gap:8px}
     #input{flex:1;padding:10px 14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface-alt);
       color:var(--text);font-size:14px;font-family:var(--font);outline:none;transition:border-color 0.15s}
@@ -125,14 +128,10 @@ data:
 
         addMsg('user', text);
 
-        var cursorSpan = document.createElement('span');
-        cursorSpan.className = 'stream-cursor';
-        cursorSpan.textContent = '\u2588';
-
-        var assistantContent = addMsg('assistant', '');
-        assistantContent.appendChild(cursorSpan);
-
-        var messagesToSend = history.concat([{role:'user', content:text}]);
+        var dots = document.createElement('span');
+        dots.className = 'typing-dots';
+        dots.innerHTML = '<span></span><span></span><span></span>';
+        assistantContent.appendChild(dots);
 
         var messagesToSend = history.concat([{role:'user', content:text}]);
 
@@ -148,7 +147,7 @@ data:
                 if (attempt < 3) {
                   setTimeout(function(){ doFetch(attempt + 1); }, 2000 * attempt);
                 } else {
-                  if (cursorSpan.parentNode) cursorSpan.remove();
+                  dots.remove();
                   assistantContent.textContent = 'Service unavailable. Please reload and try again.';
                   showError('Agent not ready after retries.');
                   sendBtn.disabled = false;
@@ -157,13 +156,13 @@ data:
               }
               var d = JSON.parse(t);
               if (!resp.ok) {
-                if (cursorSpan.parentNode) cursorSpan.remove();
+                dots.remove();
                 assistantContent.textContent = d.error || 'Error ' + resp.status;
                 showError(d.error || 'Request failed');
                 sendBtn.disabled = false;
                 return;
               }
-              if (cursorSpan.parentNode) cursorSpan.remove();
+              dots.remove();
               assistantContent.textContent = d.content || '';
               msgsEl.scrollTop = msgsEl.scrollHeight;
               sendBtn.disabled = false;
@@ -172,7 +171,7 @@ data:
               localStorage.setItem(storageKey, JSON.stringify(history));
             });
           }).catch(function(err){
-            if (cursorSpan.parentNode) cursorSpan.remove();
+            dots.remove();
             assistantContent.textContent = 'Error: ' + err.message;
             showError('Request failed: ' + err.message);
             sendBtn.disabled = false;

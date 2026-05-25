@@ -37,9 +37,9 @@ data:
             self.end_headers()
             self.wfile.write(json.dumps(data).encode())
 
-        def _forward(self, payload):
+        def _forward(self, endpoint, payload):
             req = urllib.request.Request(
-                f'{BASE}/chat/completions', data=payload,
+                f'{BASE}/{endpoint}', data=payload,
                 headers={
                     'Content-Type': 'application/json',
                     'Authorization': f'Bearer {API_KEY}'
@@ -56,20 +56,26 @@ data:
                     if not isinstance(msgs, list) or len(msgs) == 0:
                         self.send_error(400, 'invalid messages')
                         return
+                    last_input = msgs[-1]['content'] if msgs else ''
                 else:
-                    msg = body.get('message', '')
-                    if not msg.strip():
+                    last_input = body.get('message', '')
+                    if not last_input.strip():
                         self.send_error(400, 'empty message')
                         return
-                    msgs = [{'role': 'user', 'content': msg}]
                 payload = json.dumps({
                     'model': 'hermes-agent',
-                    'messages': msgs,
-                    'stream': False
+                    'input': last_input,
+                    'store': True
                 }).encode()
-                resp = self._forward(payload)
+                resp = self._forward('responses', payload)
                 data = json.loads(resp.read())
-                content = data['choices'][0]['message']['content']
+                content = ''
+                for item in data.get('output', []):
+                    if item.get('type') == 'message':
+                        for c in item.get('content', []):
+                            if c.get('type') == 'output_text':
+                                content = c['text']
+                                break
                 self._send_json(200, {'content': content})
             except urllib.error.HTTPError as e:
                 body = e.read().decode(errors='replace')[:500]
@@ -86,12 +92,8 @@ data:
                 length = int(self.headers.get('Content-Length', 0))
                 body = json.loads(self.rfile.read(length))
                 payload = json.dumps(body).encode()
-                resp = self._forward(payload)
-                self.send_response(resp.status)
-                ct = resp.headers.get('Content-Type', 'application/json')
-                self.send_header('Content-Type', ct)
-                self.end_headers()
-                self.wfile.write(resp.read())
+                resp = self._forward('chat/completions', payload)
+                self._send_json(200, json.loads(resp.read()))
             except urllib.error.HTTPError as e:
                 body = e.read().decode(errors='replace')[:500]
                 self._send_json(e.code, {'error': body})
