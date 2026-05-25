@@ -134,30 +134,52 @@ data:
 
         var messagesToSend = history.concat([{role:'user', content:text}]);
 
-        fetch(chatUrl, {
-          method: 'POST',
-          credentials: 'include',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({messages: messagesToSend})
-        }).then(function(resp){
-          if (!resp.ok) {
-            return resp.json().then(function(d){ throw new Error(d.error || 'HTTP ' + resp.status); });
-          }
-          return resp.json().then(function(d){
+        var messagesToSend = history.concat([{role:'user', content:text}]);
+
+        function doFetch(attempt) {
+          fetch(chatUrl, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({messages: messagesToSend})
+          }).then(function(resp){
+            return resp.text().then(function(t){
+              if (t.charAt(0) === '<') {
+                if (attempt < 3) {
+                  setTimeout(function(){ doFetch(attempt + 1); }, 2000 * attempt);
+                } else {
+                  if (cursorSpan.parentNode) cursorSpan.remove();
+                  assistantContent.textContent = 'Service unavailable. Please reload and try again.';
+                  showError('Agent not ready after retries.');
+                  sendBtn.disabled = false;
+                }
+                return;
+              }
+              var d = JSON.parse(t);
+              if (!resp.ok) {
+                if (cursorSpan.parentNode) cursorSpan.remove();
+                assistantContent.textContent = d.error || 'Error ' + resp.status;
+                showError(d.error || 'Request failed');
+                sendBtn.disabled = false;
+                return;
+              }
+              if (cursorSpan.parentNode) cursorSpan.remove();
+              assistantContent.textContent = d.content || '';
+              msgsEl.scrollTop = msgsEl.scrollHeight;
+              sendBtn.disabled = false;
+              inputEl.focus();
+              history.push({role:'user', content:text}, {role:'assistant', content:d.content || ''});
+              localStorage.setItem(storageKey, JSON.stringify(history));
+            });
+          }).catch(function(err){
             if (cursorSpan.parentNode) cursorSpan.remove();
-            assistantContent.textContent = d.content || '';
-            msgsEl.scrollTop = msgsEl.scrollHeight;
+            assistantContent.textContent = 'Error: ' + err.message;
+            showError('Request failed: ' + err.message);
             sendBtn.disabled = false;
-            inputEl.focus();
-            history.push({role:'user', content:text}, {role:'assistant', content:d.content || ''});
-            localStorage.setItem(storageKey, JSON.stringify(history));
           });
-        }).catch(function(err){
-          if (cursorSpan.parentNode) cursorSpan.remove();
-          assistantContent.textContent = 'Error: ' + err.message;
-          showError('Request failed: ' + err.message);
-          sendBtn.disabled = false;
-        });
+        }
+
+        doFetch(1);
       }
 
       sendBtn.addEventListener('click', sendMessage);
