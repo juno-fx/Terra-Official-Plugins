@@ -89,6 +89,12 @@ data:
       var sendBtn = document.getElementById('send-btn');
       var errorBar = document.getElementById('error-bar');
 
+      var storageKey = 'hermes_chat_' + agentName;
+      var history = JSON.parse(localStorage.getItem(storageKey) || '[]');
+
+      history.forEach(function(m){ addMsg(m.role, m.content); });
+      msgsEl.scrollTop = msgsEl.scrollHeight;
+
       function showError(msg) {
         errorBar.textContent = msg;
         errorBar.style.display = 'block';
@@ -126,11 +132,13 @@ data:
         var assistantContent = addMsg('assistant', '');
         assistantContent.appendChild(cursorSpan);
 
+        var messagesToSend = history.concat([{role:'user', content:text}]);
+
         fetch(chatUrl, {
           method: 'POST',
           credentials: 'include',
           headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({message: text})
+          body: JSON.stringify({messages: messagesToSend})
         }).then(function(resp){
           if (!resp.ok) {
             return resp.json().then(function(d){ throw new Error(d.error || 'HTTP ' + resp.status); });
@@ -141,6 +149,8 @@ data:
             msgsEl.scrollTop = msgsEl.scrollHeight;
             sendBtn.disabled = false;
             inputEl.focus();
+            history.push({role:'user', content:text}, {role:'assistant', content:d.content || ''});
+            localStorage.setItem(storageKey, JSON.stringify(history));
           });
         }).catch(function(err){
           if (cursorSpan.parentNode) cursorSpan.remove();

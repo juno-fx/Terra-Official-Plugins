@@ -11,11 +11,6 @@ data:
         server {
             listen 9119;
 
-            location = /health {
-                default_type text/plain;
-                return 200 "ok\n";
-            }
-
             location /hermes/__NAME__/api/chat {
                 proxy_pass http://127.0.0.1:5000/chat;
                 proxy_http_version 1.1;

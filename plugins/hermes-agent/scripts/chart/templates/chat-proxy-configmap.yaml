@@ -28,13 +28,20 @@ data:
             try:
                 length = int(self.headers.get('Content-Length', 0))
                 body = json.loads(self.rfile.read(length))
-                msg = body.get('message', '')
-                if not msg.strip():
-                    self.send_error(400, 'empty message')
-                    return
+                msgs = body.get('messages')
+                if msgs:
+                    if not isinstance(msgs, list) or len(msgs) == 0:
+                        self.send_error(400, 'invalid messages')
+                        return
+                else:
+                    msg = body.get('message', '')
+                    if not msg.strip():
+                        self.send_error(400, 'empty message')
+                        return
+                    msgs = [{'role': 'user', 'content': msg}]
                 payload = json.dumps({
                     'model': 'hermes-agent',
-                    'messages': [{'role': 'user', 'content': msg}],
+                    'messages': msgs,
                     'stream': False
                 }).encode()
                 req = urllib.request.Request(
