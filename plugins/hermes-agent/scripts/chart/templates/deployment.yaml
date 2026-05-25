@@ -67,6 +67,12 @@ spec:
               if [ "${PROVIDER}" = "ollama" ]; then
                 echo "  base_url: \"${OLLAMA_BASE_URL}\"" >> /opt/data/config.yaml
               fi
+              cat >> /opt/data/config.yaml << EOF
+
+              agent:
+                max_turns: 15
+                yolo: true
+              EOF
 
               # --- Write SOUL.md ---
               cat > /opt/data/SOUL.md << EOF
