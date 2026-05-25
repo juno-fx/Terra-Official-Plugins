@@ -140,6 +140,19 @@ spec:
             - name: {{ .name | quote }}
               value: {{ .value | quote }}
           {{- end }}
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8642
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8642
+            periodSeconds: 10
+            failureThreshold: 3
           resources:
             requests:
               memory: "{{ .Values.memory }}"
@@ -164,6 +177,17 @@ spec:
           env:
             - name: API_SERVER_KEY
               value: {{ .Values.api_server_key | quote }}
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            periodSeconds: 5
+            failureThreshold: 6
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            periodSeconds: 10
           resources:
             requests:
               memory: "64Mi"
@@ -180,6 +204,17 @@ spec:
             - name: http
               containerPort: 9119
               protocol: TCP
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 9119
+            periodSeconds: 5
+            failureThreshold: 6
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 9119
+            periodSeconds: 10
           resources:
             requests:
               memory: "64Mi"
