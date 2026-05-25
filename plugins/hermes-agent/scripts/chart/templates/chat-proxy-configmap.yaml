@@ -14,22 +14,45 @@ data:
     class Handler(http.server.BaseHTTPRequestHandler):
         def do_GET(self):
             if self.path == '/health':
-                self.send_response(200)
-                self.send_header('Content-Type', 'application/json')
-                self.end_headers()
-                self.wfile.write(b'{"status":"ok"}')
+                self._send_json(200, {'status': 'ok'})
+            elif self.path == '/v1/models':
+                self._send_json(200, {
+                    'object': 'list',
+                    'data': [{'id': 'hermes-agent', 'object': 'model'}]
+                })
             else:
                 self.send_error(404)
 
         def do_POST(self):
-            if self.path != '/chat':
+            if self.path == '/chat':
+                self._handle_chat()
+            elif self.path == '/v1/chat/completions':
+                self._handle_completions()
+            else:
                 self.send_error(404)
-                return
+
+        def _send_json(self, status, data):
+            self.send_response(status)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(data).encode())
+
+        def _forward(self, payload):
+            req = urllib.request.Request(
+                f'{BASE}/chat/completions', data=payload,
+                headers={
+                    'Content-Type': 'application/json',
+                    'Authorization': f'Bearer {API_KEY}'
+                }
+            )
+            return urllib.request.urlopen(req, timeout=300)
+
+        def _handle_chat(self):
             try:
                 length = int(self.headers.get('Content-Length', 0))
                 body = json.loads(self.rfile.read(length))
                 msgs = body.get('messages')
-                if msgs:
+                if msgs is not None:
                     if not isinstance(msgs, list) or len(msgs) == 0:
                         self.send_error(400, 'invalid messages')
                         return
@@ -44,38 +67,40 @@ data:
                     'messages': msgs,
                     'stream': False
                 }).encode()
-                req = urllib.request.Request(
-                    f'{BASE}/chat/completions', data=payload,
-                    headers={
-                        'Content-Type': 'application/json',
-                        'Authorization': f'Bearer {API_KEY}'
-                    }
-                )
-                resp = urllib.request.urlopen(req, timeout=300)
+                resp = self._forward(payload)
                 data = json.loads(resp.read())
                 content = data['choices'][0]['message']['content']
-                self.send_response(200)
-                self.send_header('Content-Type', 'application/json')
-                self.end_headers()
-                self.wfile.write(json.dumps({'content': content}).encode())
+                self._send_json(200, {'content': content})
             except urllib.error.HTTPError as e:
                 body = e.read().decode(errors='replace')[:500]
-                self.send_response(e.code)
-                self.send_header('Content-Type', 'application/json')
-                self.end_headers()
-                self.wfile.write(json.dumps({'error': body}).encode())
+                self._send_json(e.code, {'error': body})
             except urllib.error.URLError:
-                self.send_response(503)
-                self.send_header('Content-Type', 'application/json')
-                self.end_headers()
-                self.wfile.write(json.dumps({
+                self._send_json(503, {
                     'error': 'The agent is still starting up. Please try again in a moment.'
-                }).encode())
+                })
             except Exception as e:
-                self.send_response(500)
-                self.send_header('Content-Type', 'application/json')
+                self._send_json(500, {'error': str(e)})
+
+        def _handle_completions(self):
+            try:
+                length = int(self.headers.get('Content-Length', 0))
+                body = json.loads(self.rfile.read(length))
+                payload = json.dumps(body).encode()
+                resp = self._forward(payload)
+                self.send_response(resp.status)
+                ct = resp.headers.get('Content-Type', 'application/json')
+                self.send_header('Content-Type', ct)
                 self.end_headers()
-                self.wfile.write(json.dumps({'error': str(e)}).encode())
+                self.wfile.write(resp.read())
+            except urllib.error.HTTPError as e:
+                body = e.read().decode(errors='replace')[:500]
+                self._send_json(e.code, {'error': body})
+            except urllib.error.URLError:
+                self._send_json(503, {
+                    'error': 'The agent is still starting up. Please try again in a moment.'
+                })
+            except Exception as e:
+                self._send_json(500, {'error': str(e)})
 
         def log_message(self, fmt, *args):
             pass

@@ -72,6 +72,11 @@ spec:
               cat > /opt/data/SOUL.md << EOF
               You are ${NAME}, a helpful AI assistant.
               ${PERSONALITY}
+
+              You are running in a Kubernetes cluster.
+              Agent services follow the naming convention {name}:5000.
+              To delegate a task to another agent, use delegation with:
+                provider="custom", base_url="http://{name}:5000/v1"
               EOF
 
               chmod 644 /opt/data/*
@@ -161,6 +166,10 @@ spec:
           image: python:3.12-alpine
           imagePullPolicy: IfNotPresent
           command: ["python3", "/opt/proxy/proxy.py"]
+          ports:
+            - name: agent-api
+              containerPort: 5000
+              protocol: TCP
           env:
             - name: API_SERVER_KEY
               value: {{ .Values.api_server_key | quote }}
