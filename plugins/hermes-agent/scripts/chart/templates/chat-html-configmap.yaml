@@ -131,6 +131,7 @@ data:
         var dots = document.createElement('span');
         dots.className = 'typing-dots';
         dots.innerHTML = '<span></span><span></span><span></span>';
+        var assistantContent = addMsg('assistant', '');
         assistantContent.appendChild(dots);
 
         var messagesToSend = history.concat([{role:'user', content:text}]);
