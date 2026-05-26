@@ -11,6 +11,13 @@ spec:
     - host: {{ .Values.host }}
       http:
         paths:
+          - path: "/hermes/{{ .Values.name }}/dashboard/"
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.name }}
+                port:
+                  number: 9119
           - path: "/hermes/{{ .Values.name }}/"
             pathType: Prefix
             backend:

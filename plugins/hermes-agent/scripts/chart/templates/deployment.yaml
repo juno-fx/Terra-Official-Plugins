@@ -170,6 +170,25 @@ spec:
             - name: hermes-data
               mountPath: /opt/data
 
+        - name: hermes-dashboard
+          image: "nousresearch/hermes-agent:{{ .Values.tag }}"
+          imagePullPolicy: IfNotPresent
+          args: ["dashboard", "--host", "127.0.0.1", "--port", "9120", "--no-open"]
+          ports:
+            - name: dash-internal
+              containerPort: 9120
+              protocol: TCP
+          env:
+            - name: HERMES_HOME
+              value: /opt/data
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "200m"
+          volumeMounts:
+            - name: hermes-data
+              mountPath: /opt/data
+
         - name: chat-proxy
           image: python:3.12-alpine
           imagePullPolicy: IfNotPresent
