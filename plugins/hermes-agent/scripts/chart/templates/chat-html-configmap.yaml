@@ -131,7 +131,7 @@ data:
 
       function newSession(name) {
         var id = 's' + Date.now();
-        store.sessions[id] = {name: name || 'New Session', messages: [], created: Date.now(), updated: Date.now()};
+        store.sessions[id] = {name: name || 'New Session', messages: [], responseId: null, created: Date.now(), updated: Date.now()};
         store.cur = id;
         saveStore();
         curMsgs = [];
@@ -259,13 +259,16 @@ data:
         });
 
         var messagesToSend = curMsgs.concat([{role:'user', content:text}]);
+        var sess = curSess();
+        var reqBody = {messages: messagesToSend};
+        if (sess && sess.responseId) reqBody.previous_response_id = sess.responseId;
 
         function doFetch(attempt) {
           fetch(chatUrl, {
             method: 'POST',
             credentials: 'include',
             headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({messages: messagesToSend}),
+            body: JSON.stringify(reqBody),
             signal: controller.signal
           }).then(function(resp){
             return resp.text().then(function(t){
@@ -299,7 +302,7 @@ data:
               processing = false;
               inputEl.focus();
               curMsgs.push({role:'user', content:text}, {role:'assistant', content:d.content || ''});
-              if (curSess()) { curSess().messages = curMsgs.slice(); curSess().updated = Date.now(); saveStore(); renderSessions(); }
+              if (curSess()) { curSess().messages = curMsgs.slice(); curSess().updated = Date.now(); if (d.response_id) curSess().responseId = d.response_id; saveStore(); renderSessions(); }
             });
           }).catch(function(err){
             if (err.name === 'AbortError') {
