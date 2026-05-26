@@ -75,24 +75,24 @@ data:
                 payload = {
                     'model': 'hermes-agent',
                     'input': full_input,
-                    'store': True
+                    'store': True,
+                    'stream': True
                 }
                 prev_id = body.get('previous_response_id')
                 if prev_id:
                     payload['previous_response_id'] = prev_id
                 resp = self._forward('responses', json.dumps(payload).encode())
-                data = json.loads(resp.read())
-                content = ''
-                for item in data.get('output', []):
-                    if item.get('type') == 'message':
-                        for c in item.get('content', []):
-                            if c.get('type') == 'output_text':
-                                content = c['text']
-                                break
-                self._send_json(200, {
-                    'content': content,
-                    'response_id': data.get('id', '')
-                })
+                self.send_response(200)
+                self.send_header('Content-Type', 'text/event-stream')
+                self.send_header('Cache-Control', 'no-cache')
+                self.send_header('X-Accel-Buffering', 'no')
+                self.end_headers()
+                while True:
+                    chunk = resp.read(4096)
+                    if not chunk:
+                        break
+                    self.wfile.write(chunk)
+                    self.wfile.flush()
             except urllib.error.HTTPError as e:
                 body = e.read().decode(errors='replace')[:500]
                 self._send_json(e.code, {'error': body})

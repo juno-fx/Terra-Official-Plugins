@@ -262,67 +262,112 @@ data:
         var sess = curSess();
         var reqBody = {messages: messagesToSend};
         if (sess && sess.responseId) reqBody.previous_response_id = sess.responseId;
+        var done = false;
+        var textBuffer = '';
 
-        function doFetch(attempt) {
-          fetch(chatUrl, {
+        fetch(chatUrl, {
             method: 'POST',
             credentials: 'include',
             headers: {'Content-Type':'application/json'},
             body: JSON.stringify(reqBody),
             signal: controller.signal
-          }).then(function(resp){
-            return resp.text().then(function(t){
-              if (t.charAt(0) === '<') {
-                if (attempt < 3) {
-                  setTimeout(function(){ doFetch(attempt + 1); }, 2000 * attempt);
-                } else {
-                  dots.remove();
-                  assistantContent.textContent = 'Service unavailable. Please reload and try again.';
-                  showError('Agent not ready after retries.');
-                  sendBtn.disabled = false;
-                  processing = false;
-                }
-                return;
-              }
-              var d = JSON.parse(t);
-              if (!resp.ok) {
-                dots.remove();
-                cancelBtn.remove();
-                assistantContent.textContent = d.error || 'Error ' + resp.status;
-                showError(d.error || 'Request failed');
-                sendBtn.disabled = false;
-                processing = false;
-                return;
-              }
-              dots.remove();
-              cancelBtn.remove();
-              assistantContent.textContent = d.content || '';
-              msgsEl.scrollTop = msgsEl.scrollHeight;
-              sendBtn.disabled = false;
-              processing = false;
-              inputEl.focus();
-              curMsgs.push({role:'user', content:text}, {role:'assistant', content:d.content || ''});
-              if (curSess()) { curSess().messages = curMsgs.slice(); curSess().updated = Date.now(); if (d.response_id) curSess().responseId = d.response_id; saveStore(); renderSessions(); }
-            });
-          }).catch(function(err){
-            if (err.name === 'AbortError') {
-              dots.remove();
-              cancelBtn.remove();
-              assistantContent.textContent = '(Cancelled)';
-              sendBtn.disabled = false;
-              processing = false;
-              return;
+        }).then(function(resp){
+            if (!resp.ok) {
+                return resp.text().then(function(t){
+                    dots.remove(); cancelBtn.remove();
+                    try { var d = JSON.parse(t); textBuffer = d.error || 'Error ' + resp.status; } catch(e) { textBuffer = t; }
+                    assistantContent.textContent = textBuffer;
+                    showError(textBuffer);
+                    sendBtn.disabled = false; processing = false;
+                });
             }
-            dots.remove();
-            cancelBtn.remove();
-            assistantContent.textContent = 'Error: ' + err.message;
-            showError('Request failed: ' + err.message);
-            sendBtn.disabled = false;
-            processing = false;
-          });
-        }
+            var reader = resp.body.getReader();
+            var decoder = new TextDecoder();
+            var buf = '';
+            var lastRespId = null;
 
-        doFetch(1);
+            function readChunk() {
+                reader.read().then(function(result){
+                    if (result.done) {
+                        if (!done) {
+                            dots.remove(); cancelBtn.remove();
+                            assistantContent.textContent = textBuffer || '';
+                            msgsEl.scrollTop = msgsEl.scrollHeight;
+                            sendBtn.disabled = false; processing = false; inputEl.focus();
+                            if (textBuffer && !done) {
+                                curMsgs.push({role:'user',content:text},{role:'assistant',content:textBuffer});
+                                if (curSess()) {
+                                    curSess().messages = curMsgs.slice();
+                                    curSess().updated = Date.now();
+                                    if (lastRespId) curSess().responseId = lastRespId;
+                                    saveStore(); renderSessions();
+                                }
+                            }
+                            done = true;
+                        }
+                        return;
+                    }
+                    buf += decoder.decode(result.value, {stream:true});
+                    var lines = buf.split('\n');
+                    buf = lines.pop() || '';
+                    var currentEvent = '';
+
+                    for (var i = 0; i < lines.length; i++) {
+                        var line = lines[i];
+                        if (line.startsWith('event: ')) {
+                            currentEvent = line.substring(7).trim();
+                        } else if (line.startsWith('data: ')) {
+                            try {
+                                var d = JSON.parse(line.substring(6));
+                                if (d.type === 'output_text.delta' && d.delta) {
+                                    textBuffer += d.delta;
+                                    dots.remove();
+                                    assistantContent.textContent = textBuffer;
+                                    msgsEl.scrollTop = msgsEl.scrollHeight;
+                                } else if (d.type === 'function_call' || d.type === 'function_call_output') {
+                                    // skip - don't show tool internals
+                                } else if (d.type === 'response.completed' && d.response) {
+                                    lastRespId = d.response.id;
+                                    var finalText = '';
+                                    var out = d.response.output || [];
+                                    for (var oi = 0; oi < out.length; oi++) {
+                                        if (out[oi].type === 'message') {
+                                            var ct = out[oi].content || [];
+                                            for (var ci = 0; ci < ct.length; ci++) {
+                                                if (ct[ci].type === 'output_text') finalText = ct[ci].text;
+                                            }
+                                        }
+                                    }
+                                    if (finalText) textBuffer = finalText;
+                                }
+                            } catch(e) {}
+                        }
+                    }
+                    readChunk();
+                }).catch(function(err){
+                    if (err.name === 'AbortError') return;
+                    if (!done) {
+                        dots.remove(); cancelBtn.remove();
+                        assistantContent.textContent = textBuffer || 'Error: ' + err.message;
+                        showError('Connection error');
+                        sendBtn.disabled = false; processing = false;
+                        done = true;
+                    }
+                });
+            }
+            readChunk();
+        }).catch(function(err){
+            if (err.name === 'AbortError') {
+                dots.remove(); cancelBtn.remove();
+                assistantContent.textContent = '(Cancelled)';
+                sendBtn.disabled = false; processing = false;
+                return;
+            }
+            dots.remove(); cancelBtn.remove();
+            assistantContent.textContent = 'Error: ' + err.message;
+            showError('Request failed');
+            sendBtn.disabled = false; processing = false;
+        });
       }
 
       sendBtn.addEventListener('click', sendMessage);
