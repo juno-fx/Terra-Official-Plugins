@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-dashboard-theme"
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+data:
+  juno.yaml: |
+    name: juno
+    label: Juno
+    description: Hubble-inspired dark theme
+    palette:
+      background:
+        hex: "#191919"
+        alpha: 1.0
+      midground:
+        hex: "#f8aa5f"
+        alpha: 1.0
+      foreground:
+        hex: "#ffffff"
+        alpha: 0.0
+      warmGlow: "rgba(248, 170, 95, 0.15)"
+      noiseOpacity: 0.3
+    typography:
+      fontSans: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif'
+      fontMono: 'ui-monospace, "SF Mono", "Cascadia Code", monospace'
+      baseSize: "14px"
+      lineHeight: "1.5"
+    layout:
+      radius: "0.5rem"
+      density: comfortable
+    colorOverrides:
+      primary: "#f8aa5f"
+      ring: "#ea8a01"
+      accent: "#ea8a01"
+      border: "rgba(255, 255, 255, 0.15)"
