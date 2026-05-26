@@ -319,7 +319,7 @@ data:
                         } else if (line.startsWith('data: ')) {
                             try {
                                 var d = JSON.parse(line.substring(6));
-                                if (d.type === 'output_text.delta' && d.delta) {
+                                if (d.type === 'response.output_text.delta' && d.delta) {
                                     textBuffer += d.delta;
                                     dots.remove();
                                     assistantContent.textContent = textBuffer;
