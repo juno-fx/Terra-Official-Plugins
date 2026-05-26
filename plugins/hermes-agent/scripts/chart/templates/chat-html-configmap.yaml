@@ -25,8 +25,22 @@ data:
     ::-webkit-scrollbar-thumb:hover{background:#ea8a01}
     input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill-active{
       -webkit-box-shadow:0 0 0 30px #191919 inset!important}
-    #app{display:flex;flex-direction:column;height:100%;padding:0 16px}
-    header{display:flex;align-items:center;gap:10px;padding:16px 0;border-bottom:1px solid var(--border);margin-bottom:16px}
+    #app{display:flex;flex-direction:row;height:100%}
+    #sidebar{width:220px;min-width:220px;background:var(--surface);display:flex;flex-direction:column;border-right:1px solid var(--border);height:100%;overflow:hidden}
+    #sidebar-header{padding:12px;border-bottom:1px solid var(--border)}
+    #new-session-btn{width:100%;padding:8px;border-radius:var(--radius);border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font)}
+    #new-session-btn:hover{border-color:var(--accent)}
+    #session-list{flex:1;overflow-y:auto;padding:4px 0}
+    .session-item{padding:8px 12px;cursor:pointer;font-size:13px;color:var(--text-muted);border-left:2px solid transparent;display:flex;justify-content:space-between;align-items:center;transition:background 0.15s,color 0.15s}
+    .session-item:hover{background:var(--surface-alt);color:var(--text)}
+    .session-item.active{border-left-color:var(--accent);color:var(--text);background:var(--surface-alt)}
+    .session-item .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+    .session-item .actions{display:none;gap:2px;margin-left:4px}
+    .session-item:hover .actions{display:flex}
+    .session-item .actions button{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:1px 3px;font-size:12px;line-height:1}
+    .session-item .actions button:hover{color:var(--accent)}
+    #chat-panel{flex:1;display:flex;flex-direction:column;min-width:0;padding:0 16px}
+    header{display:flex;align-items:center;gap:10px;padding:16px 0;border-bottom:1px solid var(--border)}
     header h1{font-size:16px;font-weight:600;color:var(--accent)}
     .logo{width:28px;height:28px;border-radius:6px;background:var(--accent);display:flex;align-items:center;justify-content:center;
       font-size:13px;font-weight:700;color:var(--bg)}
@@ -62,21 +76,29 @@ data:
     #send-btn:disabled{opacity:0.4;cursor:not-allowed}
     #error-bar{display:none;padding:8px 12px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);
       border-radius:var(--radius);margin-top:8px;font-size:13px;color:#fca5a5}
-    @media(max-width:600px){.msg{max-width:95%}#app{padding:0 8px}}
+    @media(max-width:768px){.msg{max-width:95%}#sidebar{display:none}#chat-panel{padding:0 8px}}
     </style>
     </head>
     <body>
     <div id="app">
-      <header>
-        <div class="logo" id="logo-letter">H</div>
-        <h1 id="agent-name">Agent</h1>
-        <div id="header-right"></div>
-      </header>
-      <div id="messages"></div>
-      <div id="error-bar"></div>
-      <div id="input-area">
-        <input id="input" type="text" placeholder="Type a message..." autofocus>
-        <button id="send-btn">Send</button>
+      <div id="sidebar">
+        <div id="sidebar-header">
+          <button id="new-session-btn">+ New Session</button>
+        </div>
+        <div id="session-list"></div>
+      </div>
+      <div id="chat-panel">
+        <header>
+          <div class="logo" id="logo-letter">H</div>
+          <h1 id="agent-name">Agent</h1>
+          <div id="header-right"></div>
+        </header>
+        <div id="messages"></div>
+        <div id="error-bar"></div>
+        <div id="input-area">
+          <input id="input" type="text" placeholder="Type a message..." autofocus>
+          <button id="send-btn">Send</button>
+        </div>
       </div>
     </div>
     <script>
@@ -96,11 +118,96 @@ data:
       var sendBtn = document.getElementById('send-btn');
       var errorBar = document.getElementById('error-bar');
 
-      var storageKey = 'hermes_chat_' + agentName;
-      var history = JSON.parse(localStorage.getItem(storageKey) || '[]');
+      var sessKey = 'hermes_sess_' + agentName;
+      var store = JSON.parse(localStorage.getItem(sessKey) || '{"cur":null,"sessions":{}}');
+      var curMsgs = [];
+      var processing = false;
 
-      history.forEach(function(m){ addMsg(m.role, m.content); });
-      msgsEl.scrollTop = msgsEl.scrollHeight;
+      function saveStore() { try { localStorage.setItem(sessKey, JSON.stringify(store)); } catch(e) {} }
+
+      function curSess() { return store.sessions[store.cur]; }
+      function curName() { var s = curSess(); return s ? s.name : 'New Session'; }
+      function setCurName(n) { var s = curSess(); if (s) { s.name = n; s.updated = Date.now(); saveStore(); renderSessions(); } }
+
+      function newSession(name) {
+        var id = 's' + Date.now();
+        store.sessions[id] = {name: name || 'New Session', messages: [], created: Date.now(), updated: Date.now()};
+        store.cur = id;
+        saveStore();
+        curMsgs = [];
+        clearChat();
+        renderSessions();
+        focusInput();
+      }
+
+      function switchSession(id) {
+        if (id === store.cur || !store.sessions[id]) return;
+        if (curSess()) curSess().messages = curMsgs;
+        store.cur = id;
+        saveStore();
+        curMsgs = store.sessions[id].messages || [];
+        clearChat();
+        curMsgs.forEach(function(m){ addMsg(m.role, m.content); });
+        msgsEl.scrollTop = msgsEl.scrollHeight;
+        renderSessions();
+        focusInput();
+      }
+
+      function deleteSession(id) {
+        if (!store.sessions[id]) return;
+        var keys = Object.keys(store.sessions);
+        if (keys.length <= 1) { newSession(); delete store.sessions[id]; saveStore(); renderSessions(); return; }
+        delete store.sessions[id];
+        store.cur = keys.filter(function(k){ return k !== id; })[keys.length - 2] || keys[0];
+        saveStore();
+        curMsgs = store.sessions[store.cur] ? store.sessions[store.cur].messages : [];
+        clearChat();
+        curMsgs.forEach(function(m){ addMsg(m.role, m.content); });
+        msgsEl.scrollTop = msgsEl.scrollHeight;
+        renderSessions();
+      }
+
+      function renderSessions() {
+        var list = document.getElementById('session-list');
+        list.innerHTML = '';
+        var keys = Object.keys(store.sessions);
+        if (keys.length === 0) { newSession(); return; }
+        keys.forEach(function(id) {
+          var s = store.sessions[id];
+          var div = document.createElement('div');
+          div.className = 'session-item' + (id === store.cur ? ' active' : '');
+          div.innerHTML = '<span class="name">' + (s.name || 'Session') + '</span>' +
+            '<span class="actions">' +
+            '<button data-del="' + id + '">\u2716</button>' +
+            '</span>';
+          div.addEventListener('click', function(e) {
+            if (e.target.tagName !== 'BUTTON') switchSession(id);
+          });
+          div.querySelector('[data-del]').addEventListener('click', function(e) {
+            e.stopPropagation(); deleteSession(id);
+          });
+          list.appendChild(div);
+        });
+      }
+
+      function clearChat() {
+        msgsEl.innerHTML = '';
+        errorBar.style.display = 'none';
+      }
+
+      function focusInput() { setTimeout(function() { try { inputEl.focus(); } catch(e) {} }, 100); }
+
+      // Init: ensure at least one session
+      (function init() {
+        var keys = Object.keys(store.sessions);
+        if (keys.length === 0 || !store.sessions[store.cur]) newSession('Session 1');
+        curMsgs = curSess() ? curSess().messages.slice() : [];
+        curMsgs.forEach(function(m){ addMsg(m.role, m.content); });
+        msgsEl.scrollTop = msgsEl.scrollHeight;
+        renderSessions();
+      })();
+
+      document.getElementById('new-session-btn').addEventListener('click', function(){ newSession(); });
 
       function showError(msg) {
         errorBar.textContent = msg;
@@ -129,6 +236,7 @@ data:
         if (!text) return;
         inputEl.value = '';
         sendBtn.disabled = true;
+        processing = true;
 
         addMsg('user', text);
 
@@ -150,7 +258,7 @@ data:
             cancelBtn.textContent = 'Stopping...';
         });
 
-        var messagesToSend = history.concat([{role:'user', content:text}]);
+        var messagesToSend = curMsgs.concat([{role:'user', content:text}]);
 
         function doFetch(attempt) {
           fetch(chatUrl, {
@@ -169,24 +277,29 @@ data:
                   assistantContent.textContent = 'Service unavailable. Please reload and try again.';
                   showError('Agent not ready after retries.');
                   sendBtn.disabled = false;
+                  processing = false;
                 }
                 return;
               }
               var d = JSON.parse(t);
               if (!resp.ok) {
                 dots.remove();
+                cancelBtn.remove();
                 assistantContent.textContent = d.error || 'Error ' + resp.status;
                 showError(d.error || 'Request failed');
                 sendBtn.disabled = false;
+                processing = false;
                 return;
               }
               dots.remove();
+              cancelBtn.remove();
               assistantContent.textContent = d.content || '';
               msgsEl.scrollTop = msgsEl.scrollHeight;
               sendBtn.disabled = false;
+              processing = false;
               inputEl.focus();
-              history.push({role:'user', content:text}, {role:'assistant', content:d.content || ''});
-              localStorage.setItem(storageKey, JSON.stringify(history));
+              curMsgs.push({role:'user', content:text}, {role:'assistant', content:d.content || ''});
+              if (curSess()) { curSess().messages = curMsgs.slice(); curSess().updated = Date.now(); saveStore(); renderSessions(); }
             });
           }).catch(function(err){
             if (err.name === 'AbortError') {
@@ -194,6 +307,7 @@ data:
               cancelBtn.remove();
               assistantContent.textContent = '(Cancelled)';
               sendBtn.disabled = false;
+              processing = false;
               return;
             }
             dots.remove();
@@ -201,6 +315,7 @@ data:
             assistantContent.textContent = 'Error: ' + err.message;
             showError('Request failed: ' + err.message);
             sendBtn.disabled = false;
+            processing = false;
           });
         }
 
