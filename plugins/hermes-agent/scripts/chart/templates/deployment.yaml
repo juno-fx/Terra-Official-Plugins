@@ -80,6 +80,12 @@ spec:
               dashboard:
                 theme: juno
               EOF
+              cat >> /opt/data/config.yaml << EOF
+
+              platform_toolsets:
+                cli:
+                  - hermes-cli
+              EOF
 
               # --- Write SOUL.md ---
               cat > /opt/data/SOUL.md << EOF
