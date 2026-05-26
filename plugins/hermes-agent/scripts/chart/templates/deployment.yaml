@@ -86,6 +86,11 @@ spec:
                 cli:
                   - hermes-cli
               EOF
+              cat >> /opt/data/config.yaml << EOF
+
+              web:
+                backend: ddgs
+              EOF
 
               # --- Write SOUL.md ---
               cat > /opt/data/SOUL.md << EOF
