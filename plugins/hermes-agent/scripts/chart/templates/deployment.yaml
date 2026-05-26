@@ -103,6 +103,11 @@ spec:
                 base_url="http://NAME:5000/v1"
                 model="hermes-agent"
               Replace NAME with the agent's name (e.g. base_url="http://brian:5000/v1").
+
+              When calling a tool, use this exact XML format:
+              <tool_call>{'name': 'TOOL_NAME', 'arguments': {ARGS}}</tool_call>
+              For example: <tool_call>{'name': 'web_search', 'arguments': {'query': 'Juno Innovations'}}</tool_call>
+              Do NOT use <function=NAME> format.
               EOF
 
               chmod 644 /opt/data/*
