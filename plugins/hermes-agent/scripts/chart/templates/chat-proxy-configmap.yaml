@@ -74,14 +74,10 @@ data:
                     full_input = [{'role': 'user', 'content': msg}]
                 payload = {
                     'model': 'hermes-agent',
-                    'input': full_input,
-                    'store': True,
+                    'messages': full_input,
                     'stream': True
                 }
-                prev_id = body.get('previous_response_id')
-                if prev_id:
-                    payload['previous_response_id'] = prev_id
-                resp = self._forward('responses', json.dumps(payload).encode())
+                resp = self._forward('chat/completions', json.dumps(payload).encode())
                 self.send_response(200)
                 self.send_header('Content-Type', 'text/event-stream')
                 self.send_header('Cache-Control', 'no-cache')

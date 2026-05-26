@@ -65,6 +65,9 @@ data:
       padding:2px 8px;border-radius:4px;margin-top:4px;transition:color 0.15s;font-family:var(--font)}
     .cancel-btn:hover{color:var(--accent)}
     .cancel-btn:disabled{opacity:0.3;cursor:default}
+    .thinking-box{background:rgba(248,170,95,0.08);border-left:2px solid var(--accent);
+      border-radius:var(--radius);padding:8px 12px;margin-bottom:8px;font-size:13px;
+      color:var(--text-muted);font-style:italic;white-space:pre-wrap}
     #input-area{border-top:1px solid var(--border);padding:16px 0;display:flex;gap:8px}
     #input{flex:1;padding:10px 14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface-alt);
       color:var(--text);font-size:14px;font-family:var(--font);outline:none;transition:border-color 0.15s}
@@ -197,6 +200,16 @@ data:
 
       function focusInput() { setTimeout(function() { try { inputEl.focus(); } catch(e) {} }, 100); }
 
+      function updateThinking(container, text) {
+        var box = container.querySelector('.thinking-box');
+        if (!box) {
+          box = document.createElement('div');
+          box.className = 'thinking-box';
+          container.insertBefore(box, container.firstChild);
+        }
+        box.textContent = text;
+      }
+
       // Init: ensure at least one session
       (function init() {
         var keys = Object.keys(store.sessions);
@@ -259,11 +272,10 @@ data:
         });
 
         var messagesToSend = curMsgs.concat([{role:'user', content:text}]);
-        var sess = curSess();
         var reqBody = {messages: messagesToSend};
-        if (sess && sess.responseId) reqBody.previous_response_id = sess.responseId;
         var done = false;
         var textBuffer = '';
+        var thinkBuffer = '';
 
         fetch(chatUrl, {
             method: 'POST',
@@ -284,74 +296,63 @@ data:
             var reader = resp.body.getReader();
             var decoder = new TextDecoder();
             var buf = '';
-            var lastRespId = null;
 
             function readChunk() {
                 reader.read().then(function(result){
                     if (result.done) {
                         if (!done) {
+                            done = true;
                             dots.remove(); cancelBtn.remove();
-                            assistantContent.textContent = textBuffer || '';
                             msgsEl.scrollTop = msgsEl.scrollHeight;
                             sendBtn.disabled = false; processing = false; inputEl.focus();
-                            if (textBuffer && !done) {
+                            if (textBuffer) {
                                 curMsgs.push({role:'user',content:text},{role:'assistant',content:textBuffer});
                                 if (curSess()) {
                                     curSess().messages = curMsgs.slice();
                                     curSess().updated = Date.now();
-                                    if (lastRespId) curSess().responseId = lastRespId;
                                     saveStore(); renderSessions();
                                 }
                             }
-                            done = true;
                         }
                         return;
                     }
                     buf += decoder.decode(result.value, {stream:true});
                     var lines = buf.split('\n');
                     buf = lines.pop() || '';
-                    var currentEvent = '';
 
                     for (var i = 0; i < lines.length; i++) {
-                        var line = lines[i];
-                        if (line.startsWith('event: ')) {
-                            currentEvent = line.substring(7).trim();
-                        } else if (line.startsWith('data: ')) {
-                            try {
-                                var d = JSON.parse(line.substring(6));
-                                if (d.type === 'response.output_text.delta' && d.delta) {
-                                    textBuffer += d.delta;
-                                    dots.remove();
-                                    assistantContent.textContent = textBuffer;
-                                    msgsEl.scrollTop = msgsEl.scrollHeight;
-                                } else if (d.type === 'function_call' || d.type === 'function_call_output') {
-                                    // skip - don't show tool internals
-                                } else if (d.type === 'response.completed' && d.response) {
-                                    lastRespId = d.response.id;
-                                    var finalText = '';
-                                    var out = d.response.output || [];
-                                    for (var oi = 0; oi < out.length; oi++) {
-                                        if (out[oi].type === 'message') {
-                                            var ct = out[oi].content || [];
-                                            for (var ci = 0; ci < ct.length; ci++) {
-                                                if (ct[ci].type === 'output_text') finalText = ct[ci].text;
-                                            }
-                                        }
-                                    }
-                                    if (finalText) textBuffer = finalText;
-                                }
-                            } catch(e) {}
+                        var line = lines[i].trim();
+                        if (line === 'data: [DONE]') {
+                            done = true;
+                            continue;
                         }
+                        if (!line.startsWith('data: ')) continue;
+                        try {
+                            var d = JSON.parse(line.substring(6));
+                            var choice = d.choices && d.choices[0];
+                            if (!choice) continue;
+                            var delta = choice.delta || {};
+                            if (delta.reasoning_content) {
+                                thinkBuffer += delta.reasoning_content;
+                                updateThinking(assistantContent, thinkBuffer);
+                            }
+                            if (delta.content) {
+                                textBuffer += delta.content;
+                                dots.remove();
+                                assistantContent.textContent = textBuffer;
+                                msgsEl.scrollTop = msgsEl.scrollHeight;
+                            }
+                        } catch(e) {}
                     }
                     readChunk();
                 }).catch(function(err){
                     if (err.name === 'AbortError') return;
                     if (!done) {
+                        done = true;
                         dots.remove(); cancelBtn.remove();
                         assistantContent.textContent = textBuffer || 'Error: ' + err.message;
                         showError('Connection error');
                         sendBtn.disabled = false; processing = false;
-                        done = true;
                     }
                 });
             }
