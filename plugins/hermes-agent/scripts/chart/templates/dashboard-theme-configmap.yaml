@@ -14,11 +14,11 @@ data:
         hex: "#191919"
         alpha: 1.0
       midground:
-        hex: "#f8aa5f"
+        hex: "#e8e8f0"
         alpha: 1.0
       foreground:
         hex: "#ffffff"
-        alpha: 0.0
+        alpha: 1.0
       warmGlow: "rgba(248, 170, 95, 0.15)"
       noiseOpacity: 0.3
     typography:
@@ -31,6 +31,12 @@ data:
       density: comfortable
     colorOverrides:
       primary: "#f8aa5f"
+      primaryForeground: "#000000"
       ring: "#ea8a01"
-      accent: "#ea8a01"
+      accent: "#f8aa5f"
+      accentForeground: "#000000"
+      card: "#1e1e1e"
+      cardForeground: "#f1f5f9"
+      muted: "#1e1e1e"
+      mutedForeground: "#94a3b8"
       border: "rgba(255, 255, 255, 0.15)"
