@@ -72,7 +72,8 @@ spec:
 
               agent:
                 max_turns: 15
-                yolo: true
+              approvals:
+                mode: off
               EOF
               cat >> /opt/data/config.yaml << EOF
 
