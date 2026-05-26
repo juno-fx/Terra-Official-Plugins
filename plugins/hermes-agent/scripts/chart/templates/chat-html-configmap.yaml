@@ -323,7 +323,6 @@ data:
                     for (var i = 0; i < lines.length; i++) {
                         var line = lines[i].trim();
                         if (line === 'data: [DONE]') {
-                            done = true;
                             continue;
                         }
                         if (!line.startsWith('data: ')) continue;
