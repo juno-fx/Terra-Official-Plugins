@@ -6,6 +6,6 @@ cpu:
 cpuLimit:
 memory:
 memoryLimit:
-test:
+gpu:
 env:
 enableAPI:
