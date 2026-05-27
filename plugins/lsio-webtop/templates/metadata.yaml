@@ -10,7 +10,7 @@ data:
   chart: "{{ .Release.Name }}-scripts-configmap"
   description: "LSIO Webtop deployment for desktop streaming"
   fields: |
-    - name: gpu
+    - name: test
       description: "Use a GPU"
       type: boolean
       required: true
