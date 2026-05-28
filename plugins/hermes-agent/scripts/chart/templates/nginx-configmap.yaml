@@ -11,7 +11,7 @@ data:
         server {
             listen 9119;
 
-            location /hermes/__NAME__/dashboard/ {
+            location /hermes/__NAME__/dashboard {
                 proxy_pass http://127.0.0.1:9120/;
                 proxy_set_header X-Forwarded-Prefix /hermes/__NAME__/dashboard;
             }
