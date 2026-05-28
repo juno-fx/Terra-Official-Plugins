@@ -12,6 +12,13 @@ data:
     export HOME=/opt/data
     . /opt/hermes/.venv/bin/activate
 
+    cleanup() {
+      echo "[init] Shutting down..."
+      kill "$GATEWAY_PID" "$DASHBOARD_PID" "$TTYD_PID" 2>/dev/null || true
+      wait
+      exit
+    }
+
     echo "[init] Starting gateway..."
     hermes gateway run 2>&1 | sed 's/^/[gateway] /' &
     GATEWAY_PID=$!
@@ -37,6 +44,6 @@ data:
     /opt/ttyd/ttyd -b /hermes/__NAME__/terminal -W -p 7681 hermes --tui 2>&1 | sed 's/^/[ttyd] /' &
     TTYD_PID=$!
 
-    trap "echo '[init] Shutting down...'; kill $GATEWAY_PID $DASHBOARD_PID $TTYD_PID 2>/dev/null; wait; exit" SIGTERM SIGINT
+    trap cleanup TERM INT
 
     wait
