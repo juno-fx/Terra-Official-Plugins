@@ -24,16 +24,18 @@ data:
     GATEWAY_PID=$!
 
     echo "[init] Waiting for gateway health..."
-    for i in $(seq 1 60); do
+    i=1
+    while [ "$i" -le 60 ]; do
       if curl -sf http://127.0.0.1:8642/health > /dev/null 2>&1; then
         echo "[init] Gateway ready"
         break
       fi
-      if [ "$i" = 60 ]; then
+      if [ "$i" -eq 60 ]; then
         echo "[init] Gateway failed to start"
         exit 1
       fi
       sleep 2
+      i=$((i + 1))
     done
 
     echo "[init] Starting dashboard..."

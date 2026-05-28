@@ -67,26 +67,20 @@ spec:
               if [ "${PROVIDER}" = "ollama" ]; then
                 echo "  base_url: \"${OLLAMA_BASE_URL}\"" >> /opt/data/config.yaml
               fi
-              echo "  supports_tools: true" >> /opt/data/config.yaml
               cat >> /opt/data/config.yaml << EOF
+                supports_tools: true
 
               agent:
                 max_turns: 15
               approvals:
                 mode: off
-              EOF
-              cat >> /opt/data/config.yaml << EOF
 
               dashboard:
                 theme: juno
-              EOF
-              cat >> /opt/data/config.yaml << EOF
 
               platform_toolsets:
                 cli:
                   - hermes-cli
-              EOF
-              cat >> /opt/data/config.yaml << EOF
 
               web:
                 backend: ddgs
