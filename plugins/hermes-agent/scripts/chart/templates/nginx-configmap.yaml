@@ -16,6 +16,15 @@ data:
                 proxy_set_header X-Forwarded-Prefix /hermes/__NAME__/dashboard;
             }
 
+            location = /hermes/__NAME__ {
+                proxy_pass http://127.0.0.1:7681/hermes/__NAME__/terminal/;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+                proxy_buffering off;
+                proxy_cache off;
+            }
+
             location /hermes/__NAME__/ {
                 proxy_pass http://127.0.0.1:7681;
                 proxy_http_version 1.1;
