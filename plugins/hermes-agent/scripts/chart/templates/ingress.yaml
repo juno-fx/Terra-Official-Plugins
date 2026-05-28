@@ -13,7 +13,7 @@ spec:
     - host: {{ .Values.host }}
       http:
         paths:
-          - path: "/hermes/{{ .Values.name }}/dashboard/"
+          - path: "/hermes/{{ .Values.name }}/dashboard"
             pathType: Prefix
             backend:
               service:
