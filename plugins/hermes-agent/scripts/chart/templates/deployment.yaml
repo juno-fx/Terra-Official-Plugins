@@ -191,6 +191,8 @@ spec:
               value: /opt/data
             - name: HERMES_TUI_DIR
               value: /opt/hermes/ui-tui
+            - name: HERMES_ALLOW_ROOT_GATEWAY
+              value: "1"
             - name: API_SERVER_KEY
               value: {{ .Values.api_server_key | quote }}
             - name: MODEL
