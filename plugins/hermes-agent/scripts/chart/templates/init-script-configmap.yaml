@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-init-script"
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+data:
+  start.sh: |
+    #!/bin/sh
+    set -e
+
+    export HOME=/opt/data
+    . /opt/hermes/.venv/bin/activate
+
+    echo "[init] Starting gateway..."
+    hermes gateway run 2>&1 | sed 's/^/[gateway] /' &
+    GATEWAY_PID=$!
+
+    echo "[init] Waiting for gateway health..."
+    for i in $(seq 1 60); do
+      if curl -sf http://127.0.0.1:8642/health > /dev/null 2>&1; then
+        echo "[init] Gateway ready"
+        break
+      fi
+      if [ "$i" = 60 ]; then
+        echo "[init] Gateway failed to start"
+        exit 1
+      fi
+      sleep 2
+    done
+
+    echo "[init] Starting dashboard..."
+    hermes dashboard --host 127.0.0.1 --port 9120 --no-open 2>&1 | sed 's/^/[dashboard] /' &
+    DASHBOARD_PID=$!
+
+    echo "[init] Starting ttyd..."
+    /opt/ttyd/ttyd -b /hermes/__NAME__/terminal -W -p 7681 hermes --tui 2>&1 | sed 's/^/[ttyd] /' &
+    TTYD_PID=$!
+
+    trap "echo '[init] Shutting down...'; kill $GATEWAY_PID $DASHBOARD_PID $TTYD_PID 2>/dev/null; wait; exit" SIGTERM SIGINT
+
+    wait
