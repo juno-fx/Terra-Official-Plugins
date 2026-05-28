@@ -20,7 +20,7 @@ spec:
                 name: {{ .Values.name }}
                 port:
                   number: 9119
-          - path: "/hermes/{{ .Values.name }}/"
+          - path: "/hermes/{{ .Values.name }}"
             pathType: Prefix
             backend:
               service:

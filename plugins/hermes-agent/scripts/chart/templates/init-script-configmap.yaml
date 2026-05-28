@@ -46,7 +46,7 @@ data:
     chmod +x /usr/local/lib/node_modules/wetty/build/main.js
 
     echo "[init] Starting wetty..."
-    wetty -b /hermes/__NAME__/terminal --allow-iframe -p 7681 \
+    wetty -b /hermes/__NAME__ --allow-iframe -p 7681 \
       -c "bash -c '. /opt/hermes/.venv/bin/activate && exec /opt/hermes/hermes --tui'" 2>&1 | sed 's/^/[wetty] /' &
     WETTY_PID=$!
 
