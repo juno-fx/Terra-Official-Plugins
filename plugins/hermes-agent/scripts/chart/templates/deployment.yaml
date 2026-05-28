@@ -115,15 +115,14 @@ spec:
               mkdir -p /opt/data/dashboard-themes
 
               # --- Copy static files from ConfigMaps ---
-              cp /opt/templates/proxy/proxy.py /opt/proxy/proxy.py
-              cp /opt/templates/www/chat.html /opt/www/chat.html
+              cp /opt/templates/terminal/terminal.html /opt/www/terminal.html
               cp /opt/templates/theme/juno.yaml /opt/data/dashboard-themes/juno.yaml
 
               # --- Substitute nginx template ---
               sed "s/__NAME__/${NAME}/g" \
                 /opt/templates/nginx/nginx.conf > /opt/proxy/nginx.conf
 
-              chmod 644 /opt/proxy/proxy.py /opt/proxy/nginx.conf
+              chmod 644 /opt/proxy/nginx.conf /opt/www/terminal.html
           env:
             - name: API_SERVER_KEY
               value: {{ .Values.api_server_key | quote }}
@@ -148,16 +147,14 @@ spec:
           volumeMounts:
             - name: hermes-data
               mountPath: /opt/data
-            - name: proxy-config
+            - name: nginx-out
               mountPath: /opt/proxy
             - name: www-data
               mountPath: /opt/www
             - name: nginx-template
               mountPath: /opt/templates/nginx
-            - name: chat-proxy
-              mountPath: /opt/templates/proxy
-            - name: chat-html
-              mountPath: /opt/templates/www
+            - name: terminal-html
+              mountPath: /opt/templates/terminal
             - name: dashboard-theme
               mountPath: /opt/templates/theme
 
@@ -201,7 +198,7 @@ spec:
         - name: hermes-dashboard
           image: "nousresearch/hermes-agent:{{ .Values.tag }}"
           imagePullPolicy: IfNotPresent
-          args: ["dashboard", "--host", "127.0.0.1", "--port", "9120", "--no-open"]
+          args: ["dashboard", "--host", "127.0.0.1", "--port", "9120", "--no-open", "--tui"]
           ports:
             - name: dash-internal
               containerPort: 9120
@@ -209,6 +206,10 @@ spec:
           env:
             - name: HERMES_HOME
               value: /opt/data
+            - name: HERMES_TUI_DIR
+              value: /opt/hermes/ui-tui
+            - name: GATEWAY_HEALTH_URL
+              value: http://127.0.0.1:8642
           resources:
             requests:
               memory: "512Mi"
@@ -216,25 +217,6 @@ spec:
           volumeMounts:
             - name: hermes-data
               mountPath: /opt/data
-
-        - name: chat-proxy
-          image: python:3.12-alpine
-          imagePullPolicy: IfNotPresent
-          command: ["python3", "/opt/proxy/proxy.py"]
-          ports:
-            - name: agent-api
-              containerPort: 5000
-              protocol: TCP
-          env:
-            - name: API_SERVER_KEY
-              value: {{ .Values.api_server_key | quote }}
-          resources:
-            requests:
-              memory: "64Mi"
-              cpu: "50m"
-          volumeMounts:
-            - name: proxy-config
-              mountPath: /opt/proxy
 
         - name: nginx
           image: nginx:alpine
@@ -249,7 +231,7 @@ spec:
               memory: "64Mi"
               cpu: "50m"
           volumeMounts:
-            - name: proxy-config
+            - name: nginx-out
               mountPath: /opt/proxy
             - name: www-data
               mountPath: /opt/www
@@ -257,19 +239,16 @@ spec:
       volumes:
         - name: hermes-data
           emptyDir: {}
-        - name: proxy-config
+        - name: nginx-out
           emptyDir: {}
         - name: www-data
           emptyDir: {}
         - name: nginx-template
           configMap:
             name: "{{ .Release.Name }}-nginx-template"
-        - name: chat-proxy
+        - name: terminal-html
           configMap:
-            name: "{{ .Release.Name }}-chat-proxy"
-        - name: chat-html
-          configMap:
-            name: "{{ .Release.Name }}-chat-html"
+            name: "{{ .Release.Name }}-terminal-html"
         - name: dashboard-theme
           configMap:
             name: "{{ .Release.Name }}-dashboard-theme"

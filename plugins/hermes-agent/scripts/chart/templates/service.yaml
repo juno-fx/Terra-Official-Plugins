@@ -10,7 +10,3 @@ spec:
       targetPort: 9119
       protocol: TCP
       name: nginx
-    - port: 5000
-      targetPort: 5000
-      protocol: TCP
-      name: agent-api

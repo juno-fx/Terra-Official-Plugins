@@ -11,23 +11,24 @@ data:
         server {
             listen 9119;
 
-            location /hermes/__NAME__/api/chat {
-                proxy_pass http://127.0.0.1:5000/chat;
+            location /hermes/__NAME__/terminal/ {
+                alias /opt/www/;
+                index terminal.html;
+            }
+
+            location /hermes/__NAME__/dashboard/ {
+                proxy_pass http://127.0.0.1:9120/;
                 proxy_http_version 1.1;
                 proxy_set_header Upgrade $http_upgrade;
                 proxy_set_header Connection "upgrade";
+                proxy_set_header X-Forwarded-Prefix /hermes/__NAME__/dashboard;
                 proxy_buffering off;
                 proxy_cache off;
-                proxy_read_timeout 600s;
-                proxy_connect_timeout 30s;
             }
-            location /hermes/__NAME__/dashboard/ {
-                proxy_pass http://127.0.0.1:9120/;
-                proxy_set_header X-Forwarded-Prefix /hermes/__NAME__/dashboard;
-            }
+
             location /hermes/__NAME__/ {
                 alias /opt/www/;
-                index chat.html;
+                index terminal.html;
             }
         }
     }

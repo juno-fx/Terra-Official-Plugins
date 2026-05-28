@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-terminal-html"
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+data:
+  terminal.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Terminal</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.min.css">
+    <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    html,body{height:100%;background:#191919}
+    #terminal{height:100%;padding:4px}
+    </style>
+    </head>
+    <body>
+    <div id="terminal"></div>
+    <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.min.js"></script>
+    <script>
+    (function(){
+      var terminal = new Terminal({
+        theme: {background:'#191919',cursor:'#f8aa5f',foreground:'#e8e8f0',
+          selectionBackground:'#334155',selectionForeground:'#f1f5f9'},
+        fontSize:14,fontFamily:'Menlo,Consolas,monospace',cursorBlink:true,
+        allowTransparency:true,scrollback:10000
+      });
+      var fitAddon = new FitAddon.FitAddon();
+      terminal.loadAddon(fitAddon);
+      terminal.open(document.getElementById('terminal'));
+      fitAddon.fit();
+      window.addEventListener('resize',function(){fitAddon.fit()});
+
+      var parts = window.location.pathname.split('/').filter(Boolean);
+      var base = '/' + parts.slice(0,2).join('/');
+      var token = '';
+      var ws = null;
+      var reconnectTimer = null;
+      var connected = false;
+
+      function connect() {
+        if (ws) try { ws.close(); } catch(e) {}
+        if (!token) {
+          fetch(base + '/dashboard/').then(function(r){return r.text();}).then(function(html){
+            var m = html.match(/__HERMES_SESSION_TOKEN__[=]["]?([a-zA-Z0-9_-]+)/);
+            if (m) token = m[1];
+            doConnect();
+          }).catch(function(){setTimeout(connect,2000);});
+        } else {
+          doConnect();
+        }
+      }
+
+      function doConnect() {
+        var proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+        var url = proto + '//' + location.host + base + '/dashboard/api/pty?token=' + token;
+        ws = new WebSocket(url);
+        ws.onopen = function(){connected=true;terminal.focus();};
+        ws.onclose = function(){connected=false;if(reconnectTimer)clearTimeout(reconnectTimer);reconnectTimer=setTimeout(connect,3000);};
+        ws.onerror = function(){};
+        ws.onmessage = function(ev){terminal.write(ev.data);};
+        terminal.onData(function(data){if(ws && ws.readyState===1)ws.send(data);});
+        terminal.onResize(function(size){
+          if(ws && ws.readyState===1) ws.send(JSON.stringify({action:'resize',cols:size.cols,rows:size.rows}));
+        });
+      }
+
+      connect();
+    })();
+    </script>
+    </body>
+    </html>
