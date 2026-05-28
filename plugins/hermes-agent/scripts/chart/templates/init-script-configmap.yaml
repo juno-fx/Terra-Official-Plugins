@@ -14,7 +14,7 @@ data:
 
     cleanup() {
       echo "[init] Shutting down..."
-      kill "$GATEWAY_PID" "$DASHBOARD_PID" "$PTY_PID" 2>/dev/null || true
+      kill "$GATEWAY_PID" "$DASHBOARD_PID" "$WETTY_PID" 2>/dev/null || true
       wait
       exit
     }
@@ -40,12 +40,13 @@ data:
     hermes dashboard --host 127.0.0.1 --port 9120 --no-open 2>&1 | sed 's/^/[dashboard] /' &
     DASHBOARD_PID=$!
 
-    echo "[init] Installing websockets package..."
-    uv pip install websockets 2>&1 | tail -1
+    echo "[init] Installing wetty..."
+    npm install -g wetty 2>&1 | tail -3
 
-    echo "[init] Starting PTY server..."
-    python3 /opt/pty/pty_server.py 2>&1 | sed 's/^/[pty] /' &
-    PTY_PID=$!
+    echo "[init] Starting wetty..."
+    wetty -b /hermes/__NAME__/terminal --allow-iframe -p 7681 \
+      -c "bash -c '. /opt/hermes/.venv/bin/activate && exec /opt/hermes/hermes --tui'" 2>&1 | sed 's/^/[wetty] /' &
+    WETTY_PID=$!
 
     trap cleanup TERM INT
 

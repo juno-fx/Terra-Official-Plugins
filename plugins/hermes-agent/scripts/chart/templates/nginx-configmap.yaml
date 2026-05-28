@@ -11,7 +11,7 @@ data:
         server {
             listen 9119;
 
-            location /hermes/__NAME__/terminal/ws {
+            location /hermes/__NAME__/terminal/ {
                 proxy_pass http://127.0.0.1:7681;
                 proxy_http_version 1.1;
                 proxy_set_header Upgrade $http_upgrade;
@@ -20,19 +20,13 @@ data:
                 proxy_cache off;
             }
 
-            location /hermes/__NAME__/terminal/ {
-                alias /opt/www/;
-                index terminal.html;
-            }
-
             location /hermes/__NAME__/dashboard/ {
                 proxy_pass http://127.0.0.1:9120/;
                 proxy_set_header X-Forwarded-Prefix /hermes/__NAME__/dashboard;
             }
 
             location /hermes/__NAME__/ {
-                alias /opt/www/;
-                index terminal.html;
+                return 302 /hermes/__NAME__/terminal/;
             }
         }
     }
