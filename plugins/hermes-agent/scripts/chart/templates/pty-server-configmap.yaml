@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-pty-server"
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+data:
+  pty_server.py: |
+    import asyncio, fcntl, json, os, pty, signal, struct, termios
+
+    try:
+        import websockets
+    except ImportError:
+        import subprocess, sys
+        subprocess.run([sys.executable, "-m", "pip", "install", "websockets"], check=True)
+        import websockets
+
+    HERMES_CMD = os.environ.get("HERMES_CMD", "hermes --tui")
+    SHELL = os.environ.get("SHELL", "/bin/sh")
+
+    async def handler(ws):
+        pid, fd = pty.fork()
+        if pid == 0:
+            os.execvp(SHELL, [SHELL, "-c", HERMES_CMD])
+            os._exit(1)
+
+        loop = asyncio.get_event_loop()
+
+        def read_pty():
+            try:
+                return os.read(fd, 4096)
+            except OSError:
+                return b""
+
+        def set_size(rows, cols):
+            w = struct.pack("HHHH", rows, cols, 0, 0)
+            fcntl.ioctl(fd, termios.TIOCSWINSZ, w)
+
+        async def ws_to_pty():
+            async for msg in ws:
+                if isinstance(msg, str):
+                    try:
+                        data = json.loads(msg)
+                        if data.get("action") == "resize":
+                            set_size(data.get("rows", 24), data.get("cols", 80))
+                            continue
+                    except json.JSONDecodeError:
+                        pass
+                    os.write(fd, msg.encode())
+                else:
+                    os.write(fd, msg)
+
+        async def pty_to_ws():
+            while True:
+                data = await loop.run_in_executor(None, read_pty)
+                if not data:
+                    break
+                await ws.send(data)
+
+        try:
+            await asyncio.gather(ws_to_pty(), pty_to_ws())
+        except websockets.exceptions.ConnectionClosed:
+            pass
+        finally:
+            os.close(fd)
+            os.kill(pid, signal.SIGTERM)
+            os.waitpid(pid, 0)
+
+    async def main():
+        async with websockets.serve(handler, "127.0.0.1", 7681, ping_interval=30):
+            await asyncio.Future()
+
+    asyncio.run(main())

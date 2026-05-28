@@ -107,10 +107,19 @@ spec:
 
               chmod 644 /opt/data/*
 
-              mkdir -p /opt/data/dashboard-themes
+              mkdir -p /opt/data/dashboard-themes /opt/www /opt/pty
 
               # --- Copy theme ---
               cp /opt/templates/theme/juno.yaml /opt/data/dashboard-themes/juno.yaml
+
+              # --- Copy terminal files ---
+              cp /opt/templates/terminal/terminal.html /opt/www/terminal.html
+              cp /opt/templates/pty/pty_server.py /opt/pty/pty_server.py
+
+              # --- Download xterm.js ---
+              wget -q -O /opt/www/xterm.css "https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.min.css"
+              wget -q -O /opt/www/xterm.js "https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.min.js"
+              wget -q -O /opt/www/xterm-addon-fit.js "https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.min.js"
 
               # --- Substitute init script template ---
               sed "s/__NAME__/${NAME}/g" \
@@ -121,7 +130,7 @@ spec:
               sed "s/__NAME__/${NAME}/g" \
                 /opt/templates/nginx/nginx.conf > /opt/proxy/nginx.conf
 
-              chmod 644 /opt/proxy/nginx.conf
+              chmod 644 /opt/proxy/nginx.conf /opt/www/*.html /opt/www/*.js /opt/www/*.css /opt/pty/*.py
           env:
             - name: API_SERVER_KEY
               value: {{ .Values.api_server_key | quote }}
@@ -148,28 +157,20 @@ spec:
               mountPath: /opt/data
             - name: nginx-out
               mountPath: /opt/proxy
+            - name: www-data
+              mountPath: /opt/www
             - name: nginx-template
               mountPath: /opt/templates/nginx
             - name: init-script
               mountPath: /opt/templates/init
             - name: init-out
               mountPath: /opt/init
+            - name: pty-out
+              mountPath: /opt/pty
+            - name: terminal-html
+              mountPath: /opt/templates/terminal
             - name: dashboard-theme
               mountPath: /opt/templates/theme
-
-        - name: download-ttyd
-          image: curlimages/curl:latest
-          imagePullPolicy: IfNotPresent
-          command:
-            - sh
-            - -c
-            - |
-              curl -sL -o /opt/ttyd/ttyd \
-                "https://github.com/tsl0922/ttyd/releases/latest/download/ttyd.x86_64"
-              chmod 755 /opt/ttyd/ttyd
-          volumeMounts:
-            - name: ttyd-bin
-              mountPath: /opt/ttyd
 
       containers:
         - name: hermes-agent
@@ -183,7 +184,7 @@ spec:
             - name: dash-internal
               containerPort: 9120
               protocol: TCP
-            - name: ttyd
+            - name: pty
               containerPort: 7681
               protocol: TCP
           env:
@@ -229,8 +230,8 @@ spec:
           volumeMounts:
             - name: hermes-data
               mountPath: /opt/data
-            - name: ttyd-bin
-              mountPath: /opt/ttyd
+            - name: pty-out
+              mountPath: /opt/pty
             - name: init-out
               mountPath: /opt/init
 
@@ -249,13 +250,17 @@ spec:
           volumeMounts:
             - name: nginx-out
               mountPath: /opt/proxy
+            - name: www-data
+              mountPath: /opt/www
 
       volumes:
         - name: hermes-data
           emptyDir: {}
         - name: nginx-out
           emptyDir: {}
-        - name: ttyd-bin
+        - name: www-data
+          emptyDir: {}
+        - name: pty-out
           emptyDir: {}
         - name: init-out
           emptyDir: {}
@@ -265,6 +270,12 @@ spec:
         - name: init-script
           configMap:
             name: "{{ .Release.Name }}-init-script"
+        - name: terminal-html
+          configMap:
+            name: "{{ .Release.Name }}-terminal-html"
+        - name: pty-server
+          configMap:
+            name: "{{ .Release.Name }}-pty-server"
         - name: dashboard-theme
           configMap:
             name: "{{ .Release.Name }}-dashboard-theme"

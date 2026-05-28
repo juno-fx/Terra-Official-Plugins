@@ -11,13 +11,18 @@ data:
         server {
             listen 9119;
 
-            location /hermes/__NAME__/terminal/ {
+            location /hermes/__NAME__/terminal/ws {
                 proxy_pass http://127.0.0.1:7681;
                 proxy_http_version 1.1;
                 proxy_set_header Upgrade $http_upgrade;
                 proxy_set_header Connection "upgrade";
                 proxy_buffering off;
                 proxy_cache off;
+            }
+
+            location /hermes/__NAME__/terminal/ {
+                alias /opt/www/;
+                index terminal.html;
             }
 
             location /hermes/__NAME__/dashboard/ {

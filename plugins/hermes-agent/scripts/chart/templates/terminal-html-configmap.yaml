@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-terminal-html"
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+data:
+  terminal.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Terminal</title>
+    <link rel="stylesheet" href="xterm.css">
+    <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    html,body{height:100%;background:#191919}
+    #status{position:absolute;top:8px;left:8px;z-index:10;color:#94a3b8;font:13px Menlo,Consolas,monospace;pointer-events:none}
+    #terminal{height:100%;padding:4px}
+    </style>
+    </head>
+    <body>
+    <div id="status">Connecting...</div>
+    <div id="terminal"></div>
+    <script src="xterm.js"></script>
+    <script src="xterm-addon-fit.js"></script>
+    <script>
+    (function(){
+      var statusEl = document.getElementById('status');
+      function setStatus(msg){if(statusEl)statusEl.textContent=msg;}
+      if(typeof Terminal==='undefined'){setStatus('Error loading xterm.js');return;}
+
+      var term=new Terminal({
+        theme:{background:'#191919',cursor:'#f8aa5f',foreground:'#e8e8f0',
+          selectionBackground:'#334155',selectionForeground:'#f1f5f9'},
+        fontSize:14,fontFamily:'Menlo,Consolas,monospace',cursorBlink:true,scrollback:10000
+      });
+      var fitAddon=new FitAddon.FitAddon();
+      term.loadAddon(fitAddon);
+      term.open(document.getElementById('terminal'));
+      fitAddon.fit();
+      window.addEventListener('resize',function(){fitAddon.fit()});
+
+      var base=window.location.pathname.replace(/\/+$/,'');
+      if(base.lastIndexOf('/')>0)base=base.substring(0,base.lastIndexOf('/')+1);
+      else base='/';
+      var wsUrl=(location.protocol==='https:'?'wss:':'ws:')+'//'+location.host+base+'terminal/ws';
+
+      function connect(){
+        setStatus('Connecting...');
+        var ws=new WebSocket(wsUrl);
+        ws.onopen=function(){setStatus('');term.focus();if(statusEl)statusEl.style.display='none';};
+        ws.onclose=function(){setStatus('Disconnected');setTimeout(connect,3000);};
+        ws.onerror=function(){setStatus('Connection error');setTimeout(connect,3000);};
+        ws.onmessage=function(ev){term.write(ev.data);};
+        term.onData(function(data){if(ws&&ws.readyState===1)ws.send(data);});
+        term.onResize(function(size){
+          if(ws&&ws.readyState===1)ws.send(JSON.stringify({action:'resize',cols:size.cols,rows:size.rows}));
+        });
+      }
+      connect();
+    })();
+    </script>
+    </body>
+    </html>
