@@ -182,11 +182,6 @@ spec:
               port: 7681
             periodSeconds: 5
             failureThreshold: 6
-          livenessProbe:
-            tcpSocket:
-              port: 8642
-            periodSeconds: 5
-            failureThreshold: 24
           env:
             - name: HERMES_HOME
               value: /opt/data
