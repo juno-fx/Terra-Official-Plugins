@@ -31,7 +31,8 @@ data:
             }
 
             location /hermes/__NAME__/ {
-                return 302 https://$host/hermes/__NAME__/terminal/;
+                alias /opt/www/;
+                index terminal.html;
             }
         }
     }
