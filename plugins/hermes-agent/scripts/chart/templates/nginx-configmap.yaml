@@ -26,7 +26,7 @@ data:
             }
 
             location /hermes/__NAME__/ {
-                return 302 /hermes/__NAME__/terminal/;
+                return 302 \$scheme://\$host/hermes/__NAME__/terminal/;
             }
         }
     }
