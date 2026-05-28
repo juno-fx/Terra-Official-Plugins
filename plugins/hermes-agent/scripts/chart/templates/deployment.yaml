@@ -112,17 +112,23 @@ spec:
 
               chmod 644 /opt/data/*
 
-              mkdir -p /opt/data/dashboard-themes
+              mkdir -p /opt/data/dashboard-themes /opt/www
 
               # --- Copy static files from ConfigMaps ---
               cp /opt/templates/terminal/terminal.html /opt/www/terminal.html
               cp /opt/templates/theme/juno.yaml /opt/data/dashboard-themes/juno.yaml
 
+              # --- Download xterm.js ---
+              wget -q -O /opt/www/xterm.css "https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.min.css"
+              wget -q -O /opt/www/xterm.js "https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.min.js"
+              wget -q -O /opt/www/xterm-addon-fit.js "https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.min.js"
+              chmod 644 /opt/www/xterm.css /opt/www/xterm.js /opt/www/xterm-addon-fit.js
+
               # --- Substitute nginx template ---
               sed "s/__NAME__/${NAME}/g" \
                 /opt/templates/nginx/nginx.conf > /opt/proxy/nginx.conf
 
-              chmod 644 /opt/proxy/nginx.conf /opt/www/terminal.html
+              chmod 644 /opt/proxy/nginx.conf /opt/www/xterm.* /opt/www/*.html
           env:
             - name: API_SERVER_KEY
               value: {{ .Values.api_server_key | quote }}
