@@ -167,6 +167,8 @@ spec:
               mountPath: /opt/init
             - name: pty-out
               mountPath: /opt/pty
+            - name: pty-server
+              mountPath: /opt/templates/pty
             - name: terminal-html
               mountPath: /opt/templates/terminal
             - name: dashboard-theme
