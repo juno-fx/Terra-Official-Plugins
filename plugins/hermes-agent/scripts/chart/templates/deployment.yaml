@@ -23,7 +23,7 @@ spec:
         juno-innovations.com/user: "{{ .Values.user }}"
         juno-innovations.com/workstation: "{{ .Values.name }}"
     spec:
-      {{- if .Values.cluster_read_access }}
+      {{- if ne .Values.cluster_access "none" }}
       serviceAccountName: "{{ .Values.name }}"
       automountServiceAccountToken: true
       {{- else }}

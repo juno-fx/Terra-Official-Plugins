@@ -1,4 +1,4 @@
-{{- if .Values.cluster_read_access }}
+{{- if ne .Values.cluster_access "none" }}
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -11,11 +11,14 @@ metadata:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
     juno-innovations.com/workstation: "{{ .Values.name }}"
     juno-innovations.com/owner: "{{ .Values.name }}"
+{{- end }}
+
+{{- if eq .Values.cluster_access "readonly-ns" }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: "{{ .Values.name }}-reader"
+  name: "{{ .Values.name }}-role"
   namespace: "{{ .Release.Namespace }}"
   annotations:
     kuiper.juno-innovations.com/hidden: "true"
@@ -31,7 +34,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: "{{ .Values.name }}-reader"
+  name: "{{ .Values.name }}-binding"
   namespace: "{{ .Release.Namespace }}"
   annotations:
     kuiper.juno-innovations.com/hidden: "true"
@@ -42,7 +45,120 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: "{{ .Values.name }}-reader"
+  name: "{{ .Values.name }}-role"
+subjects:
+  - kind: ServiceAccount
+    name: "{{ .Values.name }}"
+    namespace: "{{ .Release.Namespace }}"
+{{- end }}
+
+{{- if eq .Values.cluster_access "admin-ns" }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: "{{ .Values.name }}-role"
+  namespace: "{{ .Release.Namespace }}"
+  annotations:
+    kuiper.juno-innovations.com/hidden: "true"
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+    juno-innovations.com/workstation: "{{ .Values.name }}"
+    juno-innovations.com/owner: "{{ .Values.name }}"
+rules:
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: "{{ .Values.name }}-binding"
+  namespace: "{{ .Release.Namespace }}"
+  annotations:
+    kuiper.juno-innovations.com/hidden: "true"
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+    juno-innovations.com/workstation: "{{ .Values.name }}"
+    juno-innovations.com/owner: "{{ .Values.name }}"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: "{{ .Values.name }}-role"
+subjects:
+  - kind: ServiceAccount
+    name: "{{ .Values.name }}"
+    namespace: "{{ .Release.Namespace }}"
+{{- end }}
+
+{{- if eq .Values.cluster_access "readonly-cluster" }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: "{{ .Values.name }}-cluster-role"
+  annotations:
+    kuiper.juno-innovations.com/hidden: "true"
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+    juno-innovations.com/workstation: "{{ .Values.name }}"
+    juno-innovations.com/owner: "{{ .Values.name }}"
+rules:
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: "{{ .Values.name }}-cluster-binding"
+  annotations:
+    kuiper.juno-innovations.com/hidden: "true"
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+    juno-innovations.com/workstation: "{{ .Values.name }}"
+    juno-innovations.com/owner: "{{ .Values.name }}"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "{{ .Values.name }}-cluster-role"
+subjects:
+  - kind: ServiceAccount
+    name: "{{ .Values.name }}"
+    namespace: "{{ .Release.Namespace }}"
+{{- end }}
+
+{{- if eq .Values.cluster_access "admin-cluster" }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: "{{ .Values.name }}-cluster-role"
+  annotations:
+    kuiper.juno-innovations.com/hidden: "true"
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+    juno-innovations.com/workstation: "{{ .Values.name }}"
+    juno-innovations.com/owner: "{{ .Values.name }}"
+rules:
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: "{{ .Values.name }}-cluster-binding"
+  annotations:
+    kuiper.juno-innovations.com/hidden: "true"
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+    juno-innovations.com/workstation: "{{ .Values.name }}"
+    juno-innovations.com/owner: "{{ .Values.name }}"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "{{ .Values.name }}-cluster-role"
 subjects:
   - kind: ServiceAccount
     name: "{{ .Values.name }}"

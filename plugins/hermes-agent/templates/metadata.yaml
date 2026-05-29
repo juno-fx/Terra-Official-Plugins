@@ -44,11 +44,17 @@ data:
       type: string
       required: false
       default: latest
-    - name: cluster_read_access
-      description: "Grant this agent namespace-scoped read-only access (creates Role, ServiceAccount, RoleBinding in the current namespace)."
-      type: boolean
+    - name: cluster_access
+      description: "Kubernetes RBAC access level for this agent."
+      type: select
       required: false
-      default: false
+      default: none
+      options:
+        - none
+        - readonly-ns
+        - admin-ns
+        - readonly-cluster
+        - admin-cluster
     - name: personality
       description: "Personality / system prompt prefix for this agent. Written to SOUL.md on first deploy only."
       type: multi-line
