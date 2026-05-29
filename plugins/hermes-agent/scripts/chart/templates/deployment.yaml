@@ -231,12 +231,8 @@ EOF
 
       volumes:
         - name: hermes-data
-        {{- if .Values.persistence_enabled }}
           persistentVolumeClaim:
             claimName: "{{ .Values.name }}-data"
-        {{- else }}
-          emptyDir: {}
-        {{- end }}
         - name: nginx-out
           emptyDir: {}
         - name: init-out

@@ -1,4 +1,3 @@
-{{- if .Values.persistence_enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -14,4 +13,3 @@ spec:
     requests:
       storage: {{ .Values.persistence_size }}
   storageClassName: {{ .Values.persistence_storage_class }}
-{{- end }}
