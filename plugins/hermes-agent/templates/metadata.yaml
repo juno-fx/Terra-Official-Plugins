@@ -49,7 +49,4 @@ data:
       type: boolean
       required: false
       default: false
-    - name: personality
-      description: "The personality you want for this agent. Written to SOUL.md and injected into the system prompt."
-      type: multi-line
-      required: false
+

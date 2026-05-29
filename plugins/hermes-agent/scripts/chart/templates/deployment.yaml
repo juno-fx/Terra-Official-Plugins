@@ -86,18 +86,17 @@ spec:
                 backend: ddgs
               EOF
 
-              # --- Write SOUL.md ---
-              cat > /opt/data/SOUL.md << EOF
-              You are ${NAME}, a helpful AI assistant.
-              ${PERSONALITY}
-
-              All agents in this cluster are accessible at {name}:5000.
-              When asked to talk to another agent (like "talk to brian"), use delegate_task with:
-                provider="custom"
-                base_url="http://NAME:5000/v1"
-                model="hermes-agent"
-              Replace NAME with the agent's name (e.g. base_url="http://brian:5000/v1").
-              EOF
+              # --- Write SOUL.md (only if not exists) ---
+              if [ ! -f /opt/data/SOUL.md ]; then
+                cat > /opt/data/SOUL.md << 'EOF'
+All agents in this cluster are accessible at {name}:5000.
+When asked to talk to another agent (like "talk to brian"), use delegate_task with:
+  provider="custom"
+  base_url="http://NAME:5000/v1"
+  model="hermes-agent"
+Replace NAME with the agent's name (e.g. base_url="http://brian:5000/v1").
+EOF
+              fi
 
               chmod 644 /opt/data/*
 
@@ -123,16 +122,14 @@ spec:
               value: {{ .Values.model | quote }}
             - name: PROVIDER
               value: {{ .Values.provider | quote }}
-            - name: PERSONALITY
-              value: {{ .Values.personality | quote }}
-            - name: NAME
-              value: {{ .Values.name | quote }}
             - name: API_KEY
               value: {{ .Values.api_key | quote }}
             {{- if eq .Values.provider "ollama" }}
             - name: OLLAMA_BASE_URL
               value: {{ .Values.ollama_base_url | quote }}
             {{- end }}
+            - name: NAME
+              value: {{ .Values.name | quote }}
             {{- range .Values.env }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}
@@ -187,20 +184,16 @@ spec:
               value: {{ .Values.model | quote }}
             - name: PROVIDER
               value: {{ .Values.provider | quote }}
-            - name: PERSONALITY
-              value: {{ .Values.personality | quote }}
-            - name: NAME
-              value: {{ .Values.name | quote }}
             - name: API_KEY
               value: {{ .Values.api_key | quote }}
             {{- if eq .Values.provider "ollama" }}
             - name: OLLAMA_BASE_URL
               value: {{ .Values.ollama_base_url | quote }}
             {{- end }}
-          {{- range .Values.env }}
+            {{- range .Values.env }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}
-          {{- end }}
+            {{- end }}
           resources:
             requests:
               memory: "{{ .Values.memory }}"
@@ -238,7 +231,12 @@ spec:
 
       volumes:
         - name: hermes-data
+        {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: "{{ .Values.name }}-data"
+        {{- else }}
           emptyDir: {}
+        {{- end }}
         - name: nginx-out
           emptyDir: {}
         - name: init-out
