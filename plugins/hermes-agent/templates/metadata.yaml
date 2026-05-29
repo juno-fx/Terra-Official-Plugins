@@ -49,6 +49,10 @@ data:
       type: boolean
       required: false
       default: false
+    - name: personality
+      description: "Personality / system prompt prefix for this agent. Written to SOUL.md on first deploy only."
+      type: multi-line
+      required: false
     - name: persistence_size
       description: "Persistent volume size (e.g. 1Gi, 500Mi)."
       type: string
