@@ -15,6 +15,11 @@ data:
                 rewrite ^ /hermes/__NAME__/dashboard/ last;
             }
 
+            location = /hermes/__NAME__/dashboard/api/auth/me {
+                default_type application/json;
+                return 200 '{"user_id":"local","email":"","display_name":"","org_id":"","provider":"","expires_at":null}';
+            }
+
             location /hermes/__NAME__/dashboard/ {
                 proxy_pass http://127.0.0.1:9120/;
                 proxy_set_header X-Forwarded-Prefix /hermes/__NAME__/dashboard;
