@@ -13,9 +13,8 @@ cpu: 500m
 memory: 1Gi
 cpuLimit: 2000m
 memoryLimit: 4Gi
-persistence:
-  enabled: true
-  size: 1Gi
-  storageClass: local-path
+persistence_enabled: true
+persistence_size: 1Gi
+persistence_storage_class: local-path
 env: []
 _kuiper:

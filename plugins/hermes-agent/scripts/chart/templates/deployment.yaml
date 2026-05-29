@@ -231,7 +231,7 @@ EOF
 
       volumes:
         - name: hermes-data
-        {{- if .Values.persistence.enabled }}
+        {{- if .Values.persistence_enabled }}
           persistentVolumeClaim:
             claimName: "{{ .Values.name }}-data"
         {{- else }}

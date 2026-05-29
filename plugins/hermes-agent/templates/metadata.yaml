@@ -49,4 +49,19 @@ data:
       type: boolean
       required: false
       default: false
+    - name: persistence_enabled
+      description: "Persist agent data across restarts (SOUL.md, sessions, skills, memories)."
+      type: boolean
+      required: false
+      default: true
+    - name: persistence_size
+      description: "Persistent volume size (e.g. 1Gi, 500Mi)."
+      type: string
+      required: false
+      default: "1Gi"
+    - name: persistence_storage_class
+      description: "Storage class for the persistent volume."
+      type: string
+      required: false
+      default: local-path
 
