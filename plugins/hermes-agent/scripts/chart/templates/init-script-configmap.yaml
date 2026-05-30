@@ -49,8 +49,19 @@ data:
     chmod +x /usr/local/lib/node_modules/wetty/build/main.js
 
     echo "[init] Starting wetty..."
+    cat > /tmp/hermes-start.sh << 'HSTART'
+#!/bin/sh
+. /opt/hermes/.venv/bin/activate
+LINES=$(hermes sessions list --limit 1 2>/dev/null | wc -l)
+if [ "$LINES" -gt 1 ]; then
+  exec /opt/hermes/hermes --tui --continue
+else
+  exec /opt/hermes/hermes --tui
+fi
+HSTART
+    chmod +x /tmp/hermes-start.sh
     wetty -b /hermes/__NAME__ --allow-iframe -p 7681 \
-      -c "bash -c '. /opt/hermes/.venv/bin/activate && exec /opt/hermes/hermes --tui --continue'" 2>&1 | sed 's/^/[wetty] /' &
+      -c "/tmp/hermes-start.sh" 2>&1 | sed 's/^/[wetty] /' &
     WETTY_PID=$!
 
     wait
