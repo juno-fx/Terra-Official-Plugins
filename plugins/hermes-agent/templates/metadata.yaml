@@ -53,8 +53,6 @@ data:
         - none
         - readonly-ns
         - admin-ns
-        - readonly-cluster
-        - admin-cluster
     - name: personality
       description: "Personality / system prompt prefix for this agent. Written to SOUL.md on first deploy only."
       type: multi-line

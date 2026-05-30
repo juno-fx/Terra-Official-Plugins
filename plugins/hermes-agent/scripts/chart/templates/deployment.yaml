@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: "{{ .Values.name }}"
   annotations:
@@ -12,7 +12,6 @@ metadata:
     juno-innovations.com/session: "{{ .Values.session }}"
 spec:
   replicas: 1
-  revisionHistoryLimit: 0
   selector:
     matchLabels:
       juno-innovations.com/workstation: "{{ .Values.name }}"
