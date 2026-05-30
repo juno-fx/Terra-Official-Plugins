@@ -166,6 +166,9 @@ spec:
             - name: wetty
               containerPort: 7681
               protocol: TCP
+            - name: git
+              containerPort: {{ .Values.git_port }}
+              protocol: TCP
           startupProbe:
             tcpSocket:
               port: 7681

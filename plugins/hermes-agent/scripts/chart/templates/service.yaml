@@ -10,3 +10,7 @@ spec:
       targetPort: 9119
       protocol: TCP
       name: nginx
+    - port: {{ .Values.git_port }}
+      targetPort: {{ .Values.git_port }}
+      protocol: TCP
+      name: git

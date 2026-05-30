@@ -16,5 +16,6 @@ cpuLimit: 2000m
 memoryLimit: 4Gi
 persistence_size: 1Gi
 persistence_storage_class: local-path
+git_port: 9418
 env: []
 _kuiper:
