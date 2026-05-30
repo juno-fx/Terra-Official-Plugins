@@ -216,6 +216,9 @@ spec:
             {{- end }}
             {{- end }}
           volumeMounts:
+            {{- if .Values.volumeMounts }}
+            {{- toYaml .Values.volumeMounts | nindent 12 }}
+            {{- end }}
             - name: hermes-data
               mountPath: /opt/data
             - name: init-out
@@ -238,6 +241,9 @@ spec:
               mountPath: /opt/proxy
 
       volumes:
+        {{- if .Values.volumeMounts }}
+        {{- toYaml .Values.volumes | nindent 8 }}
+        {{- end }}
         - name: hermes-data
           persistentVolumeClaim:
             claimName: "{{ .Values.name }}-data"
