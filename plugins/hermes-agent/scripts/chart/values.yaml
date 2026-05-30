@@ -1,0 +1,21 @@
+name: hermes-agent
+user:
+session:
+provider: openrouter
+api_key: ""
+ollama_base_url: ""
+api_server_key: ""
+model: "meta-llama/llama-3.1-8b-instruct:free"
+cluster_access: none
+personality: ""
+tag: latest
+host: ""
+cpu: 500m
+memory: 1Gi
+cpuLimit: 2000m
+memoryLimit: 4Gi
+persistence_size: 1Gi
+persistence_storage_class: local-path
+git_port: 9418
+env: []
+_kuiper:

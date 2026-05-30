@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-init-script"
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+data:
+  start.sh: |
+    #!/bin/sh
+    set -e
+
+    export HOME=/opt/data
+    . /opt/hermes/.venv/bin/activate
+
+    cleanup() {
+      echo "[init] Shutting down..."
+      kill "$GATEWAY_PID" "$DASHBOARD_PID" "$WETTY_PID" 2>/dev/null || true
+      wait
+      exit
+    }
+    trap cleanup TERM INT
+
+    echo "[init] Starting gateway..."
+    hermes gateway run 2>&1 | sed 's/^/[gateway] /' &
+    GATEWAY_PID=$!
+
+    echo "[init] Waiting for gateway health..."
+    i=1
+    while [ "$i" -le 60 ]; do
+      if curl -sf http://127.0.0.1:8642/health > /dev/null 2>&1; then
+        echo "[init] Gateway ready"
+        break
+      fi
+      sleep 2
+      i=$((i + 1))
+    done
+    if [ "$i" -gt 60 ]; then
+      echo "[init] Gateway failed to start"
+      exit 1
+    fi
+
+    echo "[init] Starting dashboard..."
+    hermes dashboard --host 127.0.0.1 --port 9120 --no-open 2>&1 | sed 's/^/[dashboard] /' &
+    DASHBOARD_PID=$!
+
+    echo "[init] Installing build tools and wetty..."
+    apt-get install -y build-essential 2>&1
+    npm install -g wetty --build-from-source 2>&1
+    chmod +x /usr/local/lib/node_modules/wetty/build/main.js
+
+    echo "[init] Starting wetty..."
+    wetty -b /hermes/__NAME__ --allow-iframe -p 7681 \
+      -c "sh -c '. /opt/hermes/.venv/bin/activate; LINES=\$(hermes sessions list --limit 1 2>/dev/null | wc -l); if [ \"\$LINES\" -gt 1 ]; then exec /opt/hermes/hermes --tui --continue; else exec /opt/hermes/hermes --tui; fi'" 2>&1 | sed 's/^/[wetty] /' &
+    WETTY_PID=$!
+
+    wait

@@ -1,0 +1,262 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{ .Values.name }}"
+  annotations:
+    juno-innovations.com/kuiper-state: "{{ .Values._kuiper }}"
+    juno-innovations.com/workload: "AI Agent"
+  labels:
+    juno-innovations.com/app: "hermes-agent"
+    juno-innovations.com/workstation: "{{ .Values.name }}"
+    juno-innovations.com/user: "{{ .Values.user }}"
+    juno-innovations.com/session: "{{ .Values.session }}"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      juno-innovations.com/workstation: "{{ .Values.name }}"
+  template:
+    metadata:
+      labels:
+        juno-innovations.com/app: "hermes-agent"
+        juno-innovations.com/user: "{{ .Values.user }}"
+        juno-innovations.com/workstation: "{{ .Values.name }}"
+    spec:
+      {{- if ne .Values.cluster_access "none" }}
+      serviceAccountName: "{{ .Values.name }}"
+      automountServiceAccountToken: true
+      {{- else }}
+      automountServiceAccountToken: false
+      {{- end }}
+      initContainers:
+        - name: write-config
+          image: busybox
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+
+              # --- Write .env ---
+              cat > /opt/data/.env << EOF
+              API_SERVER_ENABLED=true
+              API_SERVER_KEY=${API_SERVER_KEY}
+              API_SERVER_HOST=127.0.0.1
+              API_SERVER_PORT=8642
+              GATEWAY_ALLOW_ALL_USERS=true
+              EOF
+              PROVIDER_VALUE="${PROVIDER}"
+              case "${PROVIDER}" in
+                openrouter) KEY_NAME="OPENROUTER_API_KEY" ;;
+                openai)     KEY_NAME="OPENAI_API_KEY";    PROVIDER_VALUE="openai-codex" ;;
+                anthropic)  KEY_NAME="ANTHROPIC_API_KEY" ;;
+                ollama)     KEY_NAME="";                  PROVIDER_VALUE="custom" ;;
+                *)          KEY_NAME="" ;;
+              esac
+              if [ -n "${KEY_NAME}" ] && [ -n "${API_KEY}" ]; then
+                echo "${KEY_NAME}=${API_KEY}" >> /opt/data/.env
+              fi
+
+              # --- Write config.yaml ---
+              cat > /opt/data/config.yaml << EOF
+              model:
+                default: "${MODEL}"
+                provider: ${PROVIDER_VALUE}
+              EOF
+              if [ "${PROVIDER}" = "ollama" ]; then
+                echo "  base_url: \"${OLLAMA_BASE_URL}\"" >> /opt/data/config.yaml
+              fi
+              cat >> /opt/data/config.yaml << EOF
+                supports_tools: true
+
+              agent:
+                max_turns: 15
+              approvals:
+                mode: off
+
+              dashboard:
+                theme: juno
+
+              platform_toolsets:
+                cli:
+                  - hermes-cli
+
+              web:
+                backend: ddgs
+              EOF
+
+              # --- Write SOUL.md (only if not exists) ---
+              if [ ! -f /opt/data/SOUL.md ]; then
+                cat > /opt/data/SOUL.md << EOF
+              ${PERSONALITY}
+
+              All agents in this cluster are accessible at {name}:5000.
+              When asked to talk to another agent (like "talk to brian"), use delegate_task with:
+                provider="custom"
+                base_url="http://NAME:5000/v1"
+                model="hermes-agent"
+              Replace NAME with the agent's name (e.g. base_url="http://brian:5000/v1").
+              EOF
+              fi
+
+              chmod 644 /opt/data/*
+
+              mkdir -p /opt/data/dashboard-themes
+
+              # --- Copy theme ---
+              cp /opt/templates/theme/juno.yaml /opt/data/dashboard-themes/juno.yaml
+
+              # --- Substitute init script template ---
+              sed "s/__NAME__/${NAME}/g" \
+                /opt/templates/init/start.sh > /opt/init/start.sh
+              chmod 755 /opt/init/start.sh
+
+              # --- Substitute nginx template ---
+              sed "s/__NAME__/${NAME}/g" \
+                /opt/templates/nginx/nginx.conf > /opt/proxy/nginx.conf
+
+              chmod 644 /opt/proxy/nginx.conf
+          env:
+            - name: API_SERVER_KEY
+              value: {{ .Values.api_server_key | quote }}
+            - name: MODEL
+              value: {{ .Values.model | quote }}
+            - name: PROVIDER
+              value: {{ .Values.provider | quote }}
+            - name: API_KEY
+              value: {{ .Values.api_key | quote }}
+            - name: PERSONALITY
+              value: {{ .Values.personality | quote }}
+            {{- if eq .Values.provider "ollama" }}
+            - name: OLLAMA_BASE_URL
+              value: {{ .Values.ollama_base_url | quote }}
+            {{- end }}
+            - name: NAME
+              value: {{ .Values.name | quote }}
+            {{- range .Values.env }}
+            - name: {{ .name | quote }}
+              value: {{ .value | quote }}
+            {{- end }}
+          volumeMounts:
+            - name: hermes-data
+              mountPath: /opt/data
+            - name: nginx-out
+              mountPath: /opt/proxy
+            - name: nginx-template
+              mountPath: /opt/templates/nginx
+            - name: init-script
+              mountPath: /opt/templates/init
+            - name: init-out
+              mountPath: /opt/init
+            - name: dashboard-theme
+              mountPath: /opt/templates/theme
+
+      containers:
+        - name: hermes-agent
+          image: "nousresearch/hermes-agent:{{ .Values.tag }}"
+          imagePullPolicy: IfNotPresent
+          command: ["/opt/init/start.sh"]
+          ports:
+            - name: api
+              containerPort: 8642
+              protocol: TCP
+            - name: dash-internal
+              containerPort: 9120
+              protocol: TCP
+            - name: wetty
+              containerPort: 7681
+              protocol: TCP
+            - name: git
+              containerPort: {{ .Values.git_port }}
+              protocol: TCP
+          startupProbe:
+            tcpSocket:
+              port: 7681
+            periodSeconds: 5
+            failureThreshold: 30
+          readinessProbe:
+            tcpSocket:
+              port: 7681
+            periodSeconds: 5
+            failureThreshold: 6
+          env:
+            - name: HERMES_HOME
+              value: /opt/data
+            - name: HERMES_ALLOW_ROOT_GATEWAY
+              value: "1"
+            - name: API_SERVER_KEY
+              value: {{ .Values.api_server_key | quote }}
+            - name: MODEL
+              value: {{ .Values.model | quote }}
+            - name: PROVIDER
+              value: {{ .Values.provider | quote }}
+            - name: API_KEY
+              value: {{ .Values.api_key | quote }}
+            - name: PERSONALITY
+              value: {{ .Values.personality | quote }}
+            {{- if eq .Values.provider "ollama" }}
+            - name: OLLAMA_BASE_URL
+              value: {{ .Values.ollama_base_url | quote }}
+            {{- end }}
+            {{- range .Values.env }}
+            - name: {{ .name | quote }}
+              value: {{ .value | quote }}
+            {{- end }}
+          resources:
+            requests:
+              memory: "{{ .Values.memory }}"
+              cpu: "{{ .Values.cpu }}"
+            {{- if or .Values.memoryLimit .Values.cpuLimit }}
+            limits:
+            {{- if .Values.cpuLimit }}
+              cpu: "{{ .Values.cpuLimit }}"
+            {{- end }}
+            {{- if .Values.memoryLimit }}
+              memory: "{{ .Values.memoryLimit }}"
+            {{- end }}
+            {{- end }}
+          volumeMounts:
+            {{- if .Values.volumeMounts }}
+            {{- toYaml .Values.volumeMounts | nindent 12 }}
+            {{- end }}
+            - name: hermes-data
+              mountPath: /opt/data
+            - name: init-out
+              mountPath: /opt/init
+
+        - name: nginx
+          image: nginx:alpine
+          imagePullPolicy: IfNotPresent
+          command: ["nginx", "-g", "daemon off;", "-c", "/opt/proxy/nginx.conf"]
+          ports:
+            - name: http
+              containerPort: 9119
+              protocol: TCP
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+          volumeMounts:
+            - name: nginx-out
+              mountPath: /opt/proxy
+
+      volumes:
+        {{- if .Values.volumeMounts }}
+        {{- toYaml .Values.volumes | nindent 8 }}
+        {{- end }}
+        - name: hermes-data
+          persistentVolumeClaim:
+            claimName: "{{ .Values.name }}-data"
+        - name: nginx-out
+          emptyDir: {}
+        - name: init-out
+          emptyDir: {}
+        - name: nginx-template
+          configMap:
+            name: "{{ .Release.Name }}-nginx-template"
+        - name: init-script
+          configMap:
+            name: "{{ .Release.Name }}-init-script"
+        - name: dashboard-theme
+          configMap:
+            name: "{{ .Release.Name }}-dashboard-theme"
