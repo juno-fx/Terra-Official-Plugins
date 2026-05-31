@@ -19,6 +19,7 @@ data:
 
         server {
             listen 8080;
+            absolute_redirect off;
 
             location = {{ .Values.prefix }} {
                 return 301 {{ .Values.prefix }}/;
