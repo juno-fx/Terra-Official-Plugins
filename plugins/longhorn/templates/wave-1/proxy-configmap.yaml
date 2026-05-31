@@ -40,8 +40,6 @@ data:
                 sub_filter_types text/html application/javascript text/javascript;
                 sub_filter 'href="/' 'href="{{ .Values.prefix }}/';
                 sub_filter 'src="/' 'src="{{ .Values.prefix }}/';
-                sub_filter '"/v1/' '"{{ .Values.prefix }}/v1/';
-                sub_filter '"/v2/' '"{{ .Values.prefix }}/v2/';
             }
         }
     }
