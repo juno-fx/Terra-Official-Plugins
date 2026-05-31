@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-installer
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      {{- if gt (len .Values._juno_terra_image_pull_secrets) 0 }}
+      imagePullSecrets:
+{{ toYaml .Values._juno_terra_image_pull_secrets | indent 8 }}
+      {{- end }}
+      serviceAccountName: argocd-application-controller
+      containers:
+        - name: installer
+          image: "{{ .Values._juno_terra_image }}"
+          env:
+            - name: INSTALL
+              value: "true"
+            - name: PREFIX
+              value: "{{ .Values.prefix }}"
+          command: [ "/terra/bootstrap.sh" ]
+          volumeMounts:
+            - name: installer
+              mountPath: /terra/bootstrap.sh
+              subPath: bootstrap.sh
+            - name: installer
+              mountPath: /terra/scripts.base64
+              subPath: packaged_scripts.base64
+      volumes:
+        - name: installer
+          configMap:
+            name: {{ .Release.Name }}-scripts-configmap
+            defaultMode: 0500

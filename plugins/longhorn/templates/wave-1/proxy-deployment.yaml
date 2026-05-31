@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-longhorn-proxy
+  namespace: longhorn-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-longhorn-proxy
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-longhorn-proxy
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/wave-1/proxy-configmap.yaml") . | sha256sum }}
+    spec:
+      {{- if gt (len .Values._juno_terra_image_pull_secrets) 0 }}
+      imagePullSecrets:
+{{ toYaml .Values._juno_terra_image_pull_secrets | indent 8 }}
+      {{- end }}
+      containers:
+        - name: proxy
+          image: "{{ .Values._juno_longhorn_proxy_image }}"
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: {{ .Release.Name }}-longhorn-proxy-config
