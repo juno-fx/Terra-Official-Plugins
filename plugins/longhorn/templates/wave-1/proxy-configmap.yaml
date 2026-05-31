@@ -21,7 +21,7 @@ data:
             listen 8080;
 
             location = {{ .Values.prefix }} {
-                return 301 $scheme://$host$request_uri/;
+                return 301 {{ .Values.prefix }}/;
             }
 
             location {{ .Values.prefix }}/ {
