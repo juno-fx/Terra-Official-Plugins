@@ -7,15 +7,22 @@ data:
     #!/bin/bash
     set -e
     set -x
-    rm -rf /workspace/* /workspace/.[!.]* 2>/dev/null || true
-    git clone --branch "$GIT_REF" "$GIT_URL" /workspace
+
+    WORK_ROOT="/workspace"
+    if [ -n "$GIT_URL" ]; then
+      rm -rf /workspace/* /workspace/.[!.]* 2>/dev/null || true
+      git clone --branch "$GIT_REF" "$GIT_URL" /workspace
+    elif [ -n "$SOURCE_PATH" ]; then
+      WORK_ROOT="$SOURCE_PATH"
+    fi
+
     if [ -n "$WORK_DIR" ]; then
       case "$WORK_DIR" in
         /*) TARGET_DIR="$WORK_DIR" ;;
-        *)  TARGET_DIR="/workspace/$WORK_DIR" ;;
+        *)  TARGET_DIR="$WORK_ROOT/$WORK_DIR" ;;
       esac
     else
-      TARGET_DIR="/workspace"
+      TARGET_DIR="$WORK_ROOT"
     fi
     mkdir -p "$TARGET_DIR"
     if [ -n "$BUILD_COMMAND" ]; then
@@ -26,13 +33,17 @@ data:
     #!/bin/bash
     set -e
     set -x
+
+    WORK_ROOT="/workspace"
+    [ -n "$SOURCE_PATH" ] && [ -z "$GIT_URL" ] && WORK_ROOT="$SOURCE_PATH"
+
     if [ -n "$WORK_DIR" ]; then
       case "$WORK_DIR" in
         /*) TARGET_DIR="$WORK_DIR" ;;
-        *)  TARGET_DIR="/workspace/$WORK_DIR" ;;
+        *)  TARGET_DIR="$WORK_ROOT/$WORK_DIR" ;;
       esac
     else
-      TARGET_DIR="/workspace"
+      TARGET_DIR="$WORK_ROOT"
     fi
     cd "$TARGET_DIR"
     eval "$RUN_COMMAND"

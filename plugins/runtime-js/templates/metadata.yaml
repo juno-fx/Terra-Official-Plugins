@@ -28,15 +28,19 @@ data:
       required: true
       default: "22"
     - name: git_url
-      description: "Git repository URL to clone"
+      description: "Git repository URL to clone (leave empty when using source_path)"
       type: string
-      required: true
-      default: "https://github.com/aldmbmtl/runtimes.git"
+      required: false
+      default: ""
     - name: git_ref
       description: "Git reference (branch, tag, commit)"
       type: string
-      required: true
+      required: false
       default: "main"
+    - name: source_path
+      description: "Path to existing code on disk (alternative to git clone)"
+      type: string
+      required: false
     - name: work_dir
       description: "Working directory (relative to repo root, or absolute path)"
       type: string
