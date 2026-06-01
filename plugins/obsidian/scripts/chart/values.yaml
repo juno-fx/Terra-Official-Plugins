@@ -25,3 +25,5 @@ _kuiper:
 registry: "lscr.io"
 repo: "linuxserver/obsidian"
 tag: "latest"
+vault_storage_class: ""
+vault_size: "10Gi"

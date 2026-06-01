@@ -106,6 +106,8 @@ spec:
               value: {{ .value | quote }}
             {{- end }}
           volumeMounts:
+            - name: vault
+              mountPath: /config
             {{- if .Values.volumeMounts }}
             {{- toYaml .Values.volumeMounts | nindent 12 }}
             {{- end }}
@@ -117,6 +119,9 @@ spec:
             {{- end }}
             {{- end }}
       volumes:
+        - name: vault
+          persistentVolumeClaim:
+            claimName: "{{ .Values.name }}-vault"
         {{- if .Values.volumeMounts }}
         {{- toYaml .Values.volumes | nindent 8 }}
         {{- end }}

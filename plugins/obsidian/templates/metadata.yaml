@@ -27,3 +27,12 @@ data:
       type: string
       required: true
       default: "latest"
+    - name: vault_storage_class
+      description: "Storage class for your Obsidian vault. Data persists across restarts."
+      type: k8sStorageClass
+      required: true
+    - name: vault_size
+      description: "Storage size for your vault (e.g. 10Gi)."
+      type: string
+      required: true
+      default: "10Gi"
