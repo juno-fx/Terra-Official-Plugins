@@ -66,7 +66,7 @@ spec:
       {{- $userWorkspaceMount := false -}}
       {{- range .Values.volumeMounts -}}
       {{- if eq .name "workspace" }}{{ $userWorkspaceMount = true }}{{ end -}}
-      {{- end -}}
+      {{- end }}
 
       initContainers:
         - name: clone-and-build
@@ -185,7 +185,7 @@ spec:
       {{- $userWorkspaceVol := false -}}
       {{- range .Values.volumes -}}
       {{- if eq .name "workspace" }}{{ $userWorkspaceVol = true }}{{ end -}}
-      {{- end -}}
+      {{- end }}
 
       volumes:
         {{- if not $userWorkspaceVol }}
