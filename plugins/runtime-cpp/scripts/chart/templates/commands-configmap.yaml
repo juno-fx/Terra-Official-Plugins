@@ -10,7 +10,7 @@ data:
 
     WORK_ROOT="/workspace"
     if [ -n "$GIT_URL" ]; then
-      if [ ! -d /workspace/.git ]; then
+      if [ -z "$(ls -A /workspace 2>/dev/null)" ]; then
         git clone --branch "$GIT_REF" "$GIT_URL" /workspace
       fi
     elif [ -n "$SOURCE_PATH" ]; then
