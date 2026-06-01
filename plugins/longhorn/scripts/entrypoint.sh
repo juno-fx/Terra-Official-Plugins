@@ -1,11 +1,15 @@
 #!/bin/bash
-
 set -e
-echo "Starting entrypoint script..."
 
-# The full contents of the scripts directory will be
-# unpacked to the current directory that this script
-# runs in. In this example, we will just list the
-# directory so you can see the contents and begin
-# building your awesome plugin!
-ls -la
+if [ -z "${PREFIX:-}" ]; then
+    echo "Error: PREFIX environment variable is required but not set"
+    exit 1
+fi
+
+if [ "${CLEANUP:-}" = "true" ]; then
+    echo "Running cleanup with PREFIX: $PREFIX"
+    ./cleanup.sh
+else
+    echo "Starting Longhorn dashboard configuration with PREFIX: $PREFIX"
+    ./configure.sh
+fi
