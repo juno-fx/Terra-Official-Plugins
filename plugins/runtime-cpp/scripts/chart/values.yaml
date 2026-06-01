@@ -12,7 +12,6 @@ gpu: false
 git_url: ""
 git_ref: "main"
 source_path: ""
-work_dir: ""
 build_command: ""
 run_command: ""
 port: 8080

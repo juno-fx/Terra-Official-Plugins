@@ -41,11 +41,6 @@ data:
       description: "Path to existing code on disk (alternative to git clone)"
       type: string
       required: false
-    - name: work_dir
-      description: "Working directory (relative to repo root, or absolute path)"
-      type: string
-      required: false
-      default: "js"
     - name: build_command
       description: "Build command (e.g. npm install)"
       type: string

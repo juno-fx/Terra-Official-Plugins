@@ -62,45 +62,11 @@ spec:
         - name: "{{ .Values.pullSecret }}"
       {{- end }}
 
-      {{- /* Check if user provides a volumeMount at mountPath "/workspace" */ -}}
-      {{- $userWorkspaceMount := false -}}
-      {{- range .Values.volumeMounts -}}
-      {{- if eq (.mountPath | trimSuffix "/") "/workspace" }}{{ $userWorkspaceMount = true }}{{ end -}}
-      {{- end }}
-
-      initContainers:
-        - name: clone-and-build
-          imagePullPolicy: IfNotPresent
-          image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
-          command: ["/commands/init-clone.sh"]
-          env:
-            - name: GIT_URL
-              value: "{{ .Values.git_url }}"
-            - name: GIT_REF
-              value: "{{ .Values.git_ref }}"
-            - name: SOURCE_PATH
-              value: "{{ .Values.source_path }}"
-            - name: WORK_DIR
-              value: "{{ .Values.work_dir }}"
-            - name: BUILD_COMMAND
-              value: "{{ .Values.build_command }}"
-            {{- if .Values.env }}{{- include "runtime-custom-env" . | nindent 12 }}{{- end }}
-          volumeMounts:
-            - name: commands
-              mountPath: /commands
-            {{- if not $userWorkspaceMount }}
-            - name: workspace
-              mountPath: /workspace
-            {{- end }}
-            {{- if .Values.volumeMounts }}
-            {{- toYaml .Values.volumeMounts | nindent 12 }}
-            {{- end }}
-
       containers:
         - name: runtime-go
           imagePullPolicy: IfNotPresent
           image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
-          command: ["/commands/run-app.sh"]
+          command: ["/commands/entrypoint.sh"]
           env:
             - name: JUNO_WORKSTATION
               value: "{{ .Values.name }}"
@@ -126,10 +92,12 @@ spec:
               value: "{{ .Values.git_url }}"
             - name: SOURCE_PATH
               value: "{{ .Values.source_path }}"
-            - name: WORK_DIR
-              value: "{{ .Values.work_dir }}"
             - name: RUN_COMMAND
               value: "{{ .Values.run_command }}"
+            - name: GIT_REF
+              value: "{{ .Values.git_ref }}"
+            - name: BUILD_COMMAND
+              value: "{{ .Values.build_command }}"
             {{- if .Values.env }}{{- include "runtime-custom-env" . | nindent 12 }}{{- end }}
           resources:
             requests:
@@ -164,10 +132,6 @@ spec:
           volumeMounts:
             - name: commands
               mountPath: /commands
-            {{- if not $userWorkspaceMount }}
-            - name: workspace
-              mountPath: /workspace
-            {{- end }}
             - name: shm
               mountPath: /dev/shm
             {{- if .Values.volumeMounts }}
@@ -181,17 +145,7 @@ spec:
             {{- end }}
             {{- end }}
 
-      {{- /* Check if user provides a volume named "workspace" */ -}}
-      {{- $userWorkspaceVol := false -}}
-      {{- range .Values.volumes -}}
-      {{- if eq .name "workspace" }}{{ $userWorkspaceVol = true }}{{ end -}}
-      {{- end }}
-
       volumes:
-        {{- if not $userWorkspaceVol }}
-        - name: workspace
-          emptyDir: {}
-        {{- end }}
         - name: commands
           configMap:
             name: "{{ .Values.name }}-runtime-commands"

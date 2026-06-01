@@ -4,8 +4,7 @@ icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/main/plug
 description: >
   JavaScript (Node.js) runtime environment. Clone a git repo, install
   dependencies, and run your Node.js application. Configurable via env vars:
-  git_url (repo to clone), git_ref (branch/tag), work_dir (working directory),
-  build_command (e.g. npm install), run_command (e.g. node main.js), port,
+  git_url (repo to clone), git_ref (branch/tag), build_command (e.g. npm install), run_command (e.g. node main.js), port,
   and network_mode (ingress-auth/ingress-noauth/clusterip/nodeport).
 category: Development
 tags:
