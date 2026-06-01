@@ -10,8 +10,9 @@ data:
 
     WORK_ROOT="/workspace"
     if [ -n "$GIT_URL" ]; then
-      rm -rf /workspace/* /workspace/.[!.]* 2>/dev/null || true
-      git clone --branch "$GIT_REF" "$GIT_URL" /workspace
+      if [ ! -d /workspace/.git ]; then
+        git clone --branch "$GIT_REF" "$GIT_URL" /workspace
+      fi
     elif [ -n "$SOURCE_PATH" ]; then
       WORK_ROOT="$SOURCE_PATH"
     fi
@@ -25,7 +26,9 @@ data:
       TARGET_DIR="$WORK_ROOT"
     fi
     mkdir -p "$TARGET_DIR"
-    python -m venv "$WORK_ROOT/.venv"
+    if [ ! -d "$WORK_ROOT/.venv" ]; then
+      python -m venv "$WORK_ROOT/.venv"
+    fi
     if [ -n "$BUILD_COMMAND" ]; then
       source "$WORK_ROOT/.venv/bin/activate"
       cd "$TARGET_DIR" && eval "$BUILD_COMMAND"
