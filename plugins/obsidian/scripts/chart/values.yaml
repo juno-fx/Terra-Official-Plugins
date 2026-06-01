@@ -25,3 +25,7 @@ _kuiper:
 registry: "lscr.io"
 repo: "linuxserver/obsidian"
 tag: "latest"
+vault_volume:
+  name: ""
+  sub_path: ""
+  container_path: /config

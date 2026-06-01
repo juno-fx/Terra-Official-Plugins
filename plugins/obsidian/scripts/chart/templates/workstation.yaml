@@ -94,7 +94,7 @@ spec:
             - name: USER
               value: "{{ .Values.user }}"
             - name: HOME
-              value: "/home/{{ .Values.user }}"
+              value: "/config"
             - name: PUID
               value: "{{ .Values.puid }}"
             - name: PGID
@@ -106,6 +106,13 @@ spec:
               value: {{ .value | quote }}
             {{- end }}
           volumeMounts:
+            {{- if .Values.vault_volume.name }}
+            - name: vault
+              mountPath: /config
+              {{- if .Values.vault_volume.sub_path }}
+              subPath: {{ .Values.vault_volume.sub_path }}
+              {{- end }}
+            {{- end }}
             {{- if .Values.volumeMounts }}
             {{- toYaml .Values.volumeMounts | nindent 12 }}
             {{- end }}
@@ -117,6 +124,11 @@ spec:
             {{- end }}
             {{- end }}
       volumes:
+        {{- if .Values.vault_volume.name }}
+        - name: vault
+          persistentVolumeClaim:
+            claimName: {{ .Values.vault_volume.name }}
+        {{- end }}
         {{- if .Values.volumeMounts }}
         {{- toYaml .Values.volumes | nindent 8 }}
         {{- end }}
