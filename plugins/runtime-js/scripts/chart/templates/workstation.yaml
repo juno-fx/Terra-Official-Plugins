@@ -62,10 +62,10 @@ spec:
         - name: "{{ .Values.pullSecret }}"
       {{- end }}
 
-      {{- /* Check if user provides a volumeMount named "workspace" */ -}}
+      {{- /* Check if user provides a volumeMount at mountPath "/workspace" */ -}}
       {{- $userWorkspaceMount := false -}}
       {{- range .Values.volumeMounts -}}
-      {{- if eq .name "workspace" }}{{ $userWorkspaceMount = true }}{{ end -}}
+      {{- if eq .mountPath "/workspace" }}{{ $userWorkspaceMount = true }}{{ end -}}
       {{- end }}
 
       initContainers:
