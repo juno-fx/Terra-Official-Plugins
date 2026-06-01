@@ -50,7 +50,7 @@ data:
 
     echo "[init] Starting wetty..."
     wetty -b /hermes/__NAME__ --allow-iframe -p 7681 \
-      -c "sh -c '. /opt/hermes/.venv/bin/activate; LINES=\$(hermes sessions list --limit 1 2>/dev/null | wc -l); if [ \"\$LINES\" -gt 1 ]; then exec /opt/hermes/hermes --tui --continue; else exec /opt/hermes/hermes --tui; fi'" 2>&1 | sed 's/^/[wetty] /' &
+      -c "sh -c '. /opt/hermes/.venv/bin/activate && echo && echo \"Run hermes to start Hermes\" && echo && exec sh -i'" 2>&1 | sed 's/^/[wetty] /' &
     WETTY_PID=$!
 
     wait
