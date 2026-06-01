@@ -1,6 +1,6 @@
 resource_id: obsidian
 name: Obsidian
-icon: https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/obsidian/scripts/assets/obsidian.png?raw=true
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/obsidian/scripts/assets/obsidian.png
 description: Obsidian is a powerful knowledge base and note-taking application that works on top of a local folder of plain text Markdown files.
 category: Productivity
 tags:
@@ -8,12 +8,5 @@ tags:
   - notes
   - markdown
   - productivity
-fields:
-  - name: destination
-    description: Directory within the install volume where Obsidian will be installed. Default is /obsidian.
-    required: false
-    default: /obsidian
-  - name: install_volume
-    description: The shared volume to install Obsidian into.
-    required: true
-    type: shared-volume
+  - cluster-level
+fields: []

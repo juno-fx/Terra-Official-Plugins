@@ -1,6 +1,29 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}-terra-metadata
+  name: "{{ .Release.Name }}-terra-metadata"
+  annotations:
+    juno-innovations.com/workload: "Application"
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
 data:
-  chart: "{{ .Chart.Name }}"
+  chart: "{{ .Release.Name }}-scripts-configmap"
+  description: "Obsidian knowledge base and note-taking"
+  fields: |
+    - name: icon
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/obsidian/scripts/assets/obsidian.png"
+    - name: registry
+      description: "Container registry"
+      type: string
+      required: true
+      default: "lscr.io"
+    - name: repo
+      description: "Image repository"
+      type: string
+      required: true
+      default: "linuxserver/obsidian"
+    - name: tag
+      description: "Image tag"
+      type: string
+      required: true
+      default: "latest"
