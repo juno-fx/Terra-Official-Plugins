@@ -99,6 +99,8 @@ spec:
               value: "{{ .Values.puid }}"
             - name: PGID
               value: "{{ .Values.guid }}"
+            - name: PREFIX
+              value: "/polaris/{{ .Values.name }}/"
             - name: SUBFOLDER
               value: "/polaris/{{ .Values.name }}/"
             {{- range .Values.env }}
