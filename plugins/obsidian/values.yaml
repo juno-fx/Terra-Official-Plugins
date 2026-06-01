@@ -1,0 +1,7 @@
+# configuration
+destination: /obsidian
+url: "https://github.com/obsidianmd/obsidian-releases/releases/download/v1.12.7/Obsidian-1.12.7.AppImage"
+install_volume:
+  name: apps-pv-claim
+  sub_path:
+  container_path: /apps

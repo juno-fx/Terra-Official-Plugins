@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.12.7
+Name=Obsidian
+Comment=Obsidian Note-Taking App
+Exec=DESTINATION-PATH
+Icon=ICON-PATH
+Terminal=false
+Type=Application
+Categories=X-Polaris
