@@ -27,7 +27,3 @@ data:
       type: string
       required: true
       default: "latest"
-    - name: vault_volume
-      description: "Persistent volume to store your Obsidian vaults. Data is preserved across restarts."
-      type: exclusive-volume
-      required: true
