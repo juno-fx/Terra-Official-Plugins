@@ -10,6 +10,21 @@ data:
     set -e
 
     export HOME=/opt/data
+
+    # Install wetty BEFORE activating the Python venv so that node-gyp uses the
+    # system Python (which has the 'gyp' package available) rather than the venv
+    # Python (which does not). The venv activation overrides the PATH-resolved
+    # python3, causing node-gyp's gyp_main.py to fail with:
+    #   ModuleNotFoundError: No module named 'gyp'
+    if ! command -v wetty > /dev/null 2>&1; then
+      echo "[init] Installing build tools and wetty..."
+      apt-get install -y build-essential 2>&1
+      npm install -g wetty 2>&1
+      chmod +x /usr/local/lib/node_modules/wetty/build/main.js
+    else
+      echo "[init] wetty already installed, skipping..."
+    fi
+
     . /opt/hermes/.venv/bin/activate
 
     cleanup() {
@@ -42,11 +57,6 @@ data:
     echo "[init] Starting dashboard..."
     hermes dashboard --host 127.0.0.1 --port 9120 --no-open 2>&1 | sed 's/^/[dashboard] /' &
     DASHBOARD_PID=$!
-
-    echo "[init] Installing build tools and wetty..."
-    apt-get install -y build-essential 2>&1
-    npm install -g wetty --build-from-source 2>&1
-    chmod +x /usr/local/lib/node_modules/wetty/build/main.js
 
     echo "[init] Starting wetty..."
     wetty -b /hermes/__NAME__ --allow-iframe -p 7681 \
