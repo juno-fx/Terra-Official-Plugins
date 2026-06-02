@@ -10,7 +10,7 @@ data:
     set -e
 
     # Install tools and build deps for wetty's native modules
-    apt-get update -qq && apt-get install -y -qq curl bash python3 make g++ git su-exec 2>/dev/null
+    apt-get update -qq && apt-get install -y -qq curl bash python3 make g++ git gosu 2>/dev/null
 
     export SHELL=/bin/bash
 
@@ -25,7 +25,7 @@ data:
       addgroup --gid "$PGID" "$USERNAME" 2>/dev/null || true
       adduser --disabled-password --home /data --ingroup "$USERNAME" --uid "$PUID" "$USERNAME" 2>/dev/null || true
       chsh -s /bin/bash "$USERNAME" 2>/dev/null || true
-      CMD="/sbin/su-exec $USERNAME /bin/bash"
+      CMD="gosu $USERNAME /bin/bash"
       OPENCODE_USER="$USERNAME"
     else
       CMD="/bin/bash"
