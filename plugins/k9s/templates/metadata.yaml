@@ -36,10 +36,8 @@ data:
       required: true
       default: "readonly-ns"
       options:
-        - label: Read-only (current namespace)
-          value: readonly-ns
-        - label: Admin (current namespace)
-          value: admin-ns
+        - readonly-ns
+        - admin-ns
     - name: storage_class
       description: "Storage class to use for the data disk"
       required: true
