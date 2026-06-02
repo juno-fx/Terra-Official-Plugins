@@ -25,7 +25,6 @@ data:
       addgroup --gid "$PGID" "$USERNAME" 2>/dev/null || true
       adduser --disabled-password --home /data --ingroup "$USERNAME" --uid "$PUID" "$USERNAME" 2>/dev/null || true
       chsh -s /bin/bash "$USERNAME" 2>/dev/null || true
-      chown -R "$PUID:$PGID" /data
       CMD="gosu $USERNAME /bin/bash"
       OPENCODE_USER="$USERNAME"
     else
@@ -49,6 +48,9 @@ data:
 
     # Make git-serve.sh available on PATH
     ln -sf /opt/boot/git-serve.sh /usr/local/bin/git-serve
+
+    # Fix ownership so the user can write to /data (opencode cache, etc.)
+    chown -R "$PUID:$PGID" /data
 
     # Start wetty at root — nginx handles prefix
     exec wetty --port {{ .Values.ttyd_port }} --command "$CMD"
