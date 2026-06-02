@@ -7,8 +7,4 @@ cpuLimit:
 memory:
 memoryLimit:
 gpu:
-host:
-nginx_registry:
-nginx_repo:
-nginx_tag:
 env:

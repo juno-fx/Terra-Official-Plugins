@@ -146,8 +146,6 @@ Thumbs.db
 /jtmp/
 
 .vscode
-# Local test deployment files
+plugins/n8n/SECURITY-AUDIT.md
+plugins/n8n/spoofed-values.yaml
 spoofed-values.yaml
-SECURITY-AUDIT.md
-**/spoofed-values.yaml
-**/SECURITY-AUDIT.md
