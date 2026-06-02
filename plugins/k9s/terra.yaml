@@ -1,0 +1,11 @@
+resource_id: k9s
+name: k9s - Kubernetes TUI
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/k9s/scripts/assets/logo.png
+description: k9s is a Kubernetes CLI dashboard tool accessible via browser.
+category: Development
+compatibility: genesis-deployment>=3.0.0-beta.1, orion-deployment>=3.0.0-beta.1
+tags:
+  - cluster-level
+  - development
+  - kubernetes
+fields: []

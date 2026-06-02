@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-boot
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+data:
+  boot.sh: |
+    #!/bin/sh
+    set -e
+
+    # Install tools and build deps for wetty's native modules
+    apt-get update -qq && apt-get install -y -qq curl bash python3 make g++ 2>/dev/null
+
+    export SHELL=/bin/bash
+
+    # Create user from PUID/GUID
+    PUID=${PUID:-1000}
+    PGID=${PGID:-1000}
+    USERNAME=${USER:-user}
+    export HOME=/data
+    export SHELL=/bin/sh
+
+    if [ "$PUID" != "0" ]; then
+      addgroup -g $PGID $USERNAME 2>/dev/null || true
+      adduser -D -h /data -G $USERNAME -u $PUID $USERNAME 2>/dev/null || true
+      chsh -s /bin/bash $USERNAME 2>/dev/null || true
+    fi
+
+    # Install tmux (for k9s)
+    apt-get install -y -qq tmux 2>/dev/null
+
+    # Install wetty (like Hermes Agent's built-in wetty)
+    npm install -g wetty
+
+    # Download k9s binary from GitHub releases
+    curl -fsSL -o /tmp/k9s.tar.gz https://github.com/derailed/k9s/releases/latest/download/k9s_Linux_amd64.tar.gz
+    tar -xzf /tmp/k9s.tar.gz -C /usr/local/bin k9s
+    chmod +x /usr/local/bin/k9s
+    rm -f /tmp/k9s.tar.gz
+
+    # Create kubeconfig from in-cluster service account so k9s can connect
+    mkdir -p /data/.kube
+    echo "apiVersion: v1" > /data/.kube/config
+    echo "kind: Config" >> /data/.kube/config
+    echo "clusters:" >> /data/.kube/config
+    echo "- cluster:" >> /data/.kube/config
+    echo "    certificate-authority: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt" >> /data/.kube/config
+    echo "    server: https://kubernetes.default.svc" >> /data/.kube/config
+    echo "  name: in-cluster" >> /data/.kube/config
+    echo "contexts:" >> /data/.kube/config
+    echo "- context:" >> /data/.kube/config
+    echo "    cluster: in-cluster" >> /data/.kube/config
+    echo "    namespace: {{ .Release.Namespace }}" >> /data/.kube/config
+    echo "    user: default" >> /data/.kube/config
+    echo "  name: in-cluster" >> /data/.kube/config
+    echo "current-context: in-cluster" >> /data/.kube/config
+    echo "users:" >> /data/.kube/config
+    echo "- name: default" >> /data/.kube/config
+    echo "  user:" >> /data/.kube/config
+    echo "    tokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token" >> /data/.kube/config
+    export KUBECONFIG=/data/.kube/config
+
+    # Build the command
+    if [ "$PUID" != "0" ]; then
+      CMD="/sbin/su-exec $USERNAME /bin/bash -c 'k9s; exec /bin/bash -l'"
+    else
+      CMD="/bin/bash -c 'k9s; exec /bin/bash -l'"
+    fi
+
+    # Start wetty at root — nginx handles prefix
+    exec wetty --port {{ .Values.ttyd_port }} --command "$CMD"

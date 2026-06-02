@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-terra-metadata
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+  annotations:
+    juno-innovations.com/workload: "Terminal"
+data:
+  chart: "{{ .Release.Name }}-scripts-configmap"
+  description: "k9s is a Kubernetes CLI dashboard tool accessible via browser."
+  fields: |
+    - name: registry
+      description: "Registry to pull the nginx sidecar image from"
+      type: string
+      required: true
+      default: "docker.io"
+    - name: repo
+      description: "Repository to pull the nginx sidecar image from"
+      type: string
+      required: true
+      default: "nginx"
+    - name: tag
+      description: "Tag to pull the nginx sidecar image from"
+      type: string
+      required: true
+      default: "alpine"
+    - name: timezone
+      description: "Timezone to use for the k9s instance"
+      type: string
+      required: true
+      default: "America/New_York"
+    - name: cluster_access
+      description: "Kubernetes RBAC access level for the service account"
+      type: select
+      required: true
+      default: "readonly-ns"
+      options:
+        - label: Read-only (current namespace)
+          value: readonly-ns
+        - label: Admin (current namespace)
+          value: admin-ns
+    - name: storage_class
+      description: "Storage class to use for the data disk"
+      required: true
+      type: k8sStorageClass
+    - name: storage_size
+      description: "Storage size to use for the data disk"
+      default: 10Gi
+      required: true
+      type: string
