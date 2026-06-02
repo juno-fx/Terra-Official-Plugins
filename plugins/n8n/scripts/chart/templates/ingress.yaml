@@ -14,10 +14,10 @@ spec:
     - host: {{ .Values.host }}
       http:
         paths:
-          - path: "/webtop/{{ .Values.name }}/"
+          - path: "/n8n/{{ .Values.name }}/"
             pathType: Prefix
             backend:
               service:
                 name: {{ .Values.name }}
                 port:
-                  number: 3001
+                  number: 8080
