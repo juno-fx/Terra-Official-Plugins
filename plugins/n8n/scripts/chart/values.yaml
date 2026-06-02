@@ -29,3 +29,6 @@ _kuiper:
 timezone: "America/New_York"
 storage_class:
 storage_size: "1Gi"
+nginx_registry: "docker.io"
+nginx_repo: "nginx"
+nginx_tag: "latest"
