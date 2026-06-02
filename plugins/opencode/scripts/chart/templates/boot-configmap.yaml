@@ -25,6 +25,7 @@ data:
       addgroup --gid "$PGID" "$USERNAME" 2>/dev/null || true
       adduser --disabled-password --home /data --ingroup "$USERNAME" --uid "$PUID" "$USERNAME" 2>/dev/null || true
       chsh -s /bin/bash "$USERNAME" 2>/dev/null || true
+      chown -R "$PUID:$PGID" /data
       CMD="gosu $USERNAME /bin/bash"
       OPENCODE_USER="$USERNAME"
     else
