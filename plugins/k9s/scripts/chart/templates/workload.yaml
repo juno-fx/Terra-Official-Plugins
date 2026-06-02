@@ -48,6 +48,16 @@ spec:
               value: "{{ .Values.user }}"
             - name: HOME
               value: "/data"
+          startupProbe:
+            tcpSocket:
+              port: {{ .Values.ttyd_port }}
+            failureThreshold: 150
+            periodSeconds: 2
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.ttyd_port }}
+            failureThreshold: 24
+            periodSeconds: 5
           volumeMounts:
             - name: boot
               mountPath: /opt/boot
