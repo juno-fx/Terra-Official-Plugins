@@ -10,8 +10,8 @@ data:
         listen 8080;
         server_name _;
 
-        location /n8n/{{ .Values.name }}/ {
-            rewrite ^/n8n/{{ .Values.name }}/(.*) /$1 break;
+        location /polaris/{{ .Values.name }}/ {
+            rewrite ^/polaris/{{ .Values.name }}/(.*) /$1 break;
             proxy_pass http://127.0.0.1:5678;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
