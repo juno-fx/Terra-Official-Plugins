@@ -10,7 +10,7 @@ data:
     set -e
 
     # Install tools and build deps for wetty's native modules
-    apt-get update -qq && apt-get install -y -qq curl bash python3 make g++ 2>/dev/null
+    apt-get update -qq && apt-get install -y -qq curl bash python3 make g++ git 2>/dev/null
 
     export SHELL=/bin/bash
 
@@ -46,5 +46,32 @@ data:
       ln -sf /data/.opencode/bin/opencode /usr/local/bin/opencode
     fi
 
+    # Make git-serve.sh available on PATH
+    ln -sf /opt/boot/git-serve.sh /usr/local/bin/git-serve
+
     # Start wetty at root — nginx handles prefix
     exec wetty --port {{ .Values.ttyd_port }} --command "$CMD"
+  git-serve.sh: |
+    #!/bin/bash
+    set -e
+
+    SERVICE="${NAME:-opencode}"
+    NAMESPACE="${JUNO_PROJECT:-default}"
+    FQDN="${SERVICE}.${NAMESPACE}.svc.cluster.local"
+    PORT=9418
+
+    REPO_DIR="$(pwd)"
+    REPO_NAME="$(basename "$REPO_DIR")"
+    PARENT_DIR="$(dirname "$REPO_DIR")"
+
+    echo "=== git-serve ==="
+    echo "Serving:  ${REPO_DIR}"
+    echo "FQDN:     ${FQDN}"
+    echo "Clone URL: git://${FQDN}:${PORT}/${REPO_NAME}"
+    echo ""
+    echo "Add to Terra sources as:"
+    echo "  git://${FQDN}:${PORT}/${REPO_NAME}"
+    echo ""
+
+    git daemon --verbose --export-all --reuseaddr \
+      --base-path="${PARENT_DIR}" --port="${PORT}" "${REPO_DIR}"
