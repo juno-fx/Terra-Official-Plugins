@@ -1,0 +1,37 @@
+# Kuiper-injected standard keys — do not remove
+name: "claude-code"
+user: ""
+group: "coder"
+cpu: "500m"
+memory: "1Gi"
+cpuLimit: "2"
+memoryLimit: "2Gi"
+idx: 0
+guid: "1000"
+puid: "1000"
+host: ""
+pullSecret: ""
+session: ""
+volumeMounts: []
+volumes: []
+env:
+  - name: JUNO
+    value: "true"
+selector: []
+plugins: []
+_kuiper: {}
+
+# Plugin-specific defaults
+ttyd_port: 7681
+
+# Nginx sidecar image
+nginx_registry: "docker.io"
+nginx_repo: "nginx"
+nginx_tag: "alpine"
+
+# Timezone
+timezone: "America/New_York"
+
+# Storage (PVC kept for compatibility but not mounted by default)
+storage_class: ""
+storage_size: "10Gi"

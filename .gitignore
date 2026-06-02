@@ -146,3 +146,7 @@ Thumbs.db
 /jtmp/
 
 .vscode
+
+# Spoofed values for local testing
+spoofed-values.yaml
+**/spoofed-values.yaml

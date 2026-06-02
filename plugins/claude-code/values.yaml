@@ -1,0 +1,20 @@
+# Top-level values for the ArgoCD Application (install-time)
+registry: "docker.io"
+repo: "nginx"
+tag: "alpine"
+timezone: "America/New_York"
+storage_class: ""
+storage_size: "10Gi"
+cpu: "500m"
+memory: "1Gi"
+cpuLimit: "2"
+memoryLimit: "2Gi"
+group: "coder"
+host: ""
+pullSecret: ""
+guid: "1000"
+puid: "1000"
+idx: 0
+network_mode: "ingress"
+env: []
+type: "Terminal"
