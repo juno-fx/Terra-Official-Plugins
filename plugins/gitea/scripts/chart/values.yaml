@@ -34,3 +34,7 @@ nginx_tag: "1.29.3"
 
 # Resource limits (null = no limit unless requested)
 shmSize: 256Mi
+
+# Storage
+storage_class:
+storage_size: "5Gi"
