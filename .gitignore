@@ -1,3 +1,5 @@
+spoofed-values.yaml
+**/spoofed-values.yaml
 .devbox
 
 # Byte-compiled / optimized / DLL files
@@ -149,3 +151,6 @@ Thumbs.db
 plugins/n8n/SECURITY-AUDIT.md
 plugins/n8n/spoofed-values.yaml
 spoofed-values.yaml
+
+**/spoofed-values.yaml
+**/SECURITY-AUDIT.md
