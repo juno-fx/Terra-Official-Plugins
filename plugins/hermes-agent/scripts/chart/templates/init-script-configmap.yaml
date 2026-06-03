@@ -9,8 +9,9 @@ data:
     #!/bin/sh
     set -e
 
-    export HOME=/opt/data
     HERMES_BIN="/opt/hermes/.venv/bin/hermes"
+
+    log() { echo "[init] $*"; }
 
     # Install wetty BEFORE activating the Python venv so that node-gyp uses the
     # system Python (which has the 'gyp' package available) rather than the venv
@@ -18,17 +19,17 @@ data:
     # python3, causing node-gyp's gyp_main.py to fail with:
     #   ModuleNotFoundError: No module named 'gyp'
     if ! command -v wetty > /dev/null 2>&1; then
-      echo "[init] Installing build tools, sudo, and wetty..."
+      log "Installing build tools, sudo, and wetty..."
       apt-get install -y build-essential sudo 2>&1
       npm install -g wetty 2>&1
       chmod +x /usr/local/lib/node_modules/wetty/build/main.js
     else
-      echo "[init] wetty already installed, skipping..."
+      log "wetty already installed, skipping..."
     fi
 
     # --- User/group remap (only when PUID != 0) ---
     if [ "${PUID:-0}" != "0" ]; then
-      echo "[init] Remapping hermes user to PUID=${PUID} PGID=${PGID}"
+      log "Remapping hermes user to PUID=${PUID} PGID=${PGID}"
 
       # Remap the built-in hermes user to the requested UID/GID
       usermod -u "$PUID" hermes
@@ -53,27 +54,24 @@ data:
         [ -d "/opt/data/$sub" ] && chown -R hermes:hermes "/opt/data/$sub"
       done
 
-      # Re-chown install-dir trees so the remapped hermes UID can write
-      # to .venv (lazy_deps.py), ui-tui (esbuild rebuilds), node_modules.
-      # These are built with UID 10000 in the image; after usermod the
-      # files still carry the old numeric UID and the remapped hermes
-      # (now PUID) would get EACCES.
-      chown -R hermes:hermes \
-        /opt/hermes/.venv \
-        /opt/hermes/ui-tui \
-        /opt/hermes/node_modules
+      # Re-chown the entire install tree so the remapped hermes UID can
+      # write __pycache__ dirs, egg-info metadata, plugin installs, etc.
+      # The image ships with UID 10000; after usermod the on-disk numeric
+      # UID stays at 10000, causing EACCES on any write.  /opt/hermes is
+      # the image's own filesystem (not a bind mount), so recursive is safe.
+      chown -R hermes:hermes /opt/hermes
 
       # Ensure the Python venv is traversable by the hermes user
       chmod -R o+rX /opt/hermes/.venv
     else
-      echo "[init] PUID=0, running as root (legacy mode)"
+      log "PUID=0, running as root (legacy mode)"
     fi
 
     _SU=""
     [ "${PUID:-0}" != "0" ] && _SU="sudo -E -u hermes"
 
     cleanup() {
-      echo "[init] Shutting down..."
+      log "Shutting down..."
       kill "${GATEWAY_PID:-}" "${DASHBOARD_PID:-}" "${WETTY_PID:-}" 2>/dev/null || true
       wait
       exit
@@ -91,27 +89,24 @@ data:
       fi
     }
 
-    echo "[init] Starting gateway..."
+    log "Starting gateway..."
     as_user "$HERMES_BIN" gateway run 2>&1 | sed 's/^/[gateway] /' &
     GATEWAY_PID=$!
 
-    echo "[init] Waiting for gateway health..."
+    log "Waiting for gateway health..."
     i=1
     until curl -sf http://127.0.0.1:8642/health > /dev/null 2>&1; do
       sleep 2
       i=$((i + 1))
-      if [ "$i" -gt 60 ]; then
-        echo "[init] Gateway failed to start"
-        exit 1
-      fi
+      [ "$i" -gt 60 ] && { log "Gateway failed to start"; exit 1; }
     done
-    echo "[init] Gateway ready"
+    log "Gateway ready"
 
-    echo "[init] Starting dashboard..."
+    log "Starting dashboard..."
     as_user "$HERMES_BIN" dashboard --host 127.0.0.1 --port 9120 --no-open 2>&1 | sed 's/^/[dashboard] /' &
     DASHBOARD_PID=$!
 
-    echo "[init] Starting wetty..."
+    log "Starting wetty..."
     # wetty binds port 7681 as root; spawned shell runs as hermes with venv
     WETTY_CMD="sh -c '. /opt/hermes/.venv/bin/activate && echo && echo \"Run hermes to start Hermes\" && echo && exec sh -i'"
     [ -n "$_SU" ] && WETTY_CMD="$_SU ${WETTY_CMD}"
