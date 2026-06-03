@@ -2,4 +2,4 @@ apiVersion: v1
 description: OpenCode is an open source AI coding agent accessible via browser.
 name: opencode
 version: 0.0.0
-icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/opencode/scripts/assets/logo.png
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/opencode/assets/logo.png
