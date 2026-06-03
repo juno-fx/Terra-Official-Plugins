@@ -10,6 +10,7 @@ data:
     set -e
 
     export HOME=/opt/data
+    HERMES_BIN="/opt/hermes/.venv/bin/hermes"
 
     # Install wetty BEFORE activating the Python venv so that node-gyp uses the
     # system Python (which has the 'gyp' package available) rather than the venv
@@ -17,26 +18,66 @@ data:
     # python3, causing node-gyp's gyp_main.py to fail with:
     #   ModuleNotFoundError: No module named 'gyp'
     if ! command -v wetty > /dev/null 2>&1; then
-      echo "[init] Installing build tools and wetty..."
-      apt-get install -y build-essential 2>&1
+      echo "[init] Installing build tools, sudo, and wetty..."
+      apt-get install -y build-essential sudo 2>&1
       npm install -g wetty 2>&1
       chmod +x /usr/local/lib/node_modules/wetty/build/main.js
     else
       echo "[init] wetty already installed, skipping..."
     fi
 
-    . /opt/hermes/.venv/bin/activate
+    # --- User/group remap (only when PUID != 0) ---
+    if [ "${PUID:-0}" != "0" ]; then
+      echo "[init] Remapping hermes user to PUID=${PUID} PGID=${PGID}"
+
+      # Remap the built-in hermes user to the requested UID/GID
+      usermod -u "$PUID" hermes
+      groupmod -o -g "$PGID" hermes 2>/dev/null || true
+
+      # Ensure home directory exists with correct ownership
+      mkdir -p "/home/${USER}"
+      chown -R hermes:hermes "/home/${USER}"
+
+      # Passwordless sudo for package installs from the terminal
+      echo "hermes ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/hermes
+      chmod 440 /etc/sudoers.d/hermes
+
+      # Optional password
+      if [ -n "${USER_PASS:-}" ]; then
+        echo "hermes:$USER_PASS" | chpasswd
+      fi
+
+      # Fix ownership of the PVC data volume
+      chown hermes:hermes /opt/data
+      for sub in cron sessions logs hooks memories skills skins plans workspace home profiles; do
+        [ -d "/opt/data/$sub" ] && chown -R hermes:hermes "/opt/data/$sub"
+      done
+
+      # Ensure the Python venv is traversable by the hermes user
+      chmod -R o+rX /opt/hermes/.venv
+    else
+      echo "[init] PUID=0, running as root (legacy mode)"
+    fi
 
     cleanup() {
       echo "[init] Shutting down..."
-      kill "$GATEWAY_PID" "$DASHBOARD_PID" "$WETTY_PID" 2>/dev/null || true
+      kill "${GATEWAY_PID:-}" "${DASHBOARD_PID:-}" "${WETTY_PID:-}" 2>/dev/null || true
       wait
       exit
     }
     trap cleanup TERM INT
 
+    # Helper: run a command as hermes user (when not root), else run directly
+    as_user() {
+      if [ "${PUID:-0}" != "0" ]; then
+        sudo -u hermes "$@"
+      else
+        "$@"
+      fi
+    }
+
     echo "[init] Starting gateway..."
-    hermes gateway run 2>&1 | sed 's/^/[gateway] /' &
+    as_user "$HERMES_BIN" gateway run 2>&1 | sed 's/^/[gateway] /' &
     GATEWAY_PID=$!
 
     echo "[init] Waiting for gateway health..."
@@ -55,12 +96,18 @@ data:
     fi
 
     echo "[init] Starting dashboard..."
-    hermes dashboard --host 127.0.0.1 --port 9120 --no-open 2>&1 | sed 's/^/[dashboard] /' &
+    as_user "$HERMES_BIN" dashboard --host 127.0.0.1 --port 9120 --no-open 2>&1 | sed 's/^/[dashboard] /' &
     DASHBOARD_PID=$!
 
     echo "[init] Starting wetty..."
+    # wetty binds port 7681 as root; spawned shell runs as hermes with venv
+    WETTY_CMD="sh -c '. /opt/hermes/.venv/bin/activate && echo && echo \"Run hermes to start Hermes\" && echo && exec sh -i'"
+    if [ "${PUID:-0}" != "0" ]; then
+      WETTY_CMD="sudo -u hermes ${WETTY_CMD}"
+    fi
     wetty -b /hermes/__NAME__ --allow-iframe -p 7681 \
-      -c "sh -c '. /opt/hermes/.venv/bin/activate && echo && echo \"Run hermes to start Hermes\" && echo && exec sh -i'" 2>&1 | sed 's/^/[wetty] /' &
+      -c "${WETTY_CMD}" \
+      2>&1 | sed 's/^/[wetty] /' &
     WETTY_PID=$!
 
     wait
