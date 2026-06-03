@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-boot
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+data:
+  boot.sh: |
+    #!/bin/sh
+    set -e
+
+    # Config path
+    GITEA_DATA=/data/gitea
+    GITEA_CONF=$GITEA_DATA/conf/app.ini
+
+    # Ensure config directory exists
+    mkdir -p $GITEA_DATA/conf
+
+    # Create config from env vars
+    cat > "$GITEA_CONF" << EOF
+    [server]
+    APP_DATA_PATH = $GITEA_DATA
+    PROTOCOL      = http
+    DOMAIN        = {{ .Values.host }}
+    ROOT_URL      = https://{{ .Values.host }}/gitea/{{ .Values.name }}/
+    HTTP_PORT     = {{ .Values.app_port }}
+    SSH_DOMAIN    = {{ .Values.host }}
+    DISABLE_SSH   = true
+
+    [database]
+    DB_TYPE  = sqlite3
+    PATH     = $GITEA_DATA/gitea.db
+
+    [security]
+    INSTALL_LOCK = true
+
+    [service]
+    REQUIRE_SIGNIN_VIEW        = false
+    DISABLE_REGISTRATION       = false
+    ENABLE_NOTIFY_MAIL         = false
+    ALLOW_ONLY_EXTERNAL_REGISTRATION = false
+
+    [repository]
+    ENABLE_PUSH_CREATE_USER    = true
+    ENABLE_PUSH_CREATE_ORG     = true
+    DEFAULT_PUSH_CREATE_PRIVATE = false
+
+    [picture]
+    DISABLE_GRAVATAR        = true
+    ENABLE_FEDERATED_AVATAR = false
+
+    [other]
+    APP_NAME = Juno Git Server
+    EOF
+
+    echo "Config created at $GITEA_CONF"
+
+    # Run database migration (creates schema if first run)
+    gitea migrate -c "$GITEA_CONF"
+
+    # Create admin user if it doesn't already exist
+    if ! gitea admin user list -c "$GITEA_CONF" 2>/dev/null | grep -q "{{ .Values.user }}"; then
+      gitea admin user create \
+        -c "$GITEA_CONF" \
+        --username "{{ .Values.user }}" \
+        --password "juno" \
+        --email "{{ .Values.user }}@juno.local" \
+        --admin \
+        --must-change-password
+      echo "Admin user '{{ .Values.user }}' created (must change password on first login)"
+    fi
+
+    # Start Gitea in foreground
+    exec gitea web -c "$GITEA_CONF"
