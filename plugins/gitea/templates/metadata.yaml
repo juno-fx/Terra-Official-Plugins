@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-terra-metadata"
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+  annotations:
+    juno-innovations.com/workload: "Application"
+data:
+  chart: "{{ .Release.Name }}-scripts-configmap"
+  description: "Gitea is a community managed lightweight code hosting solution written in Go. It provides a Git server with a web interface for managing repositories, issues, and pull requests."
+  fields: |
+    - name: registry
+      description: "Registry to pull the Gitea image from"
+      type: string
+      required: true
+      default: "docker.io"
+    - name: repo
+      description: "Repository to pull the Gitea image from"
+      type: string
+      required: true
+      default: "gitea/gitea"
+    - name: tag
+      description: "Tag to pull the Gitea image from"
+      type: string
+      required: true
+      default: "1.23"
+    - name: nginx_registry
+      description: "Registry to pull the nginx sidecar image from"
+      type: string
+      required: true
+      default: "docker.io"
+    - name: nginx_repo
+      description: "Repository to pull the nginx sidecar image from"
+      type: string
+      required: true
+      default: "nginx"
+    - name: nginx_tag
+      description: "Tag to pull the nginx sidecar image from"
+      type: string
+      required: true
+      default: "1.29.3"

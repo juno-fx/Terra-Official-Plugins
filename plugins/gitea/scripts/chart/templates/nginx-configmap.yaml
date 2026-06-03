@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-nginx
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+data:
+  default.conf: |
+    server {
+        listen 8080;
+        server_name _;
+
+        location /gitea/{{ .Values.name }}/ {
+            proxy_set_header Accept-Encoding "";
+            rewrite ^/gitea/{{ .Values.name }}/(.*) /$1 break;
+            proxy_pass http://127.0.0.1:{{ .Values.app_port }};
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            sub_filter '<head>' '<head><base href="/gitea/{{ .Values.name }}/">';
+            sub_filter_types text/html;
+            sub_filter_once on;
+        }
+    }

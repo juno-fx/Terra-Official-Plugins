@@ -146,3 +146,6 @@ Thumbs.db
 /jtmp/
 
 .vscode
+
+**/spoofed-values.yaml
+**/SECURITY-AUDIT.md
