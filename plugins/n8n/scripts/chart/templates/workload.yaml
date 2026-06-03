@@ -44,6 +44,12 @@ spec:
               value: "true"
             - name: N8N_PATH
               value: "/polaris/{{ .Values.name }}/"
+            - name: N8N_HOST
+              value: "{{ .Values.host }}"
+            - name: N8N_PROTOCOL
+              value: "https"
+            - name: WEBHOOK_URL
+              value: "https://{{ .Values.host }}/polaris/{{ .Values.name }}/"
             {{- range .Values.env }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}
