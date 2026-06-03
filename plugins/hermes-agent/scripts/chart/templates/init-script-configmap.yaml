@@ -59,6 +59,9 @@ data:
       echo "[init] PUID=0, running as root (legacy mode)"
     fi
 
+    _SU=""
+    [ "${PUID:-0}" != "0" ] && _SU="sudo -E -u hermes"
+
     cleanup() {
       echo "[init] Shutting down..."
       kill "${GATEWAY_PID:-}" "${DASHBOARD_PID:-}" "${WETTY_PID:-}" 2>/dev/null || true
@@ -68,9 +71,11 @@ data:
     trap cleanup TERM INT
 
     # Helper: run a command as hermes user (when not root), else run directly
+    # -E preserves container env vars (HERMES_HOME, API_SERVER_KEY, etc.)
+    # that sudo would otherwise strip on env_reset.
     as_user() {
-      if [ "${PUID:-0}" != "0" ]; then
-        sudo -u hermes "$@"
+      if [ -n "$_SU" ]; then
+        $_SU "$@"
       else
         "$@"
       fi
@@ -82,18 +87,15 @@ data:
 
     echo "[init] Waiting for gateway health..."
     i=1
-    while [ "$i" -le 60 ]; do
-      if curl -sf http://127.0.0.1:8642/health > /dev/null 2>&1; then
-        echo "[init] Gateway ready"
-        break
-      fi
+    until curl -sf http://127.0.0.1:8642/health > /dev/null 2>&1; do
       sleep 2
       i=$((i + 1))
+      if [ "$i" -gt 60 ]; then
+        echo "[init] Gateway failed to start"
+        exit 1
+      fi
     done
-    if [ "$i" -gt 60 ]; then
-      echo "[init] Gateway failed to start"
-      exit 1
-    fi
+    echo "[init] Gateway ready"
 
     echo "[init] Starting dashboard..."
     as_user "$HERMES_BIN" dashboard --host 127.0.0.1 --port 9120 --no-open 2>&1 | sed 's/^/[dashboard] /' &
@@ -102,9 +104,7 @@ data:
     echo "[init] Starting wetty..."
     # wetty binds port 7681 as root; spawned shell runs as hermes with venv
     WETTY_CMD="sh -c '. /opt/hermes/.venv/bin/activate && echo && echo \"Run hermes to start Hermes\" && echo && exec sh -i'"
-    if [ "${PUID:-0}" != "0" ]; then
-      WETTY_CMD="sudo -u hermes ${WETTY_CMD}"
-    fi
+    [ -n "$_SU" ] && WETTY_CMD="$_SU ${WETTY_CMD}"
     wetty -b /hermes/__NAME__ --allow-iframe -p 7681 \
       -c "${WETTY_CMD}" \
       2>&1 | sed 's/^/[wetty] /' &
