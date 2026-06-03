@@ -53,6 +53,16 @@ data:
         [ -d "/opt/data/$sub" ] && chown -R hermes:hermes "/opt/data/$sub"
       done
 
+      # Re-chown install-dir trees so the remapped hermes UID can write
+      # to .venv (lazy_deps.py), ui-tui (esbuild rebuilds), node_modules.
+      # These are built with UID 10000 in the image; after usermod the
+      # files still carry the old numeric UID and the remapped hermes
+      # (now PUID) would get EACCES.
+      chown -R hermes:hermes \
+        /opt/hermes/.venv \
+        /opt/hermes/ui-tui \
+        /opt/hermes/node_modules
+
       # Ensure the Python venv is traversable by the hermes user
       chmod -R o+rX /opt/hermes/.venv
     else
