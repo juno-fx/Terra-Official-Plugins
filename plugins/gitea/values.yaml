@@ -1,0 +1,12 @@
+# Default values for gitea plugin
+# terra.yaml has fields: [], so no user input is expected at install time
+# Kuiper-injected values (cpu, memory, etc.) are handled in scripts/chart/values.yaml
+registry: docker.io
+repo: gitea/gitea
+tag: "1.23"
+group:
+cpu: "1"
+cpuLimit:
+memory: "1Gi"
+memoryLimit:
+env:
