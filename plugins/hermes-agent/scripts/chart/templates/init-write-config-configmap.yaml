@@ -1,0 +1,97 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-init-write-config"
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+data:
+  write-config.sh: |
+    #!/bin/sh
+    set -e
+
+    # --- Compute provider value (always runs) ---
+    PROVIDER_VALUE="${PROVIDER}"
+    case "${PROVIDER}" in
+      openrouter) KEY_NAME="OPENROUTER_API_KEY" ;;
+      openai)     KEY_NAME="OPENAI_API_KEY";    PROVIDER_VALUE="openai-codex" ;;
+      anthropic)  KEY_NAME="ANTHROPIC_API_KEY" ;;
+      ollama)     KEY_NAME="";                  PROVIDER_VALUE="custom" ;;
+      *)          KEY_NAME="" ;;
+    esac
+
+    if [ ! -f /opt/data/.env ]; then
+      cat > /opt/data/.env << EOF
+    API_SERVER_ENABLED=true
+    API_SERVER_KEY=${API_SERVER_KEY}
+    API_SERVER_HOST=127.0.0.1
+    API_SERVER_PORT=8642
+    GATEWAY_ALLOW_ALL_USERS=true
+    EOF
+      if [ -n "${KEY_NAME}" ] && [ -n "${API_KEY}" ]; then
+        echo "${KEY_NAME}=${API_KEY}" >> /opt/data/.env
+      fi
+    fi
+
+    if [ ! -f /opt/data/config.yaml ]; then
+      cat > /opt/data/config.yaml << EOF
+    model:
+      default: "${MODEL}"
+      provider: ${PROVIDER_VALUE}
+    EOF
+      if [ "${PROVIDER}" = "ollama" ]; then
+        echo "  base_url: \"${OLLAMA_BASE_URL}\"" >> /opt/data/config.yaml
+      fi
+      cat >> /opt/data/config.yaml << EOF
+      supports_tools: true
+
+    agent:
+      max_turns: 15
+    approvals:
+      mode: off
+
+    dashboard:
+      theme: juno
+
+    platform_toolsets:
+      cli:
+        - hermes-cli
+
+    web:
+      backend: ddgs
+    EOF
+    fi
+
+    # --- Write SOUL.md (only if not exists) ---
+    if [ ! -f /opt/data/SOUL.md ]; then
+      cat > /opt/data/SOUL.md << EOF
+    ${PERSONALITY}
+
+    All agents in this cluster are accessible at {name}:5000.
+    When asked to talk to another agent (like "talk to brian"), use delegate_task with:
+      provider="custom"
+      base_url="http://NAME:5000/v1"
+      model="hermes-agent"
+    Replace NAME with the agent's name (e.g. base_url="http://brian:5000/v1").
+    EOF
+    fi
+
+    echo "Fixing ownership for PUID=${PUID}:${PGID}"
+    chown -R "${PUID}:${PGID}" /opt/data
+    chmod 644 /opt/data/.env /opt/data/config.yaml /opt/data/SOUL.md 2>/dev/null || true
+
+    mkdir -p /opt/data/dashboard-themes
+
+    # --- Copy theme ---
+    if [ ! -f /opt/data/dashboard-themes/juno.yaml ]; then
+      cp /opt/templates/theme/juno.yaml /opt/data/dashboard-themes/juno.yaml
+    fi
+
+    # --- Substitute init script template ---
+    sed "s/__NAME__/${NAME}/g" \
+      /opt/templates/init/start.sh > /opt/init/start.sh
+    chmod 755 /opt/init/start.sh
+
+    # --- Substitute nginx template ---
+    sed "s/__NAME__/${NAME}/g" \
+      /opt/templates/nginx/nginx.conf > /opt/proxy/nginx.conf
+    chmod 644 /opt/proxy/nginx.conf
