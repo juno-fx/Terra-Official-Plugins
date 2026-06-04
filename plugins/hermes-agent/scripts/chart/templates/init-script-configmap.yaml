@@ -50,9 +50,9 @@ data:
 
       # Fix ownership and permissions for the entire hermes tree and data dir.
       # Image ships with UID 10000; after usermod all files show old UID.
-      # Backgrounded — startup proceeds immediately, fix completes in parallel.
-      chown -R hermes:hermes /opt/hermes /opt/data 2>/dev/null || true &
-      chmod -R o+rX /opt/hermes /opt/data 2>/dev/null || true &
+      # Synchronous — pod won't flag Ready until permissions are complete.
+      chown -R hermes:hermes /opt/hermes /opt/data 2>/dev/null || true
+      chmod -R o+rX /opt/hermes /opt/data 2>/dev/null || true
     else
       log "PUID=0, running as root (legacy mode)"
     fi
