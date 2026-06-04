@@ -13,38 +13,30 @@ data:
 
     log() { echo "[init] $*"; }
 
-    # Install wetty BEFORE activating the Python venv so that node-gyp uses the
-    # system Python (which has the 'gyp' package available) rather than the venv
-    # Python (which does not). The venv activation overrides the PATH-resolved
-    # python3, causing node-gyp's gyp_main.py to fail with:
-    #   ModuleNotFoundError: No module named 'gyp'
-    if ! command -v wetty > /dev/null 2>&1; then
-      log "Installing build tools, sudo, and wetty..."
-      apt-get install -y build-essential sudo tmux 2>&1
-      npm install -g wetty 2>&1
-      chmod +x /usr/local/lib/node_modules/wetty/build/main.js
+    # Phase 1 — install sudo + tmux (small, fast). Needed immediately for
+    # privilege-drop via sudo.  Build tools (gcc/g++/make) come later in
+    # Phase 3 so the gateway can start without waiting for compilation.
+    if ! command -v sudo > /dev/null 2>&1; then
+      log "Installing sudo and tmux..."
+      apt-get install -y sudo tmux 2>&1
     else
-      log "wetty already installed, skipping..."
+      log "sudo already installed, skipping..."
     fi
 
     # --- User/group remap (only when PUID != 0) ---
     if [ "${PUID:-0}" != "0" ]; then
       log "Remapping hermes user to PUID=${PUID} PGID=${PGID}"
 
-      # Remap the built-in hermes user to the requested UID/GID
       usermod -u "$PUID" hermes
       groupmod -o -g "$PGID" hermes 2>/dev/null || true
       usermod -s /bin/bash hermes
 
-      # Ensure home directory exists with correct ownership
       mkdir -p "/home/${USER}"
       chown -R hermes:hermes "/home/${USER}"
 
-      # Passwordless sudo for package installs from the terminal
       echo "hermes ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/hermes
       chmod 440 /etc/sudoers.d/hermes
 
-      # Optional password
       if [ -n "${USER_PASS:-}" ]; then
         echo "hermes:$USER_PASS" | chpasswd
       fi
@@ -55,14 +47,16 @@ data:
         [ -d "/opt/data/$sub" ] && chown -R hermes:hermes "/opt/data/$sub"
       done
 
-      # Re-chown the entire install tree so the remapped hermes UID can
-      # write __pycache__ dirs, egg-info metadata, plugin installs, etc.
+      # Only chown paths that need write access at runtime, not the entire
+      # install tree (avoids a 10+ s recursion over the whole venv).
       # The image ships with UID 10000; after usermod the on-disk numeric
-      # UID stays at 10000, causing EACCES on any write.  /opt/hermes is
-      # the image's own filesystem (not a bind mount), so recursive is safe.
-      chown -R hermes:hermes /opt/hermes
+      # UID stays at 10000, causing EACCES on any write to these dirs.
+      chown -R hermes:hermes \
+        /opt/hermes/.venv \
+        /opt/hermes/node_modules \
+        /opt/hermes/ui-tui \
+        2>/dev/null || true
 
-      # Ensure the Python venv is traversable by the hermes user
       chmod -R o+rX /opt/hermes/.venv
     else
       log "PUID=0, running as root (legacy mode)"
@@ -96,9 +90,6 @@ data:
     }
     trap cleanup TERM INT
 
-    # Helper: run a command as hermes user (when not root), else run directly
-    # -E preserves container env vars (HERMES_HOME, API_SERVER_KEY, etc.)
-    # that sudo would otherwise strip on env_reset.
     as_user() {
       if [ -n "$_SU" ]; then
         $_SU "$@"
@@ -107,6 +98,7 @@ data:
       fi
     }
 
+    # Phase 2 — start gateway + dashboard (fast, no build tools needed)
     log "Starting gateway..."
     as_user "$HERMES_BIN" gateway run 2>&1 | sed 's/^/[gateway] /' &
     GATEWAY_PID=$!
@@ -124,15 +116,27 @@ data:
     as_user "$HERMES_BIN" dashboard --host 127.0.0.1 --port 9120 --no-open 2>&1 | sed 's/^/[dashboard] /' &
     DASHBOARD_PID=$!
 
-    log "Starting wetty..."
-    # tmux preserves shell sessions across page refreshes.
-    # -A attaches to existing session "hermes" or creates it.
-    # Source venv and set locale before tmux — baked into session on create.
-    WETTY_CMD="bash -c 'export LANG=C.UTF-8 LC_ALL=C.UTF-8 COLORTERM=truecolor && . /opt/hermes/.venv/bin/activate && exec tmux new-session -A -s hermes bash'"
-    [ -n "$_SU" ] && WETTY_CMD="$_SU ${WETTY_CMD}"
-    wetty -b /hermes/__NAME__ --allow-iframe -p 7681 \
-      -c "${WETTY_CMD}" \
-      2>&1 | sed 's/^/[wetty] /' &
-    WETTY_PID=$!
+    # Phase 3 — install build tools + wetty (slow) in background, then
+    # start wetty.  Gateway + dashboard are already running so the agent
+    # is usable while wetty compiles.
+    _start_wetty() {
+      if ! command -v wetty > /dev/null 2>&1; then
+        log "Installing build tools (gcc, g++, make)..."
+        apt-get install -y gcc g++ make 2>&1
+        log "Installing wetty..."
+        npm install -g wetty 2>&1
+        chmod +x /usr/local/lib/node_modules/wetty/build/main.js
+      else
+        log "wetty already installed, skipping..."
+      fi
+
+      log "Starting wetty..."
+      WETTY_CMD="bash -c 'export LANG=C.UTF-8 LC_ALL=C.UTF-8 COLORTERM=truecolor && . /opt/hermes/.venv/bin/activate && exec tmux new-session -A -s hermes bash'"
+      [ -n "$_SU" ] && WETTY_CMD="$_SU ${WETTY_CMD}"
+      wetty -b /hermes/__NAME__ --allow-iframe -p 7681 \
+        -c "${WETTY_CMD}" \
+        2>&1 | sed 's/^/[wetty] /' &
+    }
+    _start_wetty &
 
     wait
