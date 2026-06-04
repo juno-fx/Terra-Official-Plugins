@@ -25,18 +25,16 @@ data:
                 proxy_set_header X-Forwarded-Prefix /hermes/__NAME__/dashboard;
             }
 
-            # Wetty HTML page — inject anti-ghosting CSS
+            # Wetty HTML page — inject DOM renderer config
             location = /hermes/__NAME__ {
                 proxy_pass http://127.0.0.1:7681;
                 proxy_http_version 1.1;
-                sub_filter '</head>' '<style>
-                  .xterm-viewport{transform:translateZ(0);will-change:transform}
-                  .xterm-screen{transform:translateZ(0)}
-                </style>
-                <script>
-                (function(){var t,e=setInterval(function(){var r=window.wetty_term,a=document.querySelector(".xterm-viewport");if(r&&a){clearInterval(e);a.addEventListener("scroll",function(){clearTimeout(t);t=setTimeout(function(){try{r.refresh(0,r.rows-1)}catch(n){}},40)})}},200);setTimeout(function(){clearInterval(e)},3e4)})();
-                </script>
-                </head>';
+                proxy_set_header Accept-Encoding "";
+                sub_filter '</head>' '<script>
+                try{var o=JSON.parse(localStorage.options||JSON.stringify({xterm:{fontSize:14},wettyFitTerminal:true,wettyVoid:0}));
+                o.xterm=o.xterm||{};o.xterm.rendererType="dom";
+                localStorage.options=JSON.stringify(o)}catch(e){}
+                </script></head>';
                 sub_filter_once on;
                 sub_filter_types text/html;
             }
