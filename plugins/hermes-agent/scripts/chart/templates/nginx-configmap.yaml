@@ -25,22 +25,7 @@ data:
                 proxy_set_header X-Forwarded-Prefix /hermes/__NAME__/dashboard;
             }
 
-            # Wetty HTML page — inject DOM renderer config
-            location = /hermes/__NAME__ {
-                proxy_pass http://127.0.0.1:7681;
-                proxy_http_version 1.1;
-                proxy_set_header Accept-Encoding "";
-                sub_filter '</head>' '<script>
-                try{var o=JSON.parse(localStorage.options||JSON.stringify({xterm:{fontSize:14},wettyFitTerminal:true,wettyVoid:0}));
-                o.xterm=o.xterm||{};o.xterm.rendererType="dom";
-                localStorage.options=JSON.stringify(o)}catch(e){}
-                </script></head>';
-                sub_filter_once on;
-                sub_filter_types text/html;
-            }
-
-            # Wetty WebSocket and assets
-            location /hermes/__NAME__/ {
+            location /hermes/__NAME__ {
                 proxy_pass http://127.0.0.1:7681;
                 proxy_http_version 1.1;
                 proxy_set_header Upgrade $http_upgrade;
