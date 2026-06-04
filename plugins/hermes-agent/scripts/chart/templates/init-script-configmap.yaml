@@ -18,6 +18,7 @@ data:
     # Phase 3 so the gateway can start without waiting for compilation.
     if ! command -v sudo > /dev/null 2>&1; then
       log "Installing sudo and tmux..."
+      apt-get update -qq
       apt-get install -y sudo tmux 2>&1
     else
       log "sudo already installed, skipping..."
@@ -122,6 +123,7 @@ data:
     _start_wetty() {
       if ! command -v wetty > /dev/null 2>&1; then
         log "Installing build tools (gcc, g++, make)..."
+        apt-get update -qq
         apt-get install -y gcc g++ make 2>&1
         log "Installing wetty..."
         npm install -g wetty 2>&1
