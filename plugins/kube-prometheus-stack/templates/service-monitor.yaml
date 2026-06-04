@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: juno-metrics
+  namespace: prometheus
+spec:
+  selector:
+    matchLabels:
+      metrics: true
+  namespaceSelector:
+    matchNames:
+      - argocd
+  endpoints:
+    - port: metrics       # matches the named port in your Service
+      interval: 30s
+      path: /.metrics
