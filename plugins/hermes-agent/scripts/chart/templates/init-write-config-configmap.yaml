@@ -13,23 +13,8 @@ data:
     : "${PGID:=1000}"
     : "${NAME:=hermes-agent}"
 
-    # --- Write SOUL.md (only if not exists) ---
-    if [ ! -f /opt/data/SOUL.md ] && [ -n "${PERSONALITY:-}" ]; then
-      cat > /opt/data/SOUL.md << EOF
-    ${PERSONALITY}
-
-    All agents in this cluster are accessible at {name}:5000.
-    When asked to talk to another agent (like "talk to brian"), use delegate_task with:
-      provider="custom"
-      base_url="http://NAME:5000/v1"
-      model="hermes-agent"
-    Replace NAME with the agent's name (e.g. base_url="http://brian:5000/v1").
-    EOF
-    fi
-
     echo "Fixing ownership for PUID=${PUID}:${PGID}"
     chown -R "${PUID}:${PGID}" /opt/data
-    chmod 644 /opt/data/SOUL.md 2>/dev/null || true
 
     mkdir -p /opt/data/dashboard-themes
 

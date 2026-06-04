@@ -36,10 +36,6 @@ data:
         - none
         - readonly-ns
         - admin-ns
-    - name: personality
-      description: "Personality / system prompt prefix for this agent. Written to SOUL.md on first deploy only."
-      type: multi-line
-      required: false
     - name: persistence_size
       description: "Persistent volume size (e.g. 1Gi, 500Mi)."
       type: string
