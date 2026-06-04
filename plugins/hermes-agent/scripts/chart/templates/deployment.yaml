@@ -34,6 +34,9 @@ spec:
         - name: write-config
           image: busybox
           command: ["sh", "/opt/init-config/write-config.sh"]
+          env:
+            - name: NAME
+              value: {{ .Values.name | quote }}
           volumeMounts:
             - name: hermes-data
               mountPath: /opt/data
