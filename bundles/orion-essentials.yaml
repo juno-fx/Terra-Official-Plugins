@@ -10,9 +10,21 @@ tags:
   - argocd
   - first time setup
   - cluster-level
+  - prometheus
+  - dashboard
+  - grafana
 fields:
   - name: host
-    description: The DNS name of your Genesis host for Argocd
+    description: The DNS name of your Genesis host
+    required: true
+  - name: path
+    description: Connection URL. i.e. `grafana.example.com`. Keep in mind you must set up a DNS record for this host to point to your cluster's ingress controller.
+    required: true
+  - name: username
+    description: Grafana Admin username
+    required: true
+  - name: password
+    description: Grafana Admin password
     required: true
 plugins:
   - plugin: Helios
