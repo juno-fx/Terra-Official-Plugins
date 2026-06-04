@@ -110,7 +110,8 @@ data:
     log "Starting wetty..."
     # tmux preserves shell sessions across page refreshes.
     # -A attaches to existing session "hermes" or creates it.
-    WETTY_CMD="tmux new-session -A -s hermes bash"
+    # Source venv before tmux so env vars are baked into the session.
+    WETTY_CMD="bash -c '. /opt/hermes/.venv/bin/activate && exec tmux new-session -A -s hermes bash'"
     [ -n "$_SU" ] && WETTY_CMD="$_SU ${WETTY_CMD}"
     wetty -b /hermes/__NAME__ --allow-iframe -p 7681 \
       -c "${WETTY_CMD}" \
