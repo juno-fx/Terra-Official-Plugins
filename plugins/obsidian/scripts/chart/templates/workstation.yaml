@@ -103,6 +103,8 @@ spec:
               value: "/polaris/{{ .Values.name }}/"
             - name: SUBFOLDER
               value: "/polaris/{{ .Values.name }}/"
+            - name: SELKIES_DESKTOP
+              value: "true"
             {{- range .Values.env }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}
