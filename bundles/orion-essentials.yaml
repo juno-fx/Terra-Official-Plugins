@@ -17,8 +17,6 @@ fields:
 plugins:
   - plugin: Helios
     name: helios-workstations
-  - plugin: Prometheus Grafana stack
-    name: kube-prometheus-stack
   - plugin: ArgoCD Dashboard
     name: argocd
     values:
