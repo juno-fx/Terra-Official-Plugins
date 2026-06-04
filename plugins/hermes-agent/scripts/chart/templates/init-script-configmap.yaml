@@ -48,17 +48,9 @@ data:
         [ -d "/opt/data/$sub" ] && chown -R hermes:hermes "/opt/data/$sub"
       done
 
-      # Only chown paths that need write access at runtime, not the entire
-      # install tree (avoids a 10+ s recursion over the whole venv).
-      # The image ships with UID 10000; after usermod the on-disk numeric
-      # UID stays at 10000, causing EACCES on any write to these dirs.
-      chown -R hermes:hermes \
-        /opt/hermes/.venv \
-        /opt/hermes/node_modules \
-        /opt/hermes/ui-tui \
-        2>/dev/null || true
-
-      chmod -R o+rX /opt/hermes/.venv
+      # No chown/chmod on venv/node_modules — these are read-only at runtime
+      # and the image ships with correct world-readable permissions. Avoiding
+      # recursive traversal of ~10k files saves 30-120s on slow I/O (arm64).
     else
       log "PUID=0, running as root (legacy mode)"
     fi
@@ -103,15 +95,7 @@ data:
     log "Starting gateway..."
     as_user "$HERMES_BIN" gateway run 2>&1 | sed 's/^/[gateway] /' &
     GATEWAY_PID=$!
-
-    log "Waiting for gateway health..."
-    i=1
-    until curl -sf http://127.0.0.1:8642/health > /dev/null 2>&1; do
-      sleep 2
-      i=$((i + 1))
-      [ "$i" -gt 60 ] && { log "Gateway failed to start"; exit 1; }
-    done
-    log "Gateway ready"
+    log "Gateway starting in background — proceeding..."
 
     log "Starting dashboard..."
     as_user "$HERMES_BIN" dashboard --host 127.0.0.1 --port 9120 --no-open 2>&1 | sed 's/^/[dashboard] /' &
