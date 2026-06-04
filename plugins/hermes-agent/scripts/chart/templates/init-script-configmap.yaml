@@ -48,11 +48,9 @@ data:
         [ -d "/opt/data/$sub" ] && chown -R hermes:hermes "/opt/data/$sub"
       done
 
-      # No chown on venv/node_modules — these are read-only at runtime.
-      # chmod o+rX below provides sufficient access for the non-owning user.
-      # Removing this saves 30-120s on slow I/O (arm64).
-
-      chmod -R o+rX /opt/hermes/.venv
+      # No chown/chmod on venv/node_modules — these are read-only at runtime
+      # and the image ships with correct world-readable permissions. Avoiding
+      # recursive traversal of ~10k files saves 30-120s on slow I/O (arm64).
     else
       log "PUID=0, running as root (legacy mode)"
     fi
