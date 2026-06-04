@@ -68,6 +68,23 @@ data:
       log "PUID=0, running as root (legacy mode)"
     fi
 
+    # --- Write .tmux.conf for color/emoji support ---
+    cat > "/home/${USER}/.tmux.conf" << 'TMUXCONF'
+# Enable truecolor (24-bit) — fixes washed-out colors
+set -g default-terminal "tmux-256color"
+set -ga terminal-overrides ",*256col*:Tc"
+
+# UTF-8 support — emoji rendering
+set -g status-utf8 on
+
+# Mouse scroll and select
+set -g mouse on
+
+# Big scrollback
+set -g history-limit 50000
+TMUXCONF
+    chown hermes:hermes "/home/${USER}/.tmux.conf" 2>/dev/null || true
+
     _SU=""
     [ "${PUID:-0}" != "0" ] && _SU="sudo -E -u hermes"
 
