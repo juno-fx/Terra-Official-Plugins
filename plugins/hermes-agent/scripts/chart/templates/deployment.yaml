@@ -75,7 +75,7 @@ spec:
             tcpSocket:
               port: 7681
             periodSeconds: 5
-            failureThreshold: 30
+            failureThreshold: 180
           readinessProbe:
             tcpSocket:
               port: 7681
