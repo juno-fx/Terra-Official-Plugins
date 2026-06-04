@@ -20,7 +20,7 @@ data:
     #   ModuleNotFoundError: No module named 'gyp'
     if ! command -v wetty > /dev/null 2>&1; then
       log "Installing build tools, sudo, and wetty..."
-      apt-get install -y build-essential sudo 2>&1
+      apt-get install -y build-essential sudo abduco 2>&1
       npm install -g wetty 2>&1
       chmod +x /usr/local/lib/node_modules/wetty/build/main.js
     else
@@ -108,8 +108,9 @@ data:
     DASHBOARD_PID=$!
 
     log "Starting wetty..."
-    # wetty binds port 7681 as root; spawned shell runs as hermes with venv
-    WETTY_CMD="bash -c '. /opt/hermes/.venv/bin/activate && echo && echo \"Run hermes to start Hermes\" && echo && exec bash -i'"
+    # wetty runs abduco which preserves shell sessions across page refreshes
+    # First connect creates the "hermes" session; page refresh re-attaches.
+    WETTY_CMD="abduco -a hermes bash"
     [ -n "$_SU" ] && WETTY_CMD="$_SU ${WETTY_CMD}"
     wetty -b /hermes/__NAME__ --allow-iframe -p 7681 \
       -c "${WETTY_CMD}" \
