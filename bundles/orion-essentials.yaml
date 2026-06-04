@@ -17,6 +17,17 @@ fields:
 plugins:
   - plugin: Helios
     name: helios-workstations
+  - plugin: Prometheus Grafana stack
+    name: kube-prometheus-stack
+    values:
+      host:
+        reference: host
+      path:
+        reference: path
+      username:
+        reference: username
+      password:
+        reference: path
   - plugin: ArgoCD Dashboard
     name: argocd
     values:
