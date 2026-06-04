@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: genesis-proxy
+  namespace: prometheus
+spec:
+  type: ExternalName
+  externalName: genesis.argocd.svc.cluster.local
+  ports:
+    - port: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: prometheus-unauthorized
+  namespace: prometheus
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: dash.lilboy
+      http:
+        paths:
+          - path: /unauthorized/
+            pathType: Prefix
+            backend:
+              service:
+                name: genesis-proxy
+                port:
+                  number: 3000
