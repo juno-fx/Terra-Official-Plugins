@@ -3,6 +3,8 @@ kind: ServiceMonitor
 metadata:
   name: juno-metrics
   namespace: prometheus
+  labels:
+    release: prometheus
 spec:
   selector:
     matchLabels:
