@@ -22,8 +22,3 @@ fields:
   - name: path
     description: Connection URL sub path. i.e. `grafana.example.com/my/path/grafana`.
     required: false
-  - name: adminOnly
-    description: "Only allow admin access to the grafana dashboards"
-    type: boolean
-    required: true
-    default: true
