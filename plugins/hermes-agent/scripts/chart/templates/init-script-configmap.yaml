@@ -72,16 +72,16 @@ data:
     cat > "/home/${USER}/.tmux.conf" << 'TMUXCONF'
     # Enable truecolor (24-bit) — fixes washed-out colors
     set -g default-terminal "tmux-256color"
-    set -ga terminal-overrides ",*256col*:Tc"
-
-    # UTF-8 support — emoji rendering
-    set -g status-utf8 on
+    set -ga terminal-overrides ",*:Tc"
 
     # Mouse scroll and select
     set -g mouse on
 
     # Big scrollback
     set -g history-limit 50000
+
+    # Refresh locale/color vars on reattach
+    set -g update-environment "LANG LC_ALL LC_CTYPE COLORTERM TERM"
     TMUXCONF
     chown hermes:hermes "/home/${USER}/.tmux.conf" 2>/dev/null || true
 
@@ -127,8 +127,8 @@ data:
     log "Starting wetty..."
     # tmux preserves shell sessions across page refreshes.
     # -A attaches to existing session "hermes" or creates it.
-    # Source venv before tmux so env vars are baked into the session.
-    WETTY_CMD="bash -c '. /opt/hermes/.venv/bin/activate && exec tmux new-session -A -s hermes bash'"
+    # Source venv and set locale before tmux — baked into session on create.
+    WETTY_CMD="bash -c 'export LANG=C.UTF-8 LC_ALL=C.UTF-8 COLORTERM=truecolor && . /opt/hermes/.venv/bin/activate && exec tmux new-session -A -s hermes bash'"
     [ -n "$_SU" ] && WETTY_CMD="$_SU ${WETTY_CMD}"
     wetty -b /hermes/__NAME__ --allow-iframe -p 7681 \
       -c "${WETTY_CMD}" \
