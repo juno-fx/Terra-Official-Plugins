@@ -34,6 +34,7 @@ data:
       # Remap the built-in hermes user to the requested UID/GID
       usermod -u "$PUID" hermes
       groupmod -o -g "$PGID" hermes 2>/dev/null || true
+      usermod -s /bin/bash hermes
 
       # Ensure home directory exists with correct ownership
       mkdir -p "/home/${USER}"
@@ -108,7 +109,7 @@ data:
 
     log "Starting wetty..."
     # wetty binds port 7681 as root; spawned shell runs as hermes with venv
-    WETTY_CMD="sh -c '. /opt/hermes/.venv/bin/activate && echo && echo \"Run hermes to start Hermes\" && echo && exec sh -i'"
+    WETTY_CMD="bash -c '. /opt/hermes/.venv/bin/activate && echo && echo \"Run hermes to start Hermes\" && echo && exec bash -i'"
     [ -n "$_SU" ] && WETTY_CMD="$_SU ${WETTY_CMD}"
     wetty -b /hermes/__NAME__ --allow-iframe -p 7681 \
       -c "${WETTY_CMD}" \
