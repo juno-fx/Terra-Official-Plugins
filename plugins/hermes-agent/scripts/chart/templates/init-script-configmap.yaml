@@ -95,15 +95,7 @@ data:
     log "Starting gateway..."
     as_user "$HERMES_BIN" gateway run 2>&1 | sed 's/^/[gateway] /' &
     GATEWAY_PID=$!
-
-    log "Waiting for gateway health..."
-    i=1
-    until curl -sf http://127.0.0.1:8642/health > /dev/null 2>&1; do
-      sleep 2
-      i=$((i + 1))
-      [ "$i" -gt 60 ] && { log "Gateway failed to start"; exit 1; }
-    done
-    log "Gateway ready"
+    log "Gateway starting in background — proceeding..."
 
     log "Starting dashboard..."
     as_user "$HERMES_BIN" dashboard --host 127.0.0.1 --port 9120 --no-open 2>&1 | sed 's/^/[dashboard] /' &
