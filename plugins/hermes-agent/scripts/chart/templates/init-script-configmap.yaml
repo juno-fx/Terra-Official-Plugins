@@ -56,9 +56,11 @@ data:
         /opt/hermes/.venv \
         /opt/hermes/node_modules \
         /opt/hermes/ui-tui \
-        2>/dev/null || true
+        2>/dev/null || true &
 
-      chmod -R o+rX /opt/hermes/.venv
+      chmod -R o+rX /opt/hermes/.venv &
+
+      # Backgrounded — proceeds immediately. chown/chmod complete in parallel.
     else
       log "PUID=0, running as root (legacy mode)"
     fi
