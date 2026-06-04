@@ -35,7 +35,7 @@ plugins:
       host:
         reference: host
       path:
-        reference: grafana_path
+        reference: path
       username:
         reference: username
       password:
