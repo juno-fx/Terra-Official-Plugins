@@ -39,14 +39,7 @@ spec:
             - |
               set -e
 
-              # --- Write .env ---
-              cat > /opt/data/.env << EOF
-              API_SERVER_ENABLED=true
-              API_SERVER_KEY=${API_SERVER_KEY}
-              API_SERVER_HOST=127.0.0.1
-              API_SERVER_PORT=8642
-              GATEWAY_ALLOW_ALL_USERS=true
-              EOF
+              # --- Compute provider value (always runs) ---
               PROVIDER_VALUE="${PROVIDER}"
               case "${PROVIDER}" in
                 openrouter) KEY_NAME="OPENROUTER_API_KEY" ;;
@@ -55,37 +48,50 @@ spec:
                 ollama)     KEY_NAME="";                  PROVIDER_VALUE="custom" ;;
                 *)          KEY_NAME="" ;;
               esac
-              if [ -n "${KEY_NAME}" ] && [ -n "${API_KEY}" ]; then
-                echo "${KEY_NAME}=${API_KEY}" >> /opt/data/.env
+
+              if [ ! -f /opt/data/.env ]; then
+                # --- Write .env ---
+                cat > /opt/data/.env << EOF
+                API_SERVER_ENABLED=true
+                API_SERVER_KEY=${API_SERVER_KEY}
+                API_SERVER_HOST=127.0.0.1
+                API_SERVER_PORT=8642
+                GATEWAY_ALLOW_ALL_USERS=true
+                EOF
+                if [ -n "${KEY_NAME}" ] && [ -n "${API_KEY}" ]; then
+                  echo "${KEY_NAME}=${API_KEY}" >> /opt/data/.env
+                fi
               fi
 
-              # --- Write config.yaml ---
-              cat > /opt/data/config.yaml << EOF
-              model:
-                default: "${MODEL}"
-                provider: ${PROVIDER_VALUE}
-              EOF
-              if [ "${PROVIDER}" = "ollama" ]; then
-                echo "  base_url: \"${OLLAMA_BASE_URL}\"" >> /opt/data/config.yaml
+              if [ ! -f /opt/data/config.yaml ]; then
+                # --- Write config.yaml ---
+                cat > /opt/data/config.yaml << EOF
+                model:
+                  default: "${MODEL}"
+                  provider: ${PROVIDER_VALUE}
+                EOF
+                if [ "${PROVIDER}" = "ollama" ]; then
+                  echo "  base_url: \"${OLLAMA_BASE_URL}\"" >> /opt/data/config.yaml
+                fi
+                cat >> /opt/data/config.yaml << EOF
+                  supports_tools: true
+
+                agent:
+                  max_turns: 15
+                approvals:
+                  mode: off
+
+                dashboard:
+                  theme: juno
+
+                platform_toolsets:
+                  cli:
+                    - hermes-cli
+
+                web:
+                  backend: ddgs
+                EOF
               fi
-              cat >> /opt/data/config.yaml << EOF
-                supports_tools: true
-
-              agent:
-                max_turns: 15
-              approvals:
-                mode: off
-
-              dashboard:
-                theme: juno
-
-              platform_toolsets:
-                cli:
-                  - hermes-cli
-
-              web:
-                backend: ddgs
-              EOF
 
               # --- Write SOUL.md (only if not exists) ---
               if [ ! -f /opt/data/SOUL.md ]; then
@@ -103,12 +109,14 @@ spec:
 
               echo "Fixing ownership for PUID=${PUID}:${PGID}"
               chown -R "${PUID}:${PGID}" /opt/data
-              chmod 644 /opt/data/*
+              chmod 644 /opt/data/.env /opt/data/config.yaml /opt/data/SOUL.md 2>/dev/null || true
 
               mkdir -p /opt/data/dashboard-themes
 
               # --- Copy theme ---
-              cp /opt/templates/theme/juno.yaml /opt/data/dashboard-themes/juno.yaml
+              if [ ! -f /opt/data/dashboard-themes/juno.yaml ]; then
+                cp /opt/templates/theme/juno.yaml /opt/data/dashboard-themes/juno.yaml
+              fi
 
               # --- Substitute init script template ---
               sed "s/__NAME__/${NAME}/g" \

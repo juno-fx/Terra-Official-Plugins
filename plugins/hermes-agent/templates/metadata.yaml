@@ -23,11 +23,11 @@ data:
         - anthropic
         - ollama
     - name: api_key
-      description: "API key for the selected provider. Not needed for Ollama."
+      description: "API key for the selected provider. Not needed for Ollama. Written to .env on first deploy only."
       type: string
       required: false
     - name: ollama_base_url
-      description: "Ollama server URL (e.g. http://ollama:11434). Only used when provider is Ollama."
+      description: "Ollama server URL (e.g. http://ollama:11434). Only used when provider is Ollama. Written to config.yaml on first deploy only."
       type: string
       required: false
     - name: api_server_key
@@ -35,7 +35,7 @@ data:
       type: string
       required: true
     - name: model
-      description: "Model name. Defaults per provider: OpenRouter -> meta-llama/llama-3.1-8b-instruct:free, OpenAI -> gpt-4o, Anthropic -> claude-sonnet-4-20250514, Ollama -> llama3.2"
+      description: "Model name. Defaults per provider: OpenRouter -> meta-llama/llama-3.1-8b-instruct:free, OpenAI -> gpt-4o, Anthropic -> claude-sonnet-4-20250514, Ollama -> llama3.2. Written to config.yaml on first deploy only."
       type: string
       required: false
       default: "meta-llama/llama-3.1-8b-instruct:free"
