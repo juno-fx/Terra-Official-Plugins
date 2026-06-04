@@ -52,7 +52,7 @@ spec:
 
       containers:
         - name: hermes-agent
-          image: "nousresearch/hermes-agent:{{ .Values.tag }}"
+          image: "{{ if .Values.registry }}{{ .Values.registry }}/{{ end }}{{ .Values.repo }}:{{ .Values.tag }}"
           imagePullPolicy: IfNotPresent
           command: ["/opt/init/start.sh"]
           ports:

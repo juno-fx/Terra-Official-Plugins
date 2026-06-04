@@ -8,7 +8,7 @@ metadata:
     juno-innovations.com/workload: "AI Agent"
 data:
   chart: "{{ .Release.Name }}-scripts-configmap"
-  description: "Hermes AI agent with multi-provider support (OpenRouter, OpenAI, Anthropic, Ollama) and web dashboard."
+  description: "Hermes AI agent with web dashboard."
   fields: |
     - name: icon
       default: "https://raw.githubusercontent.com/NousResearch/hermes-agent/main/assets/banner.png"
@@ -17,6 +17,16 @@ data:
       type: string
       required: false
       default: latest
+    - name: registry
+      description: "Container image registry (e.g. docker.io/myregistry). Leave empty for default."
+      type: string
+      required: false
+      default: ""
+    - name: repo
+      description: "Container image repository."
+      type: string
+      required: false
+      default: "nousresearch/hermes-agent"
     - name: cluster_access
       description: "Kubernetes RBAC access level for this agent."
       type: select
