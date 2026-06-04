@@ -48,15 +48,9 @@ data:
         [ -d "/opt/data/$sub" ] && chown -R hermes:hermes "/opt/data/$sub"
       done
 
-      # Only chown paths that need write access at runtime, not the entire
-      # install tree (avoids a 10+ s recursion over the whole venv).
-      # The image ships with UID 10000; after usermod the on-disk numeric
-      # UID stays at 10000, causing EACCES on any write to these dirs.
-      chown -R hermes:hermes \
-        /opt/hermes/.venv \
-        /opt/hermes/node_modules \
-        /opt/hermes/ui-tui \
-        2>/dev/null || true
+      # No chown on venv/node_modules — these are read-only at runtime.
+      # chmod o+rX below provides sufficient access for the non-owning user.
+      # Removing this saves 30-120s on slow I/O (arm64).
 
       chmod -R o+rX /opt/hermes/.venv
     else

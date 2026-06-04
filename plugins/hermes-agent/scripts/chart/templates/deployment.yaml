@@ -70,12 +70,12 @@ spec:
               protocol: TCP
           startupProbe:
             tcpSocket:
-              port: 7681
+              port: 8642
             periodSeconds: 5
             failureThreshold: 30
           readinessProbe:
             tcpSocket:
-              port: 7681
+              port: 8642
             periodSeconds: 5
             failureThreshold: 6
           env:
