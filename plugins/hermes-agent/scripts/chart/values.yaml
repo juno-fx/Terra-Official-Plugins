@@ -19,6 +19,6 @@ persistence_storage_class: local-path
 git_port: 9418
 puid: 1000
 guid: 1000
-user_pass: ""
+
 env: []
 _kuiper:

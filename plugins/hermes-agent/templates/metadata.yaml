@@ -62,20 +62,6 @@ data:
       type: string
       required: false
       default: "1Gi"
-    - name: puid
-      description: "User ID for the container process (0=root). Files written to the PVC use this owner."
-      type: int
-      required: false
-      default: 1000
-    - name: guid
-      description: "Group ID for the container process (0=root)."
-      type: int
-      required: false
-      default: 1000
-    - name: user_pass
-      description: "Optional password for the container user (only relevant when puid is not 0)."
-      type: string
-      required: false
     - name: persistence_storage_class
       description: "Storage class for the persistent volume."
       type: k8sStorageClass

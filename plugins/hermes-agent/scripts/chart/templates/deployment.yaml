@@ -198,8 +198,6 @@ spec:
               value: {{ .Values.puid | quote }}
             - name: PGID
               value: {{ .Values.guid | quote }}
-            - name: USER_PASS
-              value: {{ .Values.user_pass | quote }}
             - name: API_SERVER_KEY
               value: {{ .Values.api_server_key | quote }}
             - name: MODEL
