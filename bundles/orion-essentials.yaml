@@ -17,7 +17,7 @@ fields:
   - name: host
     description: The DNS name of your Genesis host
     required: true
-  - name: grafana_path
+  - name: path
     description: Connection URL sub path. i.e. `grafana.example.com/my/path/grafana`.
     required: true
   - name: username
@@ -35,7 +35,7 @@ plugins:
       host:
         reference: host
       path:
-        reference: grafana_path
+        reference: path
       username:
         reference: username
       password:
