@@ -29,7 +29,7 @@ fields:
 plugins:
   - plugin: Helios
     name: helios-workstations
-  - plugin: Prometheus Grafana stack
+  - plugin: Kubernetes Prometheus Stack
     name: kube-prometheus-stack
     values:
       host:
