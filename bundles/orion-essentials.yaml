@@ -17,8 +17,8 @@ fields:
   - name: host
     description: The DNS name of your Genesis host
     required: true
-  - name: path
-    description: Connection URL. i.e. `grafana.example.com`. Keep in mind you must set up a DNS record for this host to point to your cluster's ingress controller.
+  - name: grafana_path
+    description: Connection URL sub path. i.e. `grafana.example.com/my/path/grafana`.
     required: true
   - name: username
     description: Grafana Admin username
@@ -35,7 +35,7 @@ plugins:
       host:
         reference: host
       path:
-        reference: path
+        reference: grafana_path
       username:
         reference: username
       password:
