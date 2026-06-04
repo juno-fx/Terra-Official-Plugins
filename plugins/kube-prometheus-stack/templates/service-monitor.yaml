@@ -6,11 +6,11 @@ metadata:
 spec:
   selector:
     matchLabels:
-      metrics: true
+      metrics: "enabled"
   namespaceSelector:
     matchNames:
       - argocd
   endpoints:
-    - port: metrics       # matches the named port in your Service
+    - port: metrics # matches the named port in your Service
       interval: 30s
       path: /.metrics
