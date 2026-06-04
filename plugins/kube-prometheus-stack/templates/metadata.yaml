@@ -5,3 +5,6 @@ metadata:
 data:
   chart: "{{ .Chart.Name }}"
   ingress: "{{ .Values.path }}"
+  {{- if .Values.adminOnly }}
+  permission: admin
+  {{- end }}
