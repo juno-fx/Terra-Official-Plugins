@@ -25,6 +25,10 @@ data:
                 proxy_set_header X-Forwarded-Prefix /hermes/__NAME__/dashboard;
             }
 
+            location /assets/ {
+                proxy_pass http://127.0.0.1:9120/assets/;
+            }
+
             location /hermes/__NAME__ {
                 proxy_pass http://127.0.0.1:7681;
                 proxy_http_version 1.1;
