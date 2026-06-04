@@ -27,17 +27,3 @@ spec:
                 name: {{ .Values.name }}
                 port:
                   number: 9119
-          - path: "/api/"
-            pathType: Prefix
-            backend:
-              service:
-                name: {{ .Values.name }}
-                port:
-                  number: 9119
-          - path: "/dashboard-plugins/"
-            pathType: Prefix
-            backend:
-              service:
-                name: {{ .Values.name }}
-                port:
-                  number: 9119
