@@ -22,8 +22,8 @@ plugins: []
 _kuiper:
 
 # Plugin-specific fields (match metadata.yaml field names exactly)
-registry: "lscr.io"
-repo: "linuxserver/obsidian"
+registry: "docker.io"
+repo: "sytone/obsidian-remote"
 tag: "latest"
 vault_storage_class: ""
 vault_size: "10Gi"

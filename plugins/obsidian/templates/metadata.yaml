@@ -16,12 +16,12 @@ data:
       description: "Container registry"
       type: string
       required: true
-      default: "lscr.io"
+      default: "docker.io"
     - name: repo
       description: "Image repository"
       type: string
       required: true
-      default: "linuxserver/obsidian"
+      default: "sytone/obsidian-remote"
     - name: tag
       description: "Image tag"
       type: string
