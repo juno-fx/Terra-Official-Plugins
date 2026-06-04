@@ -13,6 +13,6 @@ spec:
     matchNames:
       - argocd
   endpoints:
-    - port: metrics # matches the named port in your Service
+    - port: metrics
       interval: 30s
       path: /.metrics
