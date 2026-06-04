@@ -18,15 +18,15 @@ data:
       required: false
       default: latest
     - name: registry
-      description: "Container image registry (e.g. docker.io/myregistry). Leave empty for default."
+      description: "Container image registry (e.g. nousresearch)."
       type: string
       required: false
-      default: ""
+      default: nousresearch
     - name: repo
       description: "Container image repository."
       type: string
       required: false
-      default: "nousresearch/hermes-agent"
+      default: "hermes-agent"
     - name: cluster_access
       description: "Kubernetes RBAC access level for this agent."
       type: select

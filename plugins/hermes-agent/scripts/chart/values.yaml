@@ -3,8 +3,8 @@ user:
 session:
 cluster_access: none
 personality: ""
-registry: ""
-repo: nousresearch/hermes-agent
+registry: nousresearch
+repo: hermes-agent
 tag: latest
 host: ""
 cpu: 500m
