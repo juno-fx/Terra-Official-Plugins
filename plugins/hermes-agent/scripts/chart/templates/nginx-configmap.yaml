@@ -25,7 +25,20 @@ data:
                 proxy_set_header X-Forwarded-Prefix /hermes/__NAME__/dashboard;
             }
 
-            location /hermes/__NAME__ {
+            # Wetty HTML page — inject anti-ghosting CSS
+            location = /hermes/__NAME__ {
+                proxy_pass http://127.0.0.1:7681;
+                proxy_http_version 1.1;
+                sub_filter '</head>' '<style>
+                  .xterm-viewport{transform:translateZ(0);will-change:transform}
+                  .xterm-screen{transform:translateZ(0)}
+                </style></head>';
+                sub_filter_once on;
+                sub_filter_types text/html;
+            }
+
+            # Wetty WebSocket and assets
+            location /hermes/__NAME__/ {
                 proxy_pass http://127.0.0.1:7681;
                 proxy_http_version 1.1;
                 proxy_set_header Upgrade $http_upgrade;
