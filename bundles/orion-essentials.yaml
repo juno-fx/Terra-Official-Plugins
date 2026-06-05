@@ -39,7 +39,7 @@ plugins:
       username:
         reference: username
       password:
-        reference: path
+        reference: password
   - plugin: ArgoCD Dashboard
     name: argocd
     values:
