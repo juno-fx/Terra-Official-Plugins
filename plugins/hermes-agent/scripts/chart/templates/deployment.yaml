@@ -84,10 +84,10 @@ spec:
           env:
             - name: HERMES_HOME
               value: /opt/data
+            - name: HOME
+              value: /opt/data
             - name: USER
               value: {{ .Values.user | quote }}
-            - name: HOME
-              value: "/home/{{ .Values.user }}"
             - name: PUID
               value: {{ .Values.puid | quote }}
             - name: PGID
