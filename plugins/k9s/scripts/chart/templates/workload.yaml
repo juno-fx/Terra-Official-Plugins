@@ -86,7 +86,7 @@ spec:
               mountPath: /etc/nginx/conf.d/default.conf
               subPath: default.conf
       nodeSelector:
-        juno-innovations.com/workstation: "true"
+        beta.kubernetes.io/arch: amd64
       tolerations:
         - key: juno-innovations.com/workstation
           operator: Equal
