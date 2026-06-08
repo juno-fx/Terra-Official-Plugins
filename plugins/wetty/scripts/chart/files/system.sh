@@ -24,11 +24,13 @@ if ! command -v tmux &>/dev/null; then
   apk add --no-cache tmux >/dev/null 2>&1
 fi
 
-# Start user in tmux session for persistence
+# Start wetty inside tmux session for persistence
+# --noid: skip the login form, boot directly into a shell
+# --allow-iframe: allow embedding in iframes
 SESSION_NAME="juno-wetty-${WORKSTATION_NAME}"
 
 tmux kill-session -t "$SESSION_NAME" 2>/dev/null || true
-tmux new-session -d -s "$SESSION_NAME" -- /bin/sh
+tmux new-session -d -s "$SESSION_NAME" -- /bin/sh -c "yarn start --base \"/polaris/$WORKSTATION_NAME\" --allow-iframe --noid; exec $0"
 
 # Wait forever (keeps the container alive)
 exec tail -f /dev/null
