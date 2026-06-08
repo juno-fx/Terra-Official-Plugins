@@ -10,7 +10,7 @@ data:
     set -e
 
     # Install tools and build deps for wetty's native modules
-    apt-get update -qq && apt-get install -y -qq curl bash python3 make g++ git gosu 2>/dev/null
+    apt-get update -qq && apt-get install -y -qq curl bash python3 make g++ git gosu tmux 2>/dev/null
 
     export SHELL=/bin/bash
 
@@ -52,8 +52,29 @@ data:
     # Fix ownership so the user can write to /data (opencode cache, etc.)
     chown -R "$PUID:$PGID" /data
 
-    # Start wetty at root — nginx handles prefix
-    exec wetty --port {{ .Values.ttyd_port }} --command "$CMD"
+    # Start wetty with tmux wrapper
+    exec wetty --port {{ .Values.ttyd_port }} --command "bash -c 'source /opt/boot/tmux-boot.sh && exec_tmux \"$CMD\"'"
+  tmux-boot.sh: |
+    #!/bin/sh
+    # tmux-boot.sh — shared wrapper for persistent terminal sessions
+    # Usage: source this script, then call exec_tmux "original_command"
+    # Creates or reattaches to a tmux session named juno-{USER}-{SESSION}
+
+    # Create or reattach to session
+    exec_tmux() {
+      ORIGINAL_CMD="$1"
+      SESSION_NAME="juno-${USER}-{{ .Values.session }}"
+
+      if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
+        # Reattach to existing session
+        exec tmux attach -t "$SESSION_NAME"
+      else
+        # Create new session, run command, then attach
+        tmux new-session -d -s "$SESSION_NAME"
+        tmux send-keys -t "$SESSION_NAME" "$ORIGINAL_CMD" Enter
+        exec tmux attach -t "$SESSION_NAME"
+      fi
+    }
   git-serve.sh: |
     #!/bin/bash
     set -e

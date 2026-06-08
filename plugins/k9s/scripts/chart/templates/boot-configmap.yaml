@@ -10,7 +10,7 @@ data:
     set -e
 
     # Install tools and build deps for wetty's native modules
-    apt-get update -qq && apt-get install -y -qq curl bash python3 make g++ gosu 2>/dev/null
+    apt-get update -qq && apt-get install -y -qq curl bash python3 make g++ gosu tmux 2>/dev/null
 
     export SHELL=/bin/bash
 
@@ -27,9 +27,6 @@ data:
       chsh -s /bin/bash "$USERNAME" 2>/dev/null || true
     fi
 
-    # Install tmux (for k9s)
-    apt-get install -y -qq tmux 2>/dev/null
-
     # Install wetty (like Hermes Agent's built-in wetty)
     npm install -g wetty
 
@@ -39,37 +36,39 @@ data:
     chmod +x /usr/local/bin/k9s
     rm -f /tmp/k9s.tar.gz
 
-    # Create kubeconfig from in-cluster service account so k9s can connect
-    mkdir -p /data/.kube
-    echo "apiVersion: v1" > /data/.kube/config
-    echo "kind: Config" >> /data/.kube/config
-    echo "clusters:" >> /data/.kube/config
-    echo "- cluster:" >> /data/.kube/config
-    echo "    certificate-authority: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt" >> /data/.kube/config
-    echo "    server: https://kubernetes.default.svc" >> /data/.kube/config
-    echo "  name: in-cluster" >> /data/.kube/config
-    echo "contexts:" >> /data/.kube/config
-    echo "- context:" >> /data/.kube/config
-    echo "    cluster: in-cluster" >> /data/.kube/config
-    echo "    namespace: {{ .Release.Namespace }}" >> /data/.kube/config
-    echo "    user: default" >> /data/.kube/config
-    echo "  name: in-cluster" >> /data/.kube/config
-    echo "current-context: in-cluster" >> /data/.kube/config
-    echo "users:" >> /data/.kube/config
-    echo "- name: default" >> /data/.kube/config
-    echo "  user:" >> /data/.kube/config
-    echo "    tokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token" >> /data/.kube/config
-    export KUBECONFIG=/data/.kube/config
-
-    # Build the command
-    if [ "$PUID" != "0" ]; then
-      CMD="gosu $USERNAME /bin/bash -c 'k9s; exec /bin/bash -l'"
-    else
-      CMD="/bin/bash -c 'k9s; exec /bin/bash -l'"
-    fi
+    # Kubeconfig is mounted from a dedicated ConfigMap at /etc/kubeconfig
+    export KUBECONFIG=/etc/kubeconfig/config
 
     # Fix ownership so the user can write to /data
     chown -R "$PUID:$PGID" /data
 
-    # Start wetty at root — nginx handles prefix
-    exec wetty --port {{ .Values.ttyd_port }} --command "$CMD"
+    # Start wetty with tmux wrapper
+    TMUX_CMD="source /opt/boot/tmux-boot.sh && exec_tmux 'k9s; exec /bin/bash -l'"
+    if [ "$PUID" != "0" ]; then
+      exec wetty --port {{ .Values.ttyd_port }} --command "bash -c 'gosu $USERNAME $TMUX_CMD'"
+    else
+      exec wetty --port {{ .Values.ttyd_port }} --command "bash -c '$TMUX_CMD'"
+    fi
+  tmux-boot.sh: |
+    #!/bin/sh
+    # tmux-boot.sh — shared wrapper for persistent terminal sessions
+    # Usage: source this script, then call exec_tmux "original_command"
+    # Creates or reattaches to a tmux session named juno-{USER}-{SESSION}
+
+    set -e
+
+    # Create or reattach to session
+    exec_tmux() {
+      ORIGINAL_CMD="$1"
+      SESSION_NAME="juno-${USER}-{{ .Values.session }}"
+
+      if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
+        # Reattach to existing session
+        exec tmux attach -t "$SESSION_NAME"
+      else
+        # Create new session, run command, then attach
+        tmux new-session -d -s "$SESSION_NAME"
+        tmux send-keys -t "$SESSION_NAME" "$ORIGINAL_CMD" Enter
+        exec tmux attach -t "$SESSION_NAME"
+      fi
+    }
