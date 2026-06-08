@@ -54,11 +54,11 @@ data:
 
     # Write the tmux launcher script with the command embedded at boot time
     cat > /opt/boot/tmux-launch.sh << LAUNCHER
-#!/bin/sh
-set -e
-source /opt/boot/tmux-boot.sh
-exec_tmux "\${CMD}"
-LAUNCHER
+    #!/bin/sh
+    set -e
+    source /opt/boot/tmux-boot.sh
+    exec_tmux "\${CMD}"
+    LAUNCHER
     chmod +x /opt/boot/tmux-launch.sh
 
     # Start wetty — gosu runs a script file (not a shell builtin like 'source')
