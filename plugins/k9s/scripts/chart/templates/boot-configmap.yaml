@@ -76,7 +76,7 @@ data:
 
     set -e
 
-    source /opt/boot/tmux-boot.sh
+    . /opt/boot/tmux-boot.sh
 
     # --- k9s ---
     exec_tmux 'k9s; exec /bin/bash -l'
