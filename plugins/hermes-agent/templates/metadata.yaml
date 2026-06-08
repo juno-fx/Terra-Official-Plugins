@@ -11,7 +11,7 @@ data:
   description: "Hermes AI agent with web dashboard."
   fields: |
     - name: icon
-      default: "https://raw.githubusercontent.com/NousResearch/hermes-agent/main/assets/banner.png"
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/hermes-agent/scripts/assets/hermes-logo.png"
     - name: tag
       description: "Container image tag."
       type: string
