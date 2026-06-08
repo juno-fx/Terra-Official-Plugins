@@ -25,8 +25,6 @@ if ! command -v tmux &>/dev/null; then
 fi
 
 # Start wetty inside tmux session for persistence
-# --noid: skip the login form, boot directly into a shell
-# --allow-iframe: allow embedding in iframes
 SESSION_NAME="juno-wetty-${WORKSTATION_NAME}"
 
 tmux kill-session -t "$SESSION_NAME" 2>/dev/null || true
