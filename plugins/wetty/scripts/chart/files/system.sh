@@ -10,7 +10,9 @@ addgroup -g "$PGID" wettyusers || echo "group already exists"
 
 adduser -D -u "$PUID" -G wettyusers "$USER" || echo "user already exists"
 
-echo "$USER:$USER_PASS" | chpasswd
+# Set correct home directory ownership
+mkdir -p /home/$USER
+chown -R $PUID:$PGID /home/$USER
 
 if [ -n "$PACKAGES" ]; then
   # shellcheck disable=SC2086
@@ -22,12 +24,11 @@ if ! command -v tmux &>/dev/null; then
   apk add --no-cache tmux >/dev/null 2>&1
 fi
 
-# Start wetty inside tmux session for persistence
-# When wetty exits, re-exec this script to restart it in a fresh session
+# Start user in tmux session for persistence
 SESSION_NAME="juno-wetty-${WORKSTATION_NAME}"
 
 tmux kill-session -t "$SESSION_NAME" 2>/dev/null || true
-tmux new-session -d -s "$SESSION_NAME" "yarn start --base \"/polaris/$WORKSTATION_NAME\" --allow-iframe; exec $0"
+tmux new-session -d -s "$SESSION_NAME" -- /bin/sh
 
 # Wait forever (keeps the container alive)
 exec tail -f /dev/null
