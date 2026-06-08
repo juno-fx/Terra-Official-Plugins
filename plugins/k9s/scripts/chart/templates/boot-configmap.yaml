@@ -42,13 +42,8 @@ data:
     # Fix ownership so the user can write to /data
     chown -R "$PUID:$PGID" /data
 
-    # Start wetty with tmux wrapper
-    TMUX_CMD="source /opt/boot/tmux-boot.sh && exec_tmux 'k9s; exec /bin/bash -l'"
-    if [ "$PUID" != "0" ]; then
-      exec wetty --port {{ .Values.ttyd_port }} --command "bash -c 'gosu $USERNAME $TMUX_CMD'"
-    else
-      exec wetty --port {{ .Values.ttyd_port }} --command "bash -c '$TMUX_CMD'"
-    fi
+    # Start wetty — gosu runs a script file (not a shell builtin like 'source')
+    exec wetty --port {{ .Values.ttyd_port }} --command "bash -c \"gosu $USERNAME /opt/boot/tmux-launch.sh\""
   tmux-boot.sh: |
     #!/bin/sh
     # tmux-boot.sh — shared wrapper for persistent terminal sessions

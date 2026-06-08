@@ -52,13 +52,24 @@ data:
     # Fix ownership so the user can write to /data (opencode cache, etc.)
     chown -R "$PUID:$PGID" /data
 
-    # Start wetty with tmux wrapper
-    exec wetty --port {{ .Values.ttyd_port }} --command "bash -c 'source /opt/boot/tmux-boot.sh && exec_tmux \"$CMD\"'"
+    # Write the tmux launcher script with the command embedded at boot time
+    cat > /opt/boot/tmux-launch.sh << LAUNCHER
+#!/bin/sh
+set -e
+source /opt/boot/tmux-boot.sh
+exec_tmux "\${CMD}"
+LAUNCHER
+    chmod +x /opt/boot/tmux-launch.sh
+
+    # Start wetty — gosu runs a script file (not a shell builtin like 'source')
+    exec wetty --port {{ .Values.ttyd_port }} --command "bash -c \"gosu $USERNAME /opt/boot/tmux-launch.sh\""
   tmux-boot.sh: |
     #!/bin/sh
     # tmux-boot.sh — shared wrapper for persistent terminal sessions
     # Usage: source this script, then call exec_tmux "original_command"
     # Creates or reattaches to a tmux session named juno-{USER}-{SESSION}
+
+    set -e
 
     # Create or reattach to session
     exec_tmux() {
