@@ -7,10 +7,6 @@ metadata:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/auth-url: "http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/"
     nginx.ingress.kubernetes.io/use-regex: "true"
-    {{- if eq .Values.network_mode "ingress-noauth" }}
-    nginx.ingress.kubernetes.io/auth-type: ""
-    nginx.ingress.kubernetes.io/auth-secret: ""
-    {{- end }}
 spec:
   rules:
     - host: {{ .Values.host }}
