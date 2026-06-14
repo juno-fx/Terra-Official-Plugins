@@ -23,7 +23,7 @@ fi
 apk add --no-cache tmux bash
 
 # Base path for wetty (matches ingress nginx rewrite rule)
-WETTY_BASE="/polaris/$WORKSTATION_NAME"
+WETTY_BASE="/wetty/$WORKSTATION_NAME"
 SESSION_NAME="juno-wetty-${WORKSTATION_NAME}"
 
 # Start wetty as a WebSocket-to-terminal bridge.

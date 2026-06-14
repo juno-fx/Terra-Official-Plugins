@@ -38,6 +38,11 @@ data:
       options:
         - readonly-ns
         - admin-ns
+    - name: ingressNamespace
+      description: "Namespace of the ingress controller for plugin access"
+      type: string
+      required: true
+      default: "ingress-nginx"
     - name: storage_class
       description: "Storage class to use for the data disk"
       required: true

@@ -27,3 +27,4 @@ timezone: "America/New_York"
 storage_class:
 storage_size: "1Gi"
 cluster_access: "readonly-ns"
+ingressNamespace: ingress-nginx
