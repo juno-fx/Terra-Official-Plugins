@@ -6,7 +6,8 @@ apt update
 apt install -y \
   curl \
   tar \
-  rsync
+  rsync \
+  libicu-dev
 
 # clean up any previous installation
 mkdir -pv /${DESTINATION}/${NAME}
