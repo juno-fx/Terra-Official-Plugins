@@ -35,8 +35,8 @@ SESSION_NAME="juno-wetty-${WORKSTATION_NAME}"
 # (same pattern as the Hermes agent plugin at:
 #  plugins/hermes-agent/scripts/chart/templates/init-script-configmap.yaml)
 cd /usr/src/app
-LANG=C.UTF-8 LC_ALL=C.UTF-8 COLORTERM=truecolor NODE_ENV=production node . -b "$WETTY_BASE" --allow-iframe -p 3000 \
-  -c "tmux new-session -A -s $SESSION_NAME bash" &
+cmd = "tmux new-session -A -s $SESSION_NAME bash"
+LANG=C.UTF-8 LC_ALL=C.UTF-8 COLORTERM=truecolor NODE_ENV=production node . -b "$WETTY_BASE" --allow-iframe -p 3000 -c "bash" &
 
 # Wait forever (keeps the container alive)
 exec tail -f /dev/null
