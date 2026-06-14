@@ -24,11 +24,22 @@ if ! command -v tmux &>/dev/null; then
   apk add --no-cache tmux >/dev/null 2>&1
 fi
 
-# Start wetty inside tmux session for persistence
+# Install wetty CLI if not already available (needed for -c flag to bypass login form)
+if ! command -v wetty &>/dev/null; then
+  npm install -g wetty >/dev/null 2>&1
+fi
+
+# Base path for wetty (matches ingress nginx rewrite rule)
+WETTY_BASE="/polaris/$WORKSTATION_NAME"
 SESSION_NAME="juno-wetty-${WORKSTATION_NAME}"
 
-tmux kill-session -t "$SESSION_NAME" 2>/dev/null || true
-tmux new-session -d -s "$SESSION_NAME" -- /bin/sh -c "yarn start --base \"/polaris/$WORKSTATION_NAME\" --allow-iframe --noid; exec $0"
+# Start wetty as a WebSocket-to-terminal bridge.
+# The -c flag runs a command directly, bypassing wetty's login form entirely.
+# This gives the user a raw terminal session over WebSocket immediately.
+# (same pattern as the Hermes agent plugin at:
+#  plugins/hermes-agent/scripts/chart/templates/init-script-configmap.yaml)
+wetty -b "$WETTY_BASE" --allow-iframe -p 3000 \
+  -c "export LANG=C.UTF-8 LC_ALL=C.UTF-8 COLORTERM=truecolor && exec tmux new-session -A -s $SESSION_NAME bash" &
 
 # Wait forever (keeps the container alive)
 exec tail -f /dev/null
