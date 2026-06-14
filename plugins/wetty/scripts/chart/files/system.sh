@@ -35,4 +35,4 @@ SESSION_NAME="juno-wetty-${WORKSTATION_NAME}"
 cd /usr/src/app
 # cmd = "tmux new-session -A -s $SESSION_NAME bash"
 LANG=C.UTF-8 LC_ALL=C.UTF-8 COLORTERM=truecolor NODE_ENV=production node . -b "$WETTY_BASE" --allow-iframe \
-  -p 3000 -c "su $USER && tmux new-session -A -s $SESSION_NAME bash"
+  -p 3000 -c "su $USER -c 'tmux new-session -A -s $SESSION_NAME bash'"
