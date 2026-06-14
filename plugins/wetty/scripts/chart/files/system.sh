@@ -24,15 +24,19 @@ if ! command -v tmux &>/dev/null; then
   apk add --no-cache tmux >/dev/null 2>&1
 fi
 
-# The entrypoint is `node ./build/main.js` — wetty is a Node.js app, not a binary
-
 # Base path for wetty (matches ingress nginx rewrite rule)
 WETTY_BASE="/polaris/$WORKSTATION_NAME"
 SESSION_NAME="juno-wetty-${WORKSTATION_NAME}"
 
-# Start wetty as a WebSocket-to-terminal bridge via the Node.js entrypoint.
+# Start wetty as a WebSocket-to-terminal bridge.
+# The wetty image CMD is: yarn run which expands to: NODE_ENV=production node .
+# We run node . directly (same expansion) so the -c flag works correctly.
 # The -c flag runs a command in the shell, bypassing the login form.
 # (same pattern as the Hermes agent plugin at:
 #  plugins/hermes-agent/scripts/chart/templates/init-script-configmap.yaml)
-node ./build/main.js -b "$WETTY_BASE" --allow-iframe -p 3000 \
-  -c "tmux new-session -A -s $SESSION_NAME bash"
+cd /usr/src/app
+LANG=C.UTF-8 LC_ALL=C.UTF-8 COLORTERM=truecolor NODE_ENV=production node . -b "$WETTY_BASE" --allow-iframe -p 3000 \
+  -c "tmux new-session -A -s $SESSION_NAME bash" &
+
+# Wait forever (keeps the container alive)
+exec tail -f /dev/null
