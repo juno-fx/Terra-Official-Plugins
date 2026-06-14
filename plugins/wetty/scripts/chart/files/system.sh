@@ -24,9 +24,9 @@ if ! command -v tmux &>/dev/null; then
   apk add --no-cache tmux >/dev/null 2>&1
 fi
 
-# Install wetty CLI if not already available (needed for -c flag to bypass login form)
-if ! command -v wetty &>/dev/null; then
-  npm install -g wetty >/dev/null 2>&1
+# Find wetty binary — image has it in node_modules/.bin
+if ! command -v wetty &>/dev/null && [ -f /usr/src/app/node_modules/.bin/wetty ]; then
+  export PATH="$PATH:/usr/src/app/node_modules/.bin"
 fi
 
 # Base path for wetty (matches ingress nginx rewrite rule)
