@@ -24,10 +24,8 @@ if ! command -v tmux &>/dev/null; then
   apk add --no-cache tmux >/dev/null 2>&1
 fi
 
-# Find wetty binary — image has it in node_modules/.bin
-if ! command -v wetty &>/dev/null && [ -f /usr/src/app/node_modules/.bin/wetty ]; then
-  export PATH="$PATH:/usr/src/app/node_modules/.bin"
-fi
+# The wetty image installs wetty locally in node_modules/.bin — prepend to PATH
+export PATH="$PATH:/usr/src/app/node_modules/.bin"
 
 # Base path for wetty (matches ingress nginx rewrite rule)
 WETTY_BASE="/polaris/$WORKSTATION_NAME"
