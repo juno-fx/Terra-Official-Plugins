@@ -30,13 +30,12 @@ fi
 WETTY_BASE="/polaris/$WORKSTATION_NAME"
 SESSION_NAME="juno-wetty-${WORKSTATION_NAME}"
 
-# Start wetty as a WebSocket-to-terminal bridge.
-# The wetty image entrypoint is `node ./build/main.js` — run it directly.
-# The -c flag runs a command in the shell, bypassing wetty's login form.
+# Start wetty as a WebSocket-to-terminal bridge via the Node.js entrypoint.
+# The -c flag runs a command in the shell, bypassing the login form.
 # (same pattern as the Hermes agent plugin at:
 #  plugins/hermes-agent/scripts/chart/templates/init-script-configmap.yaml)
 node ./build/main.js -b "$WETTY_BASE" --allow-iframe -p 3000 \
-  -c "export LANG=C.UTF-8 LC_ALL=C.UTF-8 COLORTERM=truecolor && exec tmux new-session -A -s $SESSION_NAME bash" &
+  -c "tmux new-session -A -s $SESSION_NAME bash" &
 
 # Wait forever (keeps the container alive)
 exec tail -f /dev/null
