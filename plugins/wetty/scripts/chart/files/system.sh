@@ -20,9 +20,7 @@ if [ -n "$PACKAGES" ]; then
 fi
 
 # Install tmux for session persistence (Alpine uses apk)
-if ! command -v tmux &>/dev/null; then
-  apk add --no-cache tmux >/dev/null 2>&1
-fi
+apk add --no-cache tmux bash
 
 # Base path for wetty (matches ingress nginx rewrite rule)
 WETTY_BASE="/polaris/$WORKSTATION_NAME"
