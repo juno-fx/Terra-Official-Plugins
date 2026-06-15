@@ -32,14 +32,6 @@ spec:
         - name: vllm
           image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
           imagePullPolicy: IfNotPresent
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
-            readOnlyRootFilesystem: true
-            runAsNonRoot: true
-            runAsUser: 1000
           args:
             - "{{ .Values.model }}"
             {{- if .Values.served_model_name }}
