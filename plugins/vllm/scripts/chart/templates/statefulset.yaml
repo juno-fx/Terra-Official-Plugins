@@ -64,6 +64,10 @@ spec:
             - --reasoning-parser
             - "{{ .Values.reasoning_parser }}"
             {{- end }}
+            - --log-level
+            - debug
+            - --engine-log-level
+            - debug
             - --host
             - 0.0.0.0
             - --port
@@ -106,8 +110,6 @@ spec:
           env:
             - name: HF_HUB_DISABLE_TELEMETRY
               value: "true"
-            - name: VLLM_HOST
-              value: "0.0.0.0"
             {{- if .Values.hf_token }}
             - name: HF_TOKEN
               valueFrom:
