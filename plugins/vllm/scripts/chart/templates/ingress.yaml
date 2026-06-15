@@ -4,6 +4,9 @@ metadata:
   name: {{ .Values.name }}-ingress
   annotations:
     kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
 spec:
   rules:
     - host: {{ .Values.host }}
@@ -13,6 +16,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ .Values.name }}
+                name: "{{ .Release.Name }}"
                 port:
                   number: 8000
