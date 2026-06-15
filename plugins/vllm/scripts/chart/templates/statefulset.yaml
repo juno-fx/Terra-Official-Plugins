@@ -93,8 +93,6 @@ spec:
           env:
             - name: HF_HUB_DISABLE_TELEMETRY
               value: "true"
-            - name: VLLM_LOGGING_LEVEL
-              value: "DEBUG"
             - name: HF_HUB_CACHE
               value: "/models"
             {{- if .Values.hf_token }}
