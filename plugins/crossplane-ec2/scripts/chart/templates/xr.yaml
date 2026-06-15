@@ -22,6 +22,7 @@ spec:
     {{- range .Values.block_device_mappings}}
       - deviceName: {{.mount_path}}
         ebs:
+          deleteOnTermination: {{$.Values.delete_on_termination}}
           volumeSize: {{.size}}
     {{- end}}
     providerConfigRef: {{.Values.provider_config_ref}}
