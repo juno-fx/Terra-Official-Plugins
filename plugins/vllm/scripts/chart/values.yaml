@@ -1,0 +1,56 @@
+# Kuiper-injected standard values — do not remove
+name: vllm
+user:
+group:
+cpu: "1"
+memory: "4Gi"
+cpuLimit: null
+memoryLimit: null
+gpu: false
+idx: 0
+guid: 0
+puid: 0
+host:
+pullSecret:
+session:
+volumeMounts: []
+volumes: []
+env:
+  - name: JUNO
+    value: "true"
+selector:
+plugins: []
+_kuiper:
+
+# vLLM image configuration
+registry: "docker.io"
+repo: "vllm/vllm-openai"
+tag: "0.14.1"
+
+# Model to serve
+model: ""
+served_model_name: ""
+
+# HuggingFace token (for gated models)
+hf_token: ""
+
+# vLLM serving arguments
+max_model_len: "262144"
+max_num_batched_tokens: "16384"
+max_num_seqs: "64"
+gpu_memory_utilization: "0.9"
+quantization: ""
+
+# Model features
+enable_prefix_caching: true
+enable_auto_tool_choice: false
+tool_call_parser: ""
+reasoning_parser: ""
+speculative_config: ""
+
+# GPU settings
+gpu_count: 1
+
+# Storage
+storage_class:
+storage_size: "50Gi"

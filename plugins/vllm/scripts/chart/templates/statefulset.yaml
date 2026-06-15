@@ -1,0 +1,144 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{ .Release.Name }}"
+  annotations:
+    juno-innovations.com/workload: "Server"
+    kuiper.juno-innovations.com/actions: "restart,stop"
+spec:
+  replicas: 1
+  serviceName: "{{ .Release.Name }}"
+  selector:
+    matchLabels:
+      kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+  template:
+    metadata:
+      labels:
+        kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+      annotations:
+        juno-innovations.com/workload: "Server"
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        fsGroup: 1000
+      {{- if .Values.gpu }}
+      runtimeClassName: nvidia
+      {{- end }}
+      {{- if .Values.pullSecret }}
+      imagePullSecrets:
+        - name: "{{ .Values.pullSecret }}"
+      {{- end }}
+      containers:
+        - name: vllm
+          image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+          args:
+            - "{{ .Values.model }}"
+            {{- if .Values.served_model_name }}
+            - --served-model-name
+            - "{{ .Values.served_model_name }}"
+            {{- end }}
+            - --max-model-len
+            - "{{ .Values.max_model_len }}"
+            - --max-num-batched-tokens
+            - "{{ .Values.max_num_batched_tokens }}"
+            - --max-num-seqs
+            - "{{ .Values.max_num_seqs }}"
+            - --gpu-memory-utilization
+            - "{{ .Values.gpu_memory_utilization }}"
+            {{- if .Values.quantization }}
+            - --quantization
+            - "{{ .Values.quantization }}"
+            {{- end }}
+            {{- if .Values.enable_prefix_caching }}
+            - --enable-prefix-caching
+            {{- end }}
+            {{- if .Values.enable_auto_tool_choice }}
+            - --enable-auto-tool-choice
+            {{- end }}
+            {{- if .Values.tool_call_parser }}
+            - --tool-call-parser
+            - "{{ .Values.tool_call_parser }}"
+            {{- end }}
+            {{- if .Values.reasoning_parser }}
+            - --reasoning-parser
+            - "{{ .Values.reasoning_parser }}"
+            {{- end }}
+            {{- if .Values.speculative_config }}
+            - --speculative-config
+            - "{{ .Values.speculative_config }}"
+            {{- end }}
+            - --host
+            - 0.0.0.0
+            - --port
+            - "8000"
+          resources:
+            requests:
+              memory: "{{ .Values.memory }}"
+              cpu: "{{ .Values.cpu }}"
+            limits:
+              {{- if .Values.gpu }}
+              nvidia.com/gpu: "{{ .Values.gpu_count }}"
+              {{- end }}
+              {{- if .Values.cpuLimit }}
+              cpu: "{{ .Values.cpuLimit }}"
+              {{- else }}
+              cpu: "{{ .Values.cpu }}"
+              {{- end }}
+              {{- if .Values.memoryLimit }}
+              memory: "{{ .Values.memoryLimit }}"
+              {{- else }}
+              memory: "{{ .Values.memory }}"
+              {{- end }}
+          ports:
+            - containerPort: 8000
+              name: api
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 60
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 3
+          env:
+            - name: HF_HUB_DISABLE_TELEMETRY
+              value: "true"
+            - name: VLLM_HOST
+              value: "0.0.0.0"
+            {{- if .Values.hf_token }}
+            - name: HF_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Name }}-hf-token"
+                  key: HF_TOKEN
+            {{- end }}
+            {{- range .Values.env }}
+            - name: {{ .name | quote }}
+              value: {{ .value | quote }}
+            {{- end }}
+          volumeMounts:
+            - name: model-cache
+              mountPath: /models
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: model-cache
+          persistentVolumeClaim:
+            claimName: "{{ .Release.Name }}-models"
+        - name: tmp
+          emptyDir: {}

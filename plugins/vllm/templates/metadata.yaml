@@ -1,0 +1,92 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-terra-metadata
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+  annotations:
+    juno-innovations.com/workload: "Server"
+data:
+  chart: "{{ .Release.Name }}-scripts-configmap"
+  description: "OpenAI-compatible LLM inference server"
+  fields: |
+    - name: registry
+      description: "Container registry"
+      required: true
+      default: "docker.io"
+    - name: repo
+      description: "Image repository"
+      required: true
+      default: "vllm/vllm-openai"
+    - name: tag
+      description: "Image tag"
+      required: true
+      default: "0.14.1"
+    - name: model
+      description: "HuggingFace model name to serve (e.g., Qwen/Qwen3.6-35B-A3B-FP8)"
+      required: true
+    - name: served_model_name
+      description: "Optional name for the served model (overrides the model name in API responses)"
+      required: false
+    - name: hf_token
+      description: "HuggingFace Hub token for gated models. Stored as env var HF_TOKEN."
+      required: false
+      type: string
+      sensitive: true
+    - name: gpu
+      description: "Enable GPU acceleration"
+      required: true
+      type: boolean
+      default: false
+    - name: gpu_count
+      description: "Number of GPUs to allocate"
+      required: false
+      type: int
+      default: 1
+    - name: max_model_len
+      description: "Maximum sequence length"
+      required: false
+      default: "262144"
+    - name: max_num_batched_tokens
+      description: "Maximum number of batched tokens"
+      required: false
+      default: "16384"
+    - name: max_num_seqs
+      description: "Maximum number of sequences"
+      required: false
+      default: "64"
+    - name: gpu_memory_utilization
+      description: "Fraction of GPU memory for KV cache"
+      required: false
+      default: "0.9"
+    - name: quantization
+      description: "Quantization method (fp8, awq, gptq, etc.). Leave empty for native precision."
+      required: false
+    - name: enable_prefix_caching
+      description: "Enable prefix caching for faster generation on repeated prompts"
+      required: false
+      type: boolean
+      default: true
+    - name: enable_auto_tool_choice
+      description: "Enable automatic tool choice in chat completions"
+      required: false
+      type: boolean
+      default: false
+    - name: tool_call_parser
+      description: "Tool call parser type (e.g., qwen3_coder)"
+      required: false
+    - name: reasoning_parser
+      description: "Reasoning parser type (e.g., qwen3)"
+      required: false
+    - name: speculative_config
+      description: "Speculative decoding config (JSON). Example: {\"method\": \"qwen3_next_mtp\", \"num_speculative_tokens\": 2}"
+      required: false
+    - name: storage_class
+      description: "Storage class for model cache"
+      required: true
+      type: k8sStorageClass
+    - name: storage_size
+      description: "Storage size for model cache"
+      required: false
+      default: "50Gi"
+      type: string
