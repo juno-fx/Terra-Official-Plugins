@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-terra-metadata"
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+  annotations:
+    juno-innovations.com/workload: "AI Agent"
+data:
+  chart: "{{ .Release.Name }}-scripts-configmap"
+  description: "Hermes AI agent with web dashboard."
+  fields: |
+    - name: icon
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/hermes-agent/scripts/assets/hermes-logo.png"
+    - name: tag
+      description: "Container image tag."
+      type: string
+      required: false
+      default: latest
+    - name: registry
+      description: "Container image registry (e.g. nousresearch)."
+      type: string
+      required: false
+      default: nousresearch
+    - name: repo
+      description: "Container image repository."
+      type: string
+      required: false
+      default: "hermes-agent"
+    - name: cluster_access
+      description: "Kubernetes RBAC access level for this agent."
+      type: select
+      required: false
+      default: none
+      options:
+        - none
+        - readonly-ns
+        - admin-ns
+    - name: persistence_size
+      description: "Persistent volume size (e.g. 1Gi, 500Mi)."
+      type: string
+      required: false
+      default: "1Gi"
+    - name: persistence_storage_class
+      description: "Storage class for the persistent volume."
+      type: k8sStorageClass
+      required: false
+

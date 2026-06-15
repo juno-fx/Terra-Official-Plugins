@@ -1,0 +1,130 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-init-script"
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+data:
+  start.sh: |
+    #!/bin/sh
+    set -e
+
+    HERMES_BIN="/opt/hermes/.venv/bin/hermes"
+
+    log() { echo "[init] $*"; }
+
+    # Phase 1 — install sudo + tmux (small, fast). Needed immediately for
+    # privilege-drop via sudo.  Build tools (gcc/g++/make) come later in
+    # Phase 3 so the gateway can start without waiting for compilation.
+    if ! command -v sudo > /dev/null 2>&1; then
+      log "Installing sudo and tmux..."
+      apt-get update -qq
+      apt-get install -y sudo tmux 2>&1
+    else
+      log "sudo already installed, skipping..."
+    fi
+
+    # --- User/group remap (only when PUID != 0) ---
+    if [ "${PUID:-0}" != "0" ]; then
+      log "Remapping hermes user to PUID=${PUID} PGID=${PGID}"
+
+      usermod -u "$PUID" hermes
+      groupmod -o -g "$PGID" hermes 2>/dev/null || true
+      usermod -s /bin/bash hermes
+
+      mkdir -p "/home/${USER}"
+      chown -R hermes:hermes "/home/${USER}"
+
+      echo "hermes ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/hermes
+      chmod 440 /etc/sudoers.d/hermes
+
+      if [ -n "${USER_PASS:-}" ]; then
+        echo "hermes:$USER_PASS" | chpasswd
+      fi
+
+      # Fix ownership of the PVC data volume
+      chown hermes:hermes /opt/data
+      for sub in cron sessions logs hooks memories skills skins plans workspace home profiles; do
+        [ -d "/opt/data/$sub" ] && chown -R hermes:hermes "/opt/data/$sub"
+      done
+
+      # Fix ownership and permissions for the entire hermes tree and data dir.
+      # Image ships with UID 10000; after usermod all files show old UID.
+      # Synchronous — pod won't flag Ready until permissions are complete.
+      chown -R hermes:hermes /opt/hermes /opt/data 2>/dev/null || true
+      chmod -R o+rX /opt/hermes /opt/data 2>/dev/null || true
+    else
+      log "PUID=0, running as root (legacy mode)"
+    fi
+
+    # --- Write .tmux.conf for color/emoji support ---
+    cat > "/home/${USER}/.tmux.conf" << 'TMUXCONF'
+    # Enable truecolor (24-bit) — fixes washed-out colors
+    set -g default-terminal "tmux-256color"
+    set -ga terminal-overrides ",*:Tc"
+
+    # Mouse scroll and select
+    set -g mouse on
+
+    # Big scrollback
+    set -g history-limit 50000
+
+    # Refresh locale/color vars on reattach
+    set -g update-environment "LANG LC_ALL LC_CTYPE COLORTERM TERM"
+    TMUXCONF
+    chown hermes:hermes "/home/${USER}/.tmux.conf" 2>/dev/null || true
+
+    _SU=""
+    [ "${PUID:-0}" != "0" ] && _SU="sudo -E -u hermes"
+
+    cleanup() {
+      log "Shutting down..."
+      kill "${GATEWAY_PID:-}" "${DASHBOARD_PID:-}" "${WETTY_PID:-}" 2>/dev/null || true
+      wait
+      exit
+    }
+    trap cleanup TERM INT
+
+    as_user() {
+      if [ -n "$_SU" ]; then
+        $_SU "$@"
+      else
+        "$@"
+      fi
+    }
+
+    # Phase 2 — start gateway + dashboard (fast, no build tools needed)
+    log "Starting gateway..."
+    as_user "$HERMES_BIN" gateway run 2>&1 | sed 's/^/[gateway] /' &
+    GATEWAY_PID=$!
+    log "Gateway starting in background — proceeding..."
+
+    log "Starting dashboard..."
+    as_user "$HERMES_BIN" dashboard --host 127.0.0.1 --port 9120 --no-open 2>&1 | sed 's/^/[dashboard] /' &
+    DASHBOARD_PID=$!
+
+    # Phase 3 — install build tools + wetty (slow) in background, then
+    # start wetty.  Gateway + dashboard are already running so the agent
+    # is usable while wetty compiles.
+    _start_wetty() {
+      if ! command -v wetty > /dev/null 2>&1; then
+        log "Installing build tools (gcc, g++, make)..."
+        apt-get update -qq
+        apt-get install -y gcc g++ make 2>&1
+        log "Installing wetty..."
+        npm install -g wetty 2>&1
+        chmod +x /usr/local/lib/node_modules/wetty/build/main.js
+      else
+        log "wetty already installed, skipping..."
+      fi
+
+      log "Starting wetty..."
+      WETTY_CMD="bash -c 'export LANG=C.UTF-8 LC_ALL=C.UTF-8 COLORTERM=truecolor && . /opt/hermes/.venv/bin/activate && exec tmux new-session -A -s hermes bash'"
+      [ -n "$_SU" ] && WETTY_CMD="$_SU ${WETTY_CMD}"
+      wetty -b /hermes/__NAME__ --allow-iframe -p 7681 \
+        -c "${WETTY_CMD}" \
+        2>&1 | sed 's/^/[wetty] /' &
+    }
+    _start_wetty &
+
+    wait

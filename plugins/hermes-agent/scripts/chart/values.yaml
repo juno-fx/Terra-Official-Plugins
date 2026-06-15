@@ -1,0 +1,20 @@
+name: hermes-agent
+user:
+session:
+cluster_access: none
+registry: nousresearch
+repo: hermes-agent
+tag: latest
+host: ""
+cpu: 500m
+memory: 1Gi
+cpuLimit: 2000m
+memoryLimit: 4Gi
+persistence_size: 1Gi
+persistence_storage_class: local-path
+git_port: 9418
+puid: 1000
+guid: 1000
+
+env: []
+_kuiper:
