@@ -78,9 +78,6 @@ data:
     - name: reasoning_parser
       description: "Reasoning parser type (e.g., qwen3)"
       required: false
-    - name: speculative_config
-      description: "Speculative decoding config (JSON). Example: {\"method\": \"qwen3_next_mtp\", \"num_speculative_tokens\": 2}"
-      required: false
     - name: storage_class
       description: "Storage class for model cache"
       required: true

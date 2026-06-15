@@ -72,10 +72,6 @@ spec:
             - --reasoning-parser
             - "{{ .Values.reasoning_parser }}"
             {{- end }}
-            {{- if .Values.speculative_config }}
-            - --speculative-config
-            - "{{ .Values.speculative_config }}"
-            {{- end }}
             - --host
             - 0.0.0.0
             - --port

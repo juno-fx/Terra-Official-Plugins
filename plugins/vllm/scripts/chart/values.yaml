@@ -46,7 +46,6 @@ enable_prefix_caching: true
 enable_auto_tool_choice: false
 tool_call_parser: ""
 reasoning_parser: ""
-speculative_config: ""
 
 # GPU settings
 gpu_count: 1
