@@ -93,7 +93,7 @@ spec:
               port: 8000
             initialDelaySeconds: 15
             periodSeconds: 10
-            failureThreshold: 60
+            failureThreshold: 360
           livenessProbe:
             httpGet:
               path: /health
@@ -106,10 +106,8 @@ spec:
               value: "true"
             - name: VLLM_LOGGING_LEVEL
               value: "DEBUG"
-            - name: VLLM_TRACE_FUNCTION
-              value: "1"
-            - name: CUDA_LAUNCH_BLOCKING
-              value: "1"
+            - name: HF_HUB_CACHE
+              value: "/models"
             {{- if .Values.hf_token }}
             - name: HF_TOKEN
               valueFrom:
