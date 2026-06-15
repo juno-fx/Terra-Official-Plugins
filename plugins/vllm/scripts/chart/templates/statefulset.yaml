@@ -80,13 +80,9 @@ spec:
               {{- end }}
               {{- if .Values.cpuLimit }}
               cpu: "{{ .Values.cpuLimit }}"
-              {{- else }}
-              cpu: "{{ .Values.cpu }}"
               {{- end }}
               {{- if .Values.memoryLimit }}
               memory: "{{ .Values.memoryLimit }}"
-              {{- else }}
-              memory: "{{ .Values.memory }}"
               {{- end }}
           ports:
             - containerPort: 8000
