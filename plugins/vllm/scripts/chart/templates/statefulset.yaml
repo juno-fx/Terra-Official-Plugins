@@ -35,20 +35,14 @@ spec:
           args:
             - "{{ .Values.model }}"
             {{- if .Values.served_model_name }}
-            - --served-model-name
-            - "{{ .Values.served_model_name }}"
+            - "--served-model-name={{ .Values.served_model_name }}"
             {{- end }}
-            - --max-model-len
-            - "{{ .Values.max_model_len }}"
-            - --max-num-batched-tokens
-            - "{{ .Values.max_num_batched_tokens }}"
-            - --max-num-seqs
-            - "{{ .Values.max_num_seqs }}"
-            - --gpu-memory-utilization
-            - "{{ .Values.gpu_memory_utilization }}"
+            - "--max-model-len={{ .Values.max_model_len }}"
+            - "--max-num-batched-tokens={{ .Values.max_num_batched_tokens }}"
+            - "--max-num-seqs={{ .Values.max_num_seqs }}"
+            - "--gpu-memory-utilization={{ .Values.gpu_memory_utilization }}"
             {{- if .Values.quantization }}
-            - --quantization
-            - "{{ .Values.quantization }}"
+            - "--quantization={{ .Values.quantization }}"
             {{- end }}
             {{- if .Values.enable_prefix_caching }}
             - --enable-prefix-caching
@@ -57,19 +51,14 @@ spec:
             - --enable-auto-tool-choice
             {{- end }}
             {{- if .Values.tool_call_parser }}
-            - --tool-call-parser
-            - "{{ .Values.tool_call_parser }}"
+            - "--tool-call-parser={{ .Values.tool_call_parser }}"
             {{- end }}
             {{- if .Values.reasoning_parser }}
-            - --reasoning-parser
-            - "{{ .Values.reasoning_parser }}"
+            - "--reasoning-parser={{ .Values.reasoning_parser }}"
             {{- end }}
-            - --uvicorn-log-level
-            - debug
-            - --host
-            - 0.0.0.0
-            - --port
-            - "8000"
+            - "--uvicorn-log-level=debug"
+            - "--host=0.0.0.0"
+            - "--port=8001"
           resources:
             requests:
               memory: "{{ .Values.memory }}"
@@ -85,19 +74,19 @@ spec:
               memory: "{{ .Values.memoryLimit }}"
               {{- end }}
           ports:
-            - containerPort: 8000
+            - containerPort: 8001
               name: api
           startupProbe:
             httpGet:
               path: /health
-              port: 8000
+              port: 8001
             initialDelaySeconds: 15
             periodSeconds: 10
             failureThreshold: 360
           livenessProbe:
             httpGet:
               path: /health
-              port: 8000
+              port: 8001
             initialDelaySeconds: 30
             periodSeconds: 30
             failureThreshold: 3
@@ -124,9 +113,29 @@ spec:
               mountPath: /models
             - name: tmp
               mountPath: /tmp
+        - name: nginx
+          image: nginx:alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+              name: http
+          resources:
+            requests:
+              cpu: "10m"
+              memory: "32Mi"
+            limits:
+              cpu: "100m"
+              memory: "64Mi"
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
       volumes:
         - name: model-cache
           persistentVolumeClaim:
             claimName: "{{ .Release.Name }}-models"
         - name: tmp
           emptyDir: {}
+        - name: nginx-config
+          configMap:
+            name: {{ .Values.name }}-nginx
