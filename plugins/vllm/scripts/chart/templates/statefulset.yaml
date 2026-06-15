@@ -110,6 +110,10 @@ spec:
               value: "true"
             - name: VLLM_LOGGING_LEVEL
               value: "DEBUG"
+            - name: VLLM_TRACE_FUNCTION
+              value: "1"
+            - name: CUDA_LAUNCH_BLOCKING
+              value: "1"
             {{- if .Values.hf_token }}
             - name: HF_TOKEN
               valueFrom:
