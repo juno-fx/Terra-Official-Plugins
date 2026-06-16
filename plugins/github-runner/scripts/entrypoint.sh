@@ -6,8 +6,10 @@ apt update
 apt install -y \
   curl \
   tar \
-  rsync \
-  libicu-dev
+  rsync
+
+# install any missing dependencies
+chroot /host/ bash -c "apt update && apt install -y libicu-dev"
 
 # clean up any previous installation
 mkdir -pv /${DESTINATION}/${NAME}
