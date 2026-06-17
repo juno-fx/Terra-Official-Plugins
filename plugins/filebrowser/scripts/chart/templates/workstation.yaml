@@ -18,6 +18,7 @@ spec:
   template:
     metadata:
       labels:
+        kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
         juno-innovations.com/app: filebrowser
         juno-innovations.com/user: "{{ .Values.user }}"
         juno-innovations.com/workstation: "{{ .Values.name }}"

@@ -26,6 +26,10 @@ data:
       description: "Container image tag"
       required: true
       default: "stable"
+    - name: ingressNamespace
+      description: "Ingress controller namespace. Default: ingress-nginx"
+      required: false
+      default: "ingress-nginx"
     - name: cpu
       description: "CPU request"
       required: true
