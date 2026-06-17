@@ -1,0 +1,8 @@
+name: File Browser
+icon: file-browser
+category: Tools
+description: Web-based file browser with drag-and-drop upload. Mount workspace volumes to browse and upload files to your Juno workspaces.
+tags:
+  - cluster-level
+fields: []
+compatibility: genesis-deployment>=3.0.2,orion-deployment>=3.1.0
