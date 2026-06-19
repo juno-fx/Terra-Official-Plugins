@@ -1,7 +1,7 @@
 resource_id: filebrowser
 name: File Browser
 icon: file-browser
-category: Server
+category: Workstations
 description: "Web-based file manager with drag-and-drop upload, configurable root path, and optional persistent storage. Browse workspace volumes or the full container filesystem."
 tags:
   - cluster-level
