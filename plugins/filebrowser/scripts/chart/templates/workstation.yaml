@@ -6,9 +6,7 @@ metadata:
     kuiper.juno-innovations.com/actions: "stop"
     juno-innovations.com/workload: "Application"
   labels:
-    juno-innovations.com/app: "filebrowser"
-    juno-innovations.com/user: "{{ .Values.user }}"
-    juno-innovations.com/workstation: "{{ .Values.name }}"
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
 
 spec:
   replicas: 1
@@ -19,34 +17,13 @@ spec:
     metadata:
       labels:
         kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
-        juno-innovations.com/app: filebrowser
-        juno-innovations.com/user: "{{ .Values.user }}"
-        juno-innovations.com/workstation: "{{ .Values.name }}"
       annotations:
-        # This will block the cluster autoscaler from evicting this pod in the case
-        # it can move to a cheaper instance. This does come at a cost, but ideally
-        # this should stop from a pod getting ripped out from under existing users.
-        cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+        juno-innovations.com/workload: "Application"
     spec:
       automountServiceAccountToken: false
       securityContext:
-        fsGroup: 1000
+        fsGroup: {{ .Values.guid }}
       hostname: "{{ .Values.name }}"
-
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: juno-innovations.com/workstation
-                    operator: In
-                    values:
-                      - "true"
-
-      tolerations:
-        - key: "juno-innovations.com/workstation"
-          operator: "Exists"
-          effect: "NoSchedule"
 
       {{- if .Values.pullSecret }}
       imagePullSecrets:
@@ -73,11 +50,19 @@ spec:
           ports:
             - containerPort: 8080
               name: filebrowser
+          args:
+            - --port=8080
+            - --address=0.0.0.0
+            - --root={{ .Values.root }}
+            - --baseURL=/filebrowser/{{ .Values.name }}
+            - --log=stdout
+            - --database=/data/filebrowser.db
+            - --username={{ .Values.user }}
+            - --noauth
+            - --cacheDir=/tmp/cache
           env:
-            - name: FILEBROWSER_CONFIG
-              value: "/config/config.yaml"
-            - name: FILEBROWSER_LOGFILE
-              value: "/dev/stdout"
+            - name: JUNO
+              value: "true"
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -85,27 +70,26 @@ spec:
                 - ALL
             readOnlyRootFilesystem: true
             runAsNonRoot: true
-            runAsUser: 1000
+            runAsUser: {{ .Values.puid }}
           volumeMounts:
             - name: config
               mountPath: /config
-              readOnly: true
             - name: filebrowser-data
               mountPath: /data
-            - name: tmp
-              mountPath: /tmp
             {{- if .Values.volumeMounts }}
             {{- toYaml .Values.volumeMounts | nindent 12 }}
             {{- end }}
 
       volumes:
         - name: config
-          configMap:
-            name: "{{ .Release.Name }}-config"
+          emptyDir: {}
         - name: filebrowser-data
+          {{- if .Values.dataPersistent }}
+          persistentVolumeClaim:
+            claimName: "{{ .Values.name }}-data"
+          {{- else }}
           emptyDir: {}
-        - name: tmp
-          emptyDir: {}
+          {{- end }}
         {{- if .Values.volumes }}
         {{- toYaml .Values.volumes | nindent 8 }}
         {{- end }}

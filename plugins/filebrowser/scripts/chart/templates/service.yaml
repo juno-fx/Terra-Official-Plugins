@@ -3,6 +3,7 @@ kind: Service
 metadata:
   name: "{{ .Release.Name }}"
   labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
     kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
 spec:
   type: ClusterIP

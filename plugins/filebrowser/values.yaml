@@ -20,3 +20,6 @@ env:
 selector:
 plugins: []
 _kuiper:
+
+# Filebrowser settings
+root: "/data"

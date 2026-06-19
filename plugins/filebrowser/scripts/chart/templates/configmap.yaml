@@ -3,15 +3,15 @@ kind: ConfigMap
 metadata:
   name: "{{ .Release.Name }}-config"
   labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
     kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
 data:
   config.yaml: |
-    server:
-      baseURL: "/filebrowser"
-      address: "0.0.0.0"
-      port: 8080
-      root: "/data"
-    authentication:
-      noauth:
-        enabled: true
+    port: "8080"
+    address: "0.0.0.0"
+    root: "/data"
+    baseURL: "/filebrowser/{{ .Values.name }}"
+    log: "stdout"
     database: "/data/filebrowser.db"
+    noauth: true
+    cacheDir: "/tmp/cache"

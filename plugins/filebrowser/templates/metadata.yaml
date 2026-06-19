@@ -21,11 +21,11 @@ data:
     - name: repo
       description: "Container image repository"
       required: true
-      default: "gtstef/filebrowser"
+      default: "filebrowser/filebrowser"
     - name: tag
       description: "Container image tag"
       required: true
-      default: "stable"
+      default: "latest"
     - name: ingressNamespace
       description: "Ingress controller namespace. Default: ingress-nginx"
       required: false
@@ -38,3 +38,22 @@ data:
       description: "Memory request"
       required: true
       default: "256Mi"
+    - name: dataPersistent
+      description: "Enable persistent storage for uploaded files and database. When enabled, creates a PVC. Default: false (ephemeral emptyDir)."
+      required: false
+      type: bool
+      default: "false"
+    - name: storageClass
+      description: "Storage class for the data PVC. Leave empty for cluster default."
+      required: false
+      type: string
+      default: ""
+    - name: storageSize
+      description: "Persistent volume size for uploaded files and database."
+      required: false
+      default: "10Gi"
+    - name: root
+      description: "Root filesystem path visible in FileBrowser. Set to '/' to browse the entire container filesystem, or '/data' to restrict to the data volume only."
+      required: false
+      type: string
+      default: "/data"

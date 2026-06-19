@@ -23,7 +23,11 @@ _kuiper:
 
 # Filebrowser settings
 workspace: ""
+root: "/data"
 registry: "docker.io"
-repo: "gtstef/filebrowser"
-tag: "stable"
+repo: "filebrowser/filebrowser"
+tag: "latest"
 ingressNamespace: "ingress-nginx"
+dataPersistent: false
+storageClass: ""
+storageSize: "10Gi"
