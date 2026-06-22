@@ -11,7 +11,7 @@
 
 ## Overview
 
-The Minecraft plugin provides a workload template for launching self-hosted Minecraft server instances directly from the Genesis workload UI. Each Minecraft workload gets its own persistent world storage and can be configured with any Minecraft server image from the popular `itzg/minecraft-server` Docker image family — supporting Java Edition, Bedrock, PaperMC, Forge, Fabric, and many more modpacks.
+The Minecraft plugin provides a workload template for running self-hosted Minecraft server instances within the Juno platform. Each Minecraft workload gets its own persistent world storage and can be configured with any Minecraft server image from the popular `itzg/minecraft-server` Docker image family — supporting Java Edition, Bedrock, PaperMC, Forge, Fabric, and many more modpacks.
 
 ---
 

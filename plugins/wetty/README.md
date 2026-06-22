@@ -24,7 +24,6 @@ Wetty (Web + tty) provides a terminal emulator accessible directly from the brow
 ## Prerequisites
 
 - Platform versions: `genesis-deployment >= 1.5.0`, `orion-deployment >= 1.5.0`
-- No additional prerequisites
 
 ---
 

@@ -10,7 +10,7 @@
 
 ## Overview
 
-Gitea is a lightweight, self-hosted Git service written in Go. It provides a full-featured Git server with a web interface for managing repositories, reviewing code, tracking issues, and managing pull requests — all running entirely within your Juno cluster. The Gitea workload template lets users launch private Git server instances directly from the Genesis workload UI, with persistent storage for repositories and an nginx proxy for web access.
+Gitea is a lightweight, self-hosted Git service written in Go. It provides a full-featured Git server with a web interface for managing repositories, reviewing code, tracking issues, and managing pull requests — all running entirely within your Juno cluster. The Gitea workload template lets users provision private Git server instances through the Juno platform, with persistent storage for repositories and an nginx proxy for web access.
 
 ---
 

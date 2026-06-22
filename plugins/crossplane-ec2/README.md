@@ -11,7 +11,7 @@
 
 ## Overview
 
-Crossplane EC2 is a workload template that lets you launch and manage AWS EC2 instances directly from the Genesis workload screen — giving cloud VMs the same lifecycle management as containerised workstations. Once launched, endpoints like SSH and RDP are automatically discovered and surfaced in Hubble.
+Crossplane EC2 is a workload template that provisions and manages AWS EC2 instances through the Juno platform, giving cloud VMs the same lifecycle management as containerised workstations. Once an instance is provisioned, endpoints like SSH and RDP are automatically discovered and surfaced in Hubble.
 
 This plugin requires **Crossplane** and **Crossplane AWS Provider** to be installed first.
 

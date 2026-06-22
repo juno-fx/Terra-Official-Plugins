@@ -13,7 +13,7 @@
 
 ## Overview
 
-The Generic Ephemeral VM workload template provides a flexible, temporary Virtual Machine environment powered by KubeVirt. Designed for short-term use cases where persistent storage is not required, ephemeral VMs are ideal for testing, development, software evaluation, or any workload where data does not need to survive between sessions. Users can launch VMs directly from the Genesis workload UI with configurable hardware options including GPU passthrough, Secure Boot, EFI, TPM, and port exposure.
+The Generic Ephemeral VM workload template provides a flexible, temporary Virtual Machine environment powered by KubeVirt. Designed for short-term use cases where persistent storage is not required, ephemeral VMs are ideal for testing, development, software evaluation, or any workload where data does not need to survive between sessions. VMs are configurable with hardware options including GPU passthrough, Secure Boot, EFI, TPM, and port exposure, and are provisioned on demand through Hubble.
 
 ---
 

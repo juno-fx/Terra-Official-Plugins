@@ -20,10 +20,6 @@ Web IDE is a browser-based VS Code environment powered by [code-server](https://
 
 ---
 
-## Prerequisites
-
-- No additional prerequisites beyond a running Juno platform
-
 ---
 
 ## Installation
