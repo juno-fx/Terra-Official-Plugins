@@ -18,7 +18,7 @@ JupyterLab is the latest web-based interactive development environment for noteb
 
 ## How It Works
 
-**Workload Template** — Adds the JupyterLab notebook type to Genesis. Once installed, users can launch their own personal JupyterLab server directly from the Genesis workload screen. Each instance is isolated and independent.
+**Workload Template** — Installs the JupyterLab workload schema into Genesis. Once installed, the JupyterLab type appears in **Genesis** on the Workloads page, where it can be authored into a workload template. Users can then launch and provision their own notebook server on demand within a project through **Hubble**.
 
 ---
 
@@ -36,7 +36,7 @@ JupyterLab is the latest web-based interactive development environment for noteb
 3. Click **Install**
 4. Click **Confirm** to deploy (no install-time fields required)
 
-Once installed, the JupyterLab workload type will appear in **Genesis** when users create new workloads.
+Once installed, the JupyterLab schema is available in **Genesis**. From the Workloads page, author the template — users can then launch and provision notebook servers on demand through **Hubble**.
 
 ---
 
@@ -48,7 +48,7 @@ No install-time configuration is required for this plugin.
 
 ### Workload Launch Fields
 
-These fields are filled in when launching a JupyterLab workload in **Genesis**:
+These fields are configured when authoring the workload template in **Genesis** and used each time a user provisions a notebook server through **Hubble**:
 
 | Field | Details |
 |-------|---------|

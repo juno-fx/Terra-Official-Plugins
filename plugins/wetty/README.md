@@ -17,7 +17,7 @@ Wetty (Web + tty) provides a terminal emulator accessible directly from the brow
 
 ## How It Works
 
-**Workload Template** — Adds the Wetty terminal type to Genesis. Once installed, users can launch a browser-accessible shell session directly from the Genesis workload screen.
+**Workload Template** — Installs the Wetty workload schema into Genesis. Once installed, the Wetty type appears in **Genesis** on the Workloads page, where it can be authored into a workload template. Users can then launch and provision browser-accessible shell sessions on demand within a project through **Hubble**.
 
 ---
 
@@ -35,7 +35,7 @@ Wetty (Web + tty) provides a terminal emulator accessible directly from the brow
 3. Click **Install**
 4. Click **Confirm** to deploy (no install-time fields required)
 
-Once installed, the Wetty workload type will appear in **Genesis** when users create new workloads.
+Once installed, the Wetty schema is available in **Genesis**. From the Workloads page, author the template — users can then launch and provision terminal sessions on demand through **Hubble**.
 
 ---
 
@@ -47,7 +47,7 @@ No install-time configuration is required for this plugin.
 
 ### Workload Launch Fields
 
-These fields are filled in when launching a Wetty workload in **Genesis**:
+These fields are configured when authoring the workload template in **Genesis** and used each time a user provisions a terminal session through **Hubble**:
 
 | Field | Details |
 |-------|---------|

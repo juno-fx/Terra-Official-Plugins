@@ -17,7 +17,7 @@ n8n is an open-source workflow automation tool with a visual node-based interfac
 
 ## How It Works
 
-**Workload Template** — Adds the n8n automation workload type to Genesis. Once installed, users can launch their own private n8n instance directly from the Genesis workload screen. Each instance has its own workflow storage and credential store.
+**Workload Template** — Installs the n8n workload schema into Genesis. Once installed, the n8n type appears in **Genesis** on the Workloads page, where it can be authored into a workload template. Users can then launch and provision their own automation instance on demand within a project through **Hubble**.
 
 ---
 
@@ -35,7 +35,7 @@ n8n is an open-source workflow automation tool with a visual node-based interfac
 3. Click **Install**
 4. Click **Confirm** to deploy (no install-time fields required)
 
-Once installed, the n8n workload type will appear in **Genesis** when users create new workloads.
+Once installed, the n8n schema is available in **Genesis**. From the Workloads page, author the template — users can then launch and provision n8n instances on demand through **Hubble**.
 
 ---
 
@@ -47,7 +47,7 @@ No install-time configuration is required for this plugin.
 
 ### Workload Launch Fields
 
-These fields are filled in when launching an n8n workload in **Genesis**:
+These fields are configured when authoring the workload template in **Genesis** and used each time a user provisions an n8n instance through **Hubble**:
 
 | Field | Details |
 |-------|---------|

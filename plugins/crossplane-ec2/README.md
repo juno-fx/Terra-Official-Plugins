@@ -19,7 +19,7 @@ This plugin requires **Crossplane** and **Crossplane AWS Provider** to be instal
 
 ## How It Works
 
-**Workload Template** — Adds an EC2 workload type to Genesis. Once installed, users can launch AWS EC2 instances directly from the Genesis workload screen. Each instance is provisioned on demand and tracked in Hubble like any other workload.
+**Workload Template** — Installs the EC2 workload schema into Genesis. Once installed, the EC2 type appears in **Genesis** on the Workloads page, where it can be authored into a workload template. Users can then launch and provision AWS EC2 instances on demand within a project through **Hubble**.
 
 ---
 
@@ -40,7 +40,7 @@ This plugin requires **Crossplane** and **Crossplane AWS Provider** to be instal
 4. Click **Install**
 5. Click **Confirm** to deploy (no install-time fields required)
 
-Once installed, the EC2 workload type will appear in Genesis when creating new workloads.
+Once installed, the EC2 schema is available in **Genesis**. From the Workloads page, author the template — users can then launch and provision EC2 instances on demand through **Hubble**.
 
 ---
 
@@ -52,7 +52,7 @@ No install-time configuration is required for this plugin.
 
 ### Workload Launch Fields
 
-These fields are filled in when launching an EC2 workload in **Genesis**:
+These fields are configured when authoring the workload template in **Genesis** and used each time a user provisions an EC2 instance through **Hubble**:
 
 | Field | Details |
 |-------|---------|

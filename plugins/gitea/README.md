@@ -16,7 +16,7 @@ Gitea is a lightweight, self-hosted Git service written in Go. It provides a ful
 
 ## How It Works
 
-**Workload Template** — Adds a Gitea Git server workload type to Genesis. Once installed, users can launch their own private Gitea instance directly from the Genesis workload screen. Each instance gets its own persistent storage and is independent from other users' instances.
+**Workload Template** — Installs the Gitea workload schema into Genesis. Once installed, the Gitea type appears in **Genesis** on the Workloads page, where it can be authored into a workload template. Users can then launch and provision their own private Git server on demand within a project through **Hubble**.
 
 ---
 
@@ -34,7 +34,7 @@ Gitea is a lightweight, self-hosted Git service written in Go. It provides a ful
 3. Click **Install**
 4. Click **Confirm** to deploy (no install-time fields required)
 
-Once installed, the Gitea workload type will appear in **Genesis** when creating new workloads.
+Once installed, the Gitea schema is available in **Genesis**. From the Workloads page, author the template — users can then launch and provision Gitea instances on demand through **Hubble**.
 
 ---
 
@@ -46,7 +46,7 @@ No install-time configuration is required for this plugin.
 
 ### Workload Launch Fields
 
-These fields are filled in when launching a Gitea workload in **Genesis**:
+These fields are configured when authoring the workload template in **Genesis** and used each time a user provisions a Gitea instance through **Hubble**:
 
 | Field | Details |
 |-------|---------|

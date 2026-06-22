@@ -18,7 +18,7 @@ The Generic Ephemeral VM workload template provides a flexible, temporary Virtua
 
 ## How It Works
 
-**Workload Template** — Adds the Generic Ephemeral VM type to Genesis. Once installed, users can launch a virtual machine directly from the Genesis workload screen. VMs are ephemeral — they are discarded when stopped unless external storage is attached.
+**Workload Template** — Installs the Generic Ephemeral VM workload schema into Genesis. Once installed, the VM type appears in **Genesis** on the Workloads page, where it can be authored into a workload template. Users can then launch and provision virtual machines on demand within a project through **Hubble**. VMs are ephemeral — discarded when stopped unless external storage is attached.
 
 ---
 
@@ -40,7 +40,7 @@ The Generic Ephemeral VM workload template provides a flexible, temporary Virtua
 4. Click **Install**
 5. Click **Confirm** to deploy (no install-time fields required)
 
-Once installed, the Generic Ephemeral VM workload type will appear in **Genesis** when users create new workloads.
+Once installed, the Generic Ephemeral VM schema is available in **Genesis**. From the Workloads page, author the template — users can then launch and provision VMs on demand through **Hubble**.
 
 ---
 
@@ -52,7 +52,7 @@ No install-time configuration is required for this plugin.
 
 ### Workload Launch Fields
 
-These fields are filled in when launching a VM workload in **Genesis**:
+These fields are configured when authoring the workload template in **Genesis** and used each time a user provisions a VM through **Hubble**:
 
 | Field | Details |
 |-------|---------|

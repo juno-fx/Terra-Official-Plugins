@@ -17,7 +17,7 @@ Open WebUI is an extensible, feature-rich, self-hosted AI platform designed to o
 
 ## How It Works
 
-**Workload Template** — Adds the Open WebUI AI chat type to Genesis. Once installed, users can launch their own private Open WebUI instance directly from the Genesis workload screen. Each instance has its own chat history and model configuration.
+**Workload Template** — Installs the Open WebUI workload schema into Genesis. Once installed, the Open WebUI type appears in **Genesis** on the Workloads page, where it can be authored into a workload template. Users can then launch and provision their own AI chat instance on demand within a project through **Hubble**.
 
 ---
 
@@ -36,7 +36,7 @@ Open WebUI is an extensible, feature-rich, self-hosted AI platform designed to o
 3. Click **Install**
 4. Click **Confirm** to deploy (no install-time fields required)
 
-Once installed, the Open WebUI workload type will appear in **Genesis** when users create new workloads.
+Once installed, the Open WebUI schema is available in **Genesis**. From the Workloads page, author the template — users can then launch and provision Open WebUI instances on demand through **Hubble**.
 
 ---
 
@@ -48,7 +48,7 @@ No install-time configuration is required for this plugin.
 
 ### Workload Launch Fields
 
-These fields are filled in when launching an Open WebUI workload in **Genesis**:
+These fields are configured when authoring the workload template in **Genesis** and used each time a user provisions an Open WebUI instance through **Hubble**:
 
 | Field | Details |
 |-------|---------|

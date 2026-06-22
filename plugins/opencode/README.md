@@ -17,7 +17,7 @@ OpenCode is an open-source AI-powered coding agent accessible directly from the 
 
 ## How It Works
 
-**Workload Template** — Adds the OpenCode AI coding agent type to Genesis. Once installed, users can launch their own browser-accessible OpenCode session directly from the Genesis workload screen.
+**Workload Template** — Installs the OpenCode workload schema into Genesis. Once installed, the OpenCode type appears in **Genesis** on the Workloads page, where it can be authored into a workload template. Users can then launch and provision their own coding agent session on demand within a project through **Hubble**.
 
 ---
 
@@ -36,7 +36,7 @@ OpenCode is an open-source AI-powered coding agent accessible directly from the 
 3. Click **Install**
 4. Click **Confirm** to deploy (no install-time fields required)
 
-Once installed, the OpenCode workload type will appear in **Genesis** when users create new workloads.
+Once installed, the OpenCode schema is available in **Genesis**. From the Workloads page, author the template — users can then launch and provision OpenCode sessions on demand through **Hubble**.
 
 ---
 
@@ -48,7 +48,7 @@ No install-time configuration is required for this plugin.
 
 ### Workload Launch Fields
 
-These fields are filled in when launching an OpenCode workload in **Genesis**:
+These fields are configured when authoring the workload template in **Genesis** and used each time a user provisions an OpenCode session through **Hubble**:
 
 | Field | Details |
 |-------|---------|

@@ -16,7 +16,7 @@ LSIO Webtop is a containerized desktop workstation built on [LinuxServer.io](htt
 
 ## How It Works
 
-**Workload Template** — Adds the LSIO Webtop desktop type to Genesis. Once installed, users can launch their own browser-accessible Linux desktop directly from the Genesis workload screen. Each instance is isolated and independent.
+**Workload Template** — Installs the LSIO Webtop workload schema into Genesis. Once installed, the Webtop type appears in **Genesis** on the Workloads page, where it can be authored into a workload template. Users can then launch and provision their own browser-accessible Linux desktop on demand within a project through **Hubble**.
 
 ---
 
@@ -34,7 +34,7 @@ LSIO Webtop is a containerized desktop workstation built on [LinuxServer.io](htt
 3. Click **Install**
 4. Click **Confirm** to deploy (no install-time fields required)
 
-Once installed, the LSIO Webtop workload type will appear in **Genesis** when users create new workloads.
+Once installed, the LSIO Webtop schema is available in **Genesis**. From the Workloads page, author the template — users can then launch and provision Webtop desktops on demand through **Hubble**.
 
 ---
 
@@ -46,7 +46,7 @@ No install-time configuration is required for this plugin.
 
 ### Workload Launch Fields
 
-These fields are filled in when launching a Webtop workload in **Genesis**:
+These fields are configured when authoring the workload template in **Genesis** and used each time a user provisions a Webtop desktop through **Hubble**:
 
 | Field | Details |
 |-------|---------|

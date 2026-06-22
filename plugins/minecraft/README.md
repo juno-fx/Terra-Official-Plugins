@@ -17,7 +17,7 @@ The Minecraft plugin provides a workload template for launching self-hosted Mine
 
 ## How It Works
 
-**Workload Template** — Adds the Minecraft server type to Genesis. Once installed, users can launch their own Minecraft server directly from the Genesis workload screen, with its own persistent world storage.
+**Workload Template** — Installs the Minecraft workload schema into Genesis. Once installed, the Minecraft type appears in **Genesis** on the Workloads page, where it can be authored into a workload template. Users can then launch and provision their own server on demand within a project through **Hubble**.
 
 ---
 
@@ -35,7 +35,7 @@ The Minecraft plugin provides a workload template for launching self-hosted Mine
 3. Click **Install**
 4. Click **Confirm** to deploy (no install-time fields required)
 
-Once installed, the Minecraft workload type will appear in **Genesis** when users create new workloads.
+Once installed, the Minecraft schema is available in **Genesis**. From the Workloads page, author the template — users can then launch and provision Minecraft servers on demand through **Hubble**.
 
 ---
 
@@ -47,7 +47,7 @@ No install-time configuration is required for this plugin.
 
 ### Workload Launch Fields
 
-These fields are filled in when launching a Minecraft workload in **Genesis**:
+These fields are configured when authoring the workload template in **Genesis** and used each time a user provisions a Minecraft server through **Hubble**:
 
 | Field | Details |
 |-------|---------|

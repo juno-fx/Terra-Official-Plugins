@@ -16,7 +16,7 @@ Hermes Agent is an AI agent workload with multi-provider LLM support and a built
 
 ## How It Works
 
-**Workload Template** — Adds the Hermes AI agent type to Genesis. Once installed, users can launch their own personal Hermes agent instance directly from the Genesis workload screen. Each instance has its own persistent storage and is isolated from other users.
+**Workload Template** — Installs the Hermes Agent workload schema into Genesis. Once installed, the Hermes Agent type appears in **Genesis** on the Workloads page, where it can be authored into a workload template. Users can then launch and provision their own agent instance on demand within a project through **Hubble**.
 
 ---
 
@@ -35,7 +35,7 @@ Hermes Agent is an AI agent workload with multi-provider LLM support and a built
 3. Click **Install**
 4. Click **Confirm** to deploy (no install-time fields required)
 
-Once installed, the Hermes Agent workload type will appear in **Genesis** when users create new workloads.
+Once installed, the Hermes Agent schema is available in **Genesis**. From the Workloads page, author the template — users can then launch and provision agent instances on demand through **Hubble**.
 
 ---
 
@@ -47,7 +47,7 @@ No install-time configuration is required for this plugin.
 
 ### Workload Launch Fields
 
-These fields are filled in when launching a Hermes Agent workload in **Genesis**:
+These fields are configured when authoring the workload template in **Genesis** and used each time a user provisions an agent instance through **Hubble**:
 
 | Field | Details |
 |-------|---------|
