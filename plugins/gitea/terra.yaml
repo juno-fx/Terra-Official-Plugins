@@ -1,0 +1,11 @@
+resource_id: gitea
+name: Gitea
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/gitea/assets/logo.png
+description: Gitea is a community managed lightweight code hosting solution written in Go. It provides a Git server with a web interface for managing repositories, issues, and pull requests. Deploy your own private Git server on the Juno platform.
+category: Development
+tags:
+  - git
+  - source-control
+  - development
+  - cluster-level
+fields: []

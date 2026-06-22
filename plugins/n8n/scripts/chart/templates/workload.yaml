@@ -15,41 +15,9 @@ spec:
         kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
     spec:
       automountServiceAccountToken: false
+      securityContext:
+        fsGroup: 1000
       containers:
-        - name: webtop
-          imagePullPolicy: IfNotPresent
-          image: "{{ .Values.webtop_registry }}/{{ .Values.webtop_repo }}:{{ .Values.webtop_tag }}"
-          resources:
-            requests:
-              memory: "1Gi"
-              cpu: "1"
-            # gotmpl's or is a function taking 2 args - this is "X or Y or Z" translated to python
-            {{- if or (or .Values.gpu .Values.memoryLimit) .Values.cpuLimit }}
-            limits:
-            {{- if .Values.cpuLimit }}
-              cpu: "{{ .Values.cpuLimit }}"
-            {{- end }}
-            {{- if .Values.memoryLimit }}
-              memory: "{{ .Values.memoryLimit }}"
-            {{- end }}
-            {{- end }}
-          ports:
-            - containerPort: 3001
-              name: viewer
-          env:
-            - name: PUID
-              value: "{{ .Values.puid }}"
-            - name: PGID
-              value: "{{ .Values.guid }}"
-            - name: SUBFOLDER
-              value: "/webtop/{{ .Values.name }}/"
-            - name: START_DOCKER
-              value: "false"
-            - name: CHROME_CLI
-              value: "--force-dark-mode http://localhost:5678/"
-          volumeMounts:
-            - mountPath: /dev/shm
-              name: dshm
         - name: n8n
           imagePullPolicy: IfNotPresent
           image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
@@ -76,6 +44,14 @@ spec:
               value: "true"
             - name: N8N_RUNNERS_ENABLED
               value: "true"
+            - name: N8N_PATH
+              value: "/polaris/{{ .Values.name }}/"
+            - name: N8N_HOST
+              value: "{{ .Values.host }}"
+            - name: N8N_PROTOCOL
+              value: "https"
+            - name: WEBHOOK_URL
+              value: "https://{{ .Values.host }}/polaris/{{ .Values.name }}/"
             {{- range .Values.env }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}
@@ -83,10 +59,24 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /home/node/.n8n
+        - name: nginx
+          imagePullPolicy: IfNotPresent
+          image: "{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}"
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+          ports:
+            - containerPort: 8080
+              name: http
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
       volumes:
-        - name: dshm
-          emptyDir:
-            medium: Memory
+        - name: nginx-config
+          configMap:
+            name: {{ .Release.Name }}-nginx
         - name: data
           persistentVolumeClaim:
             claimName: "{{ .Release.Name }}"

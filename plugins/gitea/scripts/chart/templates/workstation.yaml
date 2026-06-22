@@ -1,0 +1,194 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+  annotations:
+    juno-innovations.com/workload: "Application"
+spec:
+  replicas: 1
+  podManagementPolicy: Parallel
+  selector:
+    matchLabels:
+      kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+  template:
+    metadata:
+      labels:
+        kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+    spec:
+      hostname: {{ .Values.name }}
+      securityContext:
+        fsGroup: 1000
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: juno-innovations.com/workstation
+                    operator: In
+                    values:
+                      - "true"
+                  {{- if .Values.selector }}
+                  {{- range .Values.selector }}
+                  - key: {{ .key | quote }}
+                    operator: In
+                    values:
+                      - {{ .value | quote }}
+                  {{- end }}
+                  {{- end }}
+      tolerations:
+        - key: "juno-innovations.com/workstation"
+          operator: "Exists"
+          effect: "NoSchedule"
+      {{- if .Values.pullSecret }}
+      imagePullSecrets:
+        - name: "{{ .Values.pullSecret }}"
+      {{- end }}
+      containers:
+        - name: gitea
+          imagePullPolicy: IfNotPresent
+          image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
+          command:
+            - /bin/sh
+            - /boot.sh
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+          resources:
+            requests:
+              memory: "{{ .Values.memory }}"
+              cpu: "{{ .Values.cpu }}"
+            {{- if or .Values.memoryLimit .Values.cpuLimit }}
+            limits:
+            {{- if .Values.cpuLimit }}
+              cpu: "{{ .Values.cpuLimit }}"
+            {{- end }}
+            {{- if .Values.memoryLimit }}
+              memory: "{{ .Values.memoryLimit }}"
+            {{- end }}
+            {{- end }}
+          startupProbe:
+            tcpSocket:
+              port: {{ .Values.app_port }}
+            initialDelaySeconds: 5
+            failureThreshold: 60
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.app_port }}
+            failureThreshold: 12
+            periodSeconds: 10
+          ports:
+            - containerPort: {{ .Values.app_port }}
+              name: gitea
+          env:
+            - name: GITEA__server__HTTP_PORT
+              value: "{{ .Values.app_port }}"
+            - name: GITEA__server__DOMAIN
+              value: "{{ .Values.host }}"
+            - name: GITEA__server__ROOT_URL
+              value: "https://{{ .Values.host }}/gitea/{{ .Values.name }}/"
+            - name: GITEA__server__SSH_DOMAIN
+              value: "{{ .Values.host }}"
+            - name: GITEA__server__DISABLE_SSH
+              value: "true"
+            - name: GITEA__server__APP_NAME
+              value: "Juno Git Server"
+            - name: GITEA__security__INSTALL_LOCK
+              value: "true"
+            - name: GITEA__database__DB_TYPE
+              value: sqlite3
+            - name: GITEA__database__PATH
+              value: /data/gitea/gitea.db
+            - name: GITEA__service__REQUIRE_SIGNIN_VIEW
+              value: "false"
+            - name: GITEA__service__DISABLE_REGISTRATION
+              value: "false"
+            - name: GITEA__service__ENABLE_NOTIFY_MAIL
+              value: "false"
+            - name: GITEA__picture__DISABLE_GRAVATAR
+              value: "true"
+            - name: GITEA__picture__ENABLE_FEDERATED_AVATAR
+              value: "false"
+            - name: GITEA__repository__ENABLE_PUSH_CREATE_USER
+              value: "true"
+            - name: GITEA__repository__ENABLE_PUSH_CREATE_ORG
+              value: "true"
+            - name: GITEA__repository__DEFAULT_PUSH_CREATE_PRIVATE
+              value: "false"
+            - name: GITEA__service__ALLOW_ONLY_EXTERNAL_REGISTRATION
+              value: "false"
+            - name: JUNO_WORKSTATION
+              value: "{{ .Values.name }}"
+            - name: JUNO_PROJECT
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: USER
+              value: "{{ .Values.user }}"
+            - name: HOME
+              value: "/data"
+            - name: PREFIX
+              value: "/gitea/{{ .Values.name }}/"
+            {{- range .Values.env }}
+            - name: {{ .name | quote }}
+              value: {{ .value | quote }}
+            {{- end }}
+          volumeMounts:
+            - name: boot
+              mountPath: /boot.sh
+              subPath: boot.sh
+              readOnly: true
+            - name: gitea-data
+              mountPath: /data
+            {{- if .Values.volumeMounts }}
+            {{- toYaml .Values.volumeMounts | nindent 12 }}
+            {{- end }}
+            {{- if .Values.plugins }}
+            {{- range .Values.plugins }}
+            - name: {{ .name | quote }}
+              subPath: {{ .file | quote }}
+              mountPath: "/etc/helios/init.d/{{ .name }}/{{ .file }}"
+            {{- end }}
+            {{- end }}
+        - name: nginx
+          imagePullPolicy: IfNotPresent
+          image: "{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}"
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+          ports:
+            - containerPort: 8080
+              name: proxy
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: {{ .Release.Name }}-nginx
+        - name: boot
+          configMap:
+            name: {{ .Release.Name }}-boot
+        - name: gitea-data
+          persistentVolumeClaim:
+            claimName: "{{ .Release.Name }}"
+        {{- if .Values.volumes }}
+        {{- toYaml .Values.volumes | nindent 8 }}
+        {{- end }}
+        {{- if .Values.plugins }}
+        {{- range .Values.plugins }}
+        - name: {{ .name | quote }}
+          configMap:
+            name: {{ .config | quote }}
+            defaultMode: 0777
+        {{- end }}
+        {{- end }}

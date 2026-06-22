@@ -1,0 +1,12 @@
+resource_id: opencode
+name: OpenCode
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/opencode/assets/logo.png
+description: OpenCode is an open source AI coding agent accessible via browser.
+category: Development
+compatibility: genesis-deployment>=3.0.0-beta.1, orion-deployment>=3.0.0-beta.1
+tags:
+  - cluster-level
+  - development
+  - coding
+  - workload
+fields: []

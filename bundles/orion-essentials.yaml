@@ -10,13 +10,36 @@ tags:
   - argocd
   - first time setup
   - cluster-level
+  - prometheus
+  - dashboard
+  - grafana
 fields:
   - name: host
-    description: The DNS name of your Genesis host for Argocd
+    description: The DNS name of your Genesis host
+    required: true
+  - name: path
+    description: Connection URL sub path. i.e. `grafana.example.com/my/path/grafana`.
+    required: true
+  - name: username
+    description: Grafana Admin username
+    required: true
+  - name: password
+    description: Grafana Admin password
     required: true
 plugins:
   - plugin: Helios
     name: helios-workstations
+  - plugin: Kubernetes Prometheus Stack
+    name: kube-prometheus-stack
+    values:
+      host:
+        reference: host
+      path:
+        reference: path
+      username:
+        reference: username
+      password:
+        reference: password
   - plugin: ArgoCD Dashboard
     name: argocd
     values:

@@ -24,7 +24,7 @@ data:
       description: "Tag to pull the image from"
       type: string
       required: true
-      default: "latest"
+      default: "2.5"
     - name: icon
       default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/wetty/scripts/assets/logo.png"
     - name: packages
@@ -50,3 +50,8 @@ data:
       type: string
       required: true
       default: "1.29.3"
+    - name: publicAccess
+      description: "Allow public access (disable authentication)"
+      type: boolean
+      required: true
+      default: false
