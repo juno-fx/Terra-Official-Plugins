@@ -1,6 +1,6 @@
 # Blender
 
-![Blender](https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/blender/scripts/assets/blender.png?raw=true)
+<img src="https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/blender/scripts/assets/blender.png?raw=true" alt="Blender" width="80" />
 
 **Category:** CG
 **Type:** Software Installer

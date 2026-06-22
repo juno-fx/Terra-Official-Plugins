@@ -1,6 +1,6 @@
 # Hermes Agent
 
-![Hermes Agent](https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/hermes-agent/scripts/assets/hermes-logo.png?raw=true)
+<img src="https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/hermes-agent/scripts/assets/hermes-logo.png?raw=true" alt="Hermes Agent" width="80" />
 
 **Category:** AI
 **Type:** Workload Template

@@ -1,6 +1,6 @@
 # Storage HostPath
 
-![Storage HostPath](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/storage-hostpath/scripts/assets/logo.png)
+<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/storage-hostpath/scripts/assets/logo.png" alt="Storage HostPath" width="80" />
 
 **Category:** Storage
 **Type:** Cluster Service

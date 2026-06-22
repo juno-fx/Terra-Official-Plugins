@@ -1,6 +1,6 @@
 # Storage iSCSI
 
-![Storage iSCSI](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/storage-iscsi/scripts/assets/logo.png)
+<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/storage-iscsi/scripts/assets/logo.png" alt="Storage iSCSI" width="80" />
 
 **Category:** Storage
 **Type:** Cluster Service

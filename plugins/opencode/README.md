@@ -1,6 +1,6 @@
 # OpenCode
 
-![OpenCode](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/opencode/assets/logo.png)
+<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/opencode/assets/logo.png" alt="OpenCode" width="80" />
 
 **Category:** Development
 **Type:** Workload Template

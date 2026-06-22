@@ -1,6 +1,6 @@
 # Visual Studio Code
 
-![VS Code](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/vscode/scripts/assets/vscode.png)
+<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/vscode/scripts/assets/vscode.png" alt="VS Code" width="80" />
 
 **Category:** Software Development
 **Type:** Software Installer

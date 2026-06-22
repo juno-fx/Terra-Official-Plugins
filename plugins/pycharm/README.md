@@ -1,6 +1,6 @@
 # PyCharm
 
-![PyCharm](https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/pycharm/scripts/assets/pycharm.png?raw=true)
+<img src="https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/pycharm/scripts/assets/pycharm.png?raw=true" alt="PyCharm" width="80" />
 
 **Category:** Software Development
 **Type:** Software Installer

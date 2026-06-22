@@ -1,6 +1,6 @@
 # Certificate Manager
 
-![Certificate Manager](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/cert-manager/assets/logo.png)
+<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/cert-manager/assets/logo.png" alt="Certificate Manager" width="80" />
 
 **Category:** Infrastructure
 **Type:** Cluster Service

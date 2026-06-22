@@ -1,6 +1,6 @@
 # Ollama
 
-![Ollama](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/ollama/scripts/assets/logo.jpg)
+<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/ollama/scripts/assets/logo.jpg" alt="Ollama" width="80" />
 
 **Category:** AI
 **Type:** Project Service

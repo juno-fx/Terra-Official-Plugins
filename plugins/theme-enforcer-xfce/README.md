@@ -1,6 +1,6 @@
 # Theme Enforcer XFCE
 
-![XFCE](https://upload.wikimedia.org/wikipedia/commons/5/5b/Xfce_logo.svg)
+<img src="https://upload.wikimedia.org/wikipedia/commons/5/5b/Xfce_logo.svg" alt="XFCE" width="80" />
 
 **Category:** Desktop Plugin
 **Type:** Workstation Add-on

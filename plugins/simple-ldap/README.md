@@ -1,6 +1,6 @@
 # Simple LDAP
 
-![Simple LDAP](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/simple-ldap/scripts/assets/logo.png)
+<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/simple-ldap/scripts/assets/logo.png" alt="Simple LDAP" width="80" />
 
 **Category:** Identity & Security
 **Type:** Cluster Service

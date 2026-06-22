@@ -1,6 +1,6 @@
 # Crossplane
 
-![Crossplane](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/crossplane/assets/logo.png)
+<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/crossplane/assets/logo.png" alt="Crossplane" width="80" />
 
 **Category:** Cloud Management
 **Type:** Cluster Service

@@ -1,6 +1,6 @@
 # Nuke
 
-![Nuke](https://www.foundry.com/sites/default/files/2021-03/ICON_NUKE-rgb-yellow-01.png)
+<img src="https://www.foundry.com/sites/default/files/2021-03/ICON_NUKE-rgb-yellow-01.png" alt="Nuke" width="80" />
 
 **Category:** Compositing
 **Type:** Software Installer

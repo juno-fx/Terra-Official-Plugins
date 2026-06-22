@@ -1,6 +1,6 @@
 # Tailscale
 
-![Tailscale](https://tailscale.gallerycdn.vsassets.io/extensions/tailscale/vscode-tailscale/1.0.0/1698786256133/Microsoft.VisualStudio.Services.Icons.Default)
+<img src="https://tailscale.gallerycdn.vsassets.io/extensions/tailscale/vscode-tailscale/1.0.0/1698786256133/Microsoft.VisualStudio.Services.Icons.Default" alt="Tailscale" width="80" />
 
 **Category:** Networking
 **Type:** Cluster Service

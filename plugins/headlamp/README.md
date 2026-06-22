@@ -1,6 +1,6 @@
 # Headlamp
 
-![Headlamp](https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/headlamp/assets/logo.png?raw=true)
+<img src="https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/headlamp/assets/logo.png?raw=true" alt="Headlamp" width="80" />
 
 **Category:** Infrastructure
 **Type:** Cluster Service

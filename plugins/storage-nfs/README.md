@@ -1,6 +1,6 @@
 # Storage NFS
 
-![Storage NFS](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/storage-nfs/scripts/assets/logo.png)
+<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/storage-nfs/scripts/assets/logo.png" alt="Storage NFS" width="80" />
 
 **Category:** Storage
 **Type:** Cluster Service

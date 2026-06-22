@@ -1,6 +1,6 @@
 # Git Loader
 
-![Git Loader](https://git-scm.com/images/logos/downloads/Git-Icon-1788C.png)
+<img src="https://git-scm.com/images/logos/downloads/Git-Icon-1788C.png" alt="Git Loader" width="80" />
 
 **Category:** Utility
 **Type:** Software Installer

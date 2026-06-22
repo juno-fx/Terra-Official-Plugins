@@ -1,6 +1,6 @@
 # Kubernetes Prometheus Stack
 
-![Kubernetes Prometheus Stack](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/kube-prometheus-stack/assets/logo.png)
+<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/kube-prometheus-stack/assets/logo.png" alt="Kubernetes Prometheus Stack" width="80" />
 
 **Category:** Monitoring
 **Type:** Cluster Service

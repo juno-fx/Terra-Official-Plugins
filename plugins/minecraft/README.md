@@ -1,6 +1,6 @@
 # Minecraft
 
-![Minecraft](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/minecraft/scripts/assets/icon.png)
+<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/minecraft/scripts/assets/icon.png" alt="Minecraft" width="80" />
 
 **Category:** Gaming
 **Type:** Workload Template

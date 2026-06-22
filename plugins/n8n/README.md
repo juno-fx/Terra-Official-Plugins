@@ -1,6 +1,6 @@
 # n8n
 
-![n8n](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/n8n/scripts/assets/logo.png)
+<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/n8n/scripts/assets/logo.png" alt="n8n" width="80" />
 
 **Category:** Automation
 **Type:** Workload Template

@@ -1,6 +1,6 @@
 # Velero
 
-![Velero](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/velero/assets/logo.png)
+<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/velero/assets/logo.png" alt="Velero" width="80" />
 
 **Category:** Infrastructure
 **Type:** Cluster Service

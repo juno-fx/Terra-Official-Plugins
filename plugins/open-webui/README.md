@@ -1,6 +1,6 @@
 # Open WebUI
 
-![Open WebUI](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/open-webui/scripts/assets/logo.png)
+<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/open-webui/scripts/assets/logo.png" alt="Open WebUI" width="80" />
 
 **Category:** AI
 **Type:** Workload Template

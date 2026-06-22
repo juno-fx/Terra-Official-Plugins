@@ -1,6 +1,6 @@
 # Twingate
 
-![Twingate](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/twingate/scripts/assets/twingate.png)
+<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/twingate/scripts/assets/twingate.png" alt="Twingate" width="80" />
 
 **Category:** Networking
 **Type:** Cluster Service
