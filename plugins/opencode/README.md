@@ -15,9 +15,9 @@ OpenCode is an open-source AI-powered coding agent accessible directly from the 
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Workload Template** — Installed into the `argocd` namespace. At install time, a schema ConfigMap is created that Genesis reads to show the OpenCode workload type in the workload creation UI. Individual OpenCode instances are launched by Kuiper when users create workloads.
+**Workload Template** — Adds the OpenCode AI coding agent type to Genesis. Once installed, users can launch their own browser-accessible OpenCode session directly from the Genesis workload screen.
 
 ---
 
@@ -50,14 +50,14 @@ No install-time configuration is required for this plugin.
 
 These fields are filled in when launching an OpenCode workload in **Genesis**:
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `registry` | string | **Yes** | `docker.io` | Container registry for the nginx sidecar image |
-| `repo` | string | **Yes** | `nginx` | nginx sidecar image repository |
-| `tag` | string | **Yes** | `alpine` | nginx sidecar image tag |
-| `timezone` | string | **Yes** | `America/New_York` | Timezone for the OpenCode instance |
-| `storage_class` | k8sStorageClass | **Yes** | — | Storage class for the OpenCode data persistent volume |
-| `storage_size` | string | **Yes** | `10Gi` | Size of the persistent volume for project and config data |
+| Field | Details |
+|-------|---------|
+| `registry` | **string** · Required · Default: `docker.io`<br>Container registry for the nginx sidecar image |
+| `repo` | **string** · Required · Default: `nginx`<br>nginx sidecar image repository |
+| `tag` | **string** · Required · Default: `alpine`<br>nginx sidecar image tag |
+| `timezone` | **string** · Required · Default: `America/New_York`<br>Timezone for the OpenCode instance |
+| `storage_class` | **k8sStorageClass** · Required<br>Storage class for the OpenCode data persistent volume |
+| `storage_size` | **string** · Required · Default: `10Gi`<br>Size of the persistent volume for project and config data |
 
 ---
 

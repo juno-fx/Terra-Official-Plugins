@@ -3,7 +3,7 @@
 ![Longhorn](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/longhorn/assets/logo.png)
 
 **Category:** Storage
-**Type:** Cluster-Level Plugin
+**Type:** Cluster Service
 **Tags:** `storage` · `longhorn` · `dashboard`
 
 ---
@@ -16,9 +16,9 @@ Longhorn is a cloud-native distributed block storage system for Kubernetes that 
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Cluster-Level Plugin** — Installed into the `argocd` namespace. Longhorn provisions and manages persistent volumes cluster-wide, making storage available to all projects and workloads.
+**Cluster Service** — Installed once per cluster by an administrator. Once active, Longhorn provides replicated block storage to the whole cluster. Projects can use Longhorn-backed volumes without any per-project setup.
 
 ---
 
@@ -45,14 +45,14 @@ Longhorn is a cloud-native distributed block storage system for Kubernetes that 
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `storage_path` | string | **Yes** | `/var/lib/longhorn` | Path on host nodes where Longhorn stores volume data |
-| `default_replica_count` | int | **Yes** | `3` | Number of replicas for each volume. Higher = more redundancy but more storage used. |
-| `fs` | string | **Yes** | `ext4` | Default filesystem type for new volumes (`ext4`, `xfs`, or `btrfs`) |
-| `release` | select | **Yes** | `v1.10.x` | Longhorn version to install |
-| `host` | string | **Yes** | — | Hostname for the Longhorn management dashboard |
-| `prefix` | string | No | `/longhorn` | URL sub-path for the Longhorn dashboard |
+| Field | Details |
+|-------|---------|
+| `storage_path` | **string** · Required · Default: `/var/lib/longhorn`<br>Path on host nodes where Longhorn stores volume data |
+| `default_replica_count` | **int** · Required · Default: `3`<br>Number of replicas for each volume. Higher = more redundancy but more storage used. |
+| `fs` | **string** · Required · Default: `ext4`<br>Default filesystem type for new volumes (`ext4`, `xfs`, or `btrfs`) |
+| `release` | **select** · Required · Default: `v1.10.x`<br>Longhorn version to install |
+| `host` | **string** · Required<br>Hostname for the Longhorn management dashboard |
+| `prefix` | **string** · Optional · Default: `/longhorn`<br>URL sub-path for the Longhorn dashboard |
 
 ---
 

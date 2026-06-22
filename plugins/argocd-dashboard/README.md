@@ -3,7 +3,7 @@
 ![ArgoCD Dashboard](https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/argocd-dashboard/assets/logo.png?raw=true)
 
 **Category:** Infrastructure
-**Type:** Cluster-Level Plugin
+**Type:** Cluster Service
 **Tags:** `argocd` · `ingress` · `ingress-nginx` · `dashboard`
 
 ---
@@ -16,9 +16,9 @@ The ArgoCD Dashboard plugin embeds the ArgoCD web interface directly into your G
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Cluster-Level Plugin** — Installed into the `argocd` namespace by Terra. This plugin manages cluster-wide ingress resources and is shared across all projects in the cluster.
+**Cluster Service** — Installed once per cluster by an administrator. Once active, the ArgoCD dashboard is available to anyone with access to the Genesis URL — no per-project installation needed.
 
 ---
 
@@ -38,7 +38,7 @@ The ArgoCD Dashboard plugin embeds the ArgoCD web interface directly into your G
 4. Fill in the configuration fields below
 5. Click **Confirm** to deploy
 
-Terra will create an ArgoCD `Application` resource that syncs this plugin into the `argocd` namespace.
+Terra will activate the ArgoCD dashboard for your cluster.
 
 ---
 
@@ -46,10 +46,10 @@ Terra will create an ArgoCD `Application` resource that syncs this plugin into t
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `host` | string | **Yes** | — | The DNS hostname of your Genesis instance (e.g. `genesis.example.com`) |
-| `prefix` | string | No | `/argocd` | URL sub-path where the ArgoCD dashboard will be mounted |
+| Field | Details |
+|-------|---------|
+| `host` | **string** · Required<br>The DNS hostname of your Genesis instance (e.g. `genesis.example.com`) |
+| `prefix` | **string** · Optional · Default: `/argocd`<br>URL sub-path where the ArgoCD dashboard will be mounted |
 
 ---
 

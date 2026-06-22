@@ -15,9 +15,9 @@ The Minecraft plugin provides a workload template for launching self-hosted Mine
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Workload Template** — Installed into the `argocd` namespace. At install time, a schema ConfigMap is created that Genesis reads to show the Minecraft workload type in the workload creation UI. Individual Minecraft servers are launched by Kuiper when users create workloads.
+**Workload Template** — Adds the Minecraft server type to Genesis. Once installed, users can launch their own Minecraft server directly from the Genesis workload screen, with its own persistent world storage.
 
 ---
 
@@ -49,13 +49,13 @@ No install-time configuration is required for this plugin.
 
 These fields are filled in when launching a Minecraft workload in **Genesis**:
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `registry` | string | **Yes** | `itzg` | Container registry for the Minecraft server image |
-| `repo` | string | **Yes** | `minecraft-server` | Minecraft server image repository |
-| `tag` | string | **Yes** | `latest` | Image tag (controls server version and type) |
-| `storage_class` | k8sStorageClass | **Yes** | — | Storage class for the world data persistent volume |
-| `storage_size` | string | **Yes** | `10Gi` | Size of the persistent volume for world data |
+| Field | Details |
+|-------|---------|
+| `registry` | **string** · Required · Default: `itzg`<br>Container registry for the Minecraft server image |
+| `repo` | **string** · Required · Default: `minecraft-server`<br>Minecraft server image repository |
+| `tag` | **string** · Required · Default: `latest`<br>Image tag (controls server version and type) |
+| `storage_class` | **k8sStorageClass** · Required<br>Storage class for the world data persistent volume |
+| `storage_size` | **string** · Required · Default: `10Gi`<br>Size of the persistent volume for world data |
 
 ---
 

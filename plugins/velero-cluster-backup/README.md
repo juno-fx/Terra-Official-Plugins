@@ -3,7 +3,7 @@
 ![Velero Cluster Backup](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/velero/assets/logo.png)
 
 **Category:** Infrastructure
-**Type:** Cluster-Level Plugin
+**Type:** Cluster Service
 **Tags:** `backup`
 
 ---
@@ -16,9 +16,9 @@ Velero Cluster Backup creates a scheduled, automated backup of all Kubernetes AP
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Cluster-Level Plugin** — Installed into the `argocd` namespace. Creates a Velero `Schedule` resource that manages recurring cluster-wide backups.
+**Cluster Service** — Installed once per cluster by an administrator. Once active, automated backups run on the schedule you define and are stored in the S3 bucket configured in the Velero plugin.
 
 ---
 
@@ -45,10 +45,10 @@ Velero Cluster Backup creates a scheduled, automated backup of all Kubernetes AP
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `schedule` | string | No | `0 7 * * *` | Cron expression defining when to run backups. Default: daily at 7:00 AM UTC. |
-| `retention` | string | No | `720h0m0s` | Duration after which old backups are deleted. Default: 30 days (`720h0m0s`). |
+| Field | Details |
+|-------|---------|
+| `schedule` | **string** · Optional · Default: `0 7 * * *`<br>Cron expression defining when to run backups. Default: daily at 7:00 AM UTC. |
+| `retention` | **string** · Optional · Default: `720h0m0s`<br>Duration after which old backups are deleted. Default: 30 days (`720h0m0s`). |
 
 ---
 

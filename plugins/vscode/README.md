@@ -3,7 +3,7 @@
 ![VS Code](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/vscode/scripts/assets/vscode.png)
 
 **Category:** Software Development
-**Type:** Namespaced Plugin
+**Type:** Software Installer
 **Tags:** `vscode` · `ide` · `development`
 
 ---
@@ -14,9 +14,9 @@ Visual Studio Code (VS Code) is the open-source AI-powered code editor from Micr
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Namespaced Plugin** — Installed into your project namespace. This plugin runs an installer Job that downloads and extracts VS Code to the configured shared volume.
+**Software Installer** — When added to a project, Terra downloads and extracts VS Code to the shared volume you specify. Once complete, VS Code is available at that path for every workstation in the project that mounts the volume.
 
 ---
 
@@ -42,11 +42,11 @@ Visual Studio Code (VS Code) is the open-source AI-powered code editor from Micr
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `version` | string | **Yes** | `latest` | VS Code version to install. Enter `latest` for the most recent release, or a specific version string (e.g. `1.104.1`). |
-| `install_volume` | shared-volume | **Yes** | — | Shared persistent volume to install VS Code into |
-| `destination` | string | No | `/vscode` | Directory path within the volume for the VS Code installation |
+| Field | Details |
+|-------|---------|
+| `version` | **string** · Required · Default: `latest`<br>VS Code version to install. Enter `latest` for the most recent release, or a specific version string (e.g. `1.104.1`). |
+| `install_volume` | **shared-volume** · Required<br>Shared persistent volume to install VS Code into |
+| `destination` | **string** · Optional · Default: `/vscode`<br>Directory path within the volume for the VS Code installation |
 
 ---
 

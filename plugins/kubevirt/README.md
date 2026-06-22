@@ -3,7 +3,7 @@
 ![KubeVirt](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/kubevirt/scripts/assets/logo.png)
 
 **Category:** Virtualization
-**Type:** Cluster-Level Plugin
+**Type:** Cluster Service
 **Tags:** `kubevirt` · `kubernetes` · `virtualization` · `vm` · `virtual-machine`
 **Editable:** Yes
 
@@ -17,9 +17,9 @@ KubeVirt extends Kubernetes to support running virtual machines (VMs) alongside 
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Cluster-Level Plugin** — Installed into the `argocd` namespace. KubeVirt installs cluster-scoped CRDs and controllers that extend Kubernetes with VM management capabilities.
+**Cluster Service** — Installed once per cluster by an administrator. Once active, the cluster gains the ability to run virtual machines alongside containers. Workload templates like **Generic Ephemeral VM** depend on KubeVirt being installed first.
 
 ---
 
@@ -45,10 +45,10 @@ KubeVirt extends Kubernetes to support running virtual machines (VMs) alongside 
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `version` | select | **Yes** | `v1.7.0` | KubeVirt version to install |
-| `nested_virtualization` | boolean | **Yes** | `false` | Enable nested virtualization support (required when running VMs inside cloud VMs or hypervisors that support it) |
+| Field | Details |
+|-------|---------|
+| `version` | **select** · Required · Default: `v1.7.0`<br>KubeVirt version to install |
+| `nested_virtualization` | **boolean** · Required · Default: `false`<br>Enable nested virtualization support (required when running VMs inside cloud VMs or hypervisors that support it) |
 
 ---
 

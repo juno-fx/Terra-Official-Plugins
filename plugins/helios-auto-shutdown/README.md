@@ -3,29 +3,29 @@
 ![Helios Auto Shutdown](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios/scripts/assets/helios-icon.png)
 
 **Category:** Helios Plugin
-**Type:** Namespaced Plugin
+**Type:** Workstation Add-on
 **Tags:** `shutdown` · `desktop` · `customization`
 
 ---
 
 ## Overview
 
-Helios Auto Shutdown is a Helios workstation add-on that automatically triggers shutdown of idle Helios workstations via Kuiper. When the workstation detects that the user has been idle for a configured period, it signals Kuiper to stop the workload — helping free up cluster resources and reduce costs in deployments where workstations should not run unattended indefinitely.
+Helios Auto Shutdown is a Helios workstation add-on that automatically shuts down idle workstations. When the workstation detects that the user has been idle for a configured period, it triggers a clean shutdown — freeing up cluster resources and reducing costs in deployments where workstations should not run unattended indefinitely.
 
 The idle timeout is controlled by the `IDLE_TIME` environment variable set on the workstation at launch time.
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Namespaced Plugin** — Installed into your project namespace. This plugin installs the auto-shutdown scripts as a Helios plugin that attaches to Helios workstations running in the same project.
+**Workstation Add-on** — When added to a project, this plugin automatically attaches to every Helios workstation launched in that project. No extra steps are needed — install it once and all new Helios workstations will have auto-shutdown behaviour.
 
 ---
 
 ## Prerequisites
 
 - **Helios** workload template installed in the cluster
-- Helios workstations must be launched in the same project namespace where this plugin is installed
+- Helios workstations must be launched in the same project where this plugin is installed
 
 ---
 
@@ -50,8 +50,8 @@ No install-time configuration is required for this plugin.
 
 The shutdown behaviour is controlled via environment variables set on the Helios workload at launch time:
 
-| Environment Variable | Description |
-|----------------------|-------------|
+| Variable | Details |
+|----------|---------|
 | `IDLE_TIME` | Duration of user inactivity before shutdown is triggered (e.g. `30m`, `1h`) |
 
 ---
@@ -60,4 +60,4 @@ The shutdown behaviour is controlled via environment variables set on the Helios
 
 - This plugin is a **Helios-specific add-on** and has no effect on non-Helios workloads
 - The `IDLE_TIME` value is set in the workload's environment variables in Genesis at launch time
-- Auto-shutdown sends a shutdown signal through Kuiper, which performs a clean workload termination
+- Shutdown is clean — the workstation saves state and stops gracefully rather than being force-killed

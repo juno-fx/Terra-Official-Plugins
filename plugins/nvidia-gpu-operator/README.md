@@ -3,7 +3,7 @@
 ![NVIDIA GPU Operator](https://www.nvidia.com/content/nvidiaGDC/us/en_US/about-nvidia/legal-info/logo-brand-usage/_jcr_content/root/responsivegrid/nv_container_392921705/nv_container/nv_image.coreimg.100.410.png/1703060329053/nvidia-logo-vert.png)
 
 **Category:** Hardware
-**Type:** Cluster-Level Plugin
+**Type:** Cluster Service
 **Tags:** `gpu` · `nvidia` · `time-slicing` · `vm-passthrough` · `operator`
 **Editable:** Yes
 
@@ -15,9 +15,9 @@ The NVIDIA GPU Operator automates the management of NVIDIA GPU resources in a Ku
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Cluster-Level Plugin** — Installed into the `argocd` namespace. The GPU Operator manages GPU hardware across all cluster nodes via DaemonSets and cluster-scoped CRDs.
+**Cluster Service** — Installed once per cluster by an administrator. Once active, GPU nodes are automatically configured and GPU resources become schedulable for any workload in the cluster — no per-project setup needed.
 
 ---
 
@@ -44,14 +44,14 @@ The NVIDIA GPU Operator automates the management of NVIDIA GPU resources in a Ku
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `version` | select | **Yes** | — | GPU Operator version to install (`v25.10.1` or `v25.3.4`) |
-| `install_crds` | boolean | No | `false` | Install the GPU Operator CRDs. Set to `true` on first install; `false` for subsequent installs to avoid CRD conflicts. |
-| `open_kernel_modules` | boolean | No | `false` | Use open kernel modules for the NVIDIA driver (required for open-source kernel module installations) |
-| `k3s` | boolean | No | `true` | Configure for k3s clusters (sets containerd socket path to `/run/k3s/containerd/containerd.sock`) |
-| `slice_count` | int | **Yes** | `4` | Number of time-slices per GPU. Each GPU is divided into this many virtual GPU slices. |
-| `helm_repo` | string | **Yes** | `https://helm.ngc.nvidia.com/nvidia` | Helm repository URL for the GPU Operator chart |
+| Field | Details |
+|-------|---------|
+| `version` | **select** · Required<br>GPU Operator version to install (`v25.10.1` or `v25.3.4`) |
+| `install_crds` | **boolean** · Optional · Default: `false`<br>Install the GPU Operator CRDs. Set to `true` on first install; `false` for subsequent installs to avoid CRD conflicts. |
+| `open_kernel_modules` | **boolean** · Optional · Default: `false`<br>Use open kernel modules for the NVIDIA driver (required for open-source kernel module installations) |
+| `k3s` | **boolean** · Optional · Default: `true`<br>Configure for k3s clusters (sets containerd socket path to `/run/k3s/containerd/containerd.sock`) |
+| `slice_count` | **int** · Required · Default: `4`<br>Number of time-slices per GPU. Each GPU is divided into this many virtual GPU slices. |
+| `helm_repo` | **string** · Required · Default: `https://helm.ngc.nvidia.com/nvidia`<br>Helm repository URL for the GPU Operator chart |
 
 ---
 

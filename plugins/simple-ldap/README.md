@@ -3,7 +3,7 @@
 ![Simple LDAP](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/simple-ldap/scripts/assets/logo.png)
 
 **Category:** Identity & Security
-**Type:** Cluster-Level Plugin
+**Type:** Cluster Service
 **Tags:** `ldap` · `openldap` · `directory-service`
 **Editable:** Yes
 
@@ -15,9 +15,9 @@ Simple LDAP deploys a self-hosted OpenLDAP directory server alongside a phpLDAPa
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Cluster-Level Plugin** — Installed into the `argocd` namespace. The LDAP server and web UI are cluster-wide services accessible from any namespace.
+**Cluster Service** — Installed once per cluster by an administrator. Once active, the LDAP server and phpLDAPadmin web interface are accessible via the configured NodePorts to any system or user on your network.
 
 ---
 
@@ -42,30 +42,30 @@ Simple LDAP deploys a self-hosted OpenLDAP directory server alongside a phpLDAPa
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `domain` | string | **Yes** | `example.org` | LDAP domain name (e.g. `yourcompany.com`). Automatically converted to a base DN. |
-| `adminPassword` | string | **Yes** | — | LDAP admin password |
-| `organization` | string | **Yes** | — | Organization name displayed in the LDAP directory |
-| `ldapPort` | int | **Yes** | `389` | Internal LDAP ClusterIP port (standard is 389) |
-| `ldapNodePort` | int | **Yes** | — | External NodePort for LDAP access (must be in range `30000–32767`) |
-| `adminNodePort` | int | **Yes** | — | External NodePort for phpLDAPadmin web UI (must be in range `30000–32767`) |
-| `openldapCpu` | string | No | `500m` | CPU request for the OpenLDAP container |
-| `openldapMemory` | string | No | `256Mi` | Memory request for the OpenLDAP container |
-| `openldapCpuLimit` | string | No | — | CPU limit for the OpenLDAP container (no limit if empty) |
-| `openldapMemoryLimit` | string | No | — | Memory limit for the OpenLDAP container (no limit if empty) |
-| `adminCpu` | string | No | `200m` | CPU request for the phpLDAPadmin container |
-| `adminMemory` | string | No | `128Mi` | Memory request for the phpLDAPadmin container |
-| `adminCpuLimit` | string | No | — | CPU limit for the phpLDAPadmin container (no limit if empty) |
-| `adminMemoryLimit` | string | No | — | Memory limit for the phpLDAPadmin container (no limit if empty) |
-| `openldapRepo` | string | No | `docker.io` | Registry for the OpenLDAP image |
-| `openldapImage` | string | No | `osixia/openldap` | OpenLDAP image name |
-| `openldapTag` | string | No | `latest` | OpenLDAP image tag |
-| `adminRepo` | string | No | `docker.io` | Registry for the phpLDAPadmin image |
-| `adminImage` | string | No | `osixia/phpldapadmin` | phpLDAPadmin image name |
-| `adminTag` | string | No | `latest` | phpLDAPadmin image tag |
-| `storageSize` | string | No | `1Gi` | Persistent volume size for LDAP directory data |
-| `storageClass` | string | No | — | StorageClass for the LDAP data PVC (uses cluster default if empty) |
+| Field | Details |
+|-------|---------|
+| `domain` | **string** · Required · Default: `example.org`<br>LDAP domain name (e.g. `yourcompany.com`). Automatically converted to a base DN. |
+| `adminPassword` | **string** · Required<br>LDAP admin password |
+| `organization` | **string** · Required<br>Organization name displayed in the LDAP directory |
+| `ldapPort` | **int** · Required · Default: `389`<br>Internal LDAP ClusterIP port (standard is 389) |
+| `ldapNodePort` | **int** · Required<br>External NodePort for LDAP access (must be in range `30000–32767`) |
+| `adminNodePort` | **int** · Required<br>External NodePort for phpLDAPadmin web UI (must be in range `30000–32767`) |
+| `openldapCpu` | **string** · Optional · Default: `500m`<br>CPU request for the OpenLDAP container |
+| `openldapMemory` | **string** · Optional · Default: `256Mi`<br>Memory request for the OpenLDAP container |
+| `openldapCpuLimit` | **string** · Optional<br>CPU limit for the OpenLDAP container (no limit if empty) |
+| `openldapMemoryLimit` | **string** · Optional<br>Memory limit for the OpenLDAP container (no limit if empty) |
+| `adminCpu` | **string** · Optional · Default: `200m`<br>CPU request for the phpLDAPadmin container |
+| `adminMemory` | **string** · Optional · Default: `128Mi`<br>Memory request for the phpLDAPadmin container |
+| `adminCpuLimit` | **string** · Optional<br>CPU limit for the phpLDAPadmin container (no limit if empty) |
+| `adminMemoryLimit` | **string** · Optional<br>Memory limit for the phpLDAPadmin container (no limit if empty) |
+| `openldapRepo` | **string** · Optional · Default: `docker.io`<br>Registry for the OpenLDAP image |
+| `openldapImage` | **string** · Optional · Default: `osixia/openldap`<br>OpenLDAP image name |
+| `openldapTag` | **string** · Optional · Default: `latest`<br>OpenLDAP image tag |
+| `adminRepo` | **string** · Optional · Default: `docker.io`<br>Registry for the phpLDAPadmin image |
+| `adminImage` | **string** · Optional · Default: `osixia/phpldapadmin`<br>phpLDAPadmin image name |
+| `adminTag` | **string** · Optional · Default: `latest`<br>phpLDAPadmin image tag |
+| `storageSize` | **string** · Optional · Default: `1Gi`<br>Persistent volume size for LDAP directory data |
+| `storageClass` | **string** · Optional<br>StorageClass for the LDAP data PVC (uses cluster default if empty) |
 
 ---
 

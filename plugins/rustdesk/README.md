@@ -3,7 +3,7 @@
 ![RustDesk](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/rustdesk/scripts/assets/rustdesk.png)
 
 **Category:** VDI
-**Type:** Namespaced Plugin
+**Type:** Software Installer
 **Tags:** `remote-desktop` · `rustdesk` · `remote-access`
 
 ---
@@ -14,9 +14,9 @@ RustDesk is a fast, open-source remote desktop and remote support tool written i
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Namespaced Plugin** — Installed into your project namespace. This plugin runs an installer Job that places the RustDesk client and server components on the configured shared volume.
+**Software Installer** — When added to a project, Terra installs the RustDesk client to the shared volume you specify. Once complete, RustDesk is available at that path for every workstation in the project that mounts the volume.
 
 ---
 
@@ -41,10 +41,10 @@ RustDesk is a fast, open-source remote desktop and remote support tool written i
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `install_volume` | shared-volume | **Yes** | — | Shared persistent volume to install RustDesk into |
-| `destination` | string | **Yes** | — | Directory path within the volume for the RustDesk installation |
+| Field | Details |
+|-------|---------|
+| `install_volume` | **shared-volume** · Required<br>Shared persistent volume to install RustDesk into |
+| `destination` | **string** · Required<br>Directory path within the volume for the RustDesk installation |
 
 ---
 

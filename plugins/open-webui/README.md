@@ -15,16 +15,16 @@ Open WebUI is an extensible, feature-rich, self-hosted AI platform designed to o
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Workload Template** — Installed into the `argocd` namespace. At install time, a schema ConfigMap is created that Genesis reads to show the Open WebUI workload type in the workload creation UI. Individual Open WebUI instances are launched by Kuiper when users create workloads.
+**Workload Template** — Adds the Open WebUI AI chat type to Genesis. Once installed, users can launch their own private Open WebUI instance directly from the Genesis workload screen. Each instance has its own chat history and model configuration.
 
 ---
 
 ## Prerequisites
 
 - Platform versions: `genesis-deployment >= 3.0.0-beta.1`, `orion-deployment >= 3.0.0-beta.1`
-- For Ollama backend: the **Ollama** plugin installed in the same project namespace
+- For Ollama backend: the **Ollama** plugin installed in the same project
 - A Kubernetes storage class available for persistent chat history and configuration storage
 
 ---
@@ -50,16 +50,16 @@ No install-time configuration is required for this plugin.
 
 These fields are filled in when launching an Open WebUI workload in **Genesis**:
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `registry` | string | No | `ghcr.io/open-webui` | Container registry for the Open WebUI image |
-| `repo` | string | No | `open-webui` | Open WebUI image repository |
-| `tag` | string | No | `main` | Open WebUI image tag |
-| `webtop_registry` | string | **Yes** | `lscr.io/linuxserver` | Registry for the Webtop browser sidecar image |
-| `webtop_repo` | string | **Yes** | `chromium` | Webtop browser sidecar image repository |
-| `webtop_tag` | string | **Yes** | `latest` | Webtop browser sidecar image tag |
-| `storage_class` | k8sStorageClass | **Yes** | — | Storage class for the Open WebUI data persistent volume |
-| `storage_size` | string | **Yes** | `10Gi` | Size of the persistent volume for chat history and model config |
+| Field | Details |
+|-------|---------|
+| `registry` | **string** · Optional · Default: `ghcr.io/open-webui`<br>Container registry for the Open WebUI image |
+| `repo` | **string** · Optional · Default: `open-webui`<br>Open WebUI image repository |
+| `tag` | **string** · Optional · Default: `main`<br>Open WebUI image tag |
+| `webtop_registry` | **string** · Required · Default: `lscr.io/linuxserver`<br>Registry for the Webtop browser sidecar image |
+| `webtop_repo` | **string** · Required · Default: `chromium`<br>Webtop browser sidecar image repository |
+| `webtop_tag` | **string** · Required · Default: `latest`<br>Webtop browser sidecar image tag |
+| `storage_class` | **k8sStorageClass** · Required<br>Storage class for the Open WebUI data persistent volume |
+| `storage_size` | **string** · Required · Default: `10Gi`<br>Size of the persistent volume for chat history and model config |
 
 ---
 

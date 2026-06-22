@@ -15,9 +15,9 @@ n8n is an open-source workflow automation tool with a visual node-based interfac
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Workload Template** — Installed into the `argocd` namespace. At install time, a schema ConfigMap is created that Genesis reads to show the n8n workload type in the workload creation UI. Individual n8n instances are launched by Kuiper when users create workloads.
+**Workload Template** — Adds the n8n automation workload type to Genesis. Once installed, users can launch their own private n8n instance directly from the Genesis workload screen. Each instance has its own workflow storage and credential store.
 
 ---
 
@@ -49,14 +49,14 @@ No install-time configuration is required for this plugin.
 
 These fields are filled in when launching an n8n workload in **Genesis**:
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `registry` | string | **Yes** | `docker.n8n.io/n8nio` | Container registry for the n8n image |
-| `repo` | string | **Yes** | `n8n` | n8n image repository |
-| `tag` | string | **Yes** | `latest` | n8n image tag (version) |
-| `timezone` | string | **Yes** | `America/New_York` | Timezone for the n8n instance (affects scheduled workflow execution) |
-| `storage_class` | k8sStorageClass | **Yes** | — | Storage class for the n8n workflow data persistent volume |
-| `storage_size` | string | **Yes** | `10Gi` | Size of the persistent volume for workflow and credential storage |
+| Field | Details |
+|-------|---------|
+| `registry` | **string** · Required · Default: `docker.n8n.io/n8nio`<br>Container registry for the n8n image |
+| `repo` | **string** · Required · Default: `n8n`<br>n8n image repository |
+| `tag` | **string** · Required · Default: `latest`<br>n8n image tag (version) |
+| `timezone` | **string** · Required · Default: `America/New_York`<br>Timezone for the n8n instance (affects scheduled workflow execution) |
+| `storage_class` | **k8sStorageClass** · Required<br>Storage class for the n8n workflow data persistent volume |
+| `storage_size` | **string** · Required · Default: `10Gi`<br>Size of the persistent volume for workflow and credential storage |
 
 ---
 

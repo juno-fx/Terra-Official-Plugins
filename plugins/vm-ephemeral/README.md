@@ -16,9 +16,9 @@ The Generic Ephemeral VM workload template provides a flexible, temporary Virtua
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Workload Template** — Installed into the `argocd` namespace. At install time, a schema ConfigMap is created that Genesis reads to show the Generic Ephemeral VM workload type in the workload creation UI. Individual VM instances are launched by Kuiper when users create workloads.
+**Workload Template** — Adds the Generic Ephemeral VM type to Genesis. Once installed, users can launch a virtual machine directly from the Genesis workload screen. VMs are ephemeral — they are discarded when stopped unless external storage is attached.
 
 ---
 
@@ -54,17 +54,17 @@ No install-time configuration is required for this plugin.
 
 These fields are filled in when launching a VM workload in **Genesis**:
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `gpu` | boolean | **Yes** | `false` | Enable GPU passthrough to the VM |
-| `gpu_device_name` | string | No | — | Specific GPU device name for passthrough (when multiple GPU types are available) |
-| `secure_boot` | boolean | **Yes** | `false` | Enable Secure Boot for the VM |
-| `efi` | boolean | **Yes** | `false` | Enable EFI firmware (required for Secure Boot) |
-| `tpm` | boolean | **Yes** | `false` | Enable TPM 2.0 (required for Windows 11) |
-| `virtio_drivers` | boolean | No | `false` | Mount VirtIO drivers ISO to the VM (useful for Windows guest driver installation) |
-| `prefered_disk_bus` | select | **Yes** | `virtio` | Preferred disk bus type (`virtio`) |
-| `storage_class` | k8sStorageClass | **Yes** | — | Storage class for the VM's boot disk |
-| `ports` | list | No | — | Ports to expose from the VM (name, type: `ClusterIP` or `NodePort`) |
+| Field | Details |
+|-------|---------|
+| `gpu` | **boolean** · Required · Default: `false`<br>Enable GPU passthrough to the VM |
+| `gpu_device_name` | **string** · Optional<br>Specific GPU device name for passthrough (when multiple GPU types are available) |
+| `secure_boot` | **boolean** · Required · Default: `false`<br>Enable Secure Boot for the VM |
+| `efi` | **boolean** · Required · Default: `false`<br>Enable EFI firmware (required for Secure Boot) |
+| `tpm` | **boolean** · Required · Default: `false`<br>Enable TPM 2.0 (required for Windows 11) |
+| `virtio_drivers` | **boolean** · Optional · Default: `false`<br>Mount VirtIO drivers ISO to the VM (useful for Windows guest driver installation) |
+| `prefered_disk_bus` | **select** · Required · Default: `virtio`<br>Preferred disk bus type (`virtio`) |
+| `storage_class` | **k8sStorageClass** · Required<br>Storage class for the VM's boot disk |
+| `ports` | **list** · Optional<br>Ports to expose from the VM (name, type: `ClusterIP` or `NodePort`) |
 
 ---
 

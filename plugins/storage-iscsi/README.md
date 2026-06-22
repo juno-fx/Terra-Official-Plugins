@@ -3,7 +3,7 @@
 ![Storage iSCSI](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/storage-iscsi/scripts/assets/logo.png)
 
 **Category:** Storage
-**Type:** Cluster-Level Plugin
+**Type:** Cluster Service
 **Tags:** `storage` · `iscsi` · `persistent-volume`
 
 ---
@@ -14,9 +14,9 @@ The Storage iSCSI plugin connects an iSCSI target (from a SAN, NAS, or software 
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Cluster-Level Plugin** — Installed into the `argocd` namespace. This plugin creates a cluster-scoped Persistent Volume backed by the specified iSCSI target.
+**Cluster Service** — Installed once per cluster by an administrator. Creates a shared storage volume backed by an iSCSI target, available to workloads across all projects.
 
 ---
 
@@ -42,12 +42,12 @@ The Storage iSCSI plugin connects an iSCSI target (from a SAN, NAS, or software 
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `iqn` | string | **Yes** | — | iSCSI Qualified Name of the target (e.g. `iqn.2023-01.com.example:storage`) |
-| `lun` | int | **Yes** | `0` | Logical Unit Number (LUN) of the iSCSI target |
-| `portal` | string | **Yes** | — | IP address or hostname of the iSCSI target portal (e.g. `192.168.1.100`) |
-| `size` | string | **Yes** | — | Advertised size of the Persistent Volume (e.g. `100Gi`). Must match the actual LUN size for accurate scheduling. |
+| Field | Details |
+|-------|---------|
+| `iqn` | **string** · Required<br>iSCSI Qualified Name of the target (e.g. `iqn.2023-01.com.example:storage`) |
+| `lun` | **int** · Required · Default: `0`<br>Logical Unit Number (LUN) of the iSCSI target |
+| `portal` | **string** · Required<br>IP address or hostname of the iSCSI target portal (e.g. `192.168.1.100`) |
+| `size` | **string** · Required<br>Advertised size of the Persistent Volume (e.g. `100Gi`). Must match the actual LUN size for accurate scheduling. |
 
 ---
 

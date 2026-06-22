@@ -14,9 +14,9 @@ Hermes Agent is an AI agent workload with multi-provider LLM support and a built
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Workload Template** — Installed into the `argocd` namespace. At install time, a schema ConfigMap is created that Genesis reads to show the Hermes Agent workload type in the workload creation UI. Individual Hermes instances are launched by Kuiper when users create workloads.
+**Workload Template** — Adds the Hermes AI agent type to Genesis. Once installed, users can launch their own personal Hermes agent instance directly from the Genesis workload screen. Each instance has its own persistent storage and is isolated from other users.
 
 ---
 
@@ -49,14 +49,14 @@ No install-time configuration is required for this plugin.
 
 These fields are filled in when launching a Hermes Agent workload in **Genesis**:
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `registry` | string | No | `nousresearch` | Container registry for the Hermes image |
-| `repo` | string | No | `hermes-agent` | Hermes image repository |
-| `tag` | string | No | `latest` | Hermes image tag |
-| `cluster_access` | select | No | `none` | Kubernetes RBAC access level for the agent (`none`, `readonly-ns`, `admin-ns`) |
-| `persistence_size` | string | No | `1Gi` | Persistent volume size for agent state storage |
-| `persistence_storage_class` | k8sStorageClass | No | — | Storage class for the persistent volume |
+| Field | Details |
+|-------|---------|
+| `registry` | **string** · Optional · Default: `nousresearch`<br>Container registry for the Hermes image |
+| `repo` | **string** · Optional · Default: `hermes-agent`<br>Hermes image repository |
+| `tag` | **string** · Optional · Default: `latest`<br>Hermes image tag |
+| `cluster_access` | **select** · Optional · Default: `none`<br>Kubernetes RBAC access level for the agent (`none`, `readonly-ns`, `admin-ns`) |
+| `persistence_size` | **string** · Optional · Default: `1Gi`<br>Persistent volume size for agent state storage |
+| `persistence_storage_class` | **k8sStorageClass** · Optional<br>Storage class for the persistent volume |
 
 ---
 

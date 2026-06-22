@@ -3,7 +3,7 @@
 ![Autodesk Flow Production Tracking](https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/flow-production-tracking/scripts/assets/flow.png?raw=true)
 
 **Category:** Project Management
-**Type:** Namespaced Plugin
+**Type:** Software Installer
 **Tags:** `flow` · `autodesk` · `project-management` · `production-tracking` · `shotgun` · `shotgrid`
 
 ---
@@ -14,9 +14,9 @@ Autodesk Flow Production Tracking (formerly ShotGrid / Shotgun) is a powerful cl
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Namespaced Plugin** — Installed into your project namespace. This plugin runs an installer Job that sets up the Flow Production Tracking integration files on a shared volume accessible by project workstations.
+**Software Installer** — When added to a project, Terra installs the Flow Production Tracking integration toolkit to the shared volume you specify. Once complete, the toolkit is available for DCC applications running on project workstations that mount the volume.
 
 ---
 
@@ -42,10 +42,10 @@ Autodesk Flow Production Tracking (formerly ShotGrid / Shotgun) is a powerful cl
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `install_volume` | shared-volume | **Yes** | — | Shared persistent volume to install the Flow toolkit into |
-| `destination` | string | No | `/flow` | Directory path within the volume for the installation |
+| Field | Details |
+|-------|---------|
+| `install_volume` | **shared-volume** · Required<br>Shared persistent volume to install the Flow toolkit into |
+| `destination` | **string** · Optional · Default: `/flow`<br>Directory path within the volume for the installation |
 
 ---
 

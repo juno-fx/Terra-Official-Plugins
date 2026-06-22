@@ -3,7 +3,7 @@
 ![EmberGen](https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/embergen/scripts/assets/embergen.png?raw=true)
 
 **Category:** CG
-**Type:** Namespaced Plugin
+**Type:** Software Installer
 **Tags:** `embergen` · `vfx` · `3d` · `simulation` · `effects` · `volumetrics` · `realtime` · `gpu` · `particles`
 
 ---
@@ -14,9 +14,9 @@ EmberGen is a real-time volumetric effects and VFX tool from JangaFX designed fo
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Namespaced Plugin** — Installed into your project namespace. This plugin runs an installer Job that places EmberGen into a shared volume accessible by workstations in the project.
+**Software Installer** — When added to a project, Terra downloads and installs EmberGen to the shared volume you specify. Once complete, EmberGen is available at that path for every workstation in the project that mounts the volume.
 
 ---
 
@@ -42,11 +42,11 @@ EmberGen is a real-time volumetric effects and VFX tool from JangaFX designed fo
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `version` | string | **Yes** | — | EmberGen version to install (e.g. `1.2.4`) |
-| `install_volume` | shared-volume | **Yes** | — | Shared persistent volume to install EmberGen into |
-| `destination` | string | No | `/embergen` | Directory path within the volume for the installation |
+| Field | Details |
+|-------|---------|
+| `version` | **string** · Required<br>EmberGen version to install (e.g. `1.2.4`) |
+| `install_volume` | **shared-volume** · Required<br>Shared persistent volume to install EmberGen into |
+| `destination` | **string** · Optional · Default: `/embergen`<br>Directory path within the volume for the installation |
 
 ---
 

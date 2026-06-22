@@ -14,9 +14,9 @@ Gitea is a lightweight, self-hosted Git service written in Go. It provides a ful
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Workload Template** — Installed into the `argocd` namespace. At install time, a schema ConfigMap is created that Genesis reads to show the Gitea workload type in the workload creation UI. The actual Gitea server is launched when a user creates a workload — not at plugin install time.
+**Workload Template** — Adds a Gitea Git server workload type to Genesis. Once installed, users can launch their own private Gitea instance directly from the Genesis workload screen. Each instance gets its own persistent storage and is independent from other users' instances.
 
 ---
 
@@ -48,16 +48,16 @@ No install-time configuration is required for this plugin.
 
 These fields are filled in when launching a Gitea workload in **Genesis**:
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `registry` | string | **Yes** | `docker.io` | Container registry to pull the Gitea image from |
-| `repo` | string | **Yes** | `gitea/gitea` | Gitea image repository |
-| `tag` | string | **Yes** | `1.23` | Gitea image tag (version) |
-| `nginx_registry` | string | **Yes** | `docker.io` | Registry for the nginx sidecar image |
-| `nginx_repo` | string | **Yes** | `nginx` | nginx sidecar image repository |
-| `nginx_tag` | string | **Yes** | `1.29.3` | nginx sidecar image tag |
-| `storage_class` | k8sStorageClass | **Yes** | — | Kubernetes storage class for Gitea repository data |
-| `storage_size` | string | **Yes** | `5Gi` | Size of the persistent volume for repository storage |
+| Field | Details |
+|-------|---------|
+| `registry` | **string** · Required · Default: `docker.io`<br>Container registry to pull the Gitea image from |
+| `repo` | **string** · Required · Default: `gitea/gitea`<br>Gitea image repository |
+| `tag` | **string** · Required · Default: `1.23`<br>Gitea image tag (version) |
+| `nginx_registry` | **string** · Required · Default: `docker.io`<br>Registry for the nginx sidecar image |
+| `nginx_repo` | **string** · Required · Default: `nginx`<br>nginx sidecar image repository |
+| `nginx_tag` | **string** · Required · Default: `1.29.3`<br>nginx sidecar image tag |
+| `storage_class` | **k8sStorageClass** · Required<br>Kubernetes storage class for Gitea repository data |
+| `storage_size` | **string** · Required · Default: `5Gi`<br>Size of the persistent volume for repository storage |
 
 ---
 

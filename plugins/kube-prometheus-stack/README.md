@@ -3,7 +3,7 @@
 ![Kubernetes Prometheus Stack](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/kube-prometheus-stack/assets/logo.png)
 
 **Category:** Monitoring
-**Type:** Cluster-Level Plugin
+**Type:** Cluster Service
 **Tags:** `prometheus` · `grafana` · `alertmanager` · `dashboard`
 
 ---
@@ -14,9 +14,9 @@ The Kubernetes Prometheus Stack deploys the full Prometheus monitoring ecosystem
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Cluster-Level Plugin** — Installed into the `argocd` namespace. The Prometheus stack monitors the entire cluster and is shared across all projects and namespaces.
+**Cluster Service** — Installed once per cluster by an administrator. Once active, Prometheus begins collecting metrics from the entire cluster and Grafana is immediately available at the configured URL — no per-project installation needed.
 
 ---
 
@@ -42,12 +42,12 @@ The Kubernetes Prometheus Stack deploys the full Prometheus monitoring ecosystem
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `username` | string | **Yes** | — | Grafana admin username |
-| `password` | string | **Yes** | — | Grafana admin password |
-| `host` | string | **Yes** | — | Hostname for the Grafana dashboard (e.g. `grafana.example.com`). A DNS record pointing to your cluster's ingress must exist. |
-| `path` | string | No | — | URL sub-path for Grafana (e.g. `/grafana`) if serving under a sub-path |
+| Field | Details |
+|-------|---------|
+| `username` | **string** · Required<br>Grafana admin username |
+| `password` | **string** · Required<br>Grafana admin password |
+| `host` | **string** · Required<br>Hostname for the Grafana dashboard (e.g. `grafana.example.com`). A DNS record pointing to your cluster's ingress must exist. |
+| `path` | **string** · Optional<br>URL sub-path for Grafana (e.g. `/grafana`) if serving under a sub-path |
 
 ---
 

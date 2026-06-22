@@ -3,7 +3,7 @@
 ![Storage HostPath](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/storage-hostpath/scripts/assets/logo.png)
 
 **Category:** Storage
-**Type:** Cluster-Level Plugin
+**Type:** Cluster Service
 **Tags:** `storage` · `hostpath` · `persistent-volume`
 
 ---
@@ -16,9 +16,9 @@ The Storage HostPath plugin mounts an existing directory from a cluster node's f
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Cluster-Level Plugin** — Installed into the `argocd` namespace. This plugin creates a cluster-scoped Persistent Volume that can be claimed by workloads in any project namespace.
+**Cluster Service** — Installed once per cluster by an administrator. Creates a shared storage volume backed by a directory on the host node, available to workloads across all projects.
 
 ---
 
@@ -43,10 +43,10 @@ The Storage HostPath plugin mounts an existing directory from a cluster node's f
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `path` | string | **Yes** | — | Absolute path on the host node to expose as a Persistent Volume (e.g. `/data/shared`) |
-| `size` | string | **Yes** | `10Gi` | Advertised size of the Persistent Volume. This is for scheduling purposes only and does not limit actual disk usage. |
+| Field | Details |
+|-------|---------|
+| `path` | **string** · Required<br>Absolute path on the host node to expose as a Persistent Volume (e.g. `/data/shared`) |
+| `size` | **string** · Required · Default: `10Gi`<br>Advertised size of the Persistent Volume. This is for scheduling purposes only and does not limit actual disk usage. |
 
 ---
 

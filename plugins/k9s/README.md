@@ -15,9 +15,9 @@ k9s is a terminal-based Kubernetes management UI that provides a fast, keyboard-
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Workload Template** — Installed into the `argocd` namespace. At install time, a schema ConfigMap is created that Genesis reads to show the k9s workload type in the workload creation UI. k9s instances are launched by Kuiper when users create workloads.
+**Workload Template** — Adds the k9s terminal dashboard type to Genesis. Once installed, users can launch a browser-accessible k9s session directly from the Genesis workload screen.
 
 ---
 
@@ -50,20 +50,20 @@ No install-time configuration is required for this plugin.
 
 These fields are filled in when launching a k9s workload in **Genesis**:
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `registry` | string | **Yes** | `docker.io` | Container registry for the nginx sidecar image |
-| `repo` | string | **Yes** | `nginx` | nginx sidecar image repository |
-| `tag` | string | **Yes** | `alpine` | nginx sidecar image tag |
-| `timezone` | string | **Yes** | `America/New_York` | Timezone for the k9s instance |
-| `cluster_access` | select | **Yes** | `readonly-ns` | Kubernetes RBAC access level (`readonly-ns` or `admin-ns`) |
-| `storage_class` | k8sStorageClass | **Yes** | — | Storage class for the k9s data disk |
-| `storage_size` | string | **Yes** | `10Gi` | Size of the persistent volume for k9s data |
+| Field | Details |
+|-------|---------|
+| `registry` | **string** · Required · Default: `docker.io`<br>Container registry for the nginx sidecar image |
+| `repo` | **string** · Required · Default: `nginx`<br>nginx sidecar image repository |
+| `tag` | **string** · Required · Default: `alpine`<br>nginx sidecar image tag |
+| `timezone` | **string** · Required · Default: `America/New_York`<br>Timezone for the k9s instance |
+| `cluster_access` | **select** · Required · Default: `readonly-ns`<br>Kubernetes RBAC access level (`readonly-ns` or `admin-ns`) |
+| `storage_class` | **k8sStorageClass** · Required<br>Storage class for the k9s data disk |
+| `storage_size` | **string** · Required · Default: `10Gi`<br>Size of the persistent volume for k9s data |
 
 ---
 
 ## Notes
 
-- `readonly-ns` grants read-only access scoped to the project namespace; `admin-ns` grants full admin access to the namespace — choose carefully based on your security requirements
+- `readonly-ns` grants read-only access to the project's resources; `admin-ns` grants full admin access — choose carefully based on your security requirements
 - k9s is a powerful tool with direct cluster access; restrict who can launch k9s workloads using Genesis project permissions
 - The nginx sidecar provides the browser-accessible web proxy for the k9s terminal interface

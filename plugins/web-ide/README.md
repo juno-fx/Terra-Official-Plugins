@@ -14,9 +14,9 @@ Web IDE is a browser-based VS Code environment powered by [code-server](https://
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Workload Template** — Installed into the `argocd` namespace. At install time, a schema ConfigMap is created that Genesis reads to show the Web IDE workload type in the workload creation UI. Individual Web IDE instances are launched by Kuiper when users create workloads.
+**Workload Template** — Adds the Web IDE type to Genesis. Once installed, users can launch their own browser-based VS Code environment directly from the Genesis workload screen. Each instance is isolated with its own storage and installed packages.
 
 ---
 
@@ -47,15 +47,15 @@ No install-time configuration is required for this plugin.
 
 These fields are filled in when launching a Web IDE workload in **Genesis**:
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `registry` | string | **Yes** | `lscr.io` | Container registry for the code-server image |
-| `repo` | string | **Yes** | `linuxserver/code-server` | code-server image repository |
-| `tag` | string | **Yes** | `latest` | code-server image tag |
-| `packages` | string | No | `python3 python3-venv` | Space-separated list of additional system packages to install at startup |
-| `nginx_registry` | string | **Yes** | `docker.io` | Container registry for the nginx proxy image |
-| `nginx_repo` | string | **Yes** | `nginx` | nginx proxy image repository |
-| `nginx_tag` | string | **Yes** | `latest` | nginx proxy image tag |
+| Field | Details |
+|-------|---------|
+| `registry` | **string** · Required · Default: `lscr.io`<br>Container registry for the code-server image |
+| `repo` | **string** · Required · Default: `linuxserver/code-server`<br>code-server image repository |
+| `tag` | **string** · Required · Default: `latest`<br>code-server image tag |
+| `packages` | **string** · Optional · Default: `python3 python3-venv`<br>Space-separated list of additional system packages to install at startup |
+| `nginx_registry` | **string** · Required · Default: `docker.io`<br>Container registry for the nginx proxy image |
+| `nginx_repo` | **string** · Required · Default: `nginx`<br>nginx proxy image repository |
+| `nginx_tag` | **string** · Required · Default: `latest`<br>nginx proxy image tag |
 
 ---
 

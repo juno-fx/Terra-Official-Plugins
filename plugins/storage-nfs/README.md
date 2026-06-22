@@ -3,7 +3,7 @@
 ![Storage NFS](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/storage-nfs/scripts/assets/logo.png)
 
 **Category:** Storage
-**Type:** Cluster-Level Plugin
+**Type:** Cluster Service
 **Tags:** `storage` · `nfs` · `persistent-volume`
 
 ---
@@ -14,9 +14,9 @@ The Storage NFS plugin mounts an NFS (Network File System) share and exposes it 
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Cluster-Level Plugin** — Installed into the `argocd` namespace. This plugin creates a cluster-scoped Persistent Volume backed by the specified NFS share.
+**Cluster Service** — Installed once per cluster by an administrator. Creates a shared storage volume backed by an NFS share, mountable by multiple workstations across all projects simultaneously.
 
 ---
 
@@ -42,11 +42,11 @@ The Storage NFS plugin mounts an NFS (Network File System) share and exposes it 
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `server` | string | **Yes** | — | IP address or hostname of the NFS server (e.g. `192.168.1.50` or `nas.example.com`) |
-| `path` | string | **Yes** | — | Exported path on the NFS server (e.g. `/exports/shared`) |
-| `size` | string | **Yes** | — | Advertised size of the Persistent Volume (e.g. `500Gi`). For scheduling purposes — actual capacity depends on the NFS export. |
+| Field | Details |
+|-------|---------|
+| `server` | **string** · Required<br>IP address or hostname of the NFS server (e.g. `192.168.1.50` or `nas.example.com`) |
+| `path` | **string** · Required<br>Exported path on the NFS server (e.g. `/exports/shared`) |
+| `size` | **string** · Required<br>Advertised size of the Persistent Volume (e.g. `500Gi`). For scheduling purposes — actual capacity depends on the NFS export. |
 
 ---
 

@@ -3,7 +3,7 @@
 ![Tailscale](https://tailscale.gallerycdn.vsassets.io/extensions/tailscale/vscode-tailscale/1.0.0/1698786256133/Microsoft.VisualStudio.Services.Icons.Default)
 
 **Category:** Networking
-**Type:** Cluster-Level Plugin
+**Type:** Cluster Service
 **Tags:** `wireguard` · `vpn` · `tailscale`
 **Editable:** Yes
 
@@ -17,9 +17,9 @@ For full usage documentation, see the [Tailscale Kubernetes Operator guide](http
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Cluster-Level Plugin** — Installed into the `argocd` namespace. The Tailscale Operator manages cluster-wide resources and integration with the Tailscale coordination server.
+**Cluster Service** — Installed once per cluster by an administrator. Once active, the cluster joins your Tailscale tailnet and cluster services can be selectively exposed to your team's devices without any per-project setup.
 
 ---
 
@@ -48,10 +48,10 @@ After deployment, read the [Tailscale Kubernetes Operator documentation](https:/
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `client_id` | string | **Yes** | — | Tailscale OAuth Client ID |
-| `client_secret` | string | **Yes** | — | Tailscale OAuth Client Secret |
+| Field | Details |
+|-------|---------|
+| `client_id` | **string** · Required<br>Tailscale OAuth Client ID |
+| `client_secret` | **string** · Required<br>Tailscale OAuth Client Secret |
 
 ---
 

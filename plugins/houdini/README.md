@@ -3,7 +3,7 @@
 ![Houdini](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/houdini/scripts/assets/houdini.png)
 
 **Category:** CG
-**Type:** Namespaced Plugin
+**Type:** Software Installer
 **Tags:** `houdini` · `sidefx` · `vfx` · `usd` · `animation` · `3d` · `simulation` · `rendering` · `effects` · `modeling`
 
 ---
@@ -14,9 +14,9 @@ SideFX Houdini is the industry-standard 3D procedural content creation tool used
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Namespaced Plugin** — Installed into your project namespace. This plugin runs an installer Job that authenticates with SideFX's API and downloads the specified Houdini build to the target volume.
+**Software Installer** — When added to a project, Terra authenticates with SideFX's API using your credentials and downloads the specified Houdini build to the shared volume you choose. Once complete, Houdini is available at that path for every workstation in the project that mounts the volume.
 
 ---
 
@@ -42,13 +42,13 @@ SideFX Houdini is the industry-standard 3D procedural content creation tool used
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `version` | string | **Yes** | `20.5.278` | Houdini version to install (e.g. `20.5.278`) |
-| `destination` | string | **Yes** | `/houdini` | Directory path within the volume for the installation |
-| `client_id` | string | **Yes** | — | SideFX API Client ID for downloading the installer |
-| `client_secret` | string | **Yes** | — | SideFX API Client Secret |
-| `install_volume` | shared-volume | **Yes** | — | Shared persistent volume to install Houdini into |
+| Field | Details |
+|-------|---------|
+| `version` | **string** · Required · Default: `20.5.278`<br>Houdini version to install (e.g. `20.5.278`) |
+| `destination` | **string** · Required · Default: `/houdini`<br>Directory path within the volume for the installation |
+| `client_id` | **string** · Required<br>SideFX API Client ID for downloading the installer |
+| `client_secret` | **string** · Required<br>SideFX API Client Secret |
+| `install_volume` | **shared-volume** · Required<br>Shared persistent volume to install Houdini into |
 
 ---
 

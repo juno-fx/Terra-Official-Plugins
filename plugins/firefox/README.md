@@ -3,7 +3,7 @@
 ![Firefox](https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/firefox/scripts/assets/firefox.png?raw=true)
 
 **Category:** Web
-**Type:** Namespaced Plugin
+**Type:** Software Installer
 **Tags:** `firefox` · `browser`
 
 ---
@@ -14,9 +14,9 @@ The Firefox plugin installs the Mozilla Firefox web browser to a shared persiste
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Namespaced Plugin** — Installed into your project namespace. This plugin runs an installer Job that downloads and extracts Firefox to the configured shared volume.
+**Software Installer** — When added to a project, Terra downloads and extracts Firefox to the shared volume you specify. Once complete, Firefox is available at that path for every workstation in the project that mounts the volume.
 
 ---
 
@@ -41,10 +41,10 @@ The Firefox plugin installs the Mozilla Firefox web browser to a shared persiste
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `install_volume` | shared-volume | **Yes** | — | Shared persistent volume to install Firefox into |
-| `destination` | string | No | `/apps/firefox` | Directory path within the volume for the Firefox installation |
+| Field | Details |
+|-------|---------|
+| `install_volume` | **shared-volume** · Required<br>Shared persistent volume to install Firefox into |
+| `destination` | **string** · Optional · Default: `/apps/firefox`<br>Directory path within the volume for the Firefox installation |
 
 ---
 

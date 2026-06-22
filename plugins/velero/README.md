@@ -3,7 +3,7 @@
 ![Velero](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/velero/assets/logo.png)
 
 **Category:** Infrastructure
-**Type:** Cluster-Level Plugin
+**Type:** Cluster Service
 **Tags:** `backup`
 
 ---
@@ -14,9 +14,9 @@ Velero is an open-source Kubernetes backup and restore operator that protects yo
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Cluster-Level Plugin** — Installed into the `argocd` namespace. Velero manages cluster-scoped backup resources and connects to your S3 storage backend.
+**Cluster Service** — Installed once per cluster by an administrator. Once active, Velero can back up any resource in the cluster and store them in the S3 bucket you configure.
 
 ---
 
@@ -42,14 +42,14 @@ Velero is an open-source Kubernetes backup and restore operator that protects yo
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `chart_version` | string | **Yes** | `11.1.1` | Velero Helm chart version to install |
-| `bucket` | string | **Yes** | — | Name of the S3 bucket to store backups in |
-| `region` | string | No | — | AWS region or storage provider region (e.g. `us-east-1`). Required for AWS S3; consult your provider's docs for other S3-compatible systems. |
-| `s3Url` | string | **Yes** | `https://s3.us-east-2.amazonaws.com` | S3-compatible storage endpoint URL |
-| `access_key_id` | string | **Yes** | — | Access key ID for S3 authentication |
-| `secret_access_key` | string | **Yes** | — | Secret access key for S3 authentication |
+| Field | Details |
+|-------|---------|
+| `chart_version` | **string** · Required · Default: `11.1.1`<br>Velero Helm chart version to install |
+| `bucket` | **string** · Required<br>Name of the S3 bucket to store backups in |
+| `region` | **string** · Optional<br>AWS region or storage provider region (e.g. `us-east-1`). Required for AWS S3; consult your provider's docs for other S3-compatible systems. |
+| `s3Url` | **string** · Required · Default: `https://s3.us-east-2.amazonaws.com`<br>S3-compatible storage endpoint URL |
+| `access_key_id` | **string** · Required<br>Access key ID for S3 authentication |
+| `secret_access_key` | **string** · Required<br>Secret access key for S3 authentication |
 
 ---
 

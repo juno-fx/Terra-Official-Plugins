@@ -3,7 +3,7 @@
 ![XFCE](https://upload.wikimedia.org/wikipedia/commons/5/5b/Xfce_logo.svg)
 
 **Category:** Desktop Plugin
-**Type:** Namespaced Plugin
+**Type:** Workstation Add-on
 **Tags:** `xfce` · `theme` · `desktop` · `customization`
 
 ---
@@ -14,9 +14,9 @@ The Theme Enforcer XFCE plugin applies and enforces consistent theme settings ac
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Namespaced Plugin** — Installed into your project namespace. This plugin installs theme enforcement scripts that are applied to XFCE workstations running in the same project.
+**Workstation Add-on** — When added to a project, this plugin automatically applies a consistent XFCE theme to every workstation launched in that project. Install it once and all new workstations will start with the enforced theme.
 
 ---
 

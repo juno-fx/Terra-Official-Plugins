@@ -15,9 +15,9 @@ Wetty (Web + tty) provides a terminal emulator accessible directly from the brow
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Workload Template** — Installed into the `argocd` namespace. At install time, a schema ConfigMap is created that Genesis reads to show the Wetty workload type in the workload creation UI. Individual terminal sessions are launched by Kuiper when users create workloads.
+**Workload Template** — Adds the Wetty terminal type to Genesis. Once installed, users can launch a browser-accessible shell session directly from the Genesis workload screen.
 
 ---
 
@@ -49,17 +49,17 @@ No install-time configuration is required for this plugin.
 
 These fields are filled in when launching a Wetty workload in **Genesis**:
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `registry` | string | **Yes** | `wettyoss` | Container registry for the Wetty image |
-| `repo` | string | **Yes** | `wetty` | Wetty image repository |
-| `tag` | string | **Yes** | `2.5` | Wetty image tag |
-| `packages` | string | No | `vim` | Space-separated list of additional packages to install at startup |
-| `terra_role` | k8sServiceAccount | No | — | A Terra plugin-level service account role to assign to the terminal (grants Kubernetes RBAC permissions within the project) |
-| `nginx_registry` | string | **Yes** | `docker.io` | Container registry for the nginx proxy image |
-| `nginx_repo` | string | **Yes** | `nginx` | nginx proxy image repository |
-| `nginx_tag` | string | **Yes** | `1.29.3` | nginx proxy image tag |
-| `publicAccess` | boolean | **Yes** | `false` | Disable authentication and allow unauthenticated browser access to the terminal |
+| Field | Details |
+|-------|---------|
+| `registry` | **string** · Required · Default: `wettyoss`<br>Container registry for the Wetty image |
+| `repo` | **string** · Required · Default: `wetty`<br>Wetty image repository |
+| `tag` | **string** · Required · Default: `2.5`<br>Wetty image tag |
+| `packages` | **string** · Optional · Default: `vim`<br>Space-separated list of additional packages to install at startup |
+| `terra_role` | **k8sServiceAccount** · Optional<br>A Terra plugin-level service account role to assign to the terminal (grants Kubernetes RBAC permissions within the project) |
+| `nginx_registry` | **string** · Required · Default: `docker.io`<br>Container registry for the nginx proxy image |
+| `nginx_repo` | **string** · Required · Default: `nginx`<br>nginx proxy image repository |
+| `nginx_tag` | **string** · Required · Default: `1.29.3`<br>nginx proxy image tag |
+| `publicAccess` | **boolean** · Required · Default: `false`<br>Disable authentication and allow unauthenticated browser access to the terminal |
 
 ---
 

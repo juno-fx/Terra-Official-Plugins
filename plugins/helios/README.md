@@ -14,15 +14,14 @@ Helios is the flagship containerized workstation from Juno Innovations. It provi
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Workload Template** — Installed into the `argocd` namespace. At install time, a schema ConfigMap is created that Genesis reads to show the Helios workstation type in the workload creation UI. Each user's workstation is launched independently by Kuiper when they create a workload.
+**Workload Template** — Adds the Helios workstation type to Genesis. Once installed, any user in the cluster can launch their own personal Helios desktop directly from the Genesis workload screen. Each workstation is isolated and independent.
 
 ---
 
 ## Prerequisites
 
-- The Juno platform stack (Terra, Genesis, Kuiper, ArgoCD) must be running
 - GPU support requires the **NVIDIA GPU Operator** plugin to be installed if GPU workstations are needed
 - Helios plugin add-ons (**Helios Auto Shutdown**, **Helios RAM Monitor**) are optional but recommended for production deployments
 
@@ -49,16 +48,16 @@ No install-time configuration is required for this plugin.
 
 These fields are filled in when launching a Helios workstation in **Genesis**:
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `gpu` | boolean | **Yes** | — | Enable GPU passthrough for the workstation |
-| `registry` | string | **Yes** | `junoinnovations` | Container registry to pull the Helios image from |
-| `repo` | string | **Yes** | `helios` | Helios image repository |
-| `tag` | string | **Yes** | `unstable-rocky-9` | Helios image tag (OS flavour and version) |
-| `enableAPI` | boolean | **Yes** | `false` | Enable system-to-system communication via the Helios API |
-| `rheaRepo` | string | **Yes** | `rhea` | Repository for the Rhea sidecar image |
-| `rheaTag` | string | **Yes** | `v1.2.3` | Rhea sidecar image tag |
-| `publicAccess` | boolean | **Yes** | `false` | Disable authentication and allow unauthenticated access to the workstation |
+| Field | Details |
+|-------|---------|
+| `gpu` | **boolean** · Required<br>Enable GPU passthrough for the workstation |
+| `registry` | **string** · Required · Default: `junoinnovations`<br>Container registry to pull the Helios image from |
+| `repo` | **string** · Required · Default: `helios`<br>Helios image repository |
+| `tag` | **string** · Required · Default: `unstable-rocky-9`<br>Helios image tag (OS flavour and version) |
+| `enableAPI` | **boolean** · Required · Default: `false`<br>Enable system-to-system communication via the Helios API |
+| `rheaRepo` | **string** · Required · Default: `rhea`<br>Repository for the Rhea sidecar image |
+| `rheaTag` | **string** · Required · Default: `v1.2.3`<br>Rhea sidecar image tag |
+| `publicAccess` | **boolean** · Required · Default: `false`<br>Disable authentication and allow unauthenticated access to the workstation |
 
 ---
 

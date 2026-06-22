@@ -3,7 +3,7 @@
 ![Headlamp](https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/headlamp/assets/logo.png?raw=true)
 
 **Category:** Infrastructure
-**Type:** Cluster-Level Plugin
+**Type:** Cluster Service
 **Tags:** `dashboard` · `kubernetes` · `web-interface` · `management` · `monitoring` · `admin`
 
 ---
@@ -14,9 +14,9 @@ Headlamp is a web-based Kubernetes dashboard that provides a clean, user-friendl
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Cluster-Level Plugin** — Installed into the `argocd` namespace. Headlamp is a cluster-wide service that provides visibility across all namespaces.
+**Cluster Service** — Installed once per cluster by an administrator. Once active, the Headlamp dashboard is accessible at the configured URL for anyone with cluster access — no per-project installation needed.
 
 ---
 
@@ -41,10 +41,10 @@ Headlamp is a web-based Kubernetes dashboard that provides a clean, user-friendl
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `host` | string | **Yes** | — | Hostname for the Headlamp dashboard (e.g. `headlamp.example.com`). A DNS record pointing to your cluster's ingress must exist. |
-| `prefix` | string | No | `/` | URL sub-path to mount Headlamp under (e.g. `/headlamp`) |
+| Field | Details |
+|-------|---------|
+| `host` | **string** · Required<br>Hostname for the Headlamp dashboard (e.g. `headlamp.example.com`). A DNS record pointing to your cluster's ingress must exist. |
+| `prefix` | **string** · Optional · Default: `/`<br>URL sub-path to mount Headlamp under (e.g. `/headlamp`) |
 
 ---
 

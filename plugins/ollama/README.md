@@ -3,7 +3,7 @@
 ![Ollama](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/ollama/scripts/assets/logo.jpg)
 
 **Category:** AI
-**Type:** Namespaced Plugin
+**Type:** Project Service
 **Tags:** `llm` · `machine-learning`
 **Editable:** Yes
 
@@ -11,13 +11,13 @@
 
 ## Overview
 
-Ollama makes it easy to run large language models (LLMs) locally within your cluster. It provides a simple API and CLI for downloading, running, and managing open-source models like Llama, Mistral, Gemma, and dozens more. The Ollama plugin installs Ollama to a shared persistent volume and exposes it as a service within your project namespace. GPU acceleration is supported for significantly faster inference.
+Ollama makes it easy to run large language models (LLMs) locally within your cluster. It provides a simple API and CLI for downloading, running, and managing open-source models like Llama, Mistral, Gemma, and dozens more. The Ollama plugin installs Ollama to a shared persistent volume and runs it as a service within your project. GPU acceleration is supported for significantly faster inference.
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Namespaced Plugin** — Installed into your project namespace. This plugin runs an installer Job to set up Ollama and creates a long-running service that serves the Ollama API to workstations in the project.
+**Project Service** — When added to a project, Terra sets up Ollama and starts it as a persistent service. Workstations and other plugins in the same project can connect to the Ollama API to run models. The service stays running until you uninstall the plugin.
 
 ---
 
@@ -42,13 +42,13 @@ Ollama makes it easy to run large language models (LLMs) locally within your clu
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `gpu` | boolean | **Yes** | `false` | Enable GPU acceleration for model inference |
-| `runtime` | string | No | `""` | Container runtime for GPU access (e.g. `nvidia`). Leave empty for CPU-only. |
-| `destination` | string | **Yes** | `ollama` | Directory path within the volume for Ollama data (no leading slash) |
-| `install_volume` | shared-volume | **Yes** | — | Shared persistent volume to store Ollama models and data |
-| `enable_node_port` | boolean | **Yes** | `false` | Expose a NodePort for the Ollama API (allows access from outside the cluster). You will need to retrieve the assigned port from Kubernetes directly. |
+| Field | Details |
+|-------|---------|
+| `gpu` | **boolean** · Required · Default: `false`<br>Enable GPU acceleration for model inference |
+| `runtime` | **string** · Optional · Default: `""`<br>Container runtime for GPU access (e.g. `nvidia`). Leave empty for CPU-only. |
+| `destination` | **string** · Required · Default: `ollama`<br>Directory path within the volume for Ollama data (no leading slash) |
+| `install_volume` | **shared-volume** · Required<br>Shared persistent volume to store Ollama models and data |
+| `enable_node_port` | **boolean** · Required · Default: `false`<br>Expose a NodePort for the Ollama API (allows access from outside the cluster). You will need to retrieve the assigned port from Kubernetes directly. |
 
 ---
 

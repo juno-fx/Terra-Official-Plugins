@@ -3,7 +3,7 @@
 ![Miniconda](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/miniconda/scripts/assets/logo.png)
 
 **Category:** Development
-**Type:** Namespaced Plugin
+**Type:** Software Installer
 **Tags:** `miniconda` · `python`
 
 ---
@@ -14,9 +14,9 @@ The Miniconda plugin provides a lightweight, self-contained Python environment m
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Namespaced Plugin** — Installed into your project namespace. This plugin runs an installer Job that downloads Miniconda, installs it to the target volume, and creates the configured conda environment.
+**Software Installer** — When added to a project, Terra downloads Miniconda, installs it to the shared volume you choose, and creates the configured conda environment with the packages you specify. The environment is then available to all workstations in the project that mount the volume.
 
 ---
 
@@ -41,14 +41,14 @@ The Miniconda plugin provides a lightweight, self-contained Python environment m
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `install_volume` | shared-volume | **Yes** | — | Shared persistent volume to install Miniconda into |
-| `destination` | string | No | `/miniconda` | Directory path within the volume for the Miniconda installation |
-| `environment_name` | string | **Yes** | `base` | Name of the conda environment to create |
-| `python_version` | string | **Yes** | `3.12` | Python version to use in the conda environment (e.g. `3.10`, `3.11`, `3.12`) |
-| `packages` | string | No | `""` | Space-separated list of additional conda/pip packages to install (e.g. `numpy pandas scikit-learn`) |
-| `source_url` | string | No | Miniconda official URL | Custom URL to the Miniconda installer script (overrides the default download source) |
+| Field | Details |
+|-------|---------|
+| `install_volume` | **shared-volume** · Required<br>Shared persistent volume to install Miniconda into |
+| `destination` | **string** · Optional · Default: `/miniconda`<br>Directory path within the volume for the Miniconda installation |
+| `environment_name` | **string** · Required · Default: `base`<br>Name of the conda environment to create |
+| `python_version` | **string** · Required · Default: `3.12`<br>Python version to use in the conda environment (e.g. `3.10`, `3.11`, `3.12`) |
+| `packages` | **string** · Optional · Default: `""`<br>Space-separated list of additional conda/pip packages to install (e.g. `numpy pandas scikit-learn`) |
+| `source_url` | **string** · Optional<br>Custom URL to the Miniconda installer script (overrides the default download source) |
 
 ---
 

@@ -3,7 +3,7 @@
 ![PyCharm](https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/pycharm/scripts/assets/pycharm.png?raw=true)
 
 **Category:** Software Development
-**Type:** Namespaced Plugin
+**Type:** Software Installer
 **Tags:** `pycharm` · `ide` · `python` · `development` · `jetbrains`
 
 ---
@@ -14,9 +14,9 @@ PyCharm is the professional Python IDE from JetBrains, offering intelligent code
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Namespaced Plugin** — Installed into your project namespace. This plugin runs an installer Job that downloads and extracts PyCharm to the configured shared volume.
+**Software Installer** — When added to a project, Terra downloads and extracts PyCharm to the shared volume you specify. Once complete, PyCharm is available at that path for every workstation in the project that mounts the volume.
 
 ---
 
@@ -42,11 +42,11 @@ PyCharm is the professional Python IDE from JetBrains, offering intelligent code
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `version` | string | **Yes** | `2025.2` | PyCharm version to install (e.g. `2025.2`, `2024.3`) |
-| `install_volume` | shared-volume | **Yes** | — | Shared persistent volume to install PyCharm into |
-| `destination` | string | No | `/pycharm` | Directory path within the volume for the PyCharm installation |
+| Field | Details |
+|-------|---------|
+| `version` | **string** · Required · Default: `2025.2`<br>PyCharm version to install (e.g. `2025.2`, `2024.3`) |
+| `install_volume` | **shared-volume** · Required<br>Shared persistent volume to install PyCharm into |
+| `destination` | **string** · Optional · Default: `/pycharm`<br>Directory path within the volume for the PyCharm installation |
 
 ---
 

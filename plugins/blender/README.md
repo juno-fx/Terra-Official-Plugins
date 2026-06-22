@@ -3,7 +3,7 @@
 ![Blender](https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/blender/scripts/assets/blender.png?raw=true)
 
 **Category:** CG
-**Type:** Namespaced Plugin
+**Type:** Software Installer
 **Tags:** `blender` · `vfx` · `usd` · `animation` · `3d` · `simulation` · `rendering` · `effects` · `modeling`
 
 ---
@@ -14,9 +14,9 @@ Blender is a free and open-source 3D creation suite licensed under the GNU GPL. 
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Namespaced Plugin** — Installed into your project namespace. This plugin runs an installer Job that places Blender into a shared volume accessible to project workstations.
+**Software Installer** — When added to a project, Terra runs an installer that downloads and extracts Blender to the shared volume you specify. Once complete, Blender is available at that path for every workstation in the project that mounts the volume.
 
 ---
 
@@ -35,7 +35,7 @@ Blender is a free and open-source 3D creation suite licensed under the GNU GPL. 
 4. Fill in the configuration fields below
 5. Click **Confirm** to deploy
 
-Terra will deploy an installer Job into your project namespace that downloads and extracts Blender to the target volume.
+Terra will download and extract Blender to the target volume.
 
 ---
 
@@ -43,11 +43,11 @@ Terra will deploy an installer Job into your project namespace that downloads an
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `version` | string | **Yes** | — | Blender version to install (e.g. `4.5.1`) |
-| `install_volume` | shared-volume | **Yes** | — | The shared persistent volume to install Blender into |
-| `destination` | string | No | `/blender` | Directory path within the volume where Blender will be installed |
+| Field | Details |
+|-------|---------|
+| `version` | **string** · Required<br>Blender version to install (e.g. `4.5.1`) |
+| `install_volume` | **shared-volume** · Required<br>The shared persistent volume to install Blender into |
+| `destination` | **string** · Optional · Default: `/blender`<br>Directory path within the volume where Blender will be installed |
 
 ---
 

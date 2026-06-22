@@ -3,7 +3,7 @@
 ![Git Loader](https://git-scm.com/images/logos/downloads/Git-Icon-1788C.png)
 
 **Category:** Utility
-**Type:** Namespaced Plugin
+**Type:** Software Installer
 **Tags:** `git` · `loader` · `repository` · `clone`
 
 ---
@@ -14,9 +14,9 @@ The Git Loader plugin clones a Git repository from any Git source into a shared 
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Namespaced Plugin** — Installed into your project namespace. This plugin runs a one-time Job that clones the specified repository into the configured volume and path.
+**Software Installer** — When added to a project, Terra clones the specified Git repository into the shared volume and path you configure. This runs once at install time; the files are then available to all workstations in the project that mount the volume.
 
 ---
 
@@ -41,12 +41,12 @@ The Git Loader plugin clones a Git repository from any Git source into a shared 
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `install_volume` | shared-volume | **Yes** | — | Shared persistent volume to clone the repository into |
-| `url` | string | **Yes** | — | Git repository URL (e.g. `https://github.com/org/repo.git`) |
-| `ref` | string | **Yes** | — | Git reference to checkout — branch name, tag, or commit SHA |
-| `destination` | string | **Yes** | — | Directory path within the volume where the repo will be cloned |
+| Field | Details |
+|-------|---------|
+| `install_volume` | **shared-volume** · Required<br>Shared persistent volume to clone the repository into |
+| `url` | **string** · Required<br>Git repository URL (e.g. `https://github.com/org/repo.git`) |
+| `ref` | **string** · Required<br>Git reference to checkout — branch name, tag, or commit SHA |
+| `destination` | **string** · Required<br>Directory path within the volume where the repo will be cloned |
 
 ---
 

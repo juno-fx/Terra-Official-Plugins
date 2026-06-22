@@ -3,7 +3,7 @@
 ![Twingate](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/twingate/scripts/assets/twingate.png)
 
 **Category:** Networking
-**Type:** Cluster-Level Plugin
+**Type:** Cluster Service
 **Tags:** `zero-trust` · `vpn` · `twingate`
 **Editable:** Yes
 
@@ -17,9 +17,9 @@ For setup instructions, see the [Twingate Kubernetes Operator Getting Started gu
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Cluster-Level Plugin** — Installed into the `argocd` namespace. The Twingate Operator manages cluster-wide resources and communication with the Twingate control plane.
+**Cluster Service** — Installed once per cluster by an administrator. Once active, the cluster connects to your Twingate network and cluster services can be accessed by authorised users without exposing them publicly.
 
 ---
 
@@ -49,11 +49,11 @@ After deployment, follow the [Twingate operator guide](https://github.com/Twinga
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `api_key` | string | **Yes** | — | Twingate API Key from the admin console |
-| `network` | string | **Yes** | — | Twingate Network Slug (visible in the admin console URL) |
-| `remote_network_id` | string | **Yes** | — | Twingate Remote Network ID (from the URL when selecting a Remote Network) |
+| Field | Details |
+|-------|---------|
+| `api_key` | **string** · Required<br>Twingate API Key from the admin console |
+| `network` | **string** · Required<br>Twingate Network Slug (visible in the admin console URL) |
+| `remote_network_id` | **string** · Required<br>Twingate Remote Network ID (from the URL when selecting a Remote Network) |
 
 ---
 

@@ -3,7 +3,7 @@
 ![Certificate Manager](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/cert-manager/assets/logo.png)
 
 **Category:** Infrastructure
-**Type:** Cluster-Level Plugin
+**Type:** Cluster Service
 **Tags:** `cluster-level`
 
 ---
@@ -16,9 +16,9 @@ For a full list of supported issuers, see the [cert-manager documentation](https
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Cluster-Level Plugin** — Installed into the `argocd` namespace. cert-manager manages cluster-wide `CustomResourceDefinitions` and operates across all namespaces in the cluster.
+**Cluster Service** — Installed once per cluster by an administrator. Once active, any plugin or workload in the cluster can request a TLS certificate automatically — no per-project setup needed.
 
 ---
 
@@ -43,9 +43,9 @@ For a full list of supported issuers, see the [cert-manager documentation](https
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `chart_version` | string | **Yes** | `v1.19.1` | The cert-manager Helm chart version to install |
+| Field | Details |
+|-------|---------|
+| `chart_version` | **string** · Required · Default: `v1.19.1`<br>The cert-manager Helm chart version to install |
 
 ---
 

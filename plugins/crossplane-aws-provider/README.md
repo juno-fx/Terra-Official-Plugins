@@ -3,7 +3,7 @@
 ![Crossplane AWS Provider](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/crossplane/assets/logo.png)
 
 **Category:** Cloud Management
-**Type:** Cluster-Level Plugin
+**Type:** Cluster Service
 **Tags:** `crossplane` · `cloud` · `control-plane` · `AWS`
 **Editable:** Yes
 
@@ -17,9 +17,9 @@ This plugin requires **Crossplane** to be installed first. You will also need an
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Cluster-Level Plugin** — Installed into the `argocd` namespace. The AWS Provider installs cluster-scoped CRDs for all supported AWS resource types and connects to AWS using the configured secret.
+**Cluster Service** — Installed once per cluster by an administrator. Once active, Crossplane can provision and manage AWS resources on behalf of the whole cluster using the credentials you provide.
 
 ---
 
@@ -57,12 +57,12 @@ See the [Kubernetes Secrets documentation](https://kubernetes.io/docs/tasks/conf
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `version` | string | No | `v0.55.0` | Version of the Crossplane AWS Provider to install |
-| `secret_namespace` | string | **Yes** | — | Namespace where your AWS credentials secret is stored |
-| `secret_name` | string | **Yes** | — | Name of the Kubernetes Secret containing AWS credentials |
-| `secret_key` | string | **Yes** | — | Key within the secret that holds the credentials file content |
+| Field | Details |
+|-------|---------|
+| `version` | **string** · Optional · Default: `v0.55.0`<br>Version of the Crossplane AWS Provider to install |
+| `secret_namespace` | **string** · Required<br>Namespace where your AWS credentials secret is stored |
+| `secret_name` | **string** · Required<br>Name of the Kubernetes Secret containing AWS credentials |
+| `secret_key` | **string** · Required<br>Key within the secret that holds the credentials file content |
 
 ---
 

@@ -14,9 +14,9 @@ LSIO Webtop is a containerized desktop workstation built on [LinuxServer.io](htt
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Workload Template** — Installed into the `argocd` namespace. At install time, a schema ConfigMap is created that Genesis reads to show the LSIO Webtop workload type in the workload creation UI. Individual Webtop instances are launched by Kuiper when users create workloads.
+**Workload Template** — Adds the LSIO Webtop desktop type to Genesis. Once installed, users can launch their own browser-accessible Linux desktop directly from the Genesis workload screen. Each instance is isolated and independent.
 
 ---
 
@@ -48,13 +48,13 @@ No install-time configuration is required for this plugin.
 
 These fields are filled in when launching a Webtop workload in **Genesis**:
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `gpu` | boolean | **Yes** | — | Enable GPU passthrough for the workstation |
-| `registry` | string | **Yes** | `lscr.io/linuxserver` | Container registry for the Webtop image |
-| `repo` | string | **Yes** | `chrome` | LinuxServer.io image to launch (e.g. `chrome`, `firefox`, `ubuntu-mate`, `kde`) |
-| `tag` | string | **Yes** | `latest` | Image tag |
-| `publicAccess` | boolean | **Yes** | `false` | Disable authentication and allow unauthenticated access |
+| Field | Details |
+|-------|---------|
+| `gpu` | **boolean** · Required<br>Enable GPU passthrough for the workstation |
+| `registry` | **string** · Required · Default: `lscr.io/linuxserver`<br>Container registry for the Webtop image |
+| `repo` | **string** · Required · Default: `chrome`<br>LinuxServer.io image to launch (e.g. `chrome`, `firefox`, `ubuntu-mate`, `kde`) |
+| `tag` | **string** · Required · Default: `latest`<br>Image tag |
+| `publicAccess` | **boolean** · Required · Default: `false`<br>Disable authentication and allow unauthenticated access |
 
 ---
 

@@ -11,15 +11,15 @@
 
 ## Overview
 
-Crossplane EC2 is a workload template that lets you launch and manage AWS EC2 instances directly from the Genesis workload UI. It installs a Crossplane Composition and XRD (Composite Resource Definition) that Kuiper uses to provision EC2 instances on demand — giving cloud VMs the same lifecycle management as containerized workstations. Once launched, Kuiper tracks the EC2 instance and automatically exposes its endpoints in the Hubble UI.
+Crossplane EC2 is a workload template that lets you launch and manage AWS EC2 instances directly from the Genesis workload screen — giving cloud VMs the same lifecycle management as containerised workstations. Once launched, endpoints like SSH and RDP are automatically discovered and surfaced in Hubble.
 
 This plugin requires **Crossplane** and **Crossplane AWS Provider** to be installed first.
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Workload Template** — Installed into the `argocd` namespace. At install time, a schema ConfigMap is created that Genesis reads to show EC2 workload options in the workload creation UI. EC2 instances are provisioned when a user launches a workload — not at plugin install time.
+**Workload Template** — Adds an EC2 workload type to Genesis. Once installed, users can launch AWS EC2 instances directly from the Genesis workload screen. Each instance is provisioned on demand and tracked in Hubble like any other workload.
 
 ---
 
@@ -54,21 +54,21 @@ No install-time configuration is required for this plugin.
 
 These fields are filled in when launching an EC2 workload in **Genesis**:
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `ami_image_id` | string | **Yes** | — | AWS AMI image ID for the EC2 instance |
-| `security_group_ids` | list | **Yes** | — | List of AWS security group IDs to attach |
-| `block_device_mappings` | list | **Yes** | — | Block devices to attach (mount path + size in GB) |
-| `subnet_id` | string | **Yes** | — | AWS Subnet ID for the instance |
-| `instance_type` | string | **Yes** | `t3.micro` | EC2 instance type (e.g. `t3.medium`, `m5.large`) |
-| `delete_on_termination` | boolean | **Yes** | `true` | Whether to delete EBS volumes when the instance is terminated |
-| `region` | string | **Yes** | — | AWS region to launch the instance in (e.g. `us-east-1`) |
-| `provider_config_ref` | string | **Yes** | `aws-provider-argocd-provider-config` | Name of the Crossplane ProviderConfig to use |
+| Field | Details |
+|-------|---------|
+| `ami_image_id` | **string** · Required<br>AWS AMI image ID for the EC2 instance |
+| `security_group_ids` | **list** · Required<br>List of AWS security group IDs to attach |
+| `block_device_mappings` | **list** · Required<br>Block devices to attach (mount path + size in GB) |
+| `subnet_id` | **string** · Required<br>AWS Subnet ID for the instance |
+| `instance_type` | **string** · Required · Default: `t3.micro`<br>EC2 instance type (e.g. `t3.medium`, `m5.large`) |
+| `delete_on_termination` | **boolean** · Required · Default: `true`<br>Whether to delete EBS volumes when the instance is terminated |
+| `region` | **string** · Required<br>AWS region to launch the instance in (e.g. `us-east-1`) |
+| `provider_config_ref` | **string** · Required · Default: `aws-provider-argocd-provider-config`<br>Name of the Crossplane ProviderConfig to use |
 
 ---
 
 ## Notes
 
-- EC2 instances launched by this plugin are tracked by Kuiper; stopping a workload in Genesis will terminate the EC2 instance
+- EC2 instances are tracked as workloads — stopping a workload in Genesis will terminate the EC2 instance
 - The `delete_on_termination` field controls whether EBS volumes are destroyed with the instance — set to `false` to preserve data across launches
-- Network endpoints (SSH, RDP, etc.) are automatically discovered by Kuiper once the EC2 instance is running and surfaced in Hubble
+- Network endpoints (SSH, RDP, etc.) are automatically discovered once the EC2 instance is running and surfaced in Hubble

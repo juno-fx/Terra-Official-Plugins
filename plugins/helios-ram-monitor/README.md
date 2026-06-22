@@ -3,7 +3,7 @@
 ![Helios RAM Monitor](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios/scripts/assets/helios-icon.png)
 
 **Category:** Helios Plugin
-**Type:** Namespaced Plugin
+**Type:** Workstation Add-on
 **Tags:** `ram` · `desktop` · `customization`
 
 ---
@@ -14,16 +14,16 @@ Helios RAM Monitor is a Helios workstation add-on that monitors host server memo
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Namespaced Plugin** — Installed into your project namespace. This plugin installs the RAM monitoring scripts as a Helios plugin that attaches to Helios workstations running in the same project.
+**Workstation Add-on** — When added to a project, this plugin automatically attaches to every Helios workstation launched in that project. No extra steps are needed — install it once and all new Helios workstations will display RAM warnings when the host is under memory pressure.
 
 ---
 
 ## Prerequisites
 
 - **Helios** workload template installed in the cluster
-- Helios workstations must be launched in the same project namespace where this plugin is installed
+- Helios workstations must be launched in the same project where this plugin is installed
 
 ---
 

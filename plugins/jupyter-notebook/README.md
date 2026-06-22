@@ -16,9 +16,9 @@ JupyterLab is the latest web-based interactive development environment for noteb
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Workload Template** — Installed into the `argocd` namespace. At install time, a schema ConfigMap is created that Genesis reads to show the JupyterLab workload type in the workload creation UI. Individual Jupyter servers are launched by Kuiper when users create workloads.
+**Workload Template** — Adds the JupyterLab notebook type to Genesis. Once installed, users can launch their own personal JupyterLab server directly from the Genesis workload screen. Each instance is isolated and independent.
 
 ---
 
@@ -50,12 +50,12 @@ No install-time configuration is required for this plugin.
 
 These fields are filled in when launching a JupyterLab workload in **Genesis**:
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `registry` | string | **Yes** | `quay.io/jupyter` | Container registry for the Jupyter image |
-| `repo` | string | **Yes** | `datascience-notebook` | Jupyter image repository (must be a Jupyter docker-stacks compatible image) |
-| `tag` | string | **Yes** | `lab-4.4.9` | Image tag (version of JupyterLab) |
-| `gpu` | boolean | **Yes** | — | Enable GPU access for the notebook server |
+| Field | Details |
+|-------|---------|
+| `registry` | **string** · Required · Default: `quay.io/jupyter`<br>Container registry for the Jupyter image |
+| `repo` | **string** · Required · Default: `datascience-notebook`<br>Jupyter image repository (must be a Jupyter docker-stacks compatible image) |
+| `tag` | **string** · Required · Default: `lab-4.4.9`<br>Image tag (version of JupyterLab) |
+| `gpu` | **boolean** · Required<br>Enable GPU access for the notebook server |
 
 ---
 

@@ -3,7 +3,7 @@
 ![Crossplane](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/crossplane/assets/logo.png)
 
 **Category:** Cloud Management
-**Type:** Cluster-Level Plugin
+**Type:** Cluster Service
 **Tags:** `crossplane` · `cloud` · `control-plane`
 
 ---
@@ -14,9 +14,9 @@ Crossplane is an open-source Kubernetes add-on that transforms your cluster into
 
 ---
 
-## Plugin Type
+## How It Works
 
-**Cluster-Level Plugin** — Installed into the `argocd` namespace. Crossplane installs cluster-scoped `CustomResourceDefinitions` and controllers that manage cloud resources across all projects.
+**Cluster Service** — Installed once per cluster by an administrator. Once active, Crossplane enables cloud resource provisioning for the whole cluster. Other Crossplane provider plugins (like the AWS Provider) build on top of it.
 
 ---
 
@@ -41,9 +41,9 @@ Crossplane is an open-source Kubernetes add-on that transforms your cluster into
 
 ### Install-Time Fields
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `version` | string | No | `v2.1.4` | Version of Crossplane to install |
+| Field | Details |
+|-------|---------|
+| `version` | **string** · Optional · Default: `v2.1.4`<br>Version of Crossplane to install |
 
 ---
 
