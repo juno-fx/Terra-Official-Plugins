@@ -6,6 +6,7 @@
 **Type:** Cluster Service
 **Tags:** `kubevirt` · `kubernetes` · `virtualization` · `vm` · `virtual-machine`
 **Editable:** Yes
+**Bundle:** KubeVirt Bundle
 
 > **Alpha:** KubeVirt support is currently in Alpha. Use at your own risk.
 
@@ -54,6 +55,7 @@ KubeVirt extends Kubernetes to support running virtual machines (VMs) alongside 
 
 ## Notes
 
+- This plugin is included in the **KubeVirt Bundle** — you can install KubeVirt and the Generic Ephemeral VM workload template together in one step from Terra
 - KubeVirt is **Alpha** in this plugin — production deployments should validate behaviour in a staging environment first
 - This plugin is **editable** — you can update the version and nested virtualization setting after install via Terra
 - Nested virtualization must be supported and enabled at the host hypervisor level; enabling this flag without host support will cause VMs to fail to start

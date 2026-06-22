@@ -5,6 +5,7 @@
 **Category:** Workstations
 **Type:** Workload Template
 **Tags:** `kasm` · `vdi` · `juno`
+**Bundle:** Orion Essentials
 
 ---
 
@@ -63,6 +64,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 
 ## Notes
 
+- This plugin is included in the **Orion Essentials** bundle — you can install Helios, the Prometheus Stack, and the ArgoCD Dashboard together in one step from Terra
 - Setting `publicAccess` to `true` removes authentication from the workstation endpoint — use only in trusted network environments
 - The `tag` field controls the OS and desktop flavour of the workstation; consult the Juno documentation for available image tags
 - Helios workstations are scheduled on nodes labelled `juno-innovations.com/workstation: "true"` — ensure your cluster has workstation nodes configured

@@ -5,6 +5,7 @@
 **Category:** Virtual Machine
 **Type:** Workload Template
 **Tags:** `virtualization` · `virtual-machine` · `kubevirt`
+**Bundle:** KubeVirt Bundle
 
 > **Alpha:** This plugin is currently in Alpha. Use at your own risk.
 
@@ -70,6 +71,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 
 ## Notes
 
+- This plugin is included in the **KubeVirt Bundle** — you can install KubeVirt and the Generic Ephemeral VM workload template together in one step from Terra
 - VMs are **ephemeral** — data written inside the VM does not persist after the workload is stopped unless you attach external storage
 - Windows 11 requires `tpm: true` and `efi: true` (and `secure_boot: true` is recommended)
 - GPU passthrough gives the VM exclusive access to the GPU while it's running — other workloads will not be able to use that GPU simultaneously

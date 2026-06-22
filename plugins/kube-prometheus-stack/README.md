@@ -5,6 +5,7 @@
 **Category:** Monitoring
 **Type:** Cluster Service
 **Tags:** `prometheus` · `grafana` · `alertmanager` · `dashboard`
+**Bundle:** Orion Essentials
 
 ---
 
@@ -51,9 +52,20 @@ The Kubernetes Prometheus Stack deploys the full Prometheus monitoring ecosystem
 
 ---
 
+## Juno Metrics Gatherer
+
+Installing this plugin unlocks the **Juno Metrics Gatherer** — an Orion monitoring component that collects resource utilisation data across your running workloads and surfaces it in Grafana automatically.
+
+Once the Prometheus Stack is installed, the Metrics Gatherer populates a built-in **Workload Monitoring** dashboard in Grafana, giving administrators visibility into cluster performance and resource consumption across projects and time periods. This dashboard is also surfaced directly in the Genesis admin console.
+
+Full documentation: [Juno Metrics Gatherer](https://juno-fx.github.io/Orion-Documentation/latest/metricsgatherer/intro/)
+
+---
+
 ## Notes
 
+- This plugin is included in the **Orion Essentials** bundle — you can install the Prometheus Stack, Helios, and the ArgoCD Dashboard together in one step from Terra
 - The Grafana admin credentials set here are the initial login credentials — you can create additional users within Grafana after installation
 - Prometheus scrapes metrics from all namespaces and includes pre-built Kubernetes dashboards for nodes, pods, deployments, and cluster health
-- Alertmanager can be configured via Grafana or PrometheusRule CRDs to send alerts to Slack, PagerDuty, email, and other destinations
+- Alertmanager can be configured within Grafana to send alerts to Slack, PagerDuty, email, and other destinations
 - This is a resource-intensive stack — monitor cluster node capacity before installing on smaller clusters

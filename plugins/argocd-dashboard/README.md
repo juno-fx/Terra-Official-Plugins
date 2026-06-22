@@ -5,6 +5,7 @@
 **Category:** Infrastructure
 **Type:** Cluster Service
 **Tags:** `argocd` · `ingress` · `ingress-nginx` · `dashboard`
+**Bundle:** Orion Essentials
 
 ---
 
@@ -55,6 +56,7 @@ Terra will activate the ArgoCD dashboard for your cluster.
 
 ## Notes
 
+- This plugin is included in the **Orion Essentials** bundle — you can install the ArgoCD Dashboard, Helios, and the Prometheus Stack together in one step from Terra
 - The dashboard is accessible at `https://<host><prefix>` — for example, `https://genesis.example.com/argocd`
 - Changing the `prefix` is rarely necessary; the default `/argocd` works in most deployments
 - Authentication is handled by Genesis; no additional login is required for ArgoCD via this plugin
