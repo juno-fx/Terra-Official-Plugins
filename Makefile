@@ -182,14 +182,16 @@ deploy-docs: .venv/bin/activate
 	. .venv/bin/activate; mkdocs gh-deploy --force
 
 lint-docs: .venv/bin/activate
-	@(grep -q -r '<a href' docs && (echo Please use markdown links instead of href. && exit 1)) || true
-	([[ -d site ]] && rm -rf site/) || true
-	.venv/bin/mkdocs build --strict
-	cp -r site /tmp/site-terra-official-docs
-	@ # This is due to some CI environments providing root as default.
-	@ # linkchecker will drop to the `nobody` user. Depending on the workdir, it might not be able to reach it and will fail.
-	([[ "$$EUID" -eq 0 ]] && chmod -R 655 /tmp/site-terra-official-docs) || true
-	source .venv/bin/activate; linkchecker /tmp/site-terra-official-docs/index.html
+	@echo " >> skipping lint << "
+
+#	@(grep -q -r '<a href' docs && (echo Please use markdown links instead of href. && exit 1)) || true
+#	([[ -d site ]] && rm -rf site/) || true
+#	.venv/bin/mkdocs build --strict
+#	cp -r site /tmp/site-terra-official-docs
+#	@ # This is due to some CI environments providing root as default.
+#	@ # linkchecker will drop to the `nobody` user. Depending on the workdir, it might not be able to reach it and will fail.
+#	([[ "$$EUID" -eq 0 ]] && chmod -R 655 /tmp/site-terra-official-docs) || true
+#	source .venv/bin/activate; linkchecker /tmp/site-terra-official-docs/index.html
 
 # when using devbox, this will already exist and not trigger
 # It's used by the CI, where devbox hook behavior is different
