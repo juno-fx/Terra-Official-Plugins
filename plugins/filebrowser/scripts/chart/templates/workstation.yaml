@@ -6,7 +6,8 @@ metadata:
     kuiper.juno-innovations.com/actions: "stop"
     juno-innovations.com/workload: "Application"
   labels:
-    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+    juno-innovations.com/workstation: "{{ .Values.name }}"
+
 
 spec:
   replicas: 1
@@ -16,7 +17,7 @@ spec:
   template:
     metadata:
       labels:
-        kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+        juno-innovations.com/workstation: "{{ .Values.name }}"
       annotations:
         juno-innovations.com/workload: "Application"
     spec:
