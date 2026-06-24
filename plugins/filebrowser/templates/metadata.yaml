@@ -39,7 +39,7 @@ data:
     - name: dataPersistent
       description: "Enable persistent storage for uploaded files and database. When enabled, creates a PVC. Default: false (ephemeral emptyDir)."
       required: false
-      type: bool
+      type: boolean
       default: "false"
     - name: storageClass
       description: "Storage class for the data PVC. Leave empty for cluster default."
