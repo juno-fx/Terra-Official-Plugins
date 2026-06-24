@@ -77,12 +77,16 @@ spec:
               mountPath: /config
             - name: filebrowser-data
               mountPath: /data
+            - name: tmp-cache
+              mountPath: /tmp/cache
             {{- if .Values.volumeMounts }}
             {{- toYaml .Values.volumeMounts | nindent 12 }}
             {{- end }}
 
       volumes:
         - name: config
+          emptyDir: {}
+        - name: tmp-cache
           emptyDir: {}
         - name: filebrowser-data
           {{- if .Values.dataPersistent }}
