@@ -55,3 +55,6 @@ data:
       required: false
       type: string
       default: "/data"
+    - name: icon
+      default: https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/filebrowser/scripts/assets/icon.png?raw=true
+
