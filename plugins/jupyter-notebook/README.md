@@ -1,6 +1,6 @@
 # JupyterLab Notebook
 
-<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/jupyter-notebook/scripts/assets/logo.png" alt="JupyterLab" width="80" />
+![JupyterLab](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/jupyter-notebook/scripts/assets/logo.png)
 
 **Category:** Data Science
 **Type:** Workload Template

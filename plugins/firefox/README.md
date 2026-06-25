@@ -1,6 +1,6 @@
 # Firefox
 
-<img src="https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/firefox/scripts/assets/firefox.png?raw=true" alt="Firefox" width="80" />
+![Firefox](https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/firefox/scripts/assets/firefox.png?raw=true)
 
 **Category:** Web
 **Type:** Software Installer

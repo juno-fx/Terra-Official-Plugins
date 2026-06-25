@@ -1,6 +1,6 @@
 # Helios Auto Shutdown
 
-<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios/scripts/assets/helios-icon.png" alt="Helios Auto Shutdown" width="80" />
+![Helios Auto Shutdown](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios/scripts/assets/helios-icon.png)
 
 **Category:** Helios Plugin
 **Type:** Workstation Add-on

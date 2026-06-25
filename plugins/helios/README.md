@@ -1,6 +1,6 @@
 # Helios
 
-<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios/scripts/assets/helios-icon.png" alt="Helios" width="80" />
+![Helios](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios/scripts/assets/helios-icon.png)
 
 **Category:** Workstations
 **Type:** Workload Template

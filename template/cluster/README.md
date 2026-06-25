@@ -1,6 +1,6 @@
 # PLUGIN
 
-<img src="" alt="PLUGIN" width="80" />
+![PLUGIN]()
 
 **Category:** <!-- TODO: e.g. Hardware · Storage · Cloud Management · Networking -->
 **Type:** Cluster Service
