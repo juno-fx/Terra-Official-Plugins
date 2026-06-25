@@ -1,6 +1,6 @@
 # Houdini
 
-<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/houdini/scripts/assets/houdini.png" alt="Houdini" width="80" />
+![Houdini](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/houdini/scripts/assets/houdini.png)
 
 **Category:** CG
 **Type:** Software Installer

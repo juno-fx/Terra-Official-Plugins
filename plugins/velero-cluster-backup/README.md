@@ -1,6 +1,6 @@
 # Velero Cluster Backup
 
-<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/velero/assets/logo.png" alt="Velero Cluster Backup" width="80" />
+![Velero Cluster Backup](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/velero/assets/logo.png)
 
 **Category:** Infrastructure
 **Type:** Cluster Service

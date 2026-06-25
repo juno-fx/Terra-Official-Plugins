@@ -1,6 +1,6 @@
 # KubeVirt
 
-<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/kubevirt/scripts/assets/logo.png" alt="KubeVirt" width="80" />
+![KubeVirt](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/kubevirt/scripts/assets/logo.png)
 
 **Category:** Virtualization
 **Type:** Cluster Service

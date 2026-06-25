@@ -1,6 +1,6 @@
 # Autodesk Flow Production Tracking
 
-<img src="https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/flow-production-tracking/scripts/assets/flow.png?raw=true" alt="Autodesk Flow Production Tracking" width="80" />
+![Autodesk Flow Production Tracking](https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/flow-production-tracking/scripts/assets/flow.png?raw=true)
 
 **Category:** Project Management
 **Type:** Software Installer

@@ -1,6 +1,6 @@
 # EmberGen
 
-<img src="https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/embergen/scripts/assets/embergen.png?raw=true" alt="EmberGen" width="80" />
+![EmberGen](https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/embergen/scripts/assets/embergen.png?raw=true)
 
 **Category:** CG
 **Type:** Software Installer

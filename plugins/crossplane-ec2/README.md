@@ -1,6 +1,6 @@
 # Crossplane EC2
 
-<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/crossplane-ec2/scripts/assets/logo.png" alt="Crossplane EC2" width="80" />
+![Crossplane EC2](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/crossplane-ec2/scripts/assets/logo.png)
 
 **Category:** Virtual Machine
 **Type:** Workload Template

@@ -1,6 +1,6 @@
 # Deadline 10
 
-<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/deadline10/scripts/assets/deadline10client.png" alt="Deadline 10" width="80" />
+![Deadline 10](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/deadline10/scripts/assets/deadline10client.png)
 
 **Category:** Rendering Management
 **Type:** Software Installer

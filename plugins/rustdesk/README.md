@@ -1,6 +1,6 @@
 # RustDesk
 
-<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/rustdesk/scripts/assets/rustdesk.png" alt="RustDesk" width="80" />
+![RustDesk](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/rustdesk/scripts/assets/rustdesk.png)
 
 **Category:** VDI
 **Type:** Software Installer

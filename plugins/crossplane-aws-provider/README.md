@@ -1,6 +1,6 @@
 # Crossplane AWS Provider
 
-<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/crossplane/assets/logo.png" alt="Crossplane AWS Provider" width="80" />
+![Crossplane AWS Provider](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/crossplane/assets/logo.png)
 
 **Category:** Cloud Management
 **Type:** Cluster Service

@@ -1,6 +1,6 @@
 # Wetty
 
-<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/wetty/scripts/assets/logo.png" alt="Wetty" width="80" />
+![Wetty](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/wetty/scripts/assets/logo.png)
 
 **Category:** Development
 **Type:** Workload Template

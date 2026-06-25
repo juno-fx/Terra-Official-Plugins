@@ -1,6 +1,6 @@
 # Miniconda
 
-<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/miniconda/scripts/assets/logo.png" alt="Miniconda" width="80" />
+![Miniconda](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/miniconda/scripts/assets/logo.png)
 
 **Category:** Development
 **Type:** Software Installer

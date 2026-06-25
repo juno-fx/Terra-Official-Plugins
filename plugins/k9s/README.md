@@ -1,6 +1,6 @@
 # k9s — Kubernetes TUI
 
-<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/k9s/assets/logo.png" alt="k9s" width="80" />
+![k9s](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/k9s/assets/logo.png)
 
 **Category:** Development
 **Type:** Workload Template

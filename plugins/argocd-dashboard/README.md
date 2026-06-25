@@ -1,6 +1,6 @@
 # ArgoCD Dashboard
 
-<img src="https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/argocd-dashboard/assets/logo.png?raw=true" alt="ArgoCD Dashboard" width="80" />
+![ArgoCD Dashboard](https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/argocd-dashboard/assets/logo.png?raw=true)
 
 **Category:** Infrastructure
 **Type:** Cluster Service

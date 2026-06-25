@@ -1,6 +1,6 @@
 # Web IDE
 
-<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/web-ide/scripts/assets/logo.png" alt="Web IDE" width="80" />
+![Web IDE](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/web-ide/scripts/assets/logo.png)
 
 **Category:** Development
 **Type:** Workload Template

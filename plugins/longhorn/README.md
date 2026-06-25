@@ -1,6 +1,6 @@
 # Longhorn Storage
 
-<img src="https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/longhorn/assets/logo.png" alt="Longhorn" width="80" />
+![Longhorn](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/longhorn/assets/logo.png)
 
 **Category:** Storage
 **Type:** Cluster Service
