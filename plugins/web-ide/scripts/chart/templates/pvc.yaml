@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: "{{ .Values.name }}-config"
+  labels:
+    juno-innovations.com/app: "web-ide"
+    juno-innovations.com/workstation: "{{ .Values.name }}"
+    juno-innovations.com/owner: "{{ .Values.name }}"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.persistence_size }}
+  storageClassName: {{ .Values.persistence_storage_class }}
