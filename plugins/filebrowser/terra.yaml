@@ -1,0 +1,11 @@
+resource_id: filebrowser
+name: File Browser
+icon: https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/filebrowser/scripts/assets/icon.png?raw=true
+category: Workstations
+description: "Web-based file manager with drag-and-drop upload, configurable root path, and optional persistent storage. Browse workspace volumes or the full container filesystem."
+tags:
+  - cluster-level
+  - file-management
+  - storage
+fields: []
+compatibility: genesis-deployment>=3.0.2,orion-deployment>=3.1.0

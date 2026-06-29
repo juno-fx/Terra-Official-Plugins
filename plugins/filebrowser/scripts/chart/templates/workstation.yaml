@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{ .Values.name }}"
+  annotations:
+    kuiper.juno-innovations.com/actions: "stop"
+    juno-innovations.com/workload: "Application"
+  labels:
+    juno-innovations.com/workstation: "{{ .Values.name }}"
+
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      juno-innovations.com/workstation: "{{ .Values.name }}"
+  template:
+    metadata:
+      labels:
+        juno-innovations.com/workstation: "{{ .Values.name }}"
+      annotations:
+        juno-innovations.com/workload: "Application"
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        fsGroup: {{ .Values.guid }}
+      hostname: "{{ .Values.name }}"
+
+      {{- if .Values.pullSecret }}
+      imagePullSecrets:
+        - name: "{{ .Values.pullSecret }}"
+      {{- end }}
+
+      containers:
+        - name: filebrowser
+          image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              memory: "{{ .Values.memory }}"
+              cpu: "{{ .Values.cpu }}"
+            {{- if or .Values.memoryLimit .Values.cpuLimit }}
+            limits:
+              {{- if .Values.cpuLimit }}
+              cpu: "{{ .Values.cpuLimit }}"
+              {{- end }}
+              {{- if .Values.memoryLimit }}
+              memory: "{{ .Values.memoryLimit }}"
+              {{- end }}
+            {{- end }}
+          ports:
+            - containerPort: 8080
+              name: filebrowser
+          args:
+            - --port=8080
+            - --address=0.0.0.0
+            - --root={{ .Values.root }}
+            - --baseURL=/filebrowser/{{ .Values.name }}
+            - --log=stdout
+            - --database=/data/filebrowser.db
+            - --username={{ .Values.user }}
+            - --noauth
+            - --cacheDir=/tmp/cache
+          env:
+            - name: JUNO
+              value: "true"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: {{ .Values.puid }}
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: filebrowser-data
+              mountPath: /data
+            - name: tmp-cache
+              mountPath: /tmp/cache
+            {{- if .Values.volumeMounts }}
+            {{- toYaml .Values.volumeMounts | nindent 12 }}
+            {{- end }}
+
+      volumes:
+        - name: config
+          emptyDir: {}
+        - name: tmp-cache
+          emptyDir: {}
+        - name: filebrowser-data
+          {{- if .Values.dataPersistent }}
+          persistentVolumeClaim:
+            claimName: "{{ .Values.name }}-data"
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        {{- if .Values.volumes }}
+        {{- toYaml .Values.volumes | nindent 8 }}
+        {{- end }}
