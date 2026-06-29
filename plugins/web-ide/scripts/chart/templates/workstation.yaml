@@ -83,6 +83,8 @@ spec:
               mountPath: /custom-cont-init.d/system.sh
               subPath: system.sh
               readOnly: true
+            - name: config
+              mountPath: /config
             {{- if .Values.volumeMounts }}
             {{- toYaml .Values.volumeMounts | nindent 12 }}
             {{- end }}
@@ -94,6 +96,9 @@ spec:
         - name: nginx
           configMap:
             name: "{{ .Values.name }}-web-ide"
-        {{- if .Values.volumeMounts }}
+        - name: config
+          persistentVolumeClaim:
+            claimName: "{{ .Values.name }}-config"
+        {{- if .Values.volumes }}
         {{- toYaml .Values.volumes | nindent 8 }}
         {{- end }}
