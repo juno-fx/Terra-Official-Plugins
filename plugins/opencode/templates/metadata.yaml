@@ -10,6 +10,8 @@ data:
   chart: "{{ .Release.Name }}-scripts-configmap"
   description: "OpenCode is an open source AI coding agent accessible via browser."
   fields: |
+    - name: icon
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/opencode/assets/icon.png"
     - name: registry
       description: "Registry to pull the nginx sidecar image from"
       type: string
@@ -36,6 +38,11 @@ data:
       type: k8sStorageClass
     - name: storage_size
       description: "Storage size to use for the data disk"
-      default: 10Gi
+      default: 1Gi
       required: true
       type: string
+    - name: ingressNamespace
+      description: "Namespace of the ingress controller for plugin access"
+      type: string
+      required: true
+      default: "ingress-nginx"

@@ -12,7 +12,7 @@ spec:
     - host: {{ .Values.host }}
       http:
         paths:
-          - path: "/polaris/{{ .Values.name }}"
+          - path: "/wetty/{{ .Values.name }}"
             pathType: Prefix
             backend:
               service:
