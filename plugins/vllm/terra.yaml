@@ -1,0 +1,12 @@
+resource_id: vllm
+name: vLLM
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/vllm/scripts/assets/logo.png
+description: OpenAI-compatible LLM inference server with PagedAttention and speculative decoding.
+category: AI
+tags:
+  - llm
+  - machine-learning
+  - gpu
+  - inference
+  - cluster-level
+fields: []
