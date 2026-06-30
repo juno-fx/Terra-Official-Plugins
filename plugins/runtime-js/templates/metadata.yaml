@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-terra-metadata"
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+  annotations:
+    juno-innovations.com/workload: "Application"
+data:
+  chart: "{{ .Release.Name }}-scripts-configmap"
+  description: "JavaScript (Node.js) runtime environment — clone, build, and run your application"
+  fields: |
+    - name: icon
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/main/plugins/runtime-js/assets/icon.png"
+    - name: registry
+      description: "Container registry"
+      type: string
+      required: true
+      default: "docker.io"
+    - name: repo
+      description: "Image repository"
+      type: string
+      required: true
+      default: "node"
+    - name: tag
+      description: "Image tag"
+      type: string
+      required: true
+      default: "22"
+    - name: git_url
+      description: "Git repository URL to clone (leave empty when using source_path)"
+      type: string
+      required: false
+      default: ""
+    - name: git_ref
+      description: "Git reference (branch, tag, commit)"
+      type: string
+      required: false
+      default: "main"
+    - name: source_path
+      description: "Path to existing code on disk (alternative to git clone)"
+      type: string
+      required: false
+    - name: build_command
+      description: "Build command (e.g. npm install)"
+      type: string
+      required: false
+      default: "npm install"
+    - name: run_command
+      description: "Command to launch your application"
+      type: string
+      required: true
+      default: "node main.js"
+    - name: port
+      description: "Application port"
+      type: int
+      required: true
+      default: 8080
+    - name: network_mode
+      description: "How to expose the application"
+      type: select
+      required: true
+      default: "ingress-auth"
+      options:
+        - ingress-auth
+        - ingress-noauth
+        - clusterip
+        - nodeport
+    - name: gpu
+      description: "Attach a GPU"
+      type: boolean
+      required: true

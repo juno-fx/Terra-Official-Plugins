@@ -1,0 +1,4 @@
+apiVersion: v1
+description: runtime-go workload template
+name: runtime-go
+version: 0.0.0

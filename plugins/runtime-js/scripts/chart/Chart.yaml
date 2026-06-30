@@ -1,0 +1,4 @@
+apiVersion: v1
+description: runtime-js workload template
+name: runtime-js
+version: 0.0.0

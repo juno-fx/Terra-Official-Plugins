@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Values.name }}-runtime-commands"
+data:
+  entrypoint.sh: |
+    #!/bin/bash
+    set -e
+    set -x
+
+    if [ -n "$GIT_URL" ]; then
+      CLONE_DIR="$(mktemp -d /tmp/XXXXXXXX)"
+      git clone --branch "$GIT_REF" "$GIT_URL" "$CLONE_DIR"
+      WORK_ROOT="$CLONE_DIR"
+    elif [ -n "$SOURCE_PATH" ]; then
+      WORK_ROOT="$SOURCE_PATH"
+      mkdir -p "$WORK_ROOT"
+    fi
+
+    if [ -n "$WORK_ROOT" ]; then
+      python -m venv "$WORK_ROOT/.venv"
+      source "$WORK_ROOT/.venv/bin/activate"
+      if [ -n "$BUILD_COMMAND" ]; then
+        cd "$WORK_ROOT" && eval "$BUILD_COMMAND"
+      fi
+      cd "$WORK_ROOT"
+    fi
+
+    eval "$RUN_COMMAND"
