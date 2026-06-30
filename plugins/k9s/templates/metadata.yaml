@@ -10,6 +10,8 @@ data:
   chart: "{{ .Release.Name }}-scripts-configmap"
   description: "k9s is a Kubernetes CLI dashboard tool accessible via browser."
   fields: |
+    - name: icon
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/k9s/assets/icon.png"
     - name: registry
       description: "Registry to pull the nginx sidecar image from"
       type: string
