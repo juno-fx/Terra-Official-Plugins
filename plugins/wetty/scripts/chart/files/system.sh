@@ -11,8 +11,8 @@ addgroup -g "$PGID" wettyusers || echo "group already exists"
 adduser -D -u "$PUID" -G wettyusers "$USER" || echo "user already exists"
 
 # Set correct home directory ownership
-mkdir -p /home/$USER
-chown -R $PUID:$PGID /home/$USER
+mkdir -p /home/"$USER"
+chown -R "$PUID":"$PGID" /home/"$USER"
 
 if [ -n "$PACKAGES" ]; then
   # shellcheck disable=SC2086
