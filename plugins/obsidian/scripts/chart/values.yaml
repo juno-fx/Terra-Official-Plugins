@@ -1,0 +1,29 @@
+# Kuiper-injected standard values — do not remove
+name: obsidian
+user:
+group:
+cpu: "1"
+memory: "1Gi"
+cpuLimit: null
+memoryLimit: null
+idx: 0
+guid: 0
+puid: 0
+host:
+pullSecret:
+session:
+volumeMounts: []
+volumes: []
+env:
+  - name: JUNO
+    value: "true"
+selector:
+plugins: []
+_kuiper:
+
+# Plugin-specific fields (match metadata.yaml field names exactly)
+registry: "docker.io"
+repo: "sytone/obsidian-remote"
+tag: "latest"
+vault_storage_class: ""
+vault_size: "10Gi"

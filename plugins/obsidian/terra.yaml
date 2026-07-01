@@ -1,0 +1,12 @@
+resource_id: obsidian
+name: Obsidian
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/obsidian/scripts/assets/obsidian.png
+description: Obsidian is a powerful knowledge base and note-taking application that works on top of a local folder of plain text Markdown files.
+category: Productivity
+tags:
+  - obsidian
+  - notes
+  - markdown
+  - productivity
+  - workload
+fields: []
