@@ -55,3 +55,8 @@ data:
       type: boolean
       required: true
       default: false
+    - name: ingressNamespace
+      description: "Namespace of the ingress controller for plugin access"
+      type: string
+      required: true
+      default: "ingress-nginx"

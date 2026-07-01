@@ -47,3 +47,12 @@ data:
       type: string
       required: true
       default: "latest"
+    - name: persistence_size
+      description: "Persistent volume size for the VSCode config directory (e.g. 1Gi, 500Mi)."
+      type: string
+      required: false
+      default: "1Gi"
+    - name: persistence_storage_class
+      description: "Storage class for the VSCode config persistent volume."
+      type: k8sStorageClass
+      required: false

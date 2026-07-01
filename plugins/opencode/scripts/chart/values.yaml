@@ -26,3 +26,4 @@ _kuiper:
 timezone: "America/New_York"
 storage_class:
 storage_size: "1Gi"
+ingressNamespace: ingress-nginx
