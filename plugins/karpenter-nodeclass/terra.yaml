@@ -1,0 +1,53 @@
+resource_id: karpenter-nodeclass
+name: Karpenter EC2NodeClass
+icon: https://raw.githubusercontent.com/aws/karpenter-provider-aws/main/website/static/banner.png
+description: |
+  Configure a Karpenter EC2NodeClass for EKS node provisioning. The install name becomes the
+  EC2NodeClass resource name — use this name as the nodeclass_ref when installing
+  karpenter-nodepool. Install once per logical node class (most clusters need only one).
+  Requires Karpenter to already be installed in the cluster (e.g. via eksctl's karpenter addon).
+category: Compute
+compatibility: genesis-deployment>=3.0.2,orion-deployment>=3.1.0
+editable: true
+tags:
+  - karpenter
+  - autoscaling
+  - ec2
+  - aws
+  - cluster-level
+fields:
+  - name: cluster_name
+    description: >-
+      Your EKS cluster name. Used as the karpenter.sh/discovery tag value for subnet and
+      security group auto-discovery. Must match the tag applied to your cluster's subnets
+      and security groups.
+    required: true
+    type: string
+  - name: role
+    description: >-
+      IAM role name for Karpenter-provisioned nodes. Find it with:
+      aws iam list-roles --query "Roles[?contains(RoleName, 'KarpenterNodeRole')].RoleName" --output text
+    required: true
+    type: string
+  - name: volume_size
+    description: 'Root EBS volume size for provisioned nodes (e.g. 100Gi).'
+    required: true
+    type: string
+    default: 100Gi
+  - name: volume_type
+    description: Root EBS volume type.
+    required: true
+    type: select
+    default: gp3
+    options:
+      - gp3
+      - gp2
+      - io1
+      - io2
+  - name: ami_alias
+    description: >-
+      AMI selector alias. Controls which Amazon Machine Image nodes are provisioned with.
+      Use al2023@latest for the latest Amazon Linux 2023, or pin to a specific version.
+    required: true
+    type: string
+    default: al2023@latest

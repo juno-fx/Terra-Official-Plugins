@@ -1,0 +1,87 @@
+resource_id: karpenter-nodepool
+name: Karpenter NodePool
+icon: https://raw.githubusercontent.com/aws/karpenter-provider-aws/main/website/static/banner.png
+description: |
+  Configure a single Karpenter NodePool for EKS auto-scaling. The install name becomes the
+  NodePool resource name. Install multiple times to create multiple NodePools — each install
+  is independent. Requires a karpenter-nodeclass install (or equivalent EC2NodeClass) to
+  already exist in the cluster.
+category: Compute
+compatibility: genesis-deployment>=3.0.2,orion-deployment>=3.1.0
+editable: true
+tags:
+  - karpenter
+  - autoscaling
+  - ec2
+  - nodepool
+  - aws
+  - cluster-level
+fields:
+  - name: nodeclass_ref
+    description: >-
+      Name of the EC2NodeClass to use for this pool. Must match the install name of your
+      karpenter-nodeclass plugin install.
+    required: true
+    type: string
+  - name: pool_type
+    description: >-
+      Type of NodePool. Determines the node label and CPU architecture applied to provisioned nodes.
+      service = amd64, labeled for ingress-nginx (juno-innovations.com/service=true).
+      workstation-cpu = amd64 general workstation.
+      workstation-arm64 = ARM64 workstation.
+      workstation-gpu = amd64 GPU workstation.
+    required: true
+    type: select
+    options:
+      - service
+      - workstation-cpu
+      - workstation-arm64
+      - workstation-gpu
+  - name: availability_zone
+    description: 'Availability zone for provisioned nodes (e.g. us-east-1a).'
+    required: true
+    type: string
+  - name: capacity_type
+    description: EC2 capacity type. Use spot for cost savings, on-demand for guaranteed availability.
+    required: true
+    type: select
+    default: spot
+    options:
+      - spot
+      - on-demand
+  - name: instance_categories
+    description: >-
+      Comma-separated Karpenter instance category letters (e.g. c,t,r).
+      c=compute, m=general, r=memory, t=burstable, g=GPU, p=GPU-optimized.
+    required: true
+    type: string
+    default: 'c,t,r'
+  - name: instance_types
+    description: >-
+      Comma-separated EC2 instance types Karpenter may provision (e.g. c5.xlarge,c6a.xlarge).
+      Karpenter picks from this list when launching nodes.
+    required: true
+    type: string
+    default: 'c5.xlarge,c5a.xlarge,c5ad.xlarge,c6a.xlarge,c7i-flex.xlarge'
+  - name: cpu_limit
+    description: Maximum total CPU cores this pool may provision across all nodes.
+    required: true
+    type: string
+    default: '16'
+  - name: memory_limit
+    description: 'Maximum total memory this pool may provision across all nodes (e.g. 32Gi).'
+    required: true
+    type: string
+    default: 32Gi
+  - name: weight
+    description: >-
+      NodePool scheduling weight (1-100). Higher weight = higher priority when Karpenter chooses
+      between pools. Leave empty to use Karpenter default (0).
+    required: false
+    type: int
+  - name: min_cpu
+    description: >-
+      Minimum vCPUs for candidate instance types. Adds a Gt (greater-than) CPU requirement.
+      Leave empty to allow any size instance that matches the other requirements.
+    required: false
+    type: string
