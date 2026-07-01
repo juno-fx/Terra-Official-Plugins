@@ -1,6 +1,6 @@
 resource_id: karpenter-nodeclass
 name: Karpenter EC2NodeClass
-icon: https://raw.githubusercontent.com/aws/karpenter-provider-aws/main/website/static/banner.png
+icon: https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/karpenter-nodeclass/assets/logo.png?raw=true
 description: |
   Configure a Karpenter EC2NodeClass for EKS node provisioning. The install name becomes the
   EC2NodeClass resource name — use this name as the nodeclass_ref when installing

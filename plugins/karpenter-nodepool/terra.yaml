@@ -1,6 +1,6 @@
 resource_id: karpenter-nodepool
 name: Karpenter NodePool
-icon: https://raw.githubusercontent.com/aws/karpenter-provider-aws/main/website/static/banner.png
+icon: https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/karpenter-nodepool/assets/logo.png?raw=true
 description: |
   Configure a single Karpenter NodePool for EKS auto-scaling. The install name becomes the
   NodePool resource name. Install multiple times to create multiple NodePools — each install
