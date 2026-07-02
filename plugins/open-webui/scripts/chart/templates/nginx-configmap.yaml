@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-nginx
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+data:
+  default.conf: |
+    server {
+        listen 8080;
+        server_name _;
+
+        location /openwebui/{{ .Values.name }}/ws/socket.io/ {
+            proxy_pass http://127.0.0.1:8081/ws/socket.io/;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        location /openwebui/{{ .Values.name }}/ {
+            proxy_set_header Accept-Encoding "";
+            rewrite ^/openwebui/{{ .Values.name }}/(.*) /$1 break;
+            proxy_pass http://127.0.0.1:8081;
+            proxy_http_version 1.1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            # Open WebUI has no native subpath support — its build emits root-absolute
+            # paths (in JS, not always inside plain double quotes), so these are
+            # unanchored substring replacements rather than quote-anchored ones.
+            # Deliberately excludes application/json: API response bodies (chat
+            # content, etc.) can legitimately contain these substrings and must not
+            # be rewritten, only the app's own JS/HTML shell.
+            sub_filter_types text/html application/javascript;
+            sub_filter_once off;
+            sub_filter '/_app/'      '/openwebui/{{ .Values.name }}/_app/';
+            sub_filter '/static/'    '/openwebui/{{ .Values.name }}/static/';
+            sub_filter '/themes/'    '/openwebui/{{ .Values.name }}/themes/';
+            sub_filter '/api/'       '/openwebui/{{ .Values.name }}/api/';
+            sub_filter '/ollama/'    '/openwebui/{{ .Values.name }}/ollama/';
+            sub_filter '/openai/'    '/openwebui/{{ .Values.name }}/openai/';
+            sub_filter '/ws/'        '/openwebui/{{ .Values.name }}/ws/';
+            sub_filter 'manifest.json' 'openwebui/{{ .Values.name }}/manifest.json';
+            sub_filter '<head>'      '<head><base href="/openwebui/{{ .Values.name }}/">';
+        }
+    }
