@@ -34,10 +34,13 @@ data:
             # Open WebUI has no native subpath support — its build emits root-absolute
             # paths (in JS, not always inside plain double quotes), so these are
             # unanchored substring replacements rather than quote-anchored ones.
+            # text/javascript is required alongside application/javascript: modern
+            # Python's mimetypes module (which Starlette's StaticFiles uses) serves
+            # .js as text/javascript per RFC 9239, not application/javascript.
             # Deliberately excludes application/json: API response bodies (chat
             # content, etc.) can legitimately contain these substrings and must not
             # be rewritten, only the app's own JS/HTML shell.
-            sub_filter_types text/html application/javascript;
+            sub_filter_types text/html application/javascript text/javascript;
             sub_filter_once off;
             sub_filter '/_app/'      '/openwebui/{{ .Values.name }}/_app/';
             sub_filter '/static/'    '/openwebui/{{ .Values.name }}/static/';
