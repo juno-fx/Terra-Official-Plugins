@@ -241,7 +241,7 @@ This StatefulSet is what Kuiper deploys when a user launches a workload. Key con
 - **Toleration** — must tolerate the `juno-innovations.com/workstation: NoSchedule` taint
 - **Annotations** — `juno-innovations.com/workload` must match `metadata.yaml`
 - **Plugin mounts** — range over `.Values.plugins` to mount Helios plugin scripts
-- **Standard env vars** — `JUNO_WORKSTATION`, `JUNO_PROJECT`, `USER`, `HOME`, `PREFIX`
+- **Standard env vars** — `JUNO_WORKSTATION`, `JUNO_WORKSPACE` (formerly `JUNO_PROJECT`, still set for backwards compatibility), `USER`, `HOME`, `PREFIX`
 
 See `plugins/helios/scripts/chart/templates/workstation.yaml` for the full reference implementation.
 

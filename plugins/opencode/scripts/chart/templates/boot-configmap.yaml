@@ -95,7 +95,7 @@ data:
     set -e
 
     SERVICE="${NAME:-opencode}"
-    NAMESPACE="${JUNO_PROJECT:-default}"
+    NAMESPACE="${JUNO_WORKSPACE:-${JUNO_PROJECT:-default}}"
     FQDN="${SERVICE}.${NAMESPACE}.svc.cluster.local"
     PORT=9418
 
