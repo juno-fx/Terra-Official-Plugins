@@ -31,6 +31,12 @@ data:
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
 
+            # Open WebUI compresses responses (Content-Encoding: gzip) regardless of
+            # the Accept-Encoding override above — sub_filter cannot rewrite compressed
+            # bodies and silently no-ops on them. gunzip decompresses the upstream
+            # response before sub_filter runs, independent of what the backend decided.
+            gunzip on;
+
             # Open WebUI has no native subpath support — its build emits root-absolute
             # paths (in JS, not always inside plain double quotes), so these are
             # unanchored substring replacements rather than quote-anchored ones.
