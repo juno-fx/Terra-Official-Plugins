@@ -6,7 +6,7 @@ spec:
   selector:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
   ports:
-    - port: 3001
-      targetPort: 3001
+    - port: 8080
+      targetPort: 8080
       protocol: TCP
-      name: webtop
+      name: proxy

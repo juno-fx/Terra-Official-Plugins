@@ -1,17 +1,13 @@
 name: webui
 user:
-webtop_repo:
-webtop_tag:
-webtop_registry:
-repo:
-tag:
-registry:
+repo: open-webui
+tag: "0.10.2"
+registry: ghcr.io/open-webui
 group:
 cpu: "1"
 memory: "1Gi"
 cpuLimit: null
 memoryLimit: null
-gpu: false
 idx: 0
 guid: 0
 puid: 0
@@ -29,3 +25,8 @@ _kuiper:
 timezone: "America/New_York"
 storage_class:
 storage_size: "1Gi"
+
+# Nginx sidecar (handles the /openwebui/<name>/ base path — Open WebUI has no native subpath support)
+nginx_registry: docker.io
+nginx_repo: nginx
+nginx_tag: "1.29.3"
