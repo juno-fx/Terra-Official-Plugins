@@ -63,7 +63,10 @@ data:
             # replace) — e.g. the post-login redirect goes to bare "/" instead of our
             # prefix. That destination string is just "/", too generic to rewrite
             # safely with sub_filter, so intercept the navigation calls themselves
-            # instead and re-add the prefix whenever it's missing.
-            sub_filter '<head>' '<head><base href="/openwebui/{{ .Values.name }}/"><script>(function(p){function f(u){if(typeof u!=="string")return u;if(u.indexOf("http")===0)return u;if(u.indexOf(p)===0)return u;if(u.indexOf("/")===0)return p+u.slice(1);return u;}var a=history.pushState,b=history.replaceState;history.pushState=function(s,t,u){return a.call(this,s,t,f(u));};history.replaceState=function(s,t,u){return b.call(this,s,t,f(u));};try{var c=location.assign.bind(location),d=location.replace.bind(location);location.assign=function(u){return c(f(u));};location.replace=function(u){return d(f(u));};}catch(e){}})("/openwebui/{{ .Values.name }}/");</script>';
+            # instead and re-add the prefix whenever it's missing. Same-origin
+            # absolute URLs (e.g. "https://host/", built from location.origin) are
+            # also fixed, not just root-relative ones — a naive "starts with http
+            # means leave it alone" check would otherwise skip exactly this case.
+            sub_filter '<head>' '<head><base href="/openwebui/{{ .Values.name }}/"><script>(function(p){function f(u){if(typeof u!=="string")return u;var o=location.origin;if(u.indexOf(o)===0){var r=u.slice(o.length);if(r.indexOf(p)===0)return u;if(r.indexOf("/")===0)return o+p+r.slice(1);return u;}if(u.indexOf("http")===0)return u;if(u.indexOf(p)===0)return u;if(u.indexOf("/")===0)return p+u.slice(1);return u;}var a=history.pushState,b=history.replaceState;history.pushState=function(s,t,u){return a.call(this,s,t,f(u));};history.replaceState=function(s,t,u){return b.call(this,s,t,f(u));};try{var c=location.assign.bind(location),d=location.replace.bind(location);location.assign=function(u){return c(f(u));};location.replace=function(u){return d(f(u));};}catch(e){}})("/openwebui/{{ .Values.name }}/");</script>';
         }
     }
