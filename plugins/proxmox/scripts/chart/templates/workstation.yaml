@@ -126,6 +126,8 @@ spec:
               value: "{{ .Values.user }}"
             - name: PASSWORD
               value: "{{ .Values.password }}"
+            - name: DEBUG
+              value: "{{ .Values.debug }}"
             {{- range .Values.env }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}

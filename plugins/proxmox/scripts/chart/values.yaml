@@ -32,6 +32,7 @@ registry: docker.io
 repo: dockurr/proxmox
 tag: latest
 password: proxmox
+debug: "N"
 gpu: false
 data_size: 32Gi
 config_size: 1Gi

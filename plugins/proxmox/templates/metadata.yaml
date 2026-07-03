@@ -33,6 +33,11 @@ data:
       type: string
       required: true
       default: proxmox
+    - name: debug
+      description: Enable debug logging (Y/N)
+      type: string
+      required: false
+      default: "N"
     - name: gpu
       description: Attach a GPU to the Proxmox node (requires the nvidia runtime class)
       type: boolean
