@@ -22,4 +22,22 @@ kubectl delete secret -n "${VCLUSTER_NAMESPACE}" \
 kubectl delete secret -n "${VCLUSTER_NAMESPACE}" \
     "vc-config-${VCLUSTER_NAME}" --ignore-not-found
 
+# ArgoCD drops the app finalizer without reliably reaping PostDelete hook
+# resources. Parent them to this Job so garbage collection removes them
+# when the Job is TTL-reaped (ttlSecondsAfterFinished).
+echo "==> Parenting hook resources to the cleanup Job for GC..."
+JOB_NAME="${VCLUSTER_NAME}-cleanup"
+JOB_UID=$(kubectl get job "${JOB_NAME}" -n "${VCLUSTER_NAMESPACE}" -o jsonpath='{.metadata.uid}' 2>/dev/null || true)
+if [ -n "${JOB_UID}" ]; then
+    OWNER_PATCH="{\"metadata\":{\"ownerReferences\":[{\"apiVersion\":\"batch/v1\",\"kind\":\"Job\",\"name\":\"${JOB_NAME}\",\"uid\":\"${JOB_UID}\"}]}}"
+    for res in "configmap/${VCLUSTER_NAME}-scripts-configmap-cleanup" \
+               "rolebinding.rbac.authorization.k8s.io/${JOB_NAME}" \
+               "role.rbac.authorization.k8s.io/${JOB_NAME}" \
+               "serviceaccount/${JOB_NAME}"; do
+        kubectl patch "${res}" -n "${VCLUSTER_NAMESPACE}" --type merge -p "${OWNER_PATCH}" || true
+    done
+else
+    echo "WARNING: could not resolve own Job UID — hook resources will linger."
+fi
+
 echo "==> vcluster-juno cleanup complete."

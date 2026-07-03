@@ -23,6 +23,17 @@ rules:
   - apiGroups: [""]
     resources: ["persistentvolumeclaims", "secrets"]
     verbs: ["get", "list", "delete"]
+  # Self-reap: the script parents the hook's own resources to the Job via
+  # ownerReferences so GC removes them when the Job is TTL-reaped.
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["get"]
+  - apiGroups: [""]
+    resources: ["configmaps", "serviceaccounts"]
+    verbs: ["patch"]
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["roles", "rolebindings"]
+    verbs: ["patch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -56,6 +67,9 @@ metadata:
 spec:
   backoffLimit: 0
   activeDeadlineSeconds: 900
+  # Self-reap: ArgoCD drops the app finalizer without reliably reaping
+  # PostDelete hook resources, so the job cleans up after itself.
+  ttlSecondsAfterFinished: 300
   template:
     metadata:
       labels:
