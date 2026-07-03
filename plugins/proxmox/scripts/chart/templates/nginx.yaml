@@ -46,6 +46,7 @@ data:
           sub_filter "'/pve2/" "'/polaris/{{ .Values.name }}/pve2/";
           sub_filter '"/api2/' '"/polaris/{{ .Values.name }}/api2/';
           sub_filter "'/api2/" "'/polaris/{{ .Values.name }}/api2/";
+          sub_filter '`/api2/' '`/polaris/{{ .Values.name }}/api2/';
           sub_filter '"/novnc/' '"/polaris/{{ .Values.name }}/novnc/';
           sub_filter "'/novnc/" "'/polaris/{{ .Values.name }}/novnc/";
           sub_filter '"/xtermjs/' '"/polaris/{{ .Values.name }}/xtermjs/';
