@@ -9,7 +9,6 @@ metadata:
 data:
   chart: "{{ .Release.Name }}-scripts-configmap"
   description: "Proxmox VE hypervisor node with KVM acceleration and LXC support"
-  ingress: "{{ .Values.prefix }}"
   fields: |
     - name: icon
       description: icon
@@ -53,8 +52,18 @@ data:
       description: "Storage class for the Proxmox persistent volumes."
       type: k8sStorageClass
       required: false
-    - name: prefix
-      description: "URL path prefix for the Proxmox web UI ingress (e.g. /polaris/myproxmox)"
+    - name: nginx_registry
+      description: "Container registry for the nginx reverse proxy sidecar"
       type: string
       required: false
-      default: "/polaris/{{ .Release.Name }}"
+      default: docker.io
+    - name: nginx_repo
+      description: "Container repository for the nginx reverse proxy sidecar"
+      type: string
+      required: false
+      default: nginx
+    - name: nginx_tag
+      description: "Container tag for the nginx reverse proxy sidecar"
+      type: string
+      required: false
+      default: "1.29.3"

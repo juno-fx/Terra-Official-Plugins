@@ -14,11 +14,11 @@ data:
         listen 3000;
         listen [::]:3000;
 
-        location = {{ .Values.prefix }} {
-          return 302 {{ .Values.prefix }}/;
+        location = /polaris/{{ .Values.name }} {
+          return 302 /polaris/{{ .Values.name }}/;
         }
 
-        location {{ .Values.prefix }}/ {
+        location /polaris/{{ .Values.name }}/ {
           # Proxmox serves TLS on 8006 with a self-signed cert.
           proxy_pass https://localhost:8006/;
           proxy_ssl_verify off;
@@ -36,24 +36,24 @@ data:
           proxy_read_timeout 3600s;
           proxy_send_timeout 3600s;
           # PVEAuthCookie is issued with path=/ — rescope it to the base URL.
-          proxy_cookie_path / {{ .Values.prefix }}/;
+          proxy_cookie_path / /polaris/{{ .Values.name }}/;
 
           # The Proxmox UI hardcodes absolute paths in HTML and in JS-built
           # URLs (ExtJS) — rewrite them onto the base URL.
           sub_filter_once off;
           sub_filter_types text/html application/javascript application/json text/css;
-          sub_filter '"/pve2/' '"{{ .Values.prefix }}/pve2/';
-          sub_filter "'/pve2/" "'{{ .Values.prefix }}/pve2/";
-          sub_filter '"/api2/' '"{{ .Values.prefix }}/api2/';
-          sub_filter "'/api2/" "'{{ .Values.prefix }}/api2/";
-          sub_filter '"/novnc/' '"{{ .Values.prefix }}/novnc/';
-          sub_filter "'/novnc/" "'{{ .Values.prefix }}/novnc/";
-          sub_filter '"/xtermjs/' '"{{ .Values.prefix }}/xtermjs/';
-          sub_filter "'/xtermjs/" "'{{ .Values.prefix }}/xtermjs/";
-          sub_filter '"/pwt/' '"{{ .Values.prefix }}/pwt/';
-          sub_filter "'/pwt/" "'{{ .Values.prefix }}/pwt/";
-          sub_filter 'src="/' 'src="{{ .Values.prefix }}/';
-          sub_filter 'href="/' 'href="{{ .Values.prefix }}/';
+          sub_filter '"/pve2/' '"/polaris/{{ .Values.name }}/pve2/';
+          sub_filter "'/pve2/" "'/polaris/{{ .Values.name }}/pve2/";
+          sub_filter '"/api2/' '"/polaris/{{ .Values.name }}/api2/';
+          sub_filter "'/api2/" "'/polaris/{{ .Values.name }}/api2/";
+          sub_filter '"/novnc/' '"/polaris/{{ .Values.name }}/novnc/';
+          sub_filter "'/novnc/" "'/polaris/{{ .Values.name }}/novnc/";
+          sub_filter '"/xtermjs/' '"/polaris/{{ .Values.name }}/xtermjs/';
+          sub_filter "'/xtermjs/" "'/polaris/{{ .Values.name }}/xtermjs/";
+          sub_filter '"/pwt/' '"/polaris/{{ .Values.name }}/pwt/';
+          sub_filter "'/pwt/" "'/polaris/{{ .Values.name }}/pwt/";
+          sub_filter 'src="/' 'src="/polaris/{{ .Values.name }}/';
+          sub_filter 'href="/' 'href="/polaris/{{ .Values.name }}/';
         }
       }
     }

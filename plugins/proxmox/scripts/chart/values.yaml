@@ -21,8 +21,10 @@ selector:
 plugins: []
 _kuiper:
 
-# URL path prefix for the Proxmox web UI ingress (no trailing slash)
-prefix: "/polaris/proxmox"
+# Nginx sidecar image
+nginx_registry: docker.io
+nginx_repo: nginx
+nginx_tag: "1.29.3"
 
 # User-facing fields from metadata.yaml
 icon: https://github.com/dockur/proxmox/raw/master/.github/logo.png
