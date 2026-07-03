@@ -1,34 +1,37 @@
+import os
+import re
 import mkdocs_gen_files
 from glob import glob
 import yaml
 
-plugins = glob("plugins/*/terra.yaml")
+for plugin in sorted(glob("plugins/*/terra.yaml")):
+    with open(plugin) as f:
+        category = yaml.safe_load(f).get("category") or "Other"
 
-def generate(plugin):
-    template = f"""
+    plugin_dir = os.path.dirname(plugin)
+    plugin_name = os.path.basename(plugin_dir)
+
+    readme_path = os.path.join(plugin_dir, "README.md")
+    try:
+        with open(readme_path) as f:
+            readme_content = f.read()
+    except FileNotFoundError:
+        readme_content = ""
+
+    # Constrain first image (logo) to standard width
+    readme_content = re.sub(
+        r'!\[([^\]]*)\]\(([^)]+)\)',
+        r'<img src="\2" alt="\1" width="200">',
+        readme_content,
+        count=1,
+    )
+
+    plugin_path = f"plugins/{category}/{plugin_name}.md"
+    with mkdocs_gen_files.open(plugin_path, "w") as f:
+        print(readme_content, file=f)
+        print("---", file=f)
+        print(f"""
 ```yaml linenums="1" title="{plugin}"
 --8<-- "{plugin}"
 ```
-"""
-    return template
-
-for plugin in plugins:
-    nav = mkdocs_gen_files.Nav()
-    with open(plugin, "r") as f:
-        plugin_data = yaml.safe_load(f)
-        icon = plugin_data.get("icon")
-        description = plugin_data.get("description")
-        category = plugin_data.get("category")
-
-    plugin_name = plugin.split('/')[1]
-    plugin_path = f"plugins/{category}/{plugin_name}.md"
-    with mkdocs_gen_files.open(plugin_path, "w") as f:
-        if icon:
-            print(f"![icon]({icon})" + '{width="100"}', file=f)
-            print("<br/>", file=f)
-        if description:
-            print(f"<p>{description}</p>", file=f)
-            print("---", file=f)
-        print(generate(plugin), file=f)
-
-    nav["Plugins", plugin_name] = plugin_path
+""", file=f)
