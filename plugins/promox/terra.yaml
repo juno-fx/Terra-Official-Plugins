@@ -1,0 +1,18 @@
+resource_id: promox
+name: Proxmox VE
+icon: https://github.com/dockur/proxmox/raw/master/.github/logo.png
+description: |
+  Proxmox VE hypervisor node running as a workload (via dockur/proxmox).
+  Launch a full Proxmox Virtual Environment with KVM acceleration, LXC
+  support, and a pre-configured NAT bridge — accessible through the
+  Proxmox web UI. Requires nodes with KVM support (/dev/kvm).
+category: Infrastructure
+tags:
+  - cluster-level
+  - workload
+  - proxmox
+  - virtualization
+  - hypervisor
+  - vm
+  - kvm
+fields: []

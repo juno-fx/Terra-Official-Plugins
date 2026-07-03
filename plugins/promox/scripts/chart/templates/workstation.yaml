@@ -1,0 +1,140 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{ .Values.name }}"
+  annotations:
+    # comma separated list of users that can access this workstation as read only.
+    juno-innovations.com/shared: "none"
+    juno-innovations.com/kuiper-state: "{{ .Values._kuiper }}"
+    juno-innovations.com/workload: "Server"  # mark this as a workload and it's type for the frontend UI
+    kuiper.juno-innovations.com/connection: "username=root,port=8006"
+  labels:
+    juno-innovations.com/app: "polaris"
+    juno-innovations.com/workstation: "{{ .Values.name }}"
+    juno-innovations.com/user: "{{ .Values.user }}"
+    juno-innovations.com/session: "{{ .Values.session }}"
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      juno-innovations.com/workstation: "{{ .Values.name }}"
+
+  template:
+    metadata:
+      labels:
+        juno-innovations.com/app: polaris
+        juno-innovations.com/user: "{{ .Values.user }}"
+        juno-innovations.com/workstation: "{{ .Values.name }}"
+
+    spec:
+      hostname: pve
+      # Proxmox flushes state on shutdown — match upstream's stop_grace_period.
+      terminationGracePeriodSeconds: 120
+
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: juno-innovations.com/workstation
+                    operator: In
+                    values:
+                      - "true"
+                  {{- if .Values.selector }}
+                  {{- range .Values.selector }}
+                  - key: {{ .key | quote }}
+                    operator: In
+                    values:
+                      - {{ .value | quote }}
+                  {{- end }}
+                  {{- end }}
+
+      # allow for this pod to work on nodes reserved for workstations
+      tolerations:
+        - key: "juno-innovations.com/workstation"
+          operator: "Exists"
+          effect: "NoSchedule"
+
+      {{- if .Values.gpu }}
+      runtimeClassName: nvidia
+      {{- end }}
+
+      {{- if .Values.pullSecret }}
+      imagePullSecrets:
+        - name: "{{ .Values.pullSecret }}"
+      {{- end }}
+
+      containers:
+        - name: proxmox
+          image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            # KVM acceleration requires privileged access to /dev/kvm
+            # and the NAT bridge needs /dev/net/tun (upstream requirement).
+            privileged: true
+          startupProbe:
+            tcpSocket:
+              port: 8006
+            initialDelaySeconds: 5
+            failureThreshold: 180  # PVE boot totals 5 * 180 = 15 mins max
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: 8006
+            failureThreshold: 24
+            periodSeconds: 5
+          ports:
+            - containerPort: 8006
+              name: webui
+          resources:
+            requests:
+              cpu: "{{ .Values.cpu }}"
+              memory: "{{ .Values.memory }}"
+            {{- if or .Values.cpuLimit .Values.memoryLimit }}
+            limits:
+              {{- if .Values.cpuLimit }}
+              cpu: "{{ .Values.cpuLimit }}"
+              {{- end }}
+              {{- if .Values.memoryLimit }}
+              memory: "{{ .Values.memoryLimit }}"
+              {{- end }}
+            {{- end }}
+          env:
+            - name: JUNO_PROJECT
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: JUNO_ENVIRONMENT
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: JUNO_WORKSTATION
+              value: "{{ .Values.name }}"
+            - name: USER
+              value: "{{ .Values.user }}"
+            - name: PASSWORD
+              value: "{{ .Values.password }}"
+            {{- range .Values.env }}
+            - name: {{ .name | quote }}
+              value: {{ .value | quote }}
+            {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/vz
+            - name: config
+              mountPath: /var/lib/pve-cluster
+            {{- if .Values.volumeMounts }}
+            {{- toYaml .Values.volumeMounts | nindent 12 }}
+            {{- end }}
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: "{{ .Values.name }}-data"
+        - name: config
+          persistentVolumeClaim:
+            claimName: "{{ .Values.name }}-config"
+        {{- if .Values.volumes }}
+        {{- toYaml .Values.volumes | nindent 8 }}
+        {{- end }}

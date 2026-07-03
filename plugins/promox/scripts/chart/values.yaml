@@ -1,0 +1,33 @@
+# Kuiper-injected standard values — do not remove
+name: promox
+user:
+group:
+cpu: "2"
+memory: "2Gi"
+cpuLimit: null
+memoryLimit: null
+idx: 0
+guid: 0
+puid: 0
+host:
+pullSecret:
+session:
+volumeMounts: []
+volumes: []
+env:
+  - name: JUNO
+    value: "true"
+selector:
+plugins: []
+_kuiper:
+
+# User-facing fields from metadata.yaml
+icon: https://github.com/dockur/proxmox/raw/master/.github/logo.png
+registry: docker.io
+repo: dockurr/proxmox
+tag: latest
+password: proxmox
+gpu: false
+data_size: 32Gi
+config_size: 1Gi
+persistence_storage_class:
