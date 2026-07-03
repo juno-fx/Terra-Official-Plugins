@@ -6,6 +6,9 @@ metadata:
     {{- include "vcluster-juno.labels" . | nindent 4 }}
   annotations:
     argocd.argoproj.io/sync-wave: "2"
+    # Jobs are immutable — replace on spec change so updates re-run the
+    # (idempotent) installer instead of failing the sync.
+    argocd.argoproj.io/sync-options: Force=true,Replace=true
 spec:
   backoffLimit: 0
   activeDeadlineSeconds: 3600
@@ -36,8 +39,8 @@ spec:
               value: "https://raw.githubusercontent.com/argoproj/argo-cd/{{ .Values.argocd_version }}/manifests/install.yaml"
             - name: LABEL_NODES
               value: "{{ .Values.label_nodes }}"
-            - name: JUNO_APP_FILE
-              value: "/terra/juno-application.yaml"
+            - name: GENESIS_APP_FILE
+              value: "/terra/genesis-application.yaml"
           command: [ "/terra/bootstrap.sh" ]
           volumeMounts:
             - name: installer
@@ -46,14 +49,14 @@ spec:
             - name: installer
               mountPath: /terra/scripts.base64
               subPath: packaged_scripts.base64
-            - name: juno-application
-              mountPath: /terra/juno-application.yaml
-              subPath: juno-application.yaml
+            - name: genesis-application
+              mountPath: /terra/genesis-application.yaml
+              subPath: genesis-application.yaml
       volumes:
         - name: installer
           configMap:
             name: {{ .Release.Name }}-scripts-configmap
             defaultMode: 0500
-        - name: juno-application
+        - name: genesis-application
           configMap:
-            name: {{ .Release.Name }}-juno-application
+            name: {{ .Release.Name }}-genesis-application

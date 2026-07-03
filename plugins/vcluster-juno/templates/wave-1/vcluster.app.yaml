@@ -81,6 +81,8 @@ spec:
             fromHost:
               ingressClasses:
                 enabled: true
+              runtimeClasses:
+                enabled: true
               storageClasses:
                 enabled: auto
               csiDrivers:

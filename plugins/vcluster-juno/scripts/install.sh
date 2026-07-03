@@ -5,7 +5,7 @@ set -euo pipefail
 : "${VCLUSTER_NAMESPACE:?VCLUSTER_NAMESPACE is required}"
 : "${VCLUSTER_SERVER:?VCLUSTER_SERVER is required}"
 : "${ARGOCD_MANIFEST_URL:?ARGOCD_MANIFEST_URL is required}"
-: "${JUNO_APP_FILE:?JUNO_APP_FILE is required}"
+: "${GENESIS_APP_FILE:?GENESIS_APP_FILE is required}"
 
 KUBECONFIG_SECRET="vc-${VCLUSTER_NAME}"
 VC_KUBECONFIG=/tmp/vc-kubeconfig
@@ -85,14 +85,14 @@ if [ "${LABEL_NODES:-true}" = "true" ]; then
     ${VC} label nodes --all "juno-innovations.com/workstation=true" --overwrite
 fi
 
-echo "==> Deploying Juno (ArgoCD Application) inside the vCluster..."
-${VC} apply -f "${JUNO_APP_FILE}"
+echo "==> Deploying Genesis (ArgoCD Application) inside the vCluster..."
+${VC} apply -f "${GENESIS_APP_FILE}"
 
-echo "==> Waiting for the Juno Application to be picked up..."
-retry 30 10 ${VC} get application juno -n argocd -o name
+echo "==> Waiting for the Genesis Application to be picked up..."
+retry 30 10 ${VC} get application genesis -n argocd -o name
 
-echo "==> Current Juno Application state:"
-${VC} get application juno -n argocd \
+echo "==> Current Genesis Application state:"
+${VC} get application genesis -n argocd \
     -o jsonpath='sync: {.status.sync.status}{"\n"}health: {.status.health.status}{"\n"}' || true
 
 echo "==> vcluster-juno install complete."
