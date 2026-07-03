@@ -67,7 +67,7 @@ ${VC} rollout status statefulset/argocd-application-controller -n argocd --timeo
 # confirm they survive past their startup window before declaring success.
 echo "==> Verifying ArgoCD pods stay healthy for 30s..."
 sleep 30
-NOT_READY=$(${VC} get pods -n argocd --no-headers | awk '$2 !~ /^([0-9]+)\/\1$/ || $3 != "Running" {print $1}' || true)
+NOT_READY=$(${VC} get pods -n argocd --no-headers | awk '{split($2, r, "/"); if (r[1] != r[2] || $3 != "Running") print $1}' || true)
 if [ -n "${NOT_READY}" ]; then
     echo "ERROR: ArgoCD pods not healthy after stabilization window:"
     echo "${NOT_READY}"

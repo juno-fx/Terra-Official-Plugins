@@ -54,7 +54,7 @@ metadata:
     argocd.argoproj.io/hook-delete-policy: HookSucceeded
     argocd.argoproj.io/sync-wave: "1"
 spec:
-  backoffLimit: 1
+  backoffLimit: 0
   activeDeadlineSeconds: 900
   template:
     metadata:
