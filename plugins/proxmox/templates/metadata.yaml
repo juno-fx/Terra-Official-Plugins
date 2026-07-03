@@ -9,6 +9,7 @@ metadata:
 data:
   chart: "{{ .Release.Name }}-scripts-configmap"
   description: "Proxmox VE hypervisor node with KVM acceleration and LXC support"
+  ingress: "{{ .Values.prefix }}"
   fields: |
     - name: icon
       description: icon
@@ -52,3 +53,8 @@ data:
       description: "Storage class for the Proxmox persistent volumes."
       type: k8sStorageClass
       required: false
+    - name: prefix
+      description: "URL path prefix for the Proxmox web UI ingress (e.g. /polaris/myproxmox)"
+      type: string
+      required: false
+      default: "/polaris/{{ .Release.Name }}"

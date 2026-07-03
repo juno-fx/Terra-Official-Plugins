@@ -1,11 +1,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.name }}-promox
+  name: {{ .Values.name }}-proxmox
 spec:
   selector:
     juno-innovations.com/workstation: "{{ .Values.name }}"
   ports:
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
+      name: nginx
     - port: 8006
       targetPort: 8006
       protocol: TCP

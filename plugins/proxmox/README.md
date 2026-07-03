@@ -1,4 +1,4 @@
-# Proxmox VE (promox)
+# Proxmox VE (proxmox)
 
 Workload template plugin that launches a full [Proxmox VE](https://www.proxmox.com/)
 hypervisor node as a Juno workload, using [dockur/proxmox](https://github.com/dockur/proxmox).
@@ -39,5 +39,5 @@ out of the box.
   flush state cleanly on shutdown.
 - The Proxmox web UI uses absolute asset paths; if the UI misbehaves under the
   `/polaris/<name>/` sub-path, access it via the service directly
-  (`kubectl port-forward svc/<name>-promox 8006:8006`) while a path-rewrite
+  (`kubectl port-forward svc/<name>-proxmox 8006:8006`) while a path-rewrite
   proxy is evaluated.

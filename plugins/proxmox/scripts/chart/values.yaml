@@ -1,5 +1,5 @@
 # Kuiper-injected standard values — do not remove
-name: promox
+name: proxmox
 user:
 group:
 cpu: "2"
@@ -20,6 +20,9 @@ env:
 selector:
 plugins: []
 _kuiper:
+
+# URL path prefix for the Proxmox web UI ingress (no trailing slash)
+prefix: "/polaris/proxmox"
 
 # User-facing fields from metadata.yaml
 icon: https://github.com/dockur/proxmox/raw/master/.github/logo.png

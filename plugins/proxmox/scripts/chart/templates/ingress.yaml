@@ -2,23 +2,24 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Values.name }}-promox
+  name: {{ .Values.name }}-proxmox
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/auth-url: "http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/"
-    # The Proxmox web UI serves TLS on 8006.
-    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
-    nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
+    # Long-lived VNC/xterm.js console websockets.
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
 spec:
   rules:
     - host: {{ .Values.host }}
       http:
         paths:
-          - path: "/polaris/{{ .Values.name }}/"
+          - path: "{{ .Values.prefix }}/"
             pathType: Prefix
             backend:
               service:
-                name: {{ .Values.name }}-promox
+                name: {{ .Values.name }}-proxmox
                 port:
-                  number: 8006
+                  number: 3000
 {{- end }}

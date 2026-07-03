@@ -67,6 +67,16 @@ spec:
       {{- end }}
 
       containers:
+        - name: nginx
+          image: "{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+              name: nginx
+          volumeMounts:
+            - name: nginx
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
         - name: proxmox
           image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
           imagePullPolicy: IfNotPresent
@@ -129,6 +139,9 @@ spec:
             {{- toYaml .Values.volumeMounts | nindent 12 }}
             {{- end }}
       volumes:
+        - name: nginx
+          configMap:
+            name: "{{ .Values.name }}-proxmox"
         - name: data
           persistentVolumeClaim:
             claimName: "{{ .Values.name }}-data"

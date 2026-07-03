@@ -1,5 +1,4 @@
 apiVersion: v1
-description: Proxmox VE hypervisor node (dockur/proxmox)
-name: promox
+name: proxmox
 version: 0.0.1
 icon: https://github.com/dockur/proxmox/raw/master/.github/logo.png

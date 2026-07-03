@@ -1,4 +1,4 @@
-resource_id: promox
+resource_id: proxmox
 name: Proxmox VE
 icon: https://github.com/dockur/proxmox/raw/master/.github/logo.png
 description: |
