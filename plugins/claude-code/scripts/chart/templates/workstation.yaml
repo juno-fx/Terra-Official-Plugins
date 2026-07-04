@@ -1,1 +1,165 @@
-# removed — use workload.yaml instead
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{ .Release.Name }}"
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+  annotations:
+    juno-innovations.com/workload: "Terminal"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+  template:
+    metadata:
+      labels:
+        kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+    spec:
+      automountServiceAccountToken: false
+
+      {{- if .Values.pullSecret }}
+      imagePullSecrets:
+        - name: "{{ .Values.pullSecret }}"
+      {{- end }}
+
+      # Node affinity — target workstation nodes
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: juno-innovations.com/workstation
+                    operator: In
+                    values:
+                      - "true"
+                  {{- if .Values.selector }}
+                  {{- range .Values.selector }}
+                  - key: {{ .key | quote }}
+                    operator: In
+                    values:
+                      - {{ .value | quote }}
+                  {{- end }}
+                  {{- end }}
+
+      # Tolerate workstation taint
+      tolerations:
+        - key: "juno-innovations.com/workstation"
+          operator: "Exists"
+          effect: "NoSchedule"
+
+      containers:
+        # Main container: claude-code
+        - name: claude-code
+          imagePullPolicy: IfNotPresent
+          image: node:lts-bookworm-slim
+          command:
+            - sh
+            - /opt/boot/boot.sh
+
+          env:
+            {{- range .Values.env }}
+            - name: {{ .name | quote }}
+              value: {{ .value | quote }}
+            {{- end }}
+            - name: PUID
+              value: "{{ .Values.puid }}"
+            - name: PGID
+              value: "{{ .Values.guid }}"
+            - name: USER
+              value: "{{ .Values.user }}"
+            - name: HOME
+              value: "/data"
+            - name: TZ
+              value: "{{ .Values.timezone }}"
+            - name: JUNO_WORKSTATION
+              value: "{{ .Values.name }}"
+            - name: JUNO_PROJECT
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: PREFIX
+              value: "/claude/{{ .Values.name }}/"
+
+          ports:
+            - containerPort: {{ .Values.ttyd_port }}
+              name: ttyd
+
+          resources:
+            requests:
+              memory: "{{ .Values.memory }}"
+              cpu: "{{ .Values.cpu }}"
+            {{- if or .Values.cpuLimit .Values.memoryLimit }}
+            limits:
+              {{- if .Values.cpuLimit }}
+              cpu: "{{ .Values.cpuLimit }}"
+              {{- end }}
+              {{- if .Values.memoryLimit }}
+              memory: "{{ .Values.memoryLimit }}"
+              {{- end }}
+            {{- end }}
+
+          volumeMounts:
+            - name: boot
+              mountPath: /opt/boot
+            - name: tools
+              mountPath: /tools
+            - name: data
+              mountPath: /data
+            {{- if .Values.volumeMounts }}
+            {{- toYaml .Values.volumeMounts | nindent 12 }}
+            {{- end }}
+            {{- if .Values.plugins }}
+            {{- range .Values.plugins }}
+            - name: {{ .name | quote }}
+              subPath: {{ .file | quote }}
+              mountPath: "/etc/helios/init.d/{{ .name }}/{{ .file }}"
+            {{- end }}
+            {{- end }}
+
+        # Nginx sidecar — reverse proxy for path-routing
+        - name: nginx
+          imagePullPolicy: IfNotPresent
+          image: "{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}"
+
+          ports:
+            - containerPort: 8080
+              name: proxy
+
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+
+      volumes:
+        - name: boot
+          configMap:
+            name: "{{ .Release.Name }}-boot"
+            defaultMode: 0755
+        - name: nginx-config
+          configMap:
+            name: "{{ .Release.Name }}-nginx"
+        - name: tools
+          emptyDir: {}
+        - name: data
+          persistentVolumeClaim:
+            claimName: "{{ .Values.name }}-data"
+        {{- if .Values.volumes }}
+        {{- toYaml .Values.volumes | nindent 8 }}
+        {{- end }}
+        {{- if .Values.plugins }}
+        {{- range .Values.plugins }}
+        - name: {{ .name | quote }}
+          configMap:
+            name: {{ .config | quote }}
+            defaultMode: 0777
+        {{- end }}
+        {{- end }}

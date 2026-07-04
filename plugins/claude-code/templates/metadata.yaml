@@ -10,17 +10,19 @@ data:
   chart: "{{ .Release.Name }}-scripts-configmap"
   description: "Claude Code AI coding agent in a web terminal (wetty)"
   fields: |
-    - name: registry
+    - name: icon
+      default: ""
+    - name: nginx_registry
       description: "Registry to pull the nginx sidecar image from"
       type: string
       required: true
       default: "docker.io"
-    - name: repo
+    - name: nginx_repo
       description: "Repository to pull the nginx sidecar image from"
       type: string
       required: true
       default: "nginx"
-    - name: tag
+    - name: nginx_tag
       description: "Tag to pull the nginx sidecar image from"
       type: string
       required: true
@@ -30,17 +32,17 @@ data:
       type: string
       required: true
       default: "America/New_York"
-    - name: env
-      description: "Environment variables (e.g. ANTHROPIC_API_KEY)"
-      type: list
+    - name: storage_class
+      description: "Storage class for the persistent /data disk"
+      type: k8sStorageClass
       required: false
-      default: []
-      fields:
-        - name: name
-          description: "Environment variable name"
-          type: string
-          required: true
-        - name: value
-          description: "Environment variable value"
-          type: string
-          required: true
+    - name: storage_size
+      description: "Storage size for the persistent /data disk"
+      type: string
+      required: true
+      default: "10Gi"
+    - name: publicAccess
+      description: "Allow public access (disable authentication)"
+      type: boolean
+      required: true
+      default: false

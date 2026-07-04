@@ -9,9 +9,9 @@ data:
     #!/bin/sh
     set -e
 
-    # Install build dependencies for wetty native modules
+    # Install build dependencies for wetty native modules, and gosu for user switching
     apt-get update -qq
-    apt-get install -y -qq curl bash python3 make g++ > /dev/null 2>&1
+    apt-get install -y -qq curl bash python3 make g++ gosu > /dev/null 2>&1
 
     # Create user if PUID is not 0 (root)
     PUID=${PUID:-1000}
@@ -43,7 +43,7 @@ data:
     if [ "$PUID" = "0" ]; then
       CMD="/bin/bash"
     else
-      CMD="/usr/sbin/su-exec $USERNAME /bin/bash"
+      CMD="gosu $USERNAME /bin/bash"
     fi
 
     # Start wetty

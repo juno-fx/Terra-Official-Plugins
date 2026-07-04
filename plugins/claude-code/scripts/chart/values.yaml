@@ -32,6 +32,9 @@ nginx_tag: "alpine"
 # Timezone
 timezone: "America/New_York"
 
-# Storage (PVC kept for compatibility but not mounted by default)
+# Storage for the persistent /data disk
 storage_class: ""
 storage_size: "10Gi"
+
+# Ingress
+publicAccess: false
