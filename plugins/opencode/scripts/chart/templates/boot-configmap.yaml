@@ -10,7 +10,7 @@ data:
     set -e
 
     # Install tools and build deps for wetty's native modules
-    apt-get update -qq && apt-get install -y -qq curl bash python3 make g++ git gosu tmux 2>/dev/null
+    apt-get update && apt-get install -y curl bash python3 make g++ git gosu tmux
 
     export SHELL=/bin/bash
 
@@ -22,8 +22,8 @@ data:
     export SHELL=/bin/sh
 
     if [ "$PUID" != "0" ]; then
-      addgroup --gid "$PGID" "$USERNAME" 2>/dev/null || true
-      adduser --disabled-password --home /data --ingroup "$USERNAME" --uid "$PUID" "$USERNAME" 2>/dev/null || true
+      addgroup --gid "$PGID" "$USERNAME" || true
+      adduser --disabled-password --home /data --ingroup "$USERNAME" --uid "$PUID" "$USERNAME" || true
       chsh -s /bin/bash "$USERNAME" 2>/dev/null || true
       CMD="gosu $USERNAME /bin/bash"
       OPENCODE_USER="$USERNAME"
@@ -37,7 +37,7 @@ data:
 
     # Install opencode so the terminal has the CLI available
     export SHELL=/bin/sh
-    curl -fsSL https://opencode.ai/install -o /tmp/opencode-install.sh
+    curl -fL https://opencode.ai/install -o /tmp/opencode-install.sh
     chmod +x /tmp/opencode-install.sh
     SHELL=/bin/sh /tmp/opencode-install.sh || true
     rm -f /tmp/opencode-install.sh

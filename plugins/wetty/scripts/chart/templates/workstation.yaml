@@ -80,7 +80,7 @@ spec:
       volumes:
         - name: tooling
           configMap:
-            name: "{{ .Values.name }}-tooling"
+            name: "{{ .Release.Name }}-tooling"
         - name: nginx
           configMap:
             name: "{{ .Values.name }}-nginx"
