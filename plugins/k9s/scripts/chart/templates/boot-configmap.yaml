@@ -1,0 +1,82 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-boot
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+data:
+  boot.sh: |
+    #!/bin/sh
+    set -e
+
+    # Install tools and build deps for wetty's native modules
+    apt-get update -qq && apt-get install -y -qq curl bash python3 make g++ gosu tmux 2>/dev/null
+
+    export SHELL=/bin/bash
+
+    # Create user from PUID/GUID
+    PUID=${PUID:-1000}
+    PGID=${PGID:-1000}
+    USERNAME=${USER:-user}
+    export HOME=/data
+    export SHELL=/bin/sh
+
+    if [ "$PUID" != "0" ]; then
+      addgroup --gid "$PGID" "$USERNAME" 2>/dev/null || true
+      adduser --disabled-password --home /data --ingroup "$USERNAME" --uid "$PUID" "$USERNAME" 2>/dev/null || true
+      chsh -s /bin/bash "$USERNAME" 2>/dev/null || true
+    fi
+
+    # Install wetty (like Hermes Agent's built-in wetty)
+    npm install -g wetty
+
+    # Download k9s binary from GitHub releases
+    curl -fsSL -o /tmp/k9s.tar.gz https://github.com/derailed/k9s/releases/latest/download/k9s_Linux_amd64.tar.gz
+    tar -xzf /tmp/k9s.tar.gz -C /usr/local/bin k9s
+    chmod +x /usr/local/bin/k9s
+    rm -f /tmp/k9s.tar.gz
+
+    # Kubeconfig is mounted from a dedicated ConfigMap at /etc/kubeconfig
+    export KUBECONFIG=/etc/kubeconfig/config
+
+    # Fix ownership so the user can write to /data
+    chown -R "$PUID:$PGID" /data
+
+    # Start wetty — gosu runs a script file (not a shell builtin like 'source')
+    exec wetty --port {{ .Values.ttyd_port }} --command "bash -c \"gosu $USERNAME /opt/boot/tmux-launch.sh\""
+  tmux-boot.sh: |
+    #!/bin/sh
+    # tmux-boot.sh — shared wrapper for persistent terminal sessions
+    # Usage: source this script, then call exec_tmux "original_command"
+    # Creates or reattaches to a tmux session named juno-{USER}-{SESSION}
+
+    set -e
+
+    # Create or reattach to session
+    exec_tmux() {
+      ORIGINAL_CMD="$1"
+      SESSION_NAME="juno-${USER}-{{ .Values.session }}"
+
+      if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
+        # Reattach to existing session
+        exec tmux attach -t "$SESSION_NAME"
+      else
+        # Create new session, run command, then attach
+        tmux new-session -d -s "$SESSION_NAME"
+        tmux send-keys -t "$SESSION_NAME" "$ORIGINAL_CMD" Enter
+        exec tmux attach -t "$SESSION_NAME"
+      fi
+    }
+  tmux-launch.sh: |
+    #!/bin/sh
+    # tmux-launch.sh — entry point for wetty sessions under a specific user
+    # Called via: gosu <user> /opt/boot/tmux-launch.sh
+    # Sources tmux-boot.sh for the exec_tmux function, then launches the
+    # target application in a persistent tmux session.
+
+    set -e
+
+    . /opt/boot/tmux-boot.sh
+
+    # --- k9s ---
+    exec_tmux 'k9s; exec /bin/bash -l'

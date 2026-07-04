@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Release.Name }}"
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+spec:
+  selector:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      name: http

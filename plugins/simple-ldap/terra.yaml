@@ -1,6 +1,6 @@
 resource_id: simple-ldap
 name: Simple LDAP
-icon: https://www.openldap.org/images/logo_small.png
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/simple-ldap/scripts/assets/logo.png
 description: Simple OpenLDAP server with phpLDAPadmin web management interface
 category: Identity & Security
 tags:

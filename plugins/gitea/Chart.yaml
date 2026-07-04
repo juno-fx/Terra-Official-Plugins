@@ -1,0 +1,6 @@
+apiVersion: v2
+name: gitea
+description: Gitea - Git Server for Juno
+type: application
+version: 0.0.0
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/gitea/assets/logo.png

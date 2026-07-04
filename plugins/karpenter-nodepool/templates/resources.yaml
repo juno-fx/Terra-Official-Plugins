@@ -1,0 +1,50 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  {{- if .Values.weight }}
+  weight: {{ .Values.weight }}
+  {{- end }}
+  limits:
+    cpu: {{ .Values.cpu_limit | quote }}
+    memory: {{ .Values.memory_limit }}
+  template:
+    metadata:
+      labels:
+        {{- if eq .Values.pool_type "service" }}
+        juno-innovations.com/service: "true"
+        {{- else }}
+        juno-innovations.com/workstation: "true"
+        {{- end }}
+    spec:
+      nodeClassRef:
+        group: karpenter.k8s.aws
+        kind: EC2NodeClass
+        name: {{ .Values.nodeclass_ref }}
+      requirements:
+        - key: "karpenter.k8s.aws/instance-category"
+          operator: In
+          values: {{ splitList "," .Values.instance_categories | toJson }}
+        {{- if .Values.min_cpu }}
+        - key: "karpenter.k8s.aws/instance-cpu"
+          operator: Gt
+          values: [{{ .Values.min_cpu | quote }}]
+        {{- end }}
+        - key: "topology.kubernetes.io/zone"
+          operator: In
+          values: [{{ .Values.availability_zone | quote }}]
+        - key: "kubernetes.io/arch"
+          operator: In
+          values:
+            {{- if eq .Values.pool_type "workstation-arm64" }}
+            - "arm64"
+            {{- else }}
+            - "amd64"
+            {{- end }}
+        - key: "karpenter.sh/capacity-type"
+          operator: In
+          values: [{{ .Values.capacity_type | quote }}]
+        - key: "node.kubernetes.io/instance-type"
+          operator: In
+          values: {{ splitList "," .Values.instance_types | toJson }}

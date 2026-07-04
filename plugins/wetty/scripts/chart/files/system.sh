@@ -10,11 +10,29 @@ addgroup -g "$PGID" wettyusers || echo "group already exists"
 
 adduser -D -u "$PUID" -G wettyusers "$USER" || echo "user already exists"
 
-echo "$USER:$USER_PASS" | chpasswd
+# Set correct home directory ownership
+mkdir -p /home/"$USER"
+chown -R "$PUID":"$PGID" /home/"$USER"
 
 if [ -n "$PACKAGES" ]; then
   # shellcheck disable=SC2086
   apk add $PACKAGES
 fi
 
-yarn start --base "/polaris/$WORKSTATION_NAME" --allow-iframe
+# Install tmux for session persistence (Alpine uses apk)
+apk add --no-cache tmux bash
+
+# Base path for wetty (matches ingress nginx rewrite rule)
+WETTY_BASE="/wetty/$WORKSTATION_NAME"
+SESSION_NAME="juno-wetty-${WORKSTATION_NAME}"
+
+# Start wetty as a WebSocket-to-terminal bridge.
+# The wetty image CMD is: yarn run which expands to: NODE_ENV=production node .
+# We run node . directly (same expansion) so the -c flag works correctly.
+# The -c flag runs a command in the shell, bypassing the login form.
+# (same pattern as the Hermes agent plugin at:
+#  plugins/hermes-agent/scripts/chart/templates/init-script-configmap.yaml)
+cd /usr/src/app
+# cmd = "tmux new-session -A -s $SESSION_NAME bash"
+LANG=C.UTF-8 LC_ALL=C.UTF-8 COLORTERM=truecolor NODE_ENV=production node . -b "$WETTY_BASE" --allow-iframe \
+  -p 3000 -c "su $USER -c 'tmux new-session -A -s $SESSION_NAME bash'"

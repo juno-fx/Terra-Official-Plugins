@@ -1,0 +1,116 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-boot
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+data:
+  boot.sh: |
+    #!/bin/sh
+    set -e
+
+    # Install tools and build deps for wetty's native modules
+    apt-get update -qq && apt-get install -y -qq curl bash python3 make g++ git gosu tmux 2>/dev/null
+
+    export SHELL=/bin/bash
+
+    # Create user from PUID/GUID
+    PUID=${PUID:-1000}
+    PGID=${PGID:-1000}
+    USERNAME=${USER:-user}
+    export HOME=/data
+    export SHELL=/bin/sh
+
+    if [ "$PUID" != "0" ]; then
+      addgroup --gid "$PGID" "$USERNAME" 2>/dev/null || true
+      adduser --disabled-password --home /data --ingroup "$USERNAME" --uid "$PUID" "$USERNAME" 2>/dev/null || true
+      chsh -s /bin/bash "$USERNAME" 2>/dev/null || true
+      CMD="gosu $USERNAME /bin/bash"
+      OPENCODE_USER="$USERNAME"
+    else
+      CMD="/bin/bash"
+      OPENCODE_USER="root"
+    fi
+
+    # Install wetty (like Hermes Agent's built-in wetty)
+    npm install -g wetty
+
+    # Install opencode so the terminal has the CLI available
+    export SHELL=/bin/sh
+    curl -fsSL https://opencode.ai/install -o /tmp/opencode-install.sh
+    chmod +x /tmp/opencode-install.sh
+    SHELL=/bin/sh /tmp/opencode-install.sh || true
+    rm -f /tmp/opencode-install.sh
+    # opencode installs to ~/.opencode/bin/opencode - symlink to /usr/local/bin
+    if [ -f /data/.opencode/bin/opencode ]; then
+      ln -sf /data/.opencode/bin/opencode /usr/local/bin/opencode
+    fi
+
+    # Make git-serve.sh available on PATH
+    ln -sf /opt/boot/git-serve.sh /usr/local/bin/git-serve
+
+    # Fix ownership so the user can write to /data (opencode cache, etc.)
+    chown -R "$PUID:$PGID" /data
+
+    # Start wetty — gosu runs a script file (not a shell builtin like 'source')
+    exec wetty --port {{ .Values.ttyd_port }} --command "bash -c \"gosu $USERNAME /opt/boot/tmux-launch.sh\""
+  tmux-boot.sh: |
+    #!/bin/sh
+    # tmux-boot.sh — shared wrapper for persistent terminal sessions
+    # Usage: source this script, then call exec_tmux "original_command"
+    # Creates or reattaches to a tmux session named juno-{USER}-{SESSION}
+
+    set -e
+
+    # Create or reattach to session
+    exec_tmux() {
+      ORIGINAL_CMD="$1"
+      SESSION_NAME="juno-${USER}-{{ .Values.session }}"
+
+      if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
+        # Reattach to existing session
+        exec tmux attach -t "$SESSION_NAME"
+      else
+        # Create new session, run command, then attach
+        tmux new-session -d -s "$SESSION_NAME"
+        tmux send-keys -t "$SESSION_NAME" "$ORIGINAL_CMD" Enter
+        exec tmux attach -t "$SESSION_NAME"
+      fi
+    }
+  tmux-launch.sh: |
+    #!/bin/sh
+    # tmux-launch.sh — entry point for wetty sessions under a specific user
+    # Called via: gosu <user> /opt/boot/tmux-launch.sh
+    # Sources tmux-boot.sh for the exec_tmux function, then launches the
+    # target application in a persistent tmux session.
+
+    set -e
+
+    . /opt/boot/tmux-boot.sh
+
+    # --- opencode ---
+    exec_tmux "$CMD"
+  git-serve.sh: |
+    #!/bin/bash
+    set -e
+
+    SERVICE="${NAME:-opencode}"
+    NAMESPACE="${JUNO_PROJECT:-default}"
+    FQDN="${SERVICE}.${NAMESPACE}.svc.cluster.local"
+    PORT=9418
+
+    REPO_DIR="$(pwd)"
+    REPO_NAME="$(basename "$REPO_DIR")"
+    PARENT_DIR="$(dirname "$REPO_DIR")"
+
+    echo "=== git-serve ==="
+    echo "Serving:  ${REPO_DIR}"
+    echo "FQDN:     ${FQDN}"
+    echo "Clone URL: git://${FQDN}:${PORT}/${REPO_NAME}"
+    echo ""
+    echo "Add to Terra sources as:"
+    echo "  git://${FQDN}:${PORT}/${REPO_NAME}"
+    echo ""
+
+    git daemon --verbose --export-all --reuseaddr \
+      --base-path="${PARENT_DIR}" --port="${PORT}" "${REPO_DIR}"

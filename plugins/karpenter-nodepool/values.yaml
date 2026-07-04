@@ -1,0 +1,10 @@
+nodeclass_ref: ""
+pool_type: service
+availability_zone: ""
+capacity_type: spot
+instance_categories: 'c,t,r'
+instance_types: 'c5.xlarge,c5a.xlarge,c5ad.xlarge,c6a.xlarge,c7i-flex.xlarge'
+cpu_limit: '16'
+memory_limit: 32Gi
+weight:
+min_cpu: ""

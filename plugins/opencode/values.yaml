@@ -1,0 +1,6 @@
+# configuration
+volumeMounts: []
+volumes: []
+env:
+  - name: JUNO
+    value: "true"

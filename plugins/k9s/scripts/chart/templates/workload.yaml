@@ -1,0 +1,115 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{ .Release.Name }}"
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+  annotations:
+    juno-innovations.com/workload: "Terminal"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+  template:
+    metadata:
+      labels:
+        kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+    spec:
+      serviceAccountName: "{{ .Values.name }}"
+      automountServiceAccountToken: true
+      containers:
+        - name: k9s
+          imagePullPolicy: IfNotPresent
+          image: node:lts-bookworm-slim
+          command:
+            - sh
+            - /opt/boot/boot.sh
+          resources:
+            requests:
+              memory: "{{ .Values.memory }}"
+              cpu: "{{ .Values.cpu }}"
+            limits:
+              memory: "2Gi"
+              cpu: "2"
+          ports:
+            - containerPort: {{ .Values.ttyd_port }}
+              name: ttyd
+          env:
+            {{- range .Values.env }}
+            - name: {{ .name | quote }}
+              value: {{ .value | quote }}
+            {{- end }}
+            - name: PUID
+              value: "{{ .Values.puid }}"
+            - name: PGID
+              value: "{{ .Values.guid }}"
+            - name: USER
+              value: "{{ .Values.user }}"
+            - name: HOME
+              value: "/data"
+          startupProbe:
+            tcpSocket:
+              port: {{ .Values.ttyd_port }}
+            failureThreshold: 150
+            periodSeconds: 2
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.ttyd_port }}
+            failureThreshold: 24
+            periodSeconds: 5
+          volumeMounts:
+            - name: boot
+              mountPath: /opt/boot
+            - name: kubeconfig
+              mountPath: /etc/kubeconfig
+              readOnly: true
+            - name: tools
+              mountPath: /tools
+            - name: data
+              mountPath: /data
+            {{- if .Values.volumeMounts }}
+            {{- toYaml .Values.volumeMounts | nindent 12 }}
+            {{- end }}
+        - name: nginx
+          imagePullPolicy: IfNotPresent
+          image: {{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+          ports:
+            - containerPort: 8080
+              name: proxy
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+      nodeSelector:
+        beta.kubernetes.io/arch: amd64
+      tolerations:
+        - key: juno-innovations.com/workstation
+          operator: Equal
+          value: "true"
+          effect: NoSchedule
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: "{{ .Release.Name }}-nginx"
+        - name: boot
+          configMap:
+            name: "{{ .Release.Name }}-boot"
+            defaultMode: 0755
+        - name: kubeconfig
+          configMap:
+            name: "{{ .Release.Name }}-kubeconfig"
+        - name: tools
+          emptyDir: {}
+        - name: data
+          emptyDir: {}
+        {{- if .Values.volumes }}
+        {{- toYaml .Values.volumes | nindent 8 }}
+        {{- end }}
