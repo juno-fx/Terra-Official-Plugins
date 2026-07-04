@@ -12,8 +12,6 @@ data:
     # Install tools and build deps for wetty's native modules
     apt-get update && apt-get install -y curl bash python3 make g++ git gosu tmux
 
-    export SHELL=/bin/bash
-
     # Create user from PUID/GUID
     PUID=${PUID:-1000}
     PGID=${PGID:-1000}
@@ -22,9 +20,15 @@ data:
     export SHELL=/bin/sh
 
     if [ "$PUID" != "0" ]; then
-      addgroup --gid "$PGID" "$USERNAME" || true
-      adduser --disabled-password --home /data --ingroup "$USERNAME" --uid "$PUID" "$USERNAME" || true
-      chsh -s /bin/bash "$USERNAME" 2>/dev/null || true
+      if EXISTING_USER=$(getent passwd "$PUID" 2>/dev/null | cut -d: -f1); then
+        # UID already exists — reuse it, update home/shell
+        usermod -d /data -s /bin/bash "$EXISTING_USER" 2>/dev/null || true
+        USERNAME="$EXISTING_USER"
+      else
+        addgroup --gid "$PGID" "$USERNAME" || true
+        adduser --disabled-password --home /data --ingroup "$USERNAME" --uid "$PUID" "$USERNAME" || true
+        chsh -s /bin/bash "$USERNAME" 2>/dev/null || true
+      fi
       CMD="gosu $USERNAME /bin/bash"
       OPENCODE_USER="$USERNAME"
     else
@@ -36,7 +40,6 @@ data:
     npm install -g wetty
 
     # Install opencode so the terminal has the CLI available
-    export SHELL=/bin/sh
     curl -fL https://opencode.ai/install -o /tmp/opencode-install.sh
     chmod +x /tmp/opencode-install.sh
     SHELL=/bin/sh /tmp/opencode-install.sh || true

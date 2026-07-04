@@ -3,6 +3,6 @@ deploy:
   path: scripts/chart/
 auth:
   type: hubble
-  port: 8080
+  port: 8082
   paths:
-  - path: /plugin/__NAME__/
+  - path: /kubevirt-console/__NAME__/
