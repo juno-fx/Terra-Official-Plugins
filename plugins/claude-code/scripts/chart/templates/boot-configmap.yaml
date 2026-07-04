@@ -26,9 +26,10 @@ data:
       fi
       # Create user if it doesn't exist
       if ! id -u "$USERNAME" > /dev/null 2>&1; then
-        adduser -D -h /data -s /bin/sh -G "$USERNAME" -u "$PUID" "$USERNAME" 2>/dev/null || \
         useradd -m -d /data -s /bin/sh -g "$PGID" -u "$PUID" "$USERNAME"
       fi
+      # /data is the mounted PVC — always owned by root until chowned here
+      chown -R "$PUID:$PGID" /data
     fi
 
     export SHELL=/bin/sh
