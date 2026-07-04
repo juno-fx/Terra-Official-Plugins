@@ -1,0 +1,32 @@
+# Kuiper-injected standard values — do not remove
+name: claude-desktop
+user:
+group:
+cpu: "2"
+memory: "4Gi"
+cpuLimit: null
+memoryLimit: null
+idx: 0
+guid: 0
+puid: 0
+host:
+pullSecret:
+session:
+volumeMounts: []
+volumes: []
+env:
+  - name: JUNO
+    value: "true"
+selector:
+plugins: []
+_kuiper:
+
+# Claude Desktop fields
+registry: "lscr.io/linuxserver"
+repo: "webtop"
+tag: "ubuntu-xfce"
+gpu: false
+storage_class:
+storage_size: "5Gi"
+timezone: "Etc/UTC"
+publicAccess: false

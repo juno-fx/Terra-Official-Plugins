@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Values.name }}-init"
+data:
+  99-claude-desktop.sh: |
+    #!/bin/bash
+    set -e
+
+    if ! command -v claude-desktop >/dev/null 2>&1; then
+      echo "[claude-desktop] installing Claude Desktop..."
+      curl -fsSL -o /usr/share/keyrings/claude-desktop-archive-keyring.asc https://downloads.claude.ai/claude-desktop/key.asc
+      echo "deb [arch=amd64,arm64 signed-by=/usr/share/keyrings/claude-desktop-archive-keyring.asc] https://downloads.claude.ai/claude-desktop/apt/stable stable main" > /etc/apt/sources.list.d/claude-desktop.list
+      apt-get update
+      DEBIAN_FRONTEND=noninteractive apt-get install -y claude-desktop
+    else
+      echo "[claude-desktop] already installed, skipping"
+    fi
+
+    mkdir -p /config/.config/autostart
+    cat > /config/.config/autostart/claude-desktop.desktop <<'EOF'
+    [Desktop Entry]
+    Type=Application
+    Name=Claude
+    Exec=claude-desktop --no-sandbox
+    X-GNOME-Autostart-enabled=true
+    EOF
+
+    chown -R "${PUID}:${PGID}" /config/.config/autostart
