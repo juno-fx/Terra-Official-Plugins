@@ -7,8 +7,8 @@ annotations in context with inline comments explaining the purpose of each.
 
 ## Example 1: Basic Web Application
 
-A standard web application workload. Demonstrates actions, connection details, and ingress
-endpoint control.
+A standard web application workload with nginx sidecar authentication. Demonstrates actions,
+connection details, ingress endpoint control, and the sidecar auth pattern.
 
 ```yaml title="scripts/chart/templates/workstation.yaml"
 apiVersion: apps/v1
@@ -38,55 +38,105 @@ spec:
         - name: app
           image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
           ports:
+            - containerPort: 8081
+              name: app
+        - name: nginx
+          image: "{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}"
+          imagePullPolicy: IfNotPresent
+          ports:
             - containerPort: 8080
+              name: http
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: {{ .Release.Name }}-nginx
 ```
 
 ```yaml title="scripts/chart/templates/service.yaml"
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.name }}
+  name: {{ .Release.Name }}
 spec:
   selector:
     app: {{ .Values.name }}
   ports:
     - port: 8080
       targetPort: 8080
+      protocol: TCP
+      name: http
 ```
 
 ```yaml title="scripts/chart/templates/ingress.yaml"
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Values.name }}
+  name: {{ .Values.name }}-ingress
   annotations:
-    kubernetes.io/ingress.class: nginx
-    # Required: authenticate requests through Hubble before allowing access.
-    nginx.ingress.kubernetes.io/auth-url: "http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/"
-    nginx.ingress.kubernetes.io/use-regex: "true"
     # Hide internal paths from the Hubble endpoint list.
     kuiper.juno-innovations.com/ingress-hide: "/socket.io"
     # Surface additional deep-link paths as clickable endpoints in Hubble.
     kuiper.juno-innovations.com/ingress-extras: "/app/index.html"
 spec:
+  {{- if .Values.ingressClassName }}
+  ingressClassName: {{ .Values.ingressClassName }}
+  {{- end }}
   rules:
     - host: {{ .Values.host }}
       http:
         paths:
-          - path: /
+          - path: "/plugin/{{ .Values.name }}/"
             pathType: Prefix
             backend:
               service:
-                name: {{ .Values.name }}
+                name: {{ .Release.Name }}
                 port:
                   number: 8080
-          - path: /socket.io
-            pathType: Prefix
-            backend:
-              service:
-                name: {{ .Values.name }}
-                port:
-                  number: 8088
+```
+
+```yaml title="scripts/chart/templates/nginx-configmap.yaml"
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-nginx
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+data:
+  default.conf: |
+{{ tpl (.Files.Get "files/nginx/default.conf") . | indent 4 }}
+```
+
+```nginx title="scripts/chart/files/nginx/default.conf"
+server {
+    listen 8080;
+    server_name _;
+
+    location /plugin/{{ .Values.name }}/ {
+        auth_request /auth;
+        proxy_pass http://127.0.0.1:8081;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location = /auth {
+        internal;
+        proxy_pass http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/;
+        proxy_pass_request_body off;
+        proxy_set_header Content-Length "";
+        proxy_set_header X-Original-URI $request_uri;
+        proxy_set_header Upgrade "";
+        proxy_set_header Connection "";
+    }
+}
 ```
 
 ---

@@ -17,30 +17,70 @@ type reference — including both install-time (`terra.yaml`) and workload launc
 
 ---
 
-## Ingress Authentication
+## Nginx Sidecar Authentication
 
-These are standard nginx ingress annotations — not Kuiper-specific — but required for
-platform-integrated authentication on any ingress you expose.
+Authentication is handled by an **nginx sidecar container** inside the workload pod, not by ingress
+annotations. The sidecar uses nginx's `auth_request` module to validate every request against the
+platform auth service before proxying to the app container.
 
-**Workload templates** authenticate via Hubble:
+```
+Request → Ingress (plain route, no auth annotations) → Service → Pod
+                                                              └─ nginx sidecar (port 8080)
+                                                                   ├─ auth_request → Hubble/Genesis
+                                                                   └─ proxy_pass → 127.0.0.1:APP_PORT
+                                                              └─ app container
+```
 
-```yaml
-annotations:
-  nginx.ingress.kubernetes.io/auth-url: "http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/"
-  nginx.ingress.kubernetes.io/use-regex: "true"
+**Workload templates** — authenticate via Hubble. Sidecar nginx config at `files/nginx/default.conf`:
+
+```nginx
+location /plugin/{{ .Values.name }}/ {
+    auth_request /auth;
+    proxy_pass http://127.0.0.1:APP_PORT;
+}
+
+location = /auth {
+    internal;
+    proxy_pass http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/;
+    proxy_pass_request_body off;
+    proxy_set_header Content-Length "";
+    proxy_set_header X-Original-URI $request_uri;
+    proxy_set_header Upgrade "";
+    proxy_set_header Connection "";
+}
 ```
 
 **Namespaced and cluster-level plugins** authenticate via Genesis:
 
-!!! note
-    Workload templates must always be tagged `cluster-level` in `terra.yaml` — they are installed
-    into the `argocd` namespace by Terra.
+```nginx
+location = /auth {
+    internal;
+    proxy_pass http://genesis.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-service/{{ .Release.Name }}/;
+    proxy_pass_request_body off;
+    proxy_set_header Content-Length "";
+    proxy_set_header X-Original-URI $request_uri;
+    proxy_set_header Upgrade "";
+    proxy_set_header Connection "";
+}
+```
+
+**Conditional auth** — wrap `auth_request` in a Helm conditional for plugins that support public access:
 
 ```yaml
-annotations:
-  nginx.ingress.kubernetes.io/auth-url: "http://genesis.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-service/{{ .Release.Name }}/"
-  nginx.ingress.kubernetes.io/auth-signin: /unauthorized/
+{{- if not .Values.publicAccess }}
+auth_request /auth;
+{{- end }}
 ```
+
+The nginx config is loaded from an external file into a ConfigMap via `tpl`:
+
+```yaml
+data:
+  default.conf: |
+{{ tpl (.Files.Get "files/nginx/default.conf") . | indent 4 }}
+```
+
+The ingress itself carries no nginx annotations — only a conditional `ingressClassName`:
 
 ---
 
