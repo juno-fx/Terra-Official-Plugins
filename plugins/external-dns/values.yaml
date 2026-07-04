@@ -1,0 +1,12 @@
+chart_version: "1.21.1"
+provider: aws
+sources:
+  - service
+  - ingress
+domain_filters: ""
+txt_owner_id: "default"
+policy: upsert-only
+aws_role_arn: ""
+aws_region: "us-east-1"
+cloudflare_api_token: ""
+extra_values: ""

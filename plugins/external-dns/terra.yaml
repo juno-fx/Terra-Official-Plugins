@@ -1,0 +1,71 @@
+resource_id: external-dns
+name: ExternalDNS
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/external-dns/assets/logo.png
+description: Synchronizes exposed Kubernetes Services and Ingresses with external DNS providers (AWS Route53, Cloudflare). https://github.com/kubernetes-sigs/external-dns
+category: Networking
+tags:
+  - cluster-level
+  - dns
+  - networking
+editable: true
+fields:
+  - name: chart_version
+    description: Version of the external-dns chart to install.
+    required: true
+    default: "1.21.1"
+    type: string
+  - name: provider
+    description: "DNS provider to sync records to."
+    required: true
+    default: aws
+    type: select
+    options:
+      - aws
+      - cloudflare
+  - name: sources
+    description: "Kubernetes resource types to watch for DNS record hostnames."
+    required: true
+    default:
+      - service
+      - ingress
+    type: multi
+    options:
+      - service
+      - ingress
+      - istio-gateway
+      - istio-virtualservice
+      - node
+  - name: domain_filters
+    description: "Comma-separated list of domains to manage (e.g. example.com,example.org). Leave empty to manage all zones visible to the provider."
+    required: false
+    type: string
+  - name: txt_owner_id
+    description: "Unique identifier written into the TXT registry records. Must be unique per external-dns instance sharing the same zones, to prevent two instances from fighting over the same records."
+    required: true
+    default: "default"
+    type: string
+  - name: policy
+    description: "upsert-only never deletes DNS records when the backing Service/Ingress is removed. sync also deletes them — only use once you trust the setup."
+    required: true
+    default: upsert-only
+    type: select
+    options:
+      - upsert-only
+      - sync
+  - name: aws_role_arn
+    description: "IAM role ARN to annotate onto the ServiceAccount for IRSA (AWS provider only). Requires an OIDC-enabled cluster (EKS) with the role's trust policy configured for this ServiceAccount."
+    required: false
+    type: string
+  - name: aws_region
+    description: "AWS region (AWS provider only)."
+    required: false
+    default: "us-east-1"
+    type: string
+  - name: cloudflare_api_token
+    description: "Cloudflare API token with Zone:Read and DNS:Edit permissions (Cloudflare provider only)."
+    required: false
+    type: string
+  - name: extra_values
+    description: "Additional raw Helm values (YAML) merged into the chart — use this for anything not covered above (e.g. Cloudflare zone_id_filter/proxied, legacy API key+email auth)."
+    required: false
+    type: string
