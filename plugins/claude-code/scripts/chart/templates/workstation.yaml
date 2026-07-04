@@ -16,7 +16,12 @@ spec:
       labels:
         kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
     spec:
+      {{- if ne .Values.cluster_access "none" }}
+      serviceAccountName: "{{ .Values.name }}"
+      automountServiceAccountToken: true
+      {{- else }}
       automountServiceAccountToken: false
+      {{- end }}
 
       {{- if .Values.pullSecret }}
       imagePullSecrets:

@@ -1,0 +1,82 @@
+{{- if ne .Values.cluster_access "none" }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "{{ .Values.name }}"
+  namespace: "{{ .Release.Namespace }}"
+  annotations:
+    kuiper.juno-innovations.com/hidden: "true"
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+{{- end }}
+
+{{- if eq .Values.cluster_access "readonly-ns" }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: "{{ .Values.name }}-role"
+  namespace: "{{ .Release.Namespace }}"
+  annotations:
+    kuiper.juno-innovations.com/hidden: "true"
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+rules:
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: "{{ .Values.name }}-binding"
+  namespace: "{{ .Release.Namespace }}"
+  annotations:
+    kuiper.juno-innovations.com/hidden: "true"
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: "{{ .Values.name }}-role"
+subjects:
+  - kind: ServiceAccount
+    name: "{{ .Values.name }}"
+    namespace: "{{ .Release.Namespace }}"
+{{- end }}
+
+{{- if eq .Values.cluster_access "admin-ns" }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: "{{ .Values.name }}-role"
+  namespace: "{{ .Release.Namespace }}"
+  annotations:
+    kuiper.juno-innovations.com/hidden: "true"
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+rules:
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: "{{ .Values.name }}-binding"
+  namespace: "{{ .Release.Namespace }}"
+  annotations:
+    kuiper.juno-innovations.com/hidden: "true"
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: "{{ .Values.name }}-role"
+subjects:
+  - kind: ServiceAccount
+    name: "{{ .Values.name }}"
+    namespace: "{{ .Release.Namespace }}"
+{{- end }}

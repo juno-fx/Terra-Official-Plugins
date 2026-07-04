@@ -11,7 +11,7 @@ data:
   description: "Claude Code AI coding agent in a web terminal (wetty)"
   fields: |
     - name: icon
-      default: ""
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/claude-code/assets/logo.png"
     - name: nginx_registry
       description: "Registry to pull the nginx sidecar image from"
       type: string
@@ -46,3 +46,12 @@ data:
       type: boolean
       required: true
       default: false
+    - name: cluster_access
+      description: "Kubernetes RBAC access level for this agent."
+      type: select
+      required: false
+      default: none
+      options:
+        - none
+        - readonly-ns
+        - admin-ns
