@@ -95,7 +95,7 @@ spec:
             tcpSocket:
               port: 8888
             initialDelaySeconds: 5
-            failureThreshold: 300  # start up totals 2 * 60 = up to 2 mins # temp, don't let me merge it
+            failureThreshold: 300
             periodSeconds: 5
           livenessProbe:
             tcpSocket:
@@ -108,7 +108,7 @@ spec:
           workingDir: "/home/{{ .Values.user }}"
           env:
             - name: NOTEBOOK_ARGS
-              value: "--ServerApp.base_url=/polaris/{{ .Values.name }}/ --IdentityProvider.token= --ServerApp.root_dir=/home/{{ .Values.user }}"
+              value: "--ServerApp.base_url=/plugin/{{ .Values.name }}/ --IdentityProvider.token= --ServerApp.root_dir=/home/{{ .Values.user }}"
             # necessary to let it run when home dirs aren't yet mounted
             - name: CHOWN_HOME
               value: "yes"
@@ -127,11 +127,25 @@ spec:
             {{- toYaml .Values.volumeMounts | nindent 12 }}
             {{- end }}
           securityContext:
-            # This is checked by the startup script and used to chown the home dir.
-            # It then performs a switch to the unprivileged account.
-            # The web app itself runs as the uid passed in via NB_USER, non-root 
             runAsUser: 0
+        - name: nginx
+          image: "{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}"
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+          ports:
+            - containerPort: 8080
+              name: http
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
       volumes:
+        - name: nginx-config
+          configMap:
+            name: {{ .Release.Name }}-nginx
         {{- if .Values.volumeMounts }}
         {{- toYaml .Values.volumes | nindent 8 }}
         {{- end }}

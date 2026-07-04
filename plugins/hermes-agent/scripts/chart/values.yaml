@@ -12,6 +12,10 @@ cpuLimit: 2000m
 memoryLimit: 4Gi
 persistence_size: 1Gi
 persistence_storage_class: local-path
+ingressClassName: ""
+nginx_registry: "docker.io"
+nginx_repo: "nginx"
+nginx_tag: "alpine"
 git_port: 9418
 puid: 1000
 guid: 1000

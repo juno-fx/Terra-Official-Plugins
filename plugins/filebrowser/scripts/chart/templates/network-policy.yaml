@@ -18,5 +18,5 @@ spec:
               kubernetes.io/metadata.name: {{ .Values.ingressNamespace }}
       ports:
         - protocol: TCP
-          port: 8080
+          port: 8081
   egress: []

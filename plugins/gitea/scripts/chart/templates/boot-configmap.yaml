@@ -22,7 +22,7 @@ data:
     APP_DATA_PATH = $GITEA_DATA
     PROTOCOL      = http
     DOMAIN        = {{ .Values.host }}
-    ROOT_URL      = https://{{ .Values.host }}/gitea/{{ .Values.name }}/
+    ROOT_URL      = https://{{ .Values.host }}/plugin/{{ .Values.name }}/
     HTTP_PORT     = {{ .Values.app_port }}
     SSH_DOMAIN    = {{ .Values.host }}
     DISABLE_SSH   = true

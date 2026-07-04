@@ -18,3 +18,18 @@ fields:
   - name: prefix
     description: Connection URL prefix. i.e. `/headlamp`. Will default to `/` if not set.
     required: false
+  - name: ingressClassName
+    description: Ingress class name. Leave empty for cluster default.
+    required: false
+  - name: nginx_registry
+    description: Registry to pull the nginx sidecar image from
+    required: false
+    default: docker.io
+  - name: nginx_repo
+    description: Repository to pull the nginx sidecar image from
+    required: false
+    default: nginx
+  - name: nginx_tag
+    description: Tag to pull the nginx sidecar image from
+    required: false
+    default: alpine

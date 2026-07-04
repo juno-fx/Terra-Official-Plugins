@@ -26,6 +26,7 @@ plugins: []
 _kuiper:
 packages:
 terra_role:
+ingressClassName: ""
 nginx_registry: "docker.io"
 nginx_repo: "nginx"
 nginx_tag: "1.29.3"

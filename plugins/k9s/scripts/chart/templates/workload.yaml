@@ -73,7 +73,7 @@ spec:
             {{- end }}
         - name: nginx
           imagePullPolicy: IfNotPresent
-          image: {{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}
+          image: "{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}"
           resources:
             requests:
               memory: "64Mi"

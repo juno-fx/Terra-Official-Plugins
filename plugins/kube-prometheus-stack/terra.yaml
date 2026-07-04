@@ -22,3 +22,18 @@ fields:
   - name: path
     description: Connection URL sub path. i.e. `grafana.example.com/my/path/grafana`.
     required: false
+  - name: ingressClassName
+    description: Ingress class name. Leave empty for cluster default.
+    required: false
+  - name: nginx_registry
+    description: Registry to pull the nginx sidecar image from
+    required: false
+    default: docker.io
+  - name: nginx_repo
+    description: Repository to pull the nginx sidecar image from
+    required: false
+    default: nginx
+  - name: nginx_tag
+    description: Tag to pull the nginx sidecar image from
+    required: false
+    default: alpine

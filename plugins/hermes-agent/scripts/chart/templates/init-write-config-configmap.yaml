@@ -27,8 +27,3 @@ data:
     sed "s/__NAME__/${NAME}/g" \
       /opt/templates/init/start.sh > /opt/init/start.sh
     chmod 755 /opt/init/start.sh
-
-    # --- Substitute nginx template ---
-    sed "s/__NAME__/${NAME}/g" \
-      /opt/templates/nginx/nginx.conf > /opt/proxy/nginx.conf
-    chmod 644 /opt/proxy/nginx.conf

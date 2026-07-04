@@ -121,7 +121,7 @@ data:
       log "Starting wetty..."
       WETTY_CMD="bash -c 'export LANG=C.UTF-8 LC_ALL=C.UTF-8 COLORTERM=truecolor && . /opt/hermes/.venv/bin/activate && exec tmux new-session -A -s hermes bash'"
       [ -n "$_SU" ] && WETTY_CMD="$_SU ${WETTY_CMD}"
-      wetty -b /hermes/__NAME__ --allow-iframe -p 7681 \
+      wetty -b /plugin/__NAME__ --allow-iframe -p 7681 \
         -c "${WETTY_CMD}" \
         2>&1 | sed 's/^/[wetty] /' &
     }

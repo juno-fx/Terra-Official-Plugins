@@ -35,6 +35,11 @@ data:
       description: Name of a Terra role to assign to Development Kit. This refers to the plugin level installed roles.
       required: false
       type: k8sServiceAccount
+    - name: ingressClassName
+      description: "Ingress class name. Leave empty for cluster default."
+      type: string
+      required: false
+      default: ""
     - name: nginx_registry
       description: "Registry to pull the nginx image from"
       type: string
