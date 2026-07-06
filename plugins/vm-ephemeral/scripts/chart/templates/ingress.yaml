@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: {{ .Values.name }}-ingress
   annotations:
-    kuiper.juno-innovations.com/ingress-extras: "/plugin/{{ .Values.name }}/vnc.html?keep_device_awake=true&reconnect=5000&autoconnect=true&resize=scale"
+    kuiper.juno-innovations.com/ingress-extras: "/kubevirt-console/{{ .Values.name }}/vnc.html?keep_device_awake=true&reconnect=5000&autoconnect=true&resize=scale"
 spec:
   {{- if .Values.ingressClassName }}
   ingressClassName: {{ .Values.ingressClassName }}
@@ -12,10 +12,10 @@ spec:
     - host: {{ .Values.host }}
       http:
         paths:
-          - path: "/plugin/{{ .Values.name }}/"
+          - path: "/kubevirt-console/{{ .Values.name }}/"
             pathType: Prefix
             backend:
               service:
                 name: {{ .Release.Name }}
                 port:
-                  number: 8080
+                  number: 8082

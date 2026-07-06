@@ -551,6 +551,12 @@ All types above plus:
   are the base templates used by `make package`. Do not modify them unless changing the bootstrap script behavior
   for all plugins.
 
+- Conditional `publicAccess` support (allowing unauthenticated access via `{{- if not .Values.publicAccess }}`) is
+  implemented in only 3 plugins: `helios`, `lsio-webtop`, and `wetty`. This is an intentional per-plugin feature —
+  not all plugins need public access. Adding it to a new plugin requires: (1) the `publicAccess` field in
+  `metadata.yaml`, (2) the conditional wrapper in `files/nginx/default.conf`, and (3) no secrets or user data
+  behind the unauthenticated endpoint.
+
 ---
 
 ## Adding a New Plugin — Checklist

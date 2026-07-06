@@ -33,7 +33,7 @@ spec:
               memory: "64Mi"
               cpu: "50m"
           ports:
-            - containerPort: 8080
+            - containerPort: 8082
               name: http
           volumeMounts:
             - name: nginx-config
