@@ -27,10 +27,13 @@ nginx_repo: nginx
 nginx_tag: "1.29.3"
 
 # User-facing fields from metadata.yaml
-icon: https://github.com/dockur/proxmox/raw/master/.github/logo.png
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/proxmox/assets/logo.png
 registry: docker.io
 repo: dockurr/proxmox
-tag: latest
+# Pinned: docker.io/dockurr/proxmox:latest currently points at 9.2.4, which
+# has a `set -u` bug in network.sh (references unset $KERNEL) that
+# crashloops every container. 9.2.3 is the last known-good build.
+tag: "9.2.3"
 password: proxmox
 debug: "N"
 gpu: false
