@@ -1,6 +1,10 @@
 # configuration
 host:
 prefix: "/argocd"
+ingressClassName: ""
+nginx_registry: "docker.io"
+nginx_repo: "nginx"
+nginx_tag: "alpine"
 
 # This will be autopopulated by Terra in airgapped envs. The default here will be overriden on Terra versions > v1.0.4
 _juno_terra_image_pull_secrets: []

@@ -1,0 +1,16 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: terra-plugins
+nodes:
+  - role: control-plane
+    extraMounts:
+      # placeholder for patch-kind-config.sh to inject Docker config mount
+    labels:
+      ingress-ready: "true"
+      juno-innovations.com/workstation: "true"
+      juno-innovations.com/service: "true"
+    extraPortMappings:
+      - containerPort: 80
+        hostPort: 8080
+      - containerPort: 443
+        hostPort: 8443

@@ -4,15 +4,15 @@ metadata:
   name: "{{ .Release.Name }}"
   labels:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
-  annotations:
-    nginx.ingress.kubernetes.io/auth-url: "http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/"
 spec:
-  ingressClassName: "nginx"
+  {{- if .Values.ingressClassName }}
+  ingressClassName: {{ .Values.ingressClassName }}
+  {{- end }}
   rules:
     - host: {{ .Values.host }}
       http:
         paths:
-          - path: "/filebrowser/{{ .Values.name }}/"
+          - path: "/plugin/{{ .Values.name }}/"
             pathType: Prefix
             backend:
               service:

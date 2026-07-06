@@ -7,10 +7,10 @@ metadata:
     kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
 data:
   config.yaml: |
-    port: "8080"
+    port: "8081"
     address: "0.0.0.0"
     root: "/data"
-    baseURL: "/filebrowser/{{ .Values.name }}"
+    baseURL: "/plugin/{{ .Values.name }}"
     log: "stdout"
     database: "/data/filebrowser.db"
     noauth: true

@@ -15,10 +15,10 @@ spec:
     - matches:
         - path:
             type: PathPrefix
-            value: "/polaris/{{ .Values.name }}/"
+            value: "/plugin/{{ .Values.name }}/"
       backendRefs:
-        - name: "{{ .Values.name }}-web-ide"
-          port: 3000
+        - name: "{{ .Release.Name }}"
+          port: 8080
           kind: Service
       filters:
         - type: ExtensionRef

@@ -1,0 +1,8 @@
+deploy:
+  method: install
+  path: .
+auth:
+  type: genesis
+  port: 8080
+  paths:
+    - path: /argocd

@@ -34,7 +34,7 @@ spec:
           image: "{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}"
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 3000
+            - containerPort: 8080
               name: nginx
           volumeMounts:
             - name: nginx

@@ -29,5 +29,25 @@ data:
       type: string
       required: true
       default: "lab-4.4.9"
+    - name: ingressClassName
+      description: "Ingress class name. Leave empty for cluster default."
+      type: string
+      required: false
+      default: ""
+    - name: nginx_registry
+      description: "Registry to pull the nginx sidecar image from"
+      type: string
+      required: true
+      default: "docker.io"
+    - name: nginx_repo
+      description: "Repository to pull the nginx sidecar image from"
+      type: string
+      required: true
+      default: "nginx"
+    - name: nginx_tag
+      description: "Tag to pull the nginx sidecar image from"
+      type: string
+      required: true
+      default: "alpine"
     - name: icon
       default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/jupyter-notebook/scripts/assets/template-icon.png"

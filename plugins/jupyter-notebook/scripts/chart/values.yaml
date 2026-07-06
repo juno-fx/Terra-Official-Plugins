@@ -24,5 +24,9 @@ selector:
 plugins: []
 _kuiper:
 
+ingressClassName: ""
+nginx_registry: "docker.io"
+nginx_repo: "nginx"
+nginx_tag: "alpine"
 proxy_namespace: ingress-nginx
 

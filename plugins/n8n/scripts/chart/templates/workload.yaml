@@ -45,13 +45,13 @@ spec:
             - name: N8N_RUNNERS_ENABLED
               value: "true"
             - name: N8N_PATH
-              value: "/polaris/{{ .Values.name }}/"
+              value: "/plugin/{{ .Values.name }}/"
             - name: N8N_HOST
               value: "{{ .Values.host }}"
             - name: N8N_PROTOCOL
               value: "https"
             - name: WEBHOOK_URL
-              value: "https://{{ .Values.host }}/polaris/{{ .Values.name }}/"
+              value: "https://{{ .Values.host }}/plugin/{{ .Values.name }}/"
             {{- range .Values.env }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}

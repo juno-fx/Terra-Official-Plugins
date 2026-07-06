@@ -40,10 +40,6 @@ spec:
           volumeMounts:
             - name: hermes-data
               mountPath: /opt/data
-            - name: nginx-out
-              mountPath: /opt/proxy
-            - name: nginx-template
-              mountPath: /opt/templates/nginx
             - name: init-script
               mountPath: /opt/templates/init
             - name: init-out
@@ -119,35 +115,33 @@ spec:
               mountPath: /opt/init
 
         - name: nginx
-          image: nginx:alpine
+          image: "{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}"
           imagePullPolicy: IfNotPresent
-          command: ["nginx", "-g", "daemon off;", "-c", "/opt/proxy/nginx.conf"]
           ports:
             - name: http
-              containerPort: 9119
+              containerPort: 8080
               protocol: TCP
           resources:
             requests:
               memory: "64Mi"
               cpu: "50m"
           volumeMounts:
-            - name: nginx-out
-              mountPath: /opt/proxy
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
 
       volumes:
         {{- if .Values.volumes }}
         {{- toYaml .Values.volumes | nindent 8 }}
         {{- end }}
+        - name: nginx-config
+          configMap:
+            name: {{ .Release.Name }}-nginx
         - name: hermes-data
           persistentVolumeClaim:
             claimName: "{{ .Values.name }}-data"
-        - name: nginx-out
-          emptyDir: {}
         - name: init-out
           emptyDir: {}
-        - name: nginx-template
-          configMap:
-            name: "{{ .Release.Name }}-nginx-template"
         - name: init-script
           configMap:
             name: "{{ .Release.Name }}-init-script"

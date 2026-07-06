@@ -75,10 +75,14 @@ scripts/
 └── chart/
     ├── Chart.yaml
     ├── values.yaml            # All field names from metadata.yaml must exist here
+    ├── files/
+    │   └── nginx/
+    │       └── default.conf   # Nginx sidecar config (loaded via tpl)
     └── templates/
         ├── workstation.yaml   # Primary workload resource (StatefulSet by convention; Crossplane plugins use xr.yaml)
-        ├── service.yaml       # ClusterIP Service
-        └── ingress.yaml       # nginx Ingress with Hubble auth
+        ├── service.yaml       # ClusterIP Service, name: {{ .Release.Name }}, port name: http
+        ├── ingress.yaml       # Ingress — no nginx annotations, conditional ingressClassName
+        └── nginx-configmap.yaml  # Thin wrapper loading files/nginx/ via tpl
 ```
 
 ---
@@ -241,9 +245,19 @@ This StatefulSet is what Kuiper deploys when a user launches a workload. Key con
 - **Toleration** — must tolerate the `juno-innovations.com/workstation: NoSchedule` taint
 - **Annotations** — `juno-innovations.com/workload` must match `metadata.yaml`
 - **Plugin mounts** — range over `.Values.plugins` to mount Helios plugin scripts
+- **Nginx sidecar** — add a container named `nginx` on port 8080, using `{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}` as the image
+- **Nginx ConfigMap** — mount `{{ .Release.Name }}-nginx` ConfigMap at `/etc/nginx/conf.d/default.conf` (server-block) or `/etc/nginx/nginx.conf` (full wrapper)
 - **Standard env vars** — `JUNO_WORKSTATION`, `JUNO_PROJECT`, `USER`, `HOME`, `PREFIX`
 
-See `plugins/helios/scripts/chart/templates/workstation.yaml` for the full reference implementation.
+The nginx config lives in an external file at `files/nginx/default.conf` and is loaded via:
+
+```yaml
+data:
+  default.conf: |
+{{ tpl (.Files.Get "files/nginx/default.conf") . | indent 4 }}
+```
+
+See `plugins/filebrowser/scripts/chart/templates/workstation.yaml` for a minimal reference, or `plugins/gitea/scripts/chart/templates/workstation.yaml` for the full pattern.
 
 ---
 
@@ -305,8 +319,12 @@ This requires `inotifywait` (available in the devbox shell).
    - Set correct image reference using `{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}`
    - Set correct `containerPort` and probe ports
    - Set `juno-innovations.com/workload` annotation to match `metadata.yaml`
-6. Edit `scripts/chart/templates/service.yaml` — set correct `port`/`targetPort`
-7. `make package <plugin-name>`
+   - Add nginx sidecar container — image `{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}`, port 8080, ConfigMap volume
+6. Edit `scripts/chart/templates/service.yaml` — use `{{ .Release.Name }}` as name, port name `http`, target `8080`
+7. Create `scripts/chart/files/nginx/default.conf` — nginx config with `auth_request` + `proxy_pass` to app port
+8. Create `scripts/chart/templates/nginx-configmap.yaml` — load external config via `{{ tpl (.Files.Get "files/nginx/default.conf") . | indent 4 }}`
+9. Edit `scripts/chart/templates/ingress.yaml` — no nginx annotations, conditional `ingressClassName`, path `/plugin/{{ .Values.name }}/`
+10. `make package <plugin-name>`
 8. `make check-size <plugin-name>` — confirm under 1MiB
 9. `make verify` — confirm nothing is stale
 10. `make test <plugin-name>` or `make test-plugin <plugin-name>`
@@ -324,6 +342,8 @@ This requires `inotifywait` (available in the devbox shell).
 | Missing `juno-innovations.com/workload` annotation | Not categorized in Hubble                  | Add to both `metadata.yaml` and `workstation.yaml` |
 | `packaged-scripts.yaml` hand-edited                | Overwritten on next `make package`         | Edit `scripts/` instead                            |
 | Large assets in `scripts/`                         | Exceeds 1MiB ConfigMap limit               | Use `make check-size`, trim assets                 |
+| Auth in ingress annotations instead of sidecar     | No auth enforced                           | Move `auth_request` to nginx configmap             |
+| Inline nginx config in YAML instead of `files/`   | Hard to edit, no syntax highlighting       | Move to `files/nginx/default.conf`, load via tpl   |
 
 ---
 

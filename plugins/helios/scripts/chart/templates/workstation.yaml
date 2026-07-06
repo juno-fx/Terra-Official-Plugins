@@ -138,7 +138,7 @@ spec:
             - name: GID
               value: "{{ .Values.guid }}"
             - name: PREFIX
-              value: "/polaris/{{ .Values.name }}/"
+              value: "/plugin/{{ .Values.name }}/"
             {{- range .Values.env }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}
@@ -160,6 +160,20 @@ spec:
             - name: orionpy-volume
               mountPath: /opt/juno 
             {{- end }}
+        - name: nginx
+          image: "{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}"
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+          ports:
+            - containerPort: 8080
+              name: http
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
         {{- if .Values.enableAPI }}
         - name: rhea
           image: "{{ .Values.registry }}/{{ .Values.rheaRepo }}:{{ .Values.rheaTag }}"
@@ -198,6 +212,9 @@ spec:
             {{- end }}
         {{- end }}
       volumes:
+        - name: nginx-config
+          configMap:
+            name: {{ .Release.Name }}-nginx
         - name: shm
           emptyDir:
             medium: Memory

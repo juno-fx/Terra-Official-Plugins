@@ -2,28 +2,25 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ .Values.name }}-ingress
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
-    nginx.ingress.kubernetes.io/auth-url: "http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/"
-    nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
+  {{- if .Values.ingressClassName }}
+  ingressClassName: {{ .Values.ingressClassName }}
+  {{- end }}
   rules:
     - host: {{ .Values.host }}
       http:
         paths:
-          - path: "/hermes/{{ .Values.name }}/dashboard"
+          - path: "/plugin/{{ .Values.name }}/dashboard"
             pathType: Prefix
             backend:
               service:
-                name: {{ .Values.name }}
+                name: {{ .Release.Name }}
                 port:
-                  number: 9119
-          - path: "/hermes/{{ .Values.name }}"
+                  number: 8080
+          - path: "/plugin/{{ .Values.name }}"
             pathType: Prefix
             backend:
               service:
-                name: {{ .Values.name }}
+                name: {{ .Release.Name }}
                 port:
-                  number: 9119
+                  number: 8080
