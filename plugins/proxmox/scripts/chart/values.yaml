@@ -24,7 +24,7 @@ _kuiper:
 # Nginx sidecar image
 nginx_registry: docker.io
 nginx_repo: nginx
-nginx_tag: "1.29.3"
+nginx_tag: "alpine"
 
 # User-facing fields from metadata.yaml
 icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/proxmox/assets/logo.png
@@ -36,7 +36,6 @@ repo: dockurr/proxmox
 tag: "9.2.3"
 password: proxmox
 debug: "N"
-gpu: false
 data_size: 32Gi
 config_size: 1Gi
 persistence_storage_class:
