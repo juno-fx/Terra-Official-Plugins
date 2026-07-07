@@ -1,0 +1,20 @@
+apiVersion: karpenter.k8s.aws/v1
+kind: EC2NodeClass
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  amiFamily: AL2023
+  role: {{ .Values.role | quote }}
+  subnetSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: {{ .Values.cluster_name | quote }}
+  securityGroupSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: {{ .Values.cluster_name | quote }}
+  blockDeviceMappings:
+    - deviceName: /dev/xvda
+      ebs:
+        volumeSize: {{ .Values.volume_size }}
+        volumeType: {{ .Values.volume_type }}
+  amiSelectorTerms:
+    - alias: {{ .Values.ami_alias }}

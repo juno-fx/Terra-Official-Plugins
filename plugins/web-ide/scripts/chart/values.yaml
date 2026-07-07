@@ -33,3 +33,5 @@ proxy_namespace:
 gateway:
   name: orion
   namespace: argocd
+persistence_size: 1Gi
+persistence_storage_class: local-path

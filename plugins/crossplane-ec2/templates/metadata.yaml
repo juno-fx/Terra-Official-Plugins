@@ -46,6 +46,11 @@ data:
       required: true
       type: string
       default: t3.micro
+    - name: delete_on_termination
+      description: Delete EBS volumes when the EC2 instance is terminated
+      type: boolean
+      default: true
+      required: true
     - name: region
       description: AWS Region
       required: true

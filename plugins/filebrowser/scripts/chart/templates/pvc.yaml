@@ -1,0 +1,17 @@
+{{- if .Values.dataPersistent }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: "{{ .Values.name }}-data"
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  {{- if .Values.storageClass }}
+  storageClassName: "{{ .Values.storageClass }}"
+  {{- end }}
+  resources:
+    requests:
+      storage: "{{ .Values.storageSize }}"
+{{- end }}
