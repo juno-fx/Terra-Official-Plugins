@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-boot
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+data:
+  boot.sh: |
+    #!/bin/sh
+    set -e
+
+    # Install build dependencies for wetty native modules, and gosu for user switching
+    apt-get update -qq
+    apt-get install -y -qq curl bash python3 make g++ gosu > /dev/null 2>&1
+
+    # Create user if PUID is not 0 (root)
+    PUID=${PUID:-1000}
+    PGID=${PGID:-1000}
+    USERNAME=${USER:-coder}
+    SHELL=/bin/bash
+
+    if [ "$PUID" != "0" ]; then
+      # Create group if it doesn't exist
+      if ! getent group "$PGID" > /dev/null 2>&1; then
+        addgroup -g "$PGID" "$USERNAME" 2>/dev/null || addgroup --gid "$PGID" "$USERNAME"
+      fi
+      # Create user if it doesn't exist
+      if ! id -u "$USERNAME" > /dev/null 2>&1; then
+        useradd -m -d /data -s /bin/sh -g "$PGID" -u "$PUID" "$USERNAME"
+      fi
+      # /data is the mounted PVC — always owned by root until chowned here
+      chown -R "$PUID:$PGID" /data
+    fi
+
+    export SHELL=/bin/sh
+
+    # Install wetty web terminal
+    npm install -g wetty 2>&1
+
+    # Install Claude Code
+    npm install -g @anthropic-ai/claude-code 2>&1
+
+    # Determine command to run inside wetty
+    if [ "$PUID" = "0" ]; then
+      CMD="/bin/bash"
+    else
+      CMD="gosu $USERNAME /bin/bash"
+    fi
+
+    # Start wetty
+    exec wetty --port {{ .Values.ttyd_port }} --command "$CMD"

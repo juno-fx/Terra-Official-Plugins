@@ -1,0 +1,9 @@
+resource_id: "claude-code"
+name: "Claude Code - Web Terminal"
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/claude-code/assets/logo.png
+description: "Claude Code AI coding agent web terminal powered by wetty"
+category: "development"
+tags:
+  - cluster-level
+editable: false
+fields: []
