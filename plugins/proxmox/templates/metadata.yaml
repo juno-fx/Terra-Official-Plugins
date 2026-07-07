@@ -38,11 +38,6 @@ data:
       type: string
       required: false
       default: "N"
-    - name: gpu
-      description: Attach a GPU to the Proxmox node (requires the nvidia runtime class)
-      type: boolean
-      required: false
-      default: false
     - name: data_size
       description: "Persistent volume size for the Proxmox storage pool (/var/lib/vz) — disk images, ISOs, backups (e.g. 32Gi)."
       type: string
