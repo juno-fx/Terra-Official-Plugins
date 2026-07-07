@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Values.name }}-proxmox"
+data:
+  nginx.conf: |
+    events {}
+    http {
+      map $http_upgrade $connection_upgrade {
+        default upgrade;
+        ''      close;
+      }
+      server {
+        listen 3000;
+        listen [::]:3000;
+
+        location = /polaris/{{ .Values.name }} {
+          return 302 /polaris/{{ .Values.name }}/;
+        }
+
+        location /polaris/{{ .Values.name }}/ {
+          # Proxmox serves TLS on 8006 with a self-signed cert.
+          proxy_pass https://localhost:8006/;
+          proxy_ssl_verify off;
+          proxy_http_version 1.1;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_set_header Connection $connection_upgrade;
+          proxy_set_header Host $http_host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          # Force identity encoding so sub_filter can rewrite response bodies.
+          proxy_set_header Accept-Encoding "";
+          proxy_redirect off;
+          proxy_buffering off;
+          client_max_body_size 0;
+          proxy_read_timeout 3600s;
+          proxy_send_timeout 3600s;
+          # PVEAuthCookie is issued with path=/ — rescope it to the base URL.
+          proxy_cookie_path / /polaris/{{ .Values.name }}/;
+
+          # The Proxmox UI hardcodes absolute paths in HTML and in JS-built
+          # URLs (ExtJS) — rewrite them onto the base URL.
+          sub_filter_once off;
+          sub_filter_types text/html application/javascript application/json text/css;
+          sub_filter '"/pve2/' '"/polaris/{{ .Values.name }}/pve2/';
+          sub_filter "'/pve2/" "'/polaris/{{ .Values.name }}/pve2/";
+          sub_filter '"/api2/' '"/polaris/{{ .Values.name }}/api2/';
+          sub_filter "'/api2/" "'/polaris/{{ .Values.name }}/api2/";
+          sub_filter '`/api2/' '`/polaris/{{ .Values.name }}/api2/';
+          sub_filter '^\/api2' '^\/polaris\/{{ .Values.name }}\/api2';
+          sub_filter 'me.UI.forceSetting("path"' 'me.UI.forceSetting("host", ""); me.UI.forceSetting("port", ""); me.UI.forceSetting("path"';
+          sub_filter "'/?' + Ext.Object.toQueryString(queryDict)" "window.location.pathname + '/?' + Ext.Object.toQueryString(queryDict)";
+          sub_filter '"/novnc/' '"/polaris/{{ .Values.name }}/novnc/';
+          sub_filter "'/novnc/" "'/polaris/{{ .Values.name }}/novnc/";
+          sub_filter '"/xtermjs/' '"/polaris/{{ .Values.name }}/xtermjs/';
+          sub_filter "'/xtermjs/" "'/polaris/{{ .Values.name }}/xtermjs/";
+          sub_filter '"/pwt/' '"/polaris/{{ .Values.name }}/pwt/';
+          sub_filter "'/pwt/" "'/polaris/{{ .Values.name }}/pwt/";
+          sub_filter 'src="/' 'src="/polaris/{{ .Values.name }}/';
+          sub_filter 'href="/' 'href="/polaris/{{ .Values.name }}/';
+        }
+      }
+    }

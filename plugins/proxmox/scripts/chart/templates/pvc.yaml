@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: "{{ .Values.name }}-data"
+  labels:
+    juno-innovations.com/app: "proxmox"
+    juno-innovations.com/workstation: "{{ .Values.name }}"
+    juno-innovations.com/owner: "{{ .Values.name }}"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.data_size }}
+  {{- if .Values.persistence_storage_class }}
+  storageClassName: {{ .Values.persistence_storage_class }}
+  {{- end }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: "{{ .Values.name }}-config"
+  labels:
+    juno-innovations.com/app: "proxmox"
+    juno-innovations.com/workstation: "{{ .Values.name }}"
+    juno-innovations.com/owner: "{{ .Values.name }}"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.config_size }}
+  {{- if .Values.persistence_storage_class }}
+  storageClassName: {{ .Values.persistence_storage_class }}
+  {{- end }}
