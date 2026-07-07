@@ -12,7 +12,7 @@ data:
   fields: |
     - name: icon
       description: icon
-      default: https://github.com/dockur/proxmox/raw/master/.github/logo.png
+      default: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/proxmox/assets/logo.png
     - name: registry
       description: Registry to pull the image from
       type: string
@@ -27,7 +27,7 @@ data:
       description: Tag to pull the image from
       type: string
       required: true
-      default: latest
+      default: 9.2.3
     - name: password
       description: Password for the Proxmox web UI 'root' user
       type: string

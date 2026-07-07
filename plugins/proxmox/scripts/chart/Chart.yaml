@@ -2,4 +2,4 @@ apiVersion: v1
 description: Proxmox VE hypervisor node (dockur/proxmox)
 name: proxmox
 version: 0.0.1
-icon: https://github.com/dockur/proxmox/raw/master/.github/logo.png
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/proxmox/assets/logo.png
