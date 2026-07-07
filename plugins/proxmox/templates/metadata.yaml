@@ -66,4 +66,4 @@ data:
       description: "Container tag for the nginx reverse proxy sidecar"
       type: string
       required: false
-      default: "1.29.3"
+      default: "alpine"
