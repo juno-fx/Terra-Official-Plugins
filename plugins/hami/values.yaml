@@ -1,0 +1,8 @@
+version: v2.9.0
+helm_repo: "https://project-hami.github.io/HAMi/"
+scheduler_node_policy: binpack
+scheduler_gpu_policy: spread
+device_split_count: 10
+device_memory_scaling: "1"
+device_core_scaling: "1"
+enable_monitoring: false

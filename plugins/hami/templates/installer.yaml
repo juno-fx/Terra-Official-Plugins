@@ -1,0 +1,87 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-hami
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  sources:
+    - repoURL: {{ .Values.helm_repo }}
+      chart: hami
+      targetRevision: {{ .Values.version }}
+      helm:
+        releaseName: {{ .Release.Name }}-hami
+        values: |
+          # ============================================
+          # RESOURCE NAMING
+          # All HAMi GPU resources use hami.io/ prefix
+          # to avoid conflicts with GPU Operator's
+          # nvidia.com/ resources.
+          # ============================================
+          resourceName: "hami.io/gpu"
+          resourceMem: "hami.io/gpu-memory"
+          resourceMemPercentage: "hami.io/gpu-memory-percentage"
+          resourceCores: "hami.io/gpu-cores"
+          resourcePriority: "hami.io/priority"
+
+          # ============================================
+          # SCHEDULER — safe coexistence mode
+          # ============================================
+          scheduler:
+            forceOverwriteDefaultScheduler: false
+            kubeScheduler:
+              image:
+                registry: "registry.k8s.io"
+            defaultSchedulerPolicy:
+              nodeSchedulerPolicy: {{ .Values.scheduler_node_policy }}
+              gpuSchedulerPolicy: {{ .Values.scheduler_gpu_policy }}
+
+          # ============================================
+          # DEVICE PLUGIN — NVIDIA (always on)
+          # ============================================
+          devicePlugin:
+            deviceSplitCount: {{ .Values.device_split_count }}
+            deviceMemoryScaling: {{ .Values.device_memory_scaling }}
+            deviceCoreScaling: {{ .Values.device_core_scaling }}
+            nvidiaNodeSelector:
+              nvidia.com/gpu.present: "true"
+
+          # ============================================
+          # VENDOR DEVICES
+          # ============================================
+          devices:
+            nvidia:
+              enabled: true
+              gpuCorePolicy: default
+              libCudaLogLevel: 1
+            ascend:
+              enabled: false
+            cambricon:
+              enabled: false
+            hygon:
+              enabled: false
+            iluvatar:
+              enabled: false
+            mthreads:
+              enabled: false
+            metax:
+              enabled: false
+            enflame:
+              enabled: false
+            kunlun:
+              enabled: false
+            awsneuron:
+              enabled: false
+            biren:
+              enabled: false
+
+          # ============================================
+          # OPTIONAL FEATURES
+          # ============================================
+          prometheus:
+            enabled: {{ .Values.enable_monitoring }}
+          dra:
+            enabled: false

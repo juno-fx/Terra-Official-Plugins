@@ -1,0 +1,69 @@
+resource_id: hami
+name: HAMi GPU Sharing
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/hami/assets/hami-graph-color.svg
+description: |
+  Heterogeneous AI Computing Virtualization Middleware. Slices physical GPUs
+  into fractional vGPUs with hard memory and core isolation. Supports 10+
+  accelerator vendors. Installs alongside GPU Operator — HAMi provides GPU
+  sharing, GPU Operator provides drivers.
+category: Hardware
+tags:
+  - gpu
+  - hami
+  - cluster-level
+  - gpu-sharing
+  - heterogeneous
+fields:
+  - name: version
+    description: HAMi upstream release tag.
+    required: true
+    type: select
+    default: v2.9.0
+    options:
+      - v2.9.0
+      - v2.8.0
+      - v2.7.0
+
+  - name: helm_repo
+    description: Helm chart repository URL.
+    required: false
+    type: string
+    default: "https://project-hami.github.io/HAMi/"
+
+  - name: scheduler_node_policy
+    description: Node scheduling — binpack packs on fewer nodes; spread distributes.
+    required: false
+    type: select
+    default: binpack
+    options: [binpack, spread]
+
+  - name: scheduler_gpu_policy
+    description: GPU scheduling within nodes — binpack or spread.
+    required: false
+    type: select
+    default: spread
+    options: [binpack, spread]
+
+  - name: device_split_count
+    description: Max concurrent workloads per physical GPU.
+    required: false
+    type: int
+    default: 10
+
+  - name: device_memory_scaling
+    description: GPU memory overcommit ratio (1 = no overcommit).
+    required: false
+    type: string
+    default: "1"
+
+  - name: device_core_scaling
+    description: GPU core overcommit ratio (1 = no overcommit).
+    required: false
+    type: string
+    default: "1"
+
+  - name: enable_monitoring
+    description: Enable Prometheus metrics endpoint at port 9393.
+    required: false
+    type: boolean
+    default: false

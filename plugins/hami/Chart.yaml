@@ -1,0 +1,14 @@
+apiVersion: v2
+name: hami
+version: 0.0.1
+description: |
+  Heterogeneous AI Computing Virtualization Middleware. Slices physical GPUs
+  into fractional vGPUs with hard memory and core isolation. Supports NVIDIA,
+  Ascend, Cambricon, Hygon, Iluvatar, Moore Threads, and 10+ accelerator vendors.
+category: Hardware
+tags:
+  - gpu
+  - hami
+  - cluster-level
+  - gpu-sharing
+  - heterogeneous
