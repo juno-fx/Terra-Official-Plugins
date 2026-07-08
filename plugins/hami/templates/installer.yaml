@@ -50,7 +50,7 @@ spec:
             deviceSplitCount: {{ .Values.device_split_count }}
             deviceMemoryScaling: {{ .Values.device_memory_scaling }}
             deviceCoreScaling: {{ .Values.device_core_scaling }}
-            nvidiaDriverRoot: "/"
+            runtimeClassName: "nvidia"
             nvidiaNodeSelector:
               nvidia.com/gpu.present: "true"
               gpu: null
