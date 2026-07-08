@@ -53,6 +53,7 @@ spec:
             runtimeClassName: "nvidia"
             nvidiaNodeSelector:
               nvidia.com/gpu.present: "true"
+              nvidia.com/gpu.deploy.device-plugin: "true"
               gpu: null
 
           # ============================================
