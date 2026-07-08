@@ -35,6 +35,7 @@ spec:
             kubeScheduler:
               image:
                 registry: "registry.k8s.io"
+                repository: "kube-scheduler"
             defaultSchedulerPolicy:
               nodeSchedulerPolicy: {{ .Values.scheduler_node_policy }}
               gpuSchedulerPolicy: {{ .Values.scheduler_gpu_policy }}
@@ -48,6 +49,7 @@ spec:
             deviceCoreScaling: {{ .Values.device_core_scaling }}
             nvidiaNodeSelector:
               nvidia.com/gpu.present: "true"
+              gpu: null
 
           # ============================================
           # VENDOR DEVICES
