@@ -38,6 +38,7 @@ spec:
               image:
                 registry: "registry.k8s.io"
                 repository: "kube-scheduler"
+                tag: "v1.36.2"
             defaultSchedulerPolicy:
               nodeSchedulerPolicy: {{ .Values.scheduler_node_policy }}
               gpuSchedulerPolicy: {{ .Values.scheduler_gpu_policy }}
@@ -49,6 +50,7 @@ spec:
             deviceSplitCount: {{ .Values.device_split_count }}
             deviceMemoryScaling: {{ .Values.device_memory_scaling }}
             deviceCoreScaling: {{ .Values.device_core_scaling }}
+            nvidiaDriverRoot: "/"
             nvidiaNodeSelector:
               nvidia.com/gpu.present: "true"
               gpu: null
