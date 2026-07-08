@@ -89,3 +89,8 @@ spec:
             enabled: {{ .Values.enable_monitoring }}
           dra:
             enabled: false
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
