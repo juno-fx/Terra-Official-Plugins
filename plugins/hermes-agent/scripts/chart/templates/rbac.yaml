@@ -9,8 +9,6 @@ metadata:
     kuiper.juno-innovations.com/hidden: "true"
   labels:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
-    juno-innovations.com/workstation: "{{ .Values.name }}"
-    juno-innovations.com/owner: "{{ .Values.name }}"
 {{- end }}
 
 {{- if eq .Values.cluster_access "readonly-ns" }}
@@ -24,8 +22,6 @@ metadata:
     kuiper.juno-innovations.com/hidden: "true"
   labels:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
-    juno-innovations.com/workstation: "{{ .Values.name }}"
-    juno-innovations.com/owner: "{{ .Values.name }}"
 rules:
   - apiGroups: ["*"]
     resources: ["*"]
@@ -40,8 +36,6 @@ metadata:
     kuiper.juno-innovations.com/hidden: "true"
   labels:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
-    juno-innovations.com/workstation: "{{ .Values.name }}"
-    juno-innovations.com/owner: "{{ .Values.name }}"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -63,8 +57,6 @@ metadata:
     kuiper.juno-innovations.com/hidden: "true"
   labels:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
-    juno-innovations.com/workstation: "{{ .Values.name }}"
-    juno-innovations.com/owner: "{{ .Values.name }}"
 rules:
   - apiGroups: ["*"]
     resources: ["*"]
@@ -79,8 +71,6 @@ metadata:
     kuiper.juno-innovations.com/hidden: "true"
   labels:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
-    juno-innovations.com/workstation: "{{ .Values.name }}"
-    juno-innovations.com/owner: "{{ .Values.name }}"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role

@@ -4,6 +4,8 @@ metadata:
   name: "{{ .Release.Name }}-terra-metadata"
   labels:
     kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+  annotations:
+    juno-innovations.com/workload: "Application"
 data:
   chart: "{{ .Release.Name }}-scripts-configmap"
   description: "Web-based file browser with drag-and-drop upload. Mount workspace volumes to browse and upload files."

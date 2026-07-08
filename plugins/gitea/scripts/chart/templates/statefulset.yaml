@@ -22,27 +22,19 @@ spec:
       hostname: {{ .Values.name }}
       securityContext:
         fsGroup: 1000
+      {{- if .Values.selector }}
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
               - matchExpressions:
-                  - key: juno-innovations.com/workstation
-                    operator: In
-                    values:
-                      - "true"
-                  {{- if .Values.selector }}
                   {{- range .Values.selector }}
                   - key: {{ .key | quote }}
                     operator: In
                     values:
                       - {{ .value | quote }}
                   {{- end }}
-                  {{- end }}
-      tolerations:
-        - key: "juno-innovations.com/workstation"
-          operator: "Exists"
-          effect: "NoSchedule"
+      {{- end }}
       {{- if .Values.pullSecret }}
       imagePullSecrets:
         - name: "{{ .Values.pullSecret }}"

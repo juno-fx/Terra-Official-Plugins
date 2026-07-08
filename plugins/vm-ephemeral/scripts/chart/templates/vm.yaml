@@ -10,7 +10,6 @@ spec:
   template:
     metadata:
       labels:
-        kuiper.juno-innovations.com/vm-instance: "{{ .Values.name }}"
         kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
     spec:
       networks:
