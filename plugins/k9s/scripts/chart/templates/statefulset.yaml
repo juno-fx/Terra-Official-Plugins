@@ -90,11 +90,7 @@ spec:
               subPath: default.conf
       nodeSelector:
         beta.kubernetes.io/arch: amd64
-      tolerations:
-        - key: juno-innovations.com/workstation
-          operator: Equal
-          value: "true"
-          effect: NoSchedule
+
       volumes:
         - name: nginx-config
           configMap:

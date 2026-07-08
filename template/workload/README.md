@@ -54,6 +54,9 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `tag` | **string** · Required · Default: `latest`<br>Image tag |
 | `gpu` | **boolean** · Required<br>Enable GPU access for the workload |
 | `publicAccess` | **boolean** · Required · Default: `false`<br>Disable authentication and allow unauthenticated access to the workload |
+| `nginx_registry` | **string** · Required · Default: `docker.io`<br>Registry to pull the nginx sidecar image from |
+| `nginx_repo` | **string** · Required · Default: `nginx`<br>Nginx sidecar image repository |
+| `nginx_tag` | **string** · Required · Default: `alpine`<br>Nginx sidecar image tag |
 
 <!-- TODO: Add any extra fields from templates/metadata.yaml above, and remove fields that don't apply -->
 

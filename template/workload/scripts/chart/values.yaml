@@ -20,6 +20,9 @@ pullSecret:
 session:
 volumeMounts: []
 volumes: []
+nginx_registry: docker.io
+nginx_repo: nginx
+nginx_tag: alpine
 env:
   - name: JUNO
     value: "true"

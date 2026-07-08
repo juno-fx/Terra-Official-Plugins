@@ -6,47 +6,37 @@ metadata:
     # Workload type shown in the Hubble UI — must match the annotation in templates/metadata.yaml.
     juno-innovations.com/workload: "WORKLOAD_TYPE"
   labels:
-    app: "{{ .Values.name }}"
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
 
 spec:
   replicas: 1
 
   selector:
     matchLabels:
-      app: "{{ .Values.name }}"
+      kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
 
   template:
     metadata:
       labels:
-        app: "{{ .Values.name }}"
+        kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
 
     spec:
       automountServiceAccountToken: false
       hostname: "{{ .Values.name }}"
 
-      # Workload nodes must carry the label juno-innovations.com/workstation: "true"
+      {{- if .Values.selector }}
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
               - matchExpressions:
-                  - key: juno-innovations.com/workstation
-                    operator: In
-                    values:
-                      - "true"
-                  {{- if .Values.selector }}
                   {{- range .Values.selector }}
                   - key: {{ .key | quote }}
                     operator: In
                     values:
                       - {{ .value | quote }}
                   {{- end }}
-                  {{- end }}
-
-      tolerations:
-        - key: "juno-innovations.com/workstation"
-          operator: "Exists"
-          effect: "NoSchedule"
+      {{- end }}
 
       {{- if .Values.gpu }}
       runtimeClassName: nvidia
@@ -111,7 +101,7 @@ spec:
             - name: GID
               value: "{{ .Values.guid }}"
             - name: PREFIX
-              value: "/polaris/{{ .Values.name }}/"
+              value: "/plugin/{{ .Values.name }}/"
             {{- range .Values.env }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}
@@ -122,27 +112,30 @@ spec:
             {{- if .Values.volumeMounts }}
             {{- toYaml .Values.volumeMounts | nindent 12 }}
             {{- end }}
-            {{- if .Values.plugins }}
-            {{- range .Values.plugins }}
-            - name: {{ .name | quote }}
-              subPath: {{ .file | quote }}
-              mountPath: "/etc/helios/init.d/{{ .name }}/{{ .file }}"
-            {{- end }}
-            {{- end }}
+
+        - name: nginx
+          imagePullPolicy: IfNotPresent
+          image: "{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}"
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+          ports:
+            - containerPort: 8080
+              name: http
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
 
       volumes:
+        - name: nginx-config
+          configMap:
+            name: {{ .Values.name }}-nginx
         - name: shm
           emptyDir:
             medium: Memory
             sizeLimit: 1Gi
         {{- if .Values.volumeMounts }}
         {{- toYaml .Values.volumes | nindent 8 }}
-        {{- end }}
-        {{- if .Values.plugins }}
-        {{- range .Values.plugins }}
-        - name: {{ .name | quote }}
-          configMap:
-            name: {{ .config | quote }}
-            defaultMode: 0777
-        {{- end }}
         {{- end }}
