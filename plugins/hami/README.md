@@ -23,7 +23,11 @@ HAMi (Heterogeneous AI Computing Virtualization Middleware) slices physical GPUs
 ## Prerequisites
 
 - **GPU Operator installed** — HAMi replaces the GPU Operator's device plugin and scheduler; GPU Operator still manages drivers, nvidia-container-toolkit, NFD, and DCGM
-- **GPU nodes labeled** — Nodes must have the label `nvidia.com/gpu.present: "true"` (automatically applied by GPU Operator's NFD component when a GPU is detected)
+- **GPU nodes labeled `hami.com/gpu: "true"`** — Apply manually to each GPU node that should participate in GPU sharing:
+  ```
+  kubectl label node <node> hami.com/gpu=true
+  ```
+  Nodes without this label are skipped by the HAMi device plugin. Use this to exclude passthrough-only nodes.
 - Kubernetes 1.18+ (upstream HAMi requirement)
 
 ---

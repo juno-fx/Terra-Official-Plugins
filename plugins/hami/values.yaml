@@ -6,3 +6,4 @@ device_split_count: 10
 device_memory_scaling: "1"
 device_core_scaling: "1"
 enable_monitoring: false
+dgx_spark_cluster: false

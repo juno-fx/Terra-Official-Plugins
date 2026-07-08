@@ -50,10 +50,10 @@ spec:
             deviceSplitCount: {{ .Values.device_split_count }}
             deviceMemoryScaling: {{ .Values.device_memory_scaling }}
             deviceCoreScaling: {{ .Values.device_core_scaling }}
+            preConfiguredDeviceMemory: {{ if .Values.dgx_spark_cluster }}131072{{ else }}0{{ end }}
             runtimeClassName: "nvidia"
             nvidiaNodeSelector:
-              nvidia.com/gpu.present: "true"
-              nvidia.com/gpu.deploy.device-plugin: "true"
+              hami.com/gpu: "true"
               gpu: null
 
           # ============================================

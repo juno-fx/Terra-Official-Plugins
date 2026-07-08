@@ -67,3 +67,13 @@ fields:
     required: false
     type: boolean
     default: false
+
+  - name: dgx_spark_cluster
+    description: |
+      Enable if your cluster has NVIDIA DGX Spark (GB10) nodes with
+      unified memory architecture. Pre-configures total GPU memory
+      to 128GB since NVML auto-detection does not report memory on
+      these systems. Set to false for standard GPUs (A100, H100, etc.).
+    required: false
+    type: boolean
+    default: false
