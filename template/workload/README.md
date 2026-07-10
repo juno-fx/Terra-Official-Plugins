@@ -65,10 +65,10 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 |----------|--------------|
 | `TODO_VAR_NAME` | <!-- TODO: what this variable does and when to set it --> |
 
-<!-- TODO: Keep this table in sync with terra.yaml's `environment_variables` list. Only list the
-     most commonly used variables for end users — not every variable the upstream image supports.
-     If the image has none worth calling out, delete this subsection and set `environment_variables: []`
-     in terra.yaml instead. -->
+<!-- TODO: Keep this table in sync with templates/metadata.yaml's `environment_variables` list. Only list
+     the most commonly used variables for end users — not every variable the upstream image supports.
+     If the image has none worth calling out, delete this subsection and set `environment_variables: |` +
+     `[]` in templates/metadata.yaml instead. -->
 
 ---
 

@@ -55,3 +55,10 @@ data:
         - none
         - readonly-ns
         - admin-ns
+  environment_variables: |
+    - name: ANTHROPIC_API_KEY
+      description: Anthropic Console API key used by the claude CLI to authenticate.
+    - name: ANTHROPIC_MODEL
+      description: Overrides the default Claude model used by the CLI.
+    - name: ANTHROPIC_BASE_URL
+      description: Overrides the API base URL, e.g. to point at a proxy or compatible endpoint.

@@ -31,3 +31,10 @@ data:
       default: "lab-4.4.9"
     - name: icon
       default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/jupyter-notebook/scripts/assets/template-icon.png"
+  environment_variables: |
+    - name: GRANT_SUDO
+      description: Grants the notebook user passwordless sudo, useful for installing OS packages with apt from within the notebook's terminal.
+    - name: RESTARTABLE
+      description: Runs Jupyter in a restart loop so quitting or a kernel restart doesn't kill the container.
+    - name: DOCKER_STACKS_JUPYTER_CMD
+      description: Launches a different frontend (notebook, nbclassic, retro) instead of the default JupyterLab.

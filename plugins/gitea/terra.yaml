@@ -9,14 +9,3 @@ tags:
   - development
   - cluster-level
 fields: []
-environment_variables:
-  - name: GITEA__mailer__ENABLED
-    description: Enables outbound email (set to "true") for notifications and password resets.
-  - name: GITEA__mailer__SMTP_ADDR
-    description: SMTP server hostname for outbound mail.
-  - name: GITEA__mailer__USER
-    description: SMTP username.
-  - name: GITEA__mailer__PASSWD
-    description: SMTP password.
-  - name: GITEA__actions__ENABLED
-    description: Enables Gitea Actions (built-in CI/CD).

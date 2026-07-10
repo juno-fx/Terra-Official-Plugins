@@ -14,12 +14,3 @@ tags:
   - cluster-level
   - workload
 fields: []
-environment_variables:
-  - name: N8N_BASIC_AUTH_ACTIVE
-    description: Enables HTTP basic auth in front of the n8n editor UI (set to "true").
-  - name: N8N_BASIC_AUTH_USER
-    description: Username for basic auth, used when N8N_BASIC_AUTH_ACTIVE is enabled.
-  - name: N8N_BASIC_AUTH_PASSWORD
-    description: Password for basic auth, used when N8N_BASIC_AUTH_ACTIVE is enabled.
-  - name: N8N_ENCRYPTION_KEY
-    description: Custom key n8n uses to encrypt stored credentials. Set this to keep credentials decryptable across restarts/re-deploys.
