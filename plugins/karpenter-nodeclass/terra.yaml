@@ -51,3 +51,10 @@ fields:
     required: true
     type: string
     default: al2023@latest
+  - name: Subnet ID
+    description: >-
+      This must be the public subnet your cluster uses — otherwise Karpenter-spawned 
+      nodes can't join. Find it in the AWS console: EC2 instance running Juno → 
+      Networking tab → public subnet ID.
+    required: true
+    type: string
