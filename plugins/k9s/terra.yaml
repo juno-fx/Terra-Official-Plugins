@@ -9,3 +9,6 @@ tags:
   - development
   - kubernetes
 fields: []
+environment_variables:
+  - name: EDITOR
+    description: Text editor invoked by k9s's "e" (edit resource) command.

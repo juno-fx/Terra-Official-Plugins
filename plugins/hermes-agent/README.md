@@ -58,10 +58,21 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `persistence_size` | **string** · Optional · Default: `1Gi`<br>Persistent volume size for agent state storage |
 | `persistence_storage_class` | **k8sStorageClass** · Optional<br>Storage class for the persistent volume |
 
+### Custom Environment Variables
+
+Genesis lets you add arbitrary environment variables to the workload at launch time. These are commonly useful for Hermes Agent's multi-provider setup:
+
+| Variable | Description |
+|----------|--------------|
+| `ANTHROPIC_API_KEY` | Anthropic Console API key, used when the agent is configured to use Claude models. |
+| `OPENAI_API_KEY` | API key for OpenAI or any OpenAI-compatible endpoint (also used for local Ollama setups). |
+| `OPENROUTER_API_KEY` | OpenRouter API key for flexible access to many hosted models. |
+| `HERMES_MODEL` | Overrides the default model used by the agent. |
+
 ---
 
 ## Notes
 
 - The `cluster_access` field controls whether Hermes can interact with Kubernetes resources — use `readonly-ns` for safe exploration, `admin-ns` only when the agent needs to manage workloads
-- LLM provider API keys must be configured at the application level within the Hermes WebUI after launch — they are not set via these fields
+- LLM provider API keys are not set via the install-time fields above — configure them either as custom environment variables at workload launch (see table above) or at the application level within the Hermes WebUI after launch
 - Hermes supports OpenAI-compatible APIs, making it compatible with any provider that follows the OpenAI API specification

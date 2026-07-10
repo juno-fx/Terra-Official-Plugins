@@ -9,3 +9,12 @@ tags:
   - juno
   - cluster-level
 fields: []
+environment_variables:
+  - name: PASSWORD
+    description: Password set for the user to log into the desktop session directly.
+  - name: SUDO
+    description: Grants the user sudo access on the container.
+  - name: SELKIES_FRAMERATE
+    description: Streaming framerate for the desktop session, as a range (e.g. "15-60") or fixed value (e.g. "30").
+  - name: DISABLE_VGL
+    description: Disables the VirtualGL wrapper around the desktop session; apps needing it must be launched manually via vglrun.

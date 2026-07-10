@@ -57,6 +57,16 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `tag` | **string** · Required · Default: `lab-4.4.9`<br>Image tag (version of JupyterLab) |
 | `gpu` | **boolean** · Required<br>Enable GPU access for the notebook server |
 
+### Custom Environment Variables
+
+Genesis lets you add arbitrary environment variables to the workload at launch time. These are commonly useful for a Jupyter Docker Stacks image:
+
+| Variable | Description |
+|----------|--------------|
+| `GRANT_SUDO` | Grants the notebook user passwordless sudo, useful for installing OS packages with apt from within the notebook's terminal. |
+| `RESTARTABLE` | Runs Jupyter in a restart loop so quitting or a kernel restart doesn't kill the container. |
+| `DOCKER_STACKS_JUPYTER_CMD` | Launches a different frontend (`notebook`, `nbclassic`, `retro`) instead of the default JupyterLab. |
+
 ---
 
 ## Notes

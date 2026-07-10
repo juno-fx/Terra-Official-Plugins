@@ -10,3 +10,12 @@ tags:
   - coding
   - workload
 fields: []
+environment_variables:
+  - name: ANTHROPIC_API_KEY
+    description: Anthropic API key, auto-detected by opencode for Claude models.
+  - name: OPENAI_API_KEY
+    description: OpenAI (or OpenAI-compatible) API key, auto-detected by opencode.
+  - name: OPENROUTER_API_KEY
+    description: OpenRouter API key for access to multiple hosted models.
+  - name: OPENCODE_MODEL
+    description: Default model for opencode to use, referenced via {env:OPENCODE_MODEL} in config.

@@ -53,6 +53,17 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `nginx_repo` | **string** · Required · Default: `nginx`<br>nginx proxy image repository |
 | `nginx_tag` | **string** · Required · Default: `latest`<br>nginx proxy image tag |
 
+### Custom Environment Variables
+
+Genesis lets you add arbitrary environment variables to the workload at launch time. These are commonly useful for a code-server (LinuxServer.io) image:
+
+| Variable | Description |
+|----------|--------------|
+| `PASSWORD` | Web UI login password. If neither `PASSWORD` nor `HASHED_PASSWORD` is set, the UI has no authentication. |
+| `SUDO_PASSWORD` | Enables sudo access in the integrated terminal, protected by this password. |
+| `DEFAULT_WORKSPACE` | Directory code-server opens by default when a session starts. |
+| `TZ` | Container timezone, e.g. `America/New_York`. |
+
 ---
 
 ## Notes

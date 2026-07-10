@@ -10,3 +10,8 @@ tags:
   - inference
   - cluster-level
 fields: []
+environment_variables:
+  - name: VLLM_LOGGING_LEVEL
+    description: Logging verbosity for the vLLM engine (DEBUG, INFO, WARNING, ERROR).
+  - name: CUDA_VISIBLE_DEVICES
+    description: Restricts which GPUs on the node are visible to the process.

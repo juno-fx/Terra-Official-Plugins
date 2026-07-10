@@ -58,6 +58,17 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `storage_class` | **k8sStorageClass** · Required<br>Storage class for the n8n workflow data persistent volume |
 | `storage_size` | **string** · Required · Default: `10Gi`<br>Size of the persistent volume for workflow and credential storage |
 
+### Custom Environment Variables
+
+Genesis lets you add arbitrary environment variables to the workload at launch time. These are commonly useful for n8n:
+
+| Variable | Description |
+|----------|--------------|
+| `N8N_BASIC_AUTH_ACTIVE` | Enables HTTP basic auth in front of the n8n editor UI (set to `true`). |
+| `N8N_BASIC_AUTH_USER` | Username for basic auth, used when `N8N_BASIC_AUTH_ACTIVE` is enabled. |
+| `N8N_BASIC_AUTH_PASSWORD` | Password for basic auth, used when `N8N_BASIC_AUTH_ACTIVE` is enabled. |
+| `N8N_ENCRYPTION_KEY` | Custom key n8n uses to encrypt stored credentials. Set this to keep credentials decryptable across restarts/re-deploys. |
+
 ---
 
 ## Notes

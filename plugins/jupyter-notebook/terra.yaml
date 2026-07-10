@@ -13,3 +13,10 @@ tags:
   - development
   - cluster-level
 fields: []
+environment_variables:
+  - name: GRANT_SUDO
+    description: Grants the notebook user passwordless sudo, useful for installing OS packages with apt from within the notebook's terminal.
+  - name: RESTARTABLE
+    description: Runs Jupyter in a restart loop so quitting or a kernel restart doesn't kill the container.
+  - name: DOCKER_STACKS_JUPYTER_CMD
+    description: Launches a different frontend (notebook, nbclassic, retro) instead of the default JupyterLab.

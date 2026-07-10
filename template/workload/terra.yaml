@@ -6,3 +6,10 @@ category:
 tags:
   - cluster-level
 fields: []
+# TODO: List commonly used custom environment variables for the upstream image.
+# Remove any that conflict with vars already set in scripts/chart/templates/workstation.yaml
+# (e.g. JUNO_WORKSTATION, JUNO_PROJECT, JUNO_ENVIRONMENT, USER, HOME, UID, GID, PREFIX).
+# Leave as an empty list ([]) if the image has no commonly used custom env vars.
+environment_variables:
+  - name: TODO_VAR_NAME
+    description: TODO — what this variable does and when to set it.

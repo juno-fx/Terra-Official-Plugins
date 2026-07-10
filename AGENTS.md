@@ -80,7 +80,7 @@ this embedded chart at workload launch time using the field values defined in `t
 ```
 plugins/my-template/
 ├── Chart.yaml
-├── terra.yaml                          # tags: [cluster-level], fields: []
+├── terra.yaml                          # tags: [cluster-level], fields: [], environment_variables: [...]
 ├── values.yaml
 ├── templates/
 │   ├── metadata.yaml                   # THE CONTRACT — discovery label + fields schema
@@ -96,6 +96,33 @@ plugins/my-template/
             ├── service.yaml
             └── ingress.yaml
 ```
+
+**`environment_variables` in `terra.yaml`** — for workload templates whose `scripts/chart/templates/workstation.yaml`
+ranges over `.Values.env` (i.e. the chart actually wires up Genesis's built-in custom env var field — see the `env`
+field type in Field Types Reference below), `terra.yaml` may carry an `environment_variables:` list documenting the
+upstream image's most commonly used custom env vars:
+
+```yaml
+environment_variables:
+  - name: EXAMPLE_VAR
+    description: What this variable does and when to set it.
+```
+
+Rules:
+- **List only the handful of variables end users would actually set** — not every variable the upstream image
+  supports. This is a curated "commonly useful" list, not exhaustive reference documentation.
+- **Never list a variable already hardcoded in `workstation.yaml`'s static env block** (e.g. `JUNO_WORKSTATION`,
+  `JUNO_PROJECT`, `JUNO_ENVIRONMENT`, `USER`, `HOME`, `UID`/`PUID`, `GID`/`PGID`, `PREFIX`/`SUBFOLDER`) — check that
+  file first. A suggested var that collides with a platform-set one is misleading.
+- If the upstream image has no well-known custom env vars, set `environment_variables: []` rather than omitting
+  the key (see `plugins/proxmox/terra.yaml`).
+- Mirror the same list in the plugin's `README.md`, under a `### Custom Environment Variables` subsection inside
+  `## Configuration` (table of `Variable` / `Description`, one row per entry) — see any workload template plugin
+  under `plugins/` for the established format.
+- Do not add a "don't override" callout to the README — the goal is a short, useful suggestion list, not a
+  cautionary reference.
+- `template/workload/terra.yaml` and `template/workload/README.md` carry `TODO` placeholders for this — fill
+  them in (or delete down to `environment_variables: []`) when scaffolding a new workload template.
 
 ---
 
@@ -334,6 +361,7 @@ See `plugins/helios/scripts/chart/templates/workstation.yaml` for the full refer
 | `fields` | yes | List of install-time field definitions (can be empty `[]`) |
 | `editable` | no | `true` \| `false` — allows users to edit field values after install. Default: `false` |
 | `compatibility` | no | Pip-style platform version constraint string. Terra blocks install if not met. Example: `genesis-deployment>=3.0.2,orion-deployment>=3.1.0` |
+| `environment_variables` | no | Workload templates only, and only when `scripts/chart/templates/workstation.yaml` consumes `.Values.env`. List of `{name, description}` suggestions for the most commonly used custom env vars — see the `environment_variables` subsection above. |
 
 ---
 
@@ -470,6 +498,8 @@ All types above plus:
 | Missing `juno-innovations.com/workload` annotation | Workload not categorized in Hubble | Add annotation to both `metadata.yaml` and `workstation.yaml` |
 | Scripts directory exceeds 1MiB | ArgoCD sync fails silently | `make check-size`, trim `scripts/` |
 | Hand-editing `packaged-scripts.yaml` | Overwritten next `make package` | Edit `scripts/` instead, then repackage |
+| `environment_variables` entry duplicates a var already hardcoded in `workstation.yaml` | Misleading docs — the suggested var is silently shadowed by the platform-set one | Check `workstation.yaml`'s static env block before adding to `terra.yaml` |
+| `environment_variables` in `terra.yaml` and `README.md` fall out of sync | Docs disagree with what Genesis actually suggests | Keep both lists identical; update together |
 
 ---
 
@@ -501,6 +531,8 @@ All types above plus:
    - Edit `scripts/chart/templates/workstation.yaml` — set correct image, ports, probes; set `juno-innovations.com/workload` annotation to match `metadata.yaml`
    - Edit `scripts/chart/templates/service.yaml` — set correct `port`/`targetPort`
    - Edit `scripts/chart/templates/ingress.yaml` — add Hubble auth annotations (`nginx.ingress.kubernetes.io/auth-url` pointing to Hubble, `use-regex: "true"`)
+   - If `workstation.yaml` ranges over `.Values.env`, edit `terra.yaml`'s `environment_variables:` list (or set `[]`)
+     and mirror it in `README.md` under `### Custom Environment Variables` — see the `environment_variables` guidance above
 7. `make package <plugin-name>` — **required** for any plugin with a `scripts/` directory
 8. `make check-size <plugin-name>` — verify under 1MiB
 9. `make verify` — confirm nothing is stale

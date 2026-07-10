@@ -60,6 +60,17 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `rheaTag` | **string** · Required · Default: `v1.2.3`<br>Rhea sidecar image tag |
 | `publicAccess` | **boolean** · Required · Default: `false`<br>Disable authentication and allow unauthenticated access to the workstation |
 
+### Custom Environment Variables
+
+Genesis lets you add arbitrary environment variables to the workload at launch time. These are commonly useful for a Helios workstation:
+
+| Variable | Description |
+|----------|--------------|
+| `PASSWORD` | Password set for the user to log into the desktop session directly. |
+| `SUDO` | Grants the user sudo access on the container. |
+| `SELKIES_FRAMERATE` | Streaming framerate for the desktop session, as a range (e.g. `15-60`) or fixed value (e.g. `30`). |
+| `DISABLE_VGL` | Disables the VirtualGL wrapper around the desktop session; apps needing it must be launched manually via `vglrun`. |
+
 ---
 
 ## Notes

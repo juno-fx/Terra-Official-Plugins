@@ -72,6 +72,15 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `storage_class` | **k8sStorageClass** · Required<br>Storage class for the model cache PVC |
 | `storage_size` | **string** · Optional · Default: `50Gi`<br>Size of the model cache PVC |
 
+### Custom Environment Variables
+
+Genesis lets you add arbitrary environment variables to the workload at launch time. These are commonly useful for tuning the vLLM engine:
+
+| Variable | Description |
+|----------|--------------|
+| `VLLM_LOGGING_LEVEL` | Logging verbosity for the vLLM engine (`DEBUG`, `INFO`, `WARNING`, `ERROR`). |
+| `CUDA_VISIBLE_DEVICES` | Restricts which GPUs on the node are visible to the process. |
+
 ---
 
 ## Notes
