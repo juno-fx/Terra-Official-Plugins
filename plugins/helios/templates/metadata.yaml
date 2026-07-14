@@ -49,7 +49,7 @@ data:
       type: boolean
       required: true
       default: false
-  environment_variables: |
+  env_hints: |
     - name: PASSWORD
       description: Password set for the user to log into the desktop session directly.
     - name: SUDO

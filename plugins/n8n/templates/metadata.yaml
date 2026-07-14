@@ -41,7 +41,7 @@ data:
       default: 10Gi
       required: true
       type: string
-  environment_variables: |
+  env_hints: |
     - name: N8N_BASIC_AUTH_ACTIVE
       description: Enables HTTP basic auth in front of the n8n editor UI (set to "true").
     - name: N8N_BASIC_AUTH_USER

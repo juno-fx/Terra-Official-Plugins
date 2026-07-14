@@ -56,7 +56,7 @@ data:
       description: "Storage class for the VSCode config persistent volume."
       type: k8sStorageClass
       required: false
-  environment_variables: |
+  env_hints: |
     - name: PASSWORD
       description: Web UI login password. If neither PASSWORD nor HASHED_PASSWORD is set, the UI has no authentication.
     - name: SUDO_PASSWORD

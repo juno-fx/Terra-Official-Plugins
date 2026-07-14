@@ -55,7 +55,7 @@ data:
         - none
         - readonly-ns
         - admin-ns
-  environment_variables: |
+  env_hints: |
     - name: ANTHROPIC_API_KEY
       description: Anthropic Console API key used by the claude CLI to authenticate.
     - name: ANTHROPIC_MODEL

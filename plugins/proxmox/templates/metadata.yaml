@@ -69,5 +69,5 @@ data:
       default: "alpine"
   # dockurr/proxmox only documents PASSWORD, which is already exposed as the
   # `password` launch field above — no additional custom env vars are documented upstream.
-  environment_variables: |
+  env_hints: |
     []

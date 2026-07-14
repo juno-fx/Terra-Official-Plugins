@@ -37,7 +37,7 @@ data:
       type: boolean
       required: true
       default: false
-  environment_variables: |
+  env_hints: |
     - name: CUSTOM_USER
       description: Username for HTTP basic auth in front of the desktop.
     - name: PASSWORD

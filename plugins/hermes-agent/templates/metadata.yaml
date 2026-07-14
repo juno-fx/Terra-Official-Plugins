@@ -45,7 +45,7 @@ data:
       description: "Storage class for the persistent volume."
       type: k8sStorageClass
       required: false
-  environment_variables: |
+  env_hints: |
     - name: ANTHROPIC_API_KEY
       description: Anthropic Console API key, used when the agent is configured to use Claude models.
     - name: OPENAI_API_KEY

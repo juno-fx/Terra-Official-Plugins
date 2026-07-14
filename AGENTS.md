@@ -83,7 +83,7 @@ plugins/my-template/
 ├── terra.yaml                          # tags: [cluster-level], fields: []
 ├── values.yaml
 ├── templates/
-│   ├── metadata.yaml                   # THE CONTRACT — discovery label + fields schema + environment_variables: [...]
+│   ├── metadata.yaml                   # THE CONTRACT — discovery label + fields schema + env_hints: [...]
 │   ├── packaged-scripts.yaml           # GENERATED — never edit
 │   └── packaged-scripts-cleanup.yaml   # GENERATED — never edit
 └── scripts/
@@ -97,10 +97,10 @@ plugins/my-template/
             └── ingress.yaml
 ```
 
-**`environment_variables` in `templates/metadata.yaml`** — for workload templates whose
+**`env_hints` in `templates/metadata.yaml`** — for workload templates whose
 `scripts/chart/templates/workstation.yaml` ranges over `.Values.env` (i.e. the chart actually wires up Genesis's
 built-in custom env var field — see the `env` field type in Field Types Reference below), `templates/metadata.yaml`'s
-`data:` block may carry an `environment_variables:` key (a sibling of `fields:`, using the same string-block-scalar
+`data:` block may carry an `env_hints:` key (a sibling of `fields:`, using the same string-block-scalar
 convention since ConfigMap `data` values must be strings) documenting the upstream image's most commonly used
 custom env vars:
 
@@ -108,7 +108,7 @@ custom env vars:
 data:
   fields: |
     - name: ...
-  environment_variables: |
+  env_hints: |
     - name: EXAMPLE_VAR
       description: What this variable does and when to set it.
 ```
@@ -123,7 +123,7 @@ Rules:
 - **Never list a variable already hardcoded in `workstation.yaml`'s static env block** (e.g. `JUNO_WORKSTATION`,
   `JUNO_PROJECT`, `JUNO_ENVIRONMENT`, `USER`, `HOME`, `UID`/`PUID`, `GID`/`PGID`, `PREFIX`/`SUBFOLDER`) — check that
   file first. A suggested var that collides with a platform-set one is misleading.
-- If the upstream image has no well-known custom env vars, set `environment_variables: |` followed by an indented
+- If the upstream image has no well-known custom env vars, set `env_hints: |` followed by an indented
   `[]` rather than omitting the key (see `plugins/proxmox/templates/metadata.yaml`).
 - Mirror the same list in the plugin's `README.md`, under a `### Custom Environment Variables` subsection inside
   `## Configuration` (table of `Variable` / `Description`, one row per entry) — see any workload template plugin
@@ -131,7 +131,7 @@ Rules:
 - Do not add a "don't override" callout to the README — the goal is a short, useful suggestion list, not a
   cautionary reference.
 - `template/workload/templates/metadata.yaml` and `template/workload/README.md` carry `TODO` placeholders for
-  this — fill them in (or delete down to `environment_variables: |` + `[]`) when scaffolding a new workload template.
+  this — fill them in (or delete down to `env_hints: |` + `[]`) when scaffolding a new workload template.
 
 ---
 
@@ -249,9 +249,9 @@ Workload manifests applied to cluster
    For each, it reads:
    - `data.fields` → the schema presented in the workload creation UI
    - `data.chart` → name of the scripts ConfigMap
-   - `data.environment_variables`, if present → suggested custom env vars for the auto-injected `env` field (this
+   - `data.env_hints`, if present → suggested custom env vars for the auto-injected `env` field (this
      key exists in the ConfigMap for Genesis to consume; whether Genesis's UI currently reads and displays it is
-     outside this repo's control — see the `environment_variables` subsection above)
+     outside this repo's control — see the `env_hints` subsection above)
    - Then fetches that scripts ConfigMap and reads `packaged_scripts.base64`
 
 3. **Workload launch (Kuiper):** User creates a workload in Genesis. Kuiper receives the base64 chart string,
@@ -296,8 +296,8 @@ data:
       type: boolean
       required: true
   # Optional: suggestions surfaced next to the auto-injected `env` field at workload-launch time.
-  # See the `environment_variables` subsection above.
-  environment_variables: |
+  # See the `env_hints` subsection above.
+  env_hints: |
     - name: EXAMPLE_VAR
       description: "What this variable does and when to set it"
 ```
@@ -514,8 +514,8 @@ All types above plus:
 | Missing `juno-innovations.com/workload` annotation | Workload not categorized in Hubble | Add annotation to both `metadata.yaml` and `workstation.yaml` |
 | Scripts directory exceeds 1MiB | ArgoCD sync fails silently | `make check-size`, trim `scripts/` |
 | Hand-editing `packaged-scripts.yaml` | Overwritten next `make package` | Edit `scripts/` instead, then repackage |
-| `environment_variables` entry duplicates a var already hardcoded in `workstation.yaml` | Misleading docs — the suggested var is silently shadowed by the platform-set one | Check `workstation.yaml`'s static env block before adding to `metadata.yaml` |
-| `environment_variables` in `metadata.yaml` and `README.md` fall out of sync | Docs disagree with what Genesis actually suggests | Keep both lists identical; update together |
+| `env_hints` entry duplicates a var already hardcoded in `workstation.yaml` | Misleading docs — the suggested var is silently shadowed by the platform-set one | Check `workstation.yaml`'s static env block before adding to `metadata.yaml` |
+| `env_hints` in `metadata.yaml` and `README.md` fall out of sync | Docs disagree with what Genesis actually suggests | Keep both lists identical; update together |
 
 ---
 
@@ -547,8 +547,8 @@ All types above plus:
    - Edit `scripts/chart/templates/workstation.yaml` — set correct image, ports, probes; set `juno-innovations.com/workload` annotation to match `metadata.yaml`
    - Edit `scripts/chart/templates/service.yaml` — set correct `port`/`targetPort`
    - Edit `scripts/chart/templates/ingress.yaml` — add Hubble auth annotations (`nginx.ingress.kubernetes.io/auth-url` pointing to Hubble, `use-regex: "true"`)
-   - If `workstation.yaml` ranges over `.Values.env`, edit `templates/metadata.yaml`'s `environment_variables:` key (or set it to `|` + `[]`)
-     and mirror it in `README.md` under `### Custom Environment Variables` — see the `environment_variables` guidance above
+   - If `workstation.yaml` ranges over `.Values.env`, edit `templates/metadata.yaml`'s `env_hints:` key (or set it to `|` + `[]`)
+     and mirror it in `README.md` under `### Custom Environment Variables` — see the `env_hints` guidance above
 7. `make package <plugin-name>` — **required** for any plugin with a `scripts/` directory
 8. `make check-size <plugin-name>` — verify under 1MiB
 9. `make verify` — confirm nothing is stale

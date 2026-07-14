@@ -62,7 +62,7 @@ data:
       default: "ingress-nginx"
   # wetty is a plain tmux/bash shell, not an application with its own env vars —
   # these are generic shell-session variables useful to anything run in the terminal.
-  environment_variables: |
+  env_hints: |
     - name: TZ
       description: Timezone for the shell session, e.g. "America/New_York".
     - name: EDITOR

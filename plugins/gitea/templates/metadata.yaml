@@ -49,7 +49,7 @@ data:
       default: 5Gi
       required: true
       type: string
-  environment_variables: |
+  env_hints: |
     - name: GITEA__mailer__ENABLED
       description: Enables outbound email (set to "true") for notifications and password resets.
     - name: GITEA__mailer__SMTP_ADDR

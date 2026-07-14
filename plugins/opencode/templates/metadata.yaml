@@ -46,7 +46,7 @@ data:
       type: string
       required: true
       default: "ingress-nginx"
-  environment_variables: |
+  env_hints: |
     - name: ANTHROPIC_API_KEY
       description: Anthropic API key, auto-detected by opencode for Claude models.
     - name: OPENAI_API_KEY

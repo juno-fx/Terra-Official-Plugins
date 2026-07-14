@@ -87,7 +87,7 @@ data:
       required: false
       default: "50Gi"
       type: string
-  environment_variables: |
+  env_hints: |
     - name: VLLM_LOGGING_LEVEL
       description: Logging verbosity for the vLLM engine (DEBUG, INFO, WARNING, ERROR).
     - name: CUDA_VISIBLE_DEVICES
