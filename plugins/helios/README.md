@@ -70,6 +70,7 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 | `SUDO` | Grants the user sudo access on the container. |
 | `SELKIES_FRAMERATE` | Streaming framerate for the desktop session, as a range (e.g. `15-60`) or fixed value (e.g. `30`). |
 | `DISABLE_VGL` | Disables the VirtualGL wrapper around the desktop session; apps needing it must be launched manually via `vglrun`. |
+| `REMOTE_PROTOCOL` | if set to "dcv" Helios will run Nice DCV rather than Selkies. |
 
 ---
 
