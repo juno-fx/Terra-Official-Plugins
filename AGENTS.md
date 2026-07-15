@@ -315,7 +315,7 @@ The StatefulSet that Kuiper deploys must follow these conventions:
 - **Toleration** — tolerate taint `juno-innovations.com/workstation: NoSchedule`
 - **`juno-innovations.com/workload` annotation** — must match `metadata.yaml` value
 - **Plugin mounts** — range over `.Values.plugins` to mount Helios plugin scripts
-- **Standard env vars** — set `JUNO_WORKSTATION`, `JUNO_PROJECT`, `USER`, `HOME`, `PREFIX`
+- **Standard env vars** — set `JUNO_WORKSTATION`, `JUNO_WORKSPACE` (formerly `JUNO_PROJECT`, still set for backwards compatibility), `USER`, `HOME`, `PREFIX`
 
 See `plugins/helios/scripts/chart/templates/workstation.yaml` for the full reference implementation.
 
