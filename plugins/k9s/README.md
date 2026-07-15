@@ -60,6 +60,14 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `storage_class` | **k8sStorageClass** · Required<br>Storage class for the k9s data disk |
 | `storage_size` | **string** · Required · Default: `10Gi`<br>Size of the persistent volume for k9s data |
 
+### Custom Environment Variables
+
+Genesis lets you add arbitrary environment variables to the workload at launch time. These are commonly useful for a k9s/kubectl terminal session:
+
+| Variable | Description |
+|----------|--------------|
+| `EDITOR` | Text editor invoked by k9s's `e` (edit resource) command. |
+
 ---
 
 ## Notes

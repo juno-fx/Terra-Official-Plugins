@@ -60,6 +60,15 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `nginx_tag` | **string** · Required · Default: `1.29.3`<br>nginx proxy image tag |
 | `publicAccess` | **boolean** · Required · Default: `false`<br>Disable authentication and allow unauthenticated browser access to the terminal |
 
+### Custom Environment Variables
+
+Wetty is a plain tmux/bash shell rather than an application with its own configuration surface — Genesis lets you add arbitrary environment variables to the workload, and these are commonly useful for anything run in the terminal session:
+
+| Variable | Description |
+|----------|--------------|
+| `TZ` | Timezone for the shell session, e.g. `America/New_York`. |
+| `EDITOR` | Default text editor invoked by CLI tools (e.g. `vim`, `nano`). |
+
 ---
 
 ## Notes

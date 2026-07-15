@@ -58,11 +58,21 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `storage_size` | **string** · Required · Default: `10Gi`<br>Storage size for the persistent `/data` disk |
 | `publicAccess` | **boolean** · Required · Default: `false`<br>Allow public access (disable Hubble authentication) |
 
+### Custom Environment Variables
+
+Genesis lets you add arbitrary environment variables to the workload at launch time. These are commonly useful for the `claude` CLI (`@anthropic-ai/claude-code`):
+
+| Variable | Description |
+|----------|--------------|
+| `ANTHROPIC_API_KEY` | Anthropic Console API key used by the `claude` CLI to authenticate. |
+| `ANTHROPIC_MODEL` | Overrides the default Claude model used by the CLI. |
+| `ANTHROPIC_BASE_URL` | Overrides the API base URL, e.g. to point at a proxy or compatible endpoint. |
+
 ---
 
 ## Notes
 
-- Claude API credentials are not set at workload creation time — configure them as environment variables (e.g. `ANTHROPIC_API_KEY`) on the workload, using the environment variable field auto-injected by Genesis for every workload template
+- Claude API credentials are not set via the install-time fields above — configure them as custom environment variables at workload launch (see table above), e.g. `ANTHROPIC_API_KEY`
 - The nginx sidecar provides browser-accessible proxying for the wetty terminal interface
 - Project files and Claude Code configuration are persisted to the `/data` volume across workload restarts
 - Setting `publicAccess` to `true` removes authentication from the workstation endpoint — use only in trusted network environments

@@ -37,3 +37,12 @@ data:
       type: boolean
       required: true
       default: false
+  env_hints: |
+    - name: CUSTOM_USER
+      description: Username for HTTP basic auth in front of the desktop.
+    - name: PASSWORD
+      description: Password for HTTP basic auth, used together with CUSTOM_USER.
+    - name: DOCKER_MODS
+      description: LinuxServer.io mod(s) to install at container start, e.g. additional apps or tools.
+    - name: TZ
+      description: Timezone for the desktop session, e.g. "America/New_York".

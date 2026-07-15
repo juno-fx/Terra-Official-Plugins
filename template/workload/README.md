@@ -57,6 +57,19 @@ These fields are configured when authoring the workload template in **Genesis** 
 
 <!-- TODO: Add any extra fields from templates/metadata.yaml above, and remove fields that don't apply -->
 
+### Custom Environment Variables
+
+Genesis lets you add arbitrary environment variables to the workload at launch time. These are commonly useful for PLUGIN:
+
+| Variable | Description |
+|----------|--------------|
+| `TODO_VAR_NAME` | <!-- TODO: what this variable does and when to set it --> |
+
+<!-- TODO: Keep this table in sync with templates/metadata.yaml's `env_hints` list. Only list
+     the most commonly used variables for end users — not every variable the upstream image supports.
+     If the image has none worth calling out, delete this subsection and set `env_hints: |` +
+     `[]` in templates/metadata.yaml instead. -->
+
 ---
 
 ## Notes

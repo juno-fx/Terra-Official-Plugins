@@ -59,6 +59,18 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `storage_class` | **k8sStorageClass** · Required<br>Kubernetes storage class for Gitea repository data |
 | `storage_size` | **string** · Required · Default: `5Gi`<br>Size of the persistent volume for repository storage |
 
+### Custom Environment Variables
+
+Genesis lets you add arbitrary environment variables to the workload at launch time. Gitea reads any `GITEA__<section>__<key>` variable as a config override — these are commonly useful ones not already set by the platform:
+
+| Variable | Description |
+|----------|--------------|
+| `GITEA__mailer__ENABLED` | Enables outbound email (set to `true`) for notifications and password resets. |
+| `GITEA__mailer__SMTP_ADDR` | SMTP server hostname for outbound mail. |
+| `GITEA__mailer__USER` | SMTP username. |
+| `GITEA__mailer__PASSWD` | SMTP password. |
+| `GITEA__actions__ENABLED` | Enables Gitea Actions (built-in CI/CD). |
+
 ---
 
 ## Notes

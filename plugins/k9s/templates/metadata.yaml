@@ -45,3 +45,6 @@ data:
       type: string
       required: true
       default: "ingress-nginx"
+  env_hints: |
+    - name: EDITOR
+      description: Text editor invoked by k9s's "e" (edit resource) command.

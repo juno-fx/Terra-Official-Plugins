@@ -25,6 +25,10 @@ out of the box.
 | config_size | `1Gi` | `/var/lib/pve-cluster` — PVE configuration |
 | persistence_storage_class | cluster default | StorageClass for both volumes |
 
+### Custom Environment Variables
+
+Genesis lets you add arbitrary environment variables to the workload at launch time, but `dockurr/proxmox` only documents `PASSWORD` upstream — and that's already covered by the `password` field above. There are no additional custom environment variables to set for this image.
+
 ## Access
 
 - Web UI: exposed through the project ingress at `/polaris/<name>/` (Hubble-authenticated),
