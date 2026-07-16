@@ -59,4 +59,4 @@ data:
     - name: DISABLE_VGL
       description: Disables the VirtualGL wrapper around the desktop session; apps needing it must be launched manually via vglrun.
     - name: REMOTE_PROTOCOL
-      value: if set to "dcv" Helios will run Nice DCV rather than Selkies.
+      description: if set to "dcv" Helios will run Nice DCV rather than Selkies.
