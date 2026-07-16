@@ -51,7 +51,7 @@ data:
       default: false
   env_hints: |
     - name: PASSWORD
-      description: Password set for the user to log into the desktop session directly.
+      description: Password set for the users terminal session.
     - name: SUDO
       description: Grants the user sudo access on the container.
     - name: SELKIES_FRAMERATE
