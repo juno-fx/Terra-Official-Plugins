@@ -53,7 +53,7 @@ data:
     - name: PASSWORD
       description: Password set for the users terminal session.
     - name: SUDO
-      description: Grants the user sudo access on the container.
+      description: Grants the user sudo access on the container ("true" or "1").
     - name: SELKIES_FRAMERATE
       description: Streaming framerate for the desktop session, as a range (e.g. "15-60") or fixed value (e.g. "30").
     - name: DISABLE_VGL
