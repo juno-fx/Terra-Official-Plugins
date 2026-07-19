@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-terra-metadata
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+  annotations:
+    juno-innovations.com/workload: "Server"
+data:
+  chart: "{{ .Release.Name }}-scripts-configmap"
+  description: "BOINC distributed computing client"
+  fields: |
+    - name: icon
+      description: icon
+      default: ""
+    - name: registry
+      description: "Container registry"
+      type: string
+      required: true
+      default: "docker.io"
+    - name: repo
+      description: "Image repository"
+      type: string
+      required: true
+      default: "osgiliath/boinc"
+    - name: tag
+      description: "Image tag (nvidia for CUDA GPU support)"
+      type: string
+      required: true
+      default: "nvidia"
+    - name: project_url
+      description: "BOINC project URL (e.g. https://universeathome.pl/universe/)"
+      type: string
+      required: true
+    - name: account_key
+      description: "Weak account key for the project"
+      type: string
+      required: true
+    - name: gpu
+      description: "Attach a GPU to this workload"
+      type: boolean
+      required: true
+    - name: storage_class
+      description: "Storage class for the BOINC data volume (/var/lib/boinc)"
+      type: k8sStorageClass
+      required: true
+    - name: storage_size
+      description: "Persistent volume size for BOINC data"
+      type: string
+      required: false
+      default: "10Gi"
+  env_hints: |
+    []

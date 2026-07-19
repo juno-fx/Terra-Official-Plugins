@@ -1,0 +1,10 @@
+resource_id: boinc
+name: BOINC
+icon:
+description: Distributed computing client for BOINC projects
+category: Computing
+tags:
+  - cluster-level
+  - computing
+  - science
+fields: []
