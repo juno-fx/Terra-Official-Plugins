@@ -49,5 +49,14 @@ data:
       type: string
       required: false
       default: "10Gi"
+    - name: arch
+      description: "Target CPU architecture"
+      type: select
+      required: true
+      default: "amd64"
+      options:
+        - amd64
+        - arm64
+        - either
   env_hints: |
     []

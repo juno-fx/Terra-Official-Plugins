@@ -30,3 +30,4 @@ account_key: ""
 gpu: false
 storage_class: ""
 storage_size: "10Gi"
+arch: "amd64"

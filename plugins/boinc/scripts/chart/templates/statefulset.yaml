@@ -24,6 +24,10 @@ spec:
       imagePullSecrets:
         - name: "{{ .Values.pullSecret }}"
       {{- end }}
+      {{- if ne .Values.arch "either" }}
+      nodeSelector:
+        kubernetes.io/arch: "{{ .Values.arch }}"
+      {{- end }}
       containers:
         - name: boinc
           image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"

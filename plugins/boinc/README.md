@@ -59,6 +59,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `gpu` | **boolean** · Required · Default: `false`<br>Attach a GPU; sets `runtimeClassName: nvidia` |
 | `storage_class` | **k8sStorageClass** · Required<br>Storage class for the BOINC data PVC mounted at `/var/lib/boinc` |
 | `storage_size` | **string** · Optional · Default: `10Gi`<br>Size of the BOINC data persistent volume |
+| `arch` | **select** · Required · Default: `amd64`<br>Target CPU architecture — `amd64`, `arm64`, or `either` (no constraint) |
 
 ### Custom Environment Variables
 
