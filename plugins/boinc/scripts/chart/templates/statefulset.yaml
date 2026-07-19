@@ -34,10 +34,7 @@ spec:
           imagePullPolicy: IfNotPresent
           command:
             - /bin/sh
-            - -c
-            - |
-              boinccmd --project_attach "${PROJECT_URL}" "${ACCOUNT_KEY}" 2>/dev/null || echo "Project attach skipped (already attached or creds invalid)"
-              exec boinc
+            - /opt/start.sh
           resources:
             requests:
               memory: "{{ .Values.memory }}"
@@ -66,9 +63,19 @@ spec:
               value: {{ .value | quote }}
             {{- end }}
           volumeMounts:
+            - name: tooling
+              mountPath: /opt/start.sh
+              subPath: start.sh
             - name: data
               mountPath: /var/lib/boinc
       volumes:
+        - name: tooling
+          configMap:
+            name: "{{ .Values.name }}-tooling"
+            defaultMode: 0755
+            items:
+              - key: start.sh
+                path: start.sh
         - name: data
           persistentVolumeClaim:
             claimName: "{{ .Release.Name }}-data"
