@@ -37,6 +37,7 @@ spec:
       serviceAccountName: helios
       {{- end }}
       hostname: "{{ .Values.name }}"
+      terminationGracePeriodSeconds: 45
 
       # workstation nodes will require juno-innovations.com/workstation: "true"
       affinity:
@@ -87,6 +88,10 @@ spec:
         - name: helios
           imagePullPolicy: IfNotPresent
           image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/etc/helios/shutdown.d/custom.sh"]
           resources:
             requests:
               memory: "{{ .Values.memory }}"
