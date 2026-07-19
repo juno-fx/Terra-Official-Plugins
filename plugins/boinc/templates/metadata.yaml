@@ -4,9 +4,11 @@ metadata:
   name: {{ .Release.Name }}-terra-metadata
   labels:
     kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+  annotations:
+    juno-innovations.com/workload: "Application"
 data:
   chart: "{{ .Release.Name }}-scripts-configmap"
-  description: "BOINC distributed computing client"
+  description: "BOINC distributed computing client — LinuxServer.io"
   fields: |
     - name: icon
       description: icon
@@ -15,35 +17,27 @@ data:
       description: "Container registry"
       type: string
       required: true
-      default: "docker.io"
+      default: "lscr.io"
     - name: repo
       description: "Image repository"
       type: string
       required: true
-      default: "osgiliath/boinc"
+      default: "linuxserver/boinc"
     - name: tag
-      description: "Image tag (nvidia for CUDA GPU support)"
+      description: "Image tag — use 'latest' for current, 'arm64v8-latest' for ARM64"
       type: string
       required: true
-      default: "nvidia"
-    - name: project_url
-      description: "BOINC project URL (e.g. https://universeathome.pl/universe/)"
-      type: string
-      required: true
-    - name: account_key
-      description: "Weak account key for the project"
-      type: string
-      required: true
+      default: "latest"
     - name: gpu
       description: "Attach a GPU to this workload"
       type: boolean
       required: true
     - name: storage_class
-      description: "Storage class for the BOINC data volume (/var/lib/boinc)"
+      description: "Storage class for the BOINC config volume (/config)"
       type: k8sStorageClass
       required: true
     - name: storage_size
-      description: "Persistent volume size for BOINC data"
+      description: "Persistent volume size for BOINC config data"
       type: string
       required: false
       default: "10Gi"
@@ -57,4 +51,7 @@ data:
         - arm64
         - either
   env_hints: |
-    []
+    - name: PASSWORD
+      description: "Password for the BOINC web GUI — set via the env field"
+    - name: TZ
+      description: "Timezone for log timestamps (e.g. America/New_York)"

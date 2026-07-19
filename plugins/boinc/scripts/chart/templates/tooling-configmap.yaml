@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: "{{ .Values.name }}-tooling"
-  labels:
-    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
-data:
-  start.sh: |
-{{ .Files.Get "files/start.sh" | indent 4 }}

@@ -22,11 +22,9 @@ plugins: []
 _kuiper:
 
 # Plugin-specific fields — must match metadata.yaml field names
-registry: docker.io
-repo: osgiliath/boinc
-tag: nvidia
-project_url: ""
-account_key: ""
+registry: lscr.io
+repo: linuxserver/boinc
+tag: latest
 gpu: false
 storage_class: ""
 storage_size: "10Gi"
