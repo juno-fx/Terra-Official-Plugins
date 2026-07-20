@@ -70,11 +70,14 @@ spec:
               {{- end }}
             {{- end }}
           startupProbe:
-            tcpSocket:
-              port: 8181
-            initialDelaySeconds: 10
-            failureThreshold: 30
-            periodSeconds: 10
+            exec:
+              command:
+                - /bin/bash
+                - -c
+                - 'P=$(cat /config/gui_rpc_auth.cfg 2>/dev/null) && [ -n "$P" ] && boinccmd --passwd "$P" --get_state 2>/dev/null | grep -q "master URL"'
+            initialDelaySeconds: 15
+            failureThreshold: 24
+            periodSeconds: 5
           livenessProbe:
             tcpSocket:
               port: 8181
