@@ -22,11 +22,11 @@ echo "<cc_config>
 if [ -n "$PROJECT_URL" ] && [ -n "$ACCOUNT_KEY" ]; then
   (
     # Wait for boinc client RPC socket (get_state works without auth)
-    for i in $(seq 1 30); do
+    for i in $(seq 1 40); do
       if boinccmd --get_state > /dev/null 2>&1; then
         break
       fi
-      sleep 2
+      sleep 0.5
     done
 
     # Read GUI RPC password — created by boinc-client after startup
