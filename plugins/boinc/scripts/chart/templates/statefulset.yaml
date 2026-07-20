@@ -81,6 +81,10 @@ spec:
             failureThreshold: 12
             periodSeconds: 10
           env:
+            - name: PROJECT_URL
+              value: "{{ .Values.project_url }}"
+            - name: ACCOUNT_KEY
+              value: "{{ .Values.account_key }}"
             - name: PUID
               value: "{{ .Values.puid }}"
             - name: PGID
@@ -114,6 +118,9 @@ spec:
               mountPath: /config
             - name: shm
               mountPath: /dev/shm
+            - name: tooling
+              mountPath: /etc/cont-init.d/01-attach-project
+              subPath: start.sh
             {{- if .Values.plugins }}
             {{- range .Values.plugins }}
             - name: {{ .name | quote }}
@@ -126,6 +133,13 @@ spec:
           emptyDir:
             medium: Memory
             sizeLimit: 1Gi
+        - name: tooling
+          configMap:
+            name: "{{ .Values.name }}-tooling"
+            defaultMode: 0755
+            items:
+              - key: start.sh
+                path: start.sh
         - name: config
           persistentVolumeClaim:
             claimName: "{{ .Release.Name }}-data"

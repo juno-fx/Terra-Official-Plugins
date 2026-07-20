@@ -10,7 +10,7 @@
 
 BOINC (Berkeley Open Infrastructure for Network Computing) is an open-source volunteer computing platform that uses your computer's CPU/GPU for scientific research — curing diseases, studying climate change, discovering pulsars, and more. This workload template deploys the [LinuxServer.io](https://github.com/linuxserver/docker-boinc) BOINC desktop container, providing a web GUI to manage BOINC client projects and work units.
 
-Each workload provisions a BOINC client with a persistent volume at `/config` to retain configuration across restarts. The web GUI is accessible via browser at the workload's endpoint URL. Optional GPU acceleration is available for compatible BOINC projects.
+Each workload provisions a BOINC client with a persistent volume at `/config` to retain configuration across restarts. On startup, the BOINC client automatically attaches to the configured project using the provided project URL and weak account key — no manual setup needed. The web GUI is accessible via browser at the workload's endpoint URL for monitoring and project management. Optional GPU acceleration is available for compatible BOINC projects.
 
 **Architecture support:** amd64 and arm64 — use tag `latest` (multi-arch) or pin with `arm64v8-latest` for ARM clusters.
 
@@ -25,6 +25,7 @@ Each workload provisions a BOINC client with a persistent volume at `/config` to
 ## Prerequisites
 
 - A **StorageClass** must be available for the BOINC config PVC (mounted at `/config`)
+- A BOINC **weak account key** for the target project (obtain this from the project's website)
 - For GPU-accelerated workloads: **NVIDIA GPU Operator** plugin must be installed and nodes must have the `nvidia` runtime class configured
 
 ---
@@ -55,6 +56,8 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `registry`      | **string** · Required · Default: `lscr.io`<br>Container registry for the BOINC image                                |
 | `repo`          | **string** · Required · Default: `linuxserver/boinc`<br>BOINC image repository                                      |
 | `tag`           | **string** · Required · Default: `latest`<br>Image tag — use `latest` for current, `arm64v8-latest` for ARM64       |
+| `project_url`   | **string** · Required<br>BOINC project URL (e.g. `https://universeathome.pl/universe/`)                              |
+| `account_key`   | **string** · Required<br>Weak account key for authenticating with the project                                       |
 | `gpu`           | **boolean** · Required · Default: `false`<br>Attach a GPU; sets `runtimeClassName: nvidia`                          |
 | `storage_class` | **k8sStorageClass** · Required<br>Storage class for the BOINC config PVC mounted at `/config`                       |
 | `storage_size`  | **string** · Optional · Default: `10Gi`<br>Size of the BOINC config persistent volume                               |

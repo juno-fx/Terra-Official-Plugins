@@ -28,4 +28,6 @@ tag: latest
 gpu: false
 storage_class: ""
 storage_size: "10Gi"
+project_url: ""
+account_key: ""
 arch: "amd64"

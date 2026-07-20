@@ -28,6 +28,14 @@ data:
       type: string
       required: true
       default: "latest"
+    - name: project_url
+      description: "BOINC project URL (e.g. https://universeathome.pl/universe/)"
+      type: string
+      required: true
+    - name: account_key
+      description: "Weak account key for the project"
+      type: string
+      required: true
     - name: gpu
       description: "Attach a GPU to this workload"
       type: boolean
