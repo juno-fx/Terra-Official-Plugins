@@ -103,10 +103,6 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
-            - name: USER
-              value: "{{ .Values.user }}"
-            - name: HOME
-              value: "/home/{{ .Values.user }}"
             - name: SUBFOLDER
               value: "/polaris/{{ .Values.name }}/"
             {{- range .Values.env }}
