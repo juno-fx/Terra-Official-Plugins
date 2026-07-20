@@ -20,9 +20,14 @@ echo "<cc_config>
 # Fork attach into background — boinc client may not be ready yet
 if [ -n "$PROJECT_URL" ] && [ -n "$ACCOUNT_KEY" ]; then
   (
+    # Read GUI RPC password (LSIO generates a random one)
+    GUI_PASS=$(cat /config/gui_rpc_auth.cfg 2>/dev/null || echo "")
+    PASS_OPTS=""
+    [ -n "$GUI_PASS" ] && PASS_OPTS="--passwd $GUI_PASS"
+
     # Wait for boinc client RPC socket
     for i in $(seq 1 30); do
-      if boinccmd --get_state > /dev/null 2>&1; then
+      if boinccmd $PASS_OPTS --get_state > /dev/null 2>&1; then
         break
       fi
       sleep 2
@@ -36,11 +41,11 @@ if [ -n "$PROJECT_URL" ] && [ -n "$ACCOUNT_KEY" ]; then
       PCT=$(( TARGET_MB * 1024 * 100 / TOTAL_MEM ))
       [ "$PCT" -gt 90 ] && PCT=90
       [ "$PCT" -lt 5 ] && PCT=5
-      boinccmd --set_global_prefs "<global_preferences><ram_max_used_busy_pct>${PCT}</ram_max_used_busy_pct><ram_max_used_idle_pct>${PCT}</ram_max_used_idle_pct></global_preferences>" 2>/dev/null || true
+      boinccmd $PASS_OPTS --set_global_prefs "<global_preferences><ram_max_used_busy_pct>${PCT}</ram_max_used_busy_pct><ram_max_used_idle_pct>${PCT}</ram_max_used_idle_pct></global_preferences>" 2>/dev/null || true
     fi
 
     # Attach to project
-    boinccmd --project_attach "$PROJECT_URL" "$ACCOUNT_KEY" 2>/dev/null || true
+    boinccmd $PASS_OPTS --project_attach "$PROJECT_URL" "$ACCOUNT_KEY" 2>/dev/null || true
     echo "BOINC attached to project: $PROJECT_URL"
   ) &
 fi
