@@ -2,7 +2,7 @@
 set -e
 
 # s6-overlay init script — runs before boinc-client starts
-# Injects project into client_state.xml so boinc-client sees it immediately on startup
+# Creates client_state.xml with project pre-configured
 
 # Write cc_config with CPU limit from cgroup
 if [ -f /sys/fs/cgroup/cpu.max ]; then
@@ -16,11 +16,10 @@ echo "<cc_config>
   </options>
 </cc_config>" > /config/cc_config.xml
 
-# Inject project into client_state.xml before boinc-client starts
+# Create client_state.xml with project pre-configured
 if [ -n "$PROJECT_URL" ] && [ -n "$ACCOUNT_KEY" ]; then
-  # Remove the original closing tag, then append project block with new closing tag
-  sed -i '/<\/client_state>/d' /config/client_state.xml
-  cat >> /config/client_state.xml <<EOF
+  cat > /config/client_state.xml <<EOF
+<client_state>
   <project>
     <master_url>${PROJECT_URL}</master_url>
     <authenticator>${ACCOUNT_KEY}</authenticator>
