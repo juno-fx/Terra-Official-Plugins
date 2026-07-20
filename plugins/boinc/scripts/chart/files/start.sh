@@ -2,7 +2,7 @@
 set -e
 
 # s6-overlay init script — runs before boinc-client starts
-# Creates client_state.xml with project pre-configured
+# Schedules project attach via nohup to survive s6 init transition
 
 # Write cc_config with CPU limit from cgroup
 if [ -f /sys/fs/cgroup/cpu.max ]; then
@@ -16,15 +16,17 @@ echo "<cc_config>
   </options>
 </cc_config>" > /config/cc_config.xml
 
-# Create client_state.xml with project pre-configured
+# Schedule attach — nohup survives s6 init-to-service transition
 if [ -n "$PROJECT_URL" ] && [ -n "$ACCOUNT_KEY" ]; then
-  cat > /config/client_state.xml <<EOF
-<client_state>
-  <project>
-    <master_url>${PROJECT_URL}</master_url>
-    <authenticator>${ACCOUNT_KEY}</authenticator>
-    <resource_share>100</resource_share>
-  </project>
-</client_state>
-EOF
+  nohup /bin/bash -c '
+    sleep 15
+    GUI_PASS=$(cat /config/gui_rpc_auth.cfg 2>/dev/null || echo "")
+    boinccmd --passwd "$GUI_PASS" \
+      --set_global_prefs "<global_preferences><ram_max_used_busy_pct>80</ram_max_used_busy_pct><ram_max_used_idle_pct>80</ram_max_used_idle_pct></global_preferences>" \
+      2>/dev/null || true
+    boinccmd --passwd "$GUI_PASS" \
+      --project_attach "$PROJECT_URL" "$ACCOUNT_KEY" \
+      2>/dev/null || true
+    echo "BOINC attached to project: $PROJECT_URL"
+  ' &>/dev/null &
 fi
