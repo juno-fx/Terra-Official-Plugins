@@ -72,15 +72,7 @@ spec:
           startupProbe:
             exec:
               command:
-                - /bin/bash
-                - -c
-                - |
-                  P=$(cat /config/gui_rpc_auth.cfg 2>/dev/null || echo "")
-                  if [ -n "$P" ] && [ -n "$PROJECT_URL" ] && [ -n "$ACCOUNT_KEY" ]; then
-                    boinccmd --passwd "$P" --project_attach "$PROJECT_URL" "$ACCOUNT_KEY" 2>/dev/null
-                  fi
-                  P=$(cat /config/gui_rpc_auth.cfg 2>/dev/null || echo "")
-                  [ -n "$P" ] && boinccmd --passwd "$P" --get_state 2>/dev/null | grep -q "master URL"
+                - /opt/startup-probe.sh
             initialDelaySeconds: 10
             failureThreshold: 12
             periodSeconds: 5
@@ -126,6 +118,9 @@ spec:
             - name: tooling
               mountPath: /etc/cont-init.d/01-attach-project
               subPath: start.sh
+            - name: tooling
+              mountPath: /opt/startup-probe.sh
+              subPath: startup-probe.sh
             {{- if .Values.plugins }}
             {{- range .Values.plugins }}
             - name: {{ .name | quote }}
@@ -145,6 +140,8 @@ spec:
             items:
               - key: start.sh
                 path: start.sh
+              - key: startup-probe.sh
+                path: startup-probe.sh
         - name: config
           persistentVolumeClaim:
             claimName: "{{ .Release.Name }}-data"
