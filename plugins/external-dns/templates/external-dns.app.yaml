@@ -1,0 +1,63 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-external-dns
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    - post-delete-finalizer.argocd.argoproj.io
+    - post-delete-finalizer.argocd.argoproj.io/cleanup
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: external-dns
+  sources:
+    - repoURL: https://kubernetes-sigs.github.io/external-dns/
+      chart: external-dns
+      targetRevision: {{ .Values.chart_version }}
+      helm:
+        releaseName: external-dns
+        values: |
+          provider:
+            name: {{ .Values.provider }}
+          policy: {{ .Values.policy }}
+          registry: txt
+          txtOwnerId: {{ .Values.txt_owner_id | quote }}
+          sources:
+            {{- range .Values.sources }}
+            - {{ . }}
+            {{- end }}
+          {{- if .Values.domain_filters }}
+          domainFilters:
+            {{- range splitList "," .Values.domain_filters }}
+            - {{ . | trim }}
+            {{- end }}
+          {{- end }}
+          annotationFilter: "external-dns.alpha.kubernetes.io/enable=true"
+          {{- if eq .Values.provider "aws" }}
+          extraArgs:
+            - --aws-region={{ .Values.aws_region }}
+          {{- if .Values.aws_role_arn }}
+          serviceAccount:
+            annotations:
+              eks.amazonaws.com/role-arn: {{ .Values.aws_role_arn | quote }}
+          {{- end }}
+          {{- end }}
+          {{- if eq .Values.provider "cloudflare" }}
+          env:
+            - name: CF_API_TOKEN
+              value: {{ .Values.cloudflare_api_token | quote }}
+          {{- end }}
+          {{- if .Values.extra_values }}
+          {{ .Values.extra_values | nindent 10 }}
+          {{- end }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - ServerSideApply=true
+      - CreateNamespace=true
