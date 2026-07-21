@@ -31,15 +31,21 @@ if [ -n "$PROJECT_URL" ] && [ -n "$ACCOUNT_KEY" ]; then
   cat > /etc/s6-overlay/s6-rc.d/svc-boinc-client/run <<'SERVICEFILE'
 #!/usr/bin/with-contenv bash
 s6-setuidgid abc /usr/bin/boinc --dir /config &
-# Retry project_attach for up to 60s (12 attempts x 5s apart)
-for i in $(seq 1 12); do
+echo "--- attach start $(date) ---" > /config/attach-debug.log
+# Retry project_attach for up to 120s (24 attempts x 5s apart)
+for i in $(seq 1 24); do
   sleep 5
   GUI_PASS=$(cat /config/gui_rpc_auth.cfg 2>/dev/null || echo "")
   if [ -n "$GUI_PASS" ] && [ -n "$PROJECT_URL" ] && [ -n "$ACCOUNT_KEY" ]; then
-    boinccmd --passwd "$GUI_PASS" --project_attach "$(echo "$PROJECT_URL" | tr -d '\n\r')" "$(echo "$ACCOUNT_KEY" | tr -d '\n\r')" 2>/dev/null
+    echo "[$i] URL=$(echo "$PROJECT_URL" | tr -d '\n\r') KEY=$(echo "$ACCOUNT_KEY" | tr -d '\n\r')" >> /config/attach-debug.log
+    boinccmd --passwd "$GUI_PASS" --project_attach "$(echo "$PROJECT_URL" | tr -d '\n\r')" "$(echo "$ACCOUNT_KEY" | tr -d '\n\r')" >> /config/attach-debug.log 2>&1
+    echo "[$i] EXIT: $?" >> /config/attach-debug.log
+  else
+    echo "[$i] SKIP — GUI_PASS=[$GUI_PASS] URL_SET=$([ -n "$PROJECT_URL" ] && echo yes || echo no) KEY_SET=$([ -n "$ACCOUNT_KEY" ] && echo yes || echo no)" >> /config/attach-debug.log
   fi
 done
 boinccmd --passwd "$GUI_PASS" --read_global_prefs_override 2>/dev/null || true
+echo "--- attach end $(date) ---" >> /config/attach-debug.log
 wait
 SERVICEFILE
   chmod 755 /etc/s6-overlay/s6-rc.d/svc-boinc-client/run
