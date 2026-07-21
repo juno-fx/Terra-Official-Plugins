@@ -26,19 +26,6 @@ cat > /config/global_prefs_override.xml <<'PREFS'
 PREFS
 chown abc:abc /config/global_prefs_override.xml
 
-# Inject project into client_state.xml — boinc reads this on startup
-if [ -n "$PROJECT_URL" ] && [ -n "$ACCOUNT_KEY" ]; then
-  cat > /config/client_state.xml <<EOF
-<client_state>
-  <project>
-    <master_url>${PROJECT_URL}</master_url>
-    <authenticator>${ACCOUNT_KEY}</authenticator>
-    <resource_share>100</resource_share>
-  </project>
-</client_state>
-EOF
-fi
-
 # Rewrite labwc autostart to wait for project before launching boincmgr
 mkdir -p /config/.config/labwc
 cat > /config/.config/labwc/autostart <<'AUTOSTART'

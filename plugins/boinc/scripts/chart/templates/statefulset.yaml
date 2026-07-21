@@ -74,7 +74,13 @@ spec:
               command:
                 - /bin/bash
                 - -c
-                - 'grep -q "<project>" /config/client_state.xml 2>/dev/null'
+                - |
+                  P=$(cat /config/gui_rpc_auth.cfg 2>/dev/null || echo "")
+                  if [ -n "$P" ] && [ -n "$PROJECT_URL" ] && [ -n "$ACCOUNT_KEY" ]; then
+                    boinccmd --passwd "$P" --project_attach "$PROJECT_URL" "$ACCOUNT_KEY" 2>/dev/null
+                  fi
+                  P=$(cat /config/gui_rpc_auth.cfg 2>/dev/null || echo "")
+                  [ -n "$P" ] && boinccmd --passwd "$P" --get_state 2>/dev/null | grep -q "master URL"
             initialDelaySeconds: 10
             failureThreshold: 12
             periodSeconds: 5
