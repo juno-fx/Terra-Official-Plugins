@@ -63,6 +63,45 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `storage_size`  | **string** · Optional · Default: `10Gi`<br>Size of the BOINC config persistent volume                               |
 | `arch`          | **select** · Required · Default: `amd64`<br>Target CPU architecture — `amd64`, `arm64`, or `either` (no constraint) |
 
+### Resource Configuration
+
+CPU and memory limits are automatically applied from the workload's Kubernetes
+resource requests/limits — no manual tuning needed.
+
+| Resource | Source | BOINC Setting |
+|----------|--------|---------------|
+| **CPU** | Pod `limits.cpu` via cgroup `cpu.max` | `<ncpus>` in `cc_config.xml` — limits concurrent tasks to the pod's CPU quota |
+| **Memory** | Pod `limits.memory` via cgroup `memory.max` | `ram_max_used_busy_pct: 80` in `global_prefs_override.xml` — caps BOINC memory usage at 80% of the pod's limit |
+
+Both files are written during container initialization, before the BOINC client
+starts. Configuration is static — changing the workload's resource limits after
+launch requires a pod recycle (restart) to take effect.
+
+### Account Setup
+
+Each BOINC project requires an account. To create one and connect it to the workload:
+
+1. **Create an account** on the project's website, e.g.:
+   - [Asteroids@home](https://asteroidsathome.net/boinc/) — click "Join" and fill in the registration form
+   - [Universe@home](https://universeathome.pl/universe/) — click "Join"
+   - [Einstein@home](https://einsteinathome.org/) — click "Participate"
+
+2. **Get your weak account key** — after creating the account, log in and visit your
+   account page. Look for a link like **"Account keys"** or **"Weak account key"**.
+   It will be a long string like:
+   ```
+   123456_abcdef1234567890abcdef1234567890ab
+   ```
+
+3. **Configure the workload** — when authoring the workload template in Genesis,
+   set the `project_url` and `account_key` fields:
+   - `project_url`: the project's BOINC URL (e.g. `https://asteroidsathome.net/boinc/`)
+   - `account_key`: the weak account key from step 2
+
+The BOINC client will automatically attach to the project on startup using
+these credentials. See the [BOINC wiki](https://boinc.berkeley.edu/wiki/Weak_account_key)
+for more details on weak account keys.
+
 ### Custom Environment Variables
 
 Genesis has a built-in `env` field for adding arbitrary environment variables at workload launch. These are commonly useful for the BOINC workload:
