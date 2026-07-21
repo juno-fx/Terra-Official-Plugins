@@ -36,7 +36,7 @@ for i in $(seq 1 12); do
   sleep 5
   GUI_PASS=$(cat /config/gui_rpc_auth.cfg 2>/dev/null || echo "")
   if [ -n "$GUI_PASS" ] && [ -n "$PROJECT_URL" ] && [ -n "$ACCOUNT_KEY" ]; then
-    boinccmd --passwd "$GUI_PASS" --project_attach "$PROJECT_URL" "$ACCOUNT_KEY" 2>/dev/null
+    boinccmd --passwd "$GUI_PASS" --project_attach "$(echo "$PROJECT_URL" | tr -d '\n\r')" "$(echo "$ACCOUNT_KEY" | tr -d '\n\r')" 2>/dev/null
   fi
 done
 boinccmd --passwd "$GUI_PASS" --read_global_prefs_override 2>/dev/null || true
