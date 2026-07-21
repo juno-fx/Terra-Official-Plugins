@@ -74,9 +74,9 @@ spec:
               command:
                 - /bin/bash
                 - -c
-                - 'P=$(cat /config/gui_rpc_auth.cfg 2>/dev/null) && [ -n "$P" ] && boinccmd --passwd "$P" --get_state 2>/dev/null | grep -q "master URL"'
-            initialDelaySeconds: 15
-            failureThreshold: 24
+                - 'grep -q "<project>" /config/client_state.xml 2>/dev/null'
+            initialDelaySeconds: 10
+            failureThreshold: 12
             periodSeconds: 5
           livenessProbe:
             tcpSocket:

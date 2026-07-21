@@ -2,8 +2,8 @@
 set -e
 
 # s6-overlay init script — runs before boinc-client starts
-# Rewrites svc-boinc-client/run to auto-attach project on startup
-# Rewrites labwc autostart to wait for project before launching boincmgr
+# Injects project into client_state.xml so boinc sees it immediately
+# (s6-rc uses a compiled database, modifying service run files has no effect)
 
 # Write cc_config with CPU limit from cgroup
 if [ -f /sys/fs/cgroup/cpu.max ]; then
@@ -26,29 +26,17 @@ cat > /config/global_prefs_override.xml <<'PREFS'
 PREFS
 chown abc:abc /config/global_prefs_override.xml
 
-# Rewrite boinc service to attach project after startup
+# Inject project into client_state.xml — boinc reads this on startup
 if [ -n "$PROJECT_URL" ] && [ -n "$ACCOUNT_KEY" ]; then
-  cat > /etc/s6-overlay/s6-rc.d/svc-boinc-client/run <<'SERVICEFILE'
-#!/usr/bin/with-contenv bash
-s6-setuidgid abc /usr/bin/boinc --dir /config &
-echo "--- attach start $(date) ---" > /config/attach-debug.log
-# Retry project_attach for up to 120s (24 attempts x 5s apart)
-for i in $(seq 1 24); do
-  sleep 5
-  GUI_PASS=$(cat /config/gui_rpc_auth.cfg 2>/dev/null || echo "")
-  if [ -n "$GUI_PASS" ] && [ -n "$PROJECT_URL" ] && [ -n "$ACCOUNT_KEY" ]; then
-    echo "[$i] URL=$(echo "$PROJECT_URL" | tr -d '\n\r') KEY=$(echo "$ACCOUNT_KEY" | tr -d '\n\r')" >> /config/attach-debug.log
-    boinccmd --passwd "$GUI_PASS" --project_attach "$(echo "$PROJECT_URL" | tr -d '\n\r')" "$(echo "$ACCOUNT_KEY" | tr -d '\n\r')" >> /config/attach-debug.log 2>&1
-    echo "[$i] EXIT: $?" >> /config/attach-debug.log
-  else
-    echo "[$i] SKIP — GUI_PASS=[$GUI_PASS] URL_SET=$([ -n "$PROJECT_URL" ] && echo yes || echo no) KEY_SET=$([ -n "$ACCOUNT_KEY" ] && echo yes || echo no)" >> /config/attach-debug.log
-  fi
-done
-boinccmd --passwd "$GUI_PASS" --read_global_prefs_override 2>/dev/null || true
-echo "--- attach end $(date) ---" >> /config/attach-debug.log
-wait
-SERVICEFILE
-  chmod 755 /etc/s6-overlay/s6-rc.d/svc-boinc-client/run
+  cat > /config/client_state.xml <<EOF
+<client_state>
+  <project>
+    <master_url>${PROJECT_URL}</master_url>
+    <authenticator>${ACCOUNT_KEY}</authenticator>
+    <resource_share>100</resource_share>
+  </project>
+</client_state>
+EOF
 fi
 
 # Rewrite labwc autostart to wait for project before launching boincmgr
