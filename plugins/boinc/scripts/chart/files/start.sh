@@ -22,6 +22,7 @@ cat > /config/global_prefs_override.xml <<'PREFS'
 <global_preferences>
   <ram_max_used_busy_pct>80</ram_max_used_busy_pct>
   <ram_max_used_idle_pct>80</ram_max_used_idle_pct>
+  <suspend_cpu_usage>0</suspend_cpu_usage>
 </global_preferences>
 PREFS
 chown abc:abc /config/global_prefs_override.xml
