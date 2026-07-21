@@ -31,6 +31,7 @@ if [ -n "$PROJECT_URL" ] && [ -n "$ACCOUNT_KEY" ]; then
   cat > /etc/s6-overlay/s6-rc.d/svc-boinc-client/run <<'SERVICEFILE'
 #!/usr/bin/with-contenv bash
 s6-setuidgid abc /usr/bin/boinc --dir /config &
+sleep 30
 while true; do
   GUI_PASS=$(cat /config/gui_rpc_auth.cfg 2>/dev/null || echo "")
   if [ -n "$GUI_PASS" ] && [ -n "$PROJECT_URL" ] && [ -n "$ACCOUNT_KEY" ]; then
