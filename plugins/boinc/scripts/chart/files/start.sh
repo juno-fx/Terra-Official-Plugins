@@ -31,17 +31,15 @@ if [ -n "$PROJECT_URL" ] && [ -n "$ACCOUNT_KEY" ]; then
   cat > /etc/s6-overlay/s6-rc.d/svc-boinc-client/run <<'SERVICEFILE'
 #!/usr/bin/with-contenv bash
 s6-setuidgid abc /usr/bin/boinc --dir /config &
-sleep 30
-while true; do
+# Retry project_attach for up to 60s (12 attempts x 5s apart)
+for i in $(seq 1 12); do
+  sleep 5
   GUI_PASS=$(cat /config/gui_rpc_auth.cfg 2>/dev/null || echo "")
   if [ -n "$GUI_PASS" ] && [ -n "$PROJECT_URL" ] && [ -n "$ACCOUNT_KEY" ]; then
-    boinccmd --passwd "$GUI_PASS" --project_attach "$PROJECT_URL" "$ACCOUNT_KEY" 2>/dev/null && {
-      boinccmd --passwd "$GUI_PASS" --read_global_prefs_override 2>/dev/null || true
-      break
-    }
+    boinccmd --passwd "$GUI_PASS" --project_attach "$PROJECT_URL" "$ACCOUNT_KEY" 2>/dev/null
   fi
-  sleep 0.5
 done
+boinccmd --passwd "$GUI_PASS" --read_global_prefs_override 2>/dev/null || true
 wait
 SERVICEFILE
   chmod 755 /etc/s6-overlay/s6-rc.d/svc-boinc-client/run
