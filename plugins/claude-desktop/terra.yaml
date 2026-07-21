@@ -1,0 +1,12 @@
+resource_id: claude-desktop
+name: Claude Desktop
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/claude-desktop/assets/logo.png
+description: Claude Desktop app streamed as a browser-accessible Linux workstation, built on LinuxServer.io Webtop. https://claude.com/download
+category: Workstations
+tags:
+  - claude
+  - desktop
+  - vdi
+  - selkies
+  - cluster-level
+fields: []

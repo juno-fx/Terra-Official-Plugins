@@ -1,0 +1,4 @@
+apiVersion: v2
+name: claude-desktop
+description: Claude Desktop workstation
+version: 0.0.0

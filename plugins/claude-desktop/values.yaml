@@ -1,0 +1,2 @@
+# This chart only carries the Terra metadata + embedded workload-template
+# scripts ConfigMap. Nothing here is consumed by templates/ directly.
