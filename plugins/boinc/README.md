@@ -110,8 +110,7 @@ Genesis has a built-in `env` field for adding arbitrary environment variables at
 |---------------|-----------------------------------------------------------|
 | `PASSWORD`    | Password for the BOINC web GUI — enables HTTP basic auth  |
 | `TZ`          | Timezone for log timestamps (e.g. `America/New_York`)     |
-| `PUID`        | User ID for file permissions on `/config` (default: `99`) |
-| `PGID`        | Group ID for file permissions on `/config` (default: `99`) |
+
 
 ---
 

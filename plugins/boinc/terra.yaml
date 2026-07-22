@@ -5,6 +5,7 @@ description: Distributed computing client for BOINC projects
 category: Computing
 tags:
   - cluster-level
+  - workload
   - computing
   - science
 fields: []
