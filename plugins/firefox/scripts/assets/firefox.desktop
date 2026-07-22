@@ -1,9 +1,0 @@
-[Desktop Entry]
-Version=30.0
-Name=Firefox 30.0
-Comment=Firefox Terra Install
-Exec=DESTINATION-PATH
-Icon=ICON-PATH
-Terminal=false
-Type=Application
-Categories=X-Polaris
