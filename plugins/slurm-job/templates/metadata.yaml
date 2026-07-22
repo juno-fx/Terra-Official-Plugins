@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-terra-metadata"
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    juno-innovations.com/workload: "Application"
+data:
+  chart: "{{ .Release.Name }}-scripts-configmap"
+  description: "Slurm job submission workload — clone a git repo with your sbatch script, build, and submit to the Slurm cluster via sbatch"
+  fields: |
+    - name: registry
+      description: "Container registry"
+      type: string
+      required: true
+      default: "ghcr.io"
+    - name: repo
+      description: "Slurm CLI image repository"
+      type: string
+      required: true
+      default: "slinkyproject/login"
+    - name: tag
+      description: "Slurm CLI image tag"
+      type: string
+      required: true
+      default: "25.11-ubuntu24.04"
+    - name: git_url
+      description: "Git repository URL with your sbatch script"
+      type: string
+      required: true
+      default: "https://github.com/aldmbmtl/runtimes.git"
+    - name: git_ref
+      description: "Git reference (branch, tag, commit)"
+      type: string
+      required: true
+      default: "main"
+    - name: work_dir
+      description: "Working directory (relative to repo root, or absolute path)"
+      type: string
+      required: false
+      default: "slurm"
+    - name: build_command
+      description: "Build command run before submission (e.g. chmod +x job.sh)"
+      type: string
+      required: false
+      default: "chmod +x hello-world.sh gpu-test.sh"
+    - name: run_command
+      description: "Command to submit the Slurm job (e.g. sbatch job.sh)"
+      type: string
+      required: true
+      default: "sbatch --chdir /tmp hello-world.sh"

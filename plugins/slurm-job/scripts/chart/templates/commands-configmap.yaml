@@ -1,0 +1,117 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Values.name }}-slurm-commands"
+data:
+  lib.sh: |
+    # POSIX-shared library for slurm-job scripts
+    # shellcheck disable=SC3043
+    resolve_target_dir() {
+      _wd="$1"
+      if [ -n "$_wd" ]; then
+        case "$_wd" in
+          /*) _dir="$_wd" ;;
+          *)  _dir="/workspace/$_wd" ;;
+        esac
+      else
+        _dir="/workspace"
+      fi
+      mkdir -p "$_dir"
+      echo "$_dir"
+    }
+
+  init-clone.sh: |
+    #!/bin/sh
+    set -e
+    set -x
+    . /commands/lib.sh
+    rm -rf /workspace/* /workspace/.[!.]* 2>/dev/null || true
+    git clone --branch "$GIT_REF" "$GIT_URL" /workspace
+    TARGET_DIR=$(resolve_target_dir "$WORK_DIR")
+    cd "$TARGET_DIR"
+    if [ -n "$BUILD_COMMAND" ]; then
+      eval "$BUILD_COMMAND"
+    fi
+
+  run-sbatch.sh: |
+    #!/bin/bash
+    set -x
+
+    # Build slurm.conf pointing at the controller (auth/slurm with sackd)
+    mkdir -p /etc/slurm
+    cat > /etc/slurm/slurm.conf <<EOF
+    ClusterName=slurm-cluster
+    SlurmctldHost=slurm-cluster-controller
+    SlurmctldPort=6817
+    SlurmdPort=6818
+    AuthType=auth/slurm
+    CredType=cred/slurm
+    EOF
+    echo "slurm.conf written"
+
+    # Start sackd for auth/slurm authentication
+    # (slurm.key is mounted at /etc/slurm/slurm.key with defaultMode 0600)
+    mkdir -p /run/slurm
+    chmod 0777 /run/slurm 2>/dev/null || true
+    chown 0 /run/slurm 2>/dev/null || true
+    sackd -D &
+    for _ in 1 2 3 4 5; do
+      if [ -S /run/slurm/sack.socket ]; then
+        echo "sackd ready (socket found)"
+        break
+      fi
+      sleep 1
+    done
+    if [ ! -S /run/slurm/sack.socket ]; then
+      echo "WARNING: sackd socket not detected after 5s — continuing anyway"
+    fi
+
+    # cd to workspace
+    . /commands/lib.sh
+    TARGET_DIR=$(resolve_target_dir "$WORK_DIR")
+    cd "$TARGET_DIR"
+
+    # Submit the Slurm job
+    echo "Submitting Slurm job..."
+    # Convert k8s memory format (1Gi -> 1G, 512Mi -> 512M) for Slurm
+    memory="${SLURM_MEMORY:-1G}"
+    export SBATCH_MEM_PER_NODE="${memory//i/}"
+    export SBATCH_CPUS_PER_TASK="${SLURM_CPUS:-1}"
+    set +e
+    JOB_OUTPUT=$(eval "$RUN_COMMAND" 2>&1)
+    EXIT_CODE=$?
+    set -e
+    echo "$JOB_OUTPUT"
+
+    if [ $EXIT_CODE -ne 0 ]; then
+      echo "Submission failed with exit code $EXIT_CODE"
+      exit $EXIT_CODE
+    fi
+
+    # Extract Slurm job ID from "Submitted batch job NNN"
+    JOB_ID=$(echo "$JOB_OUTPUT" | grep -oP 'Submitted batch job \K\d+')
+    if [ -z "$JOB_ID" ]; then
+      echo "Command completed (not an sbatch submission). Exiting."
+      exit 0
+    fi
+
+    # Cancel the Slurm job on SIGTERM (Kubernetes pod deletion)
+    _cancel() {
+      echo "Received termination signal — cancelling Slurm job $JOB_ID"
+      timeout 10 scancel "$JOB_ID" 2>/dev/null || true
+      exit 130
+    }
+    trap '_cancel' TERM INT
+
+    # Poll until the job leaves the queue (COMPLETED, FAILED, CANCELLED, etc.)
+    echo "Slurm job $JOB_ID submitted. Polling for completion..."
+    while true; do
+      JOB_STATE=$(scontrol show job "$JOB_ID" 2>/dev/null | grep -oP 'JobState=\K\S+')
+      echo "  job state: ${JOB_STATE:-UNKNOWN}"
+      case "$JOB_STATE" in
+        COMPLETED)           exit 0 ;;
+        FAILED|CANCELLED|TIMEOUT|NODE_FAIL|PREEMPTED|OUT_OF_MEMORY) exit 1 ;;
+        ""|PENDING|RUNNING|COMPLETING) sleep 10 & wait $! ;;
+        *)                   sleep 10 & wait $! ;;
+      esac
+    done
