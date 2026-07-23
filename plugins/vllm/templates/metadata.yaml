@@ -87,6 +87,8 @@ data:
       required: false
       default: "50Gi"
       type: string
+    - name: icon
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/vllm/assets/logo.png"
   env_hints: |
     - name: VLLM_LOGGING_LEVEL
       description: Logging verbosity for the vLLM engine (DEBUG, INFO, WARNING, ERROR).
