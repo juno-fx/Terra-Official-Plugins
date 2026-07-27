@@ -49,8 +49,55 @@ For a full list of supported issuers, see the [cert-manager documentation](https
 
 ---
 
+## Issuing Certificates (Required — Not Automatic)
+
+Installing this plugin only installs the cert-manager controller and CRDs. It does **not** issue any certificates by itself — nothing happens until you create two more resources yourself.
+
+Neither this plugin nor cert-manager creates these for you — they're plain Kubernetes manifests you must apply to the cluster yourself, e.g. `kubectl apply -f cluster-issuer.yaml`, or commit them to a repo your GitOps tooling (ArgoCD) watches.
+
+### 1. An Issuer or ClusterIssuer
+
+Tells cert-manager *where* to get certs from and how to prove domain ownership. `Issuer` is namespace-scoped, `ClusterIssuer` works cluster-wide. Example, Let's Encrypt via HTTP-01 challenge:
+
+```yaml
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: you@example.com
+    privateKeySecretRef:
+      name: letsencrypt-prod-key
+    solvers:
+      - http01:
+          ingress:
+            class: nginx
+```
+
+For wildcard certs you need a **DNS-01** challenge instead of HTTP-01 — this requires a `solvers[].dns01` block with credentials for your DNS provider (Route53, Cloudflare, etc.). These credentials are configured independently in the Issuer — cert-manager does not share credentials with the ExternalDNS plugin, even if both target the same DNS provider.
+
+### 2. A certificate request
+
+Either an explicit `Certificate` object, or — more commonly — an annotation on your Ingress:
+
+```yaml
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+    - hosts: [myapp.example.com]
+      secretName: myapp-tls
+```
+
+Once both exist, cert-manager sees the annotated Ingress, runs the challenge, fetches the cert, stores it in the named Secret, and auto-renews before expiry. Skip either piece and no certificate ever gets issued.
+
+---
+
 ## Notes
 
-- After installation, you must create an `Issuer` or `ClusterIssuer` resource to begin issuing certificates — cert-manager itself does not issue certificates without a configured issuer
+- After installation, you must create an `Issuer` or `ClusterIssuer` resource to begin issuing certificates — cert-manager itself does not issue certificates without a configured issuer (see [Issuing Certificates](#issuing-certificates-required--not-automatic) above)
 - See the [cert-manager issuer documentation](https://cert-manager.io/docs/configuration/issuers/) for setup guides for Let's Encrypt, self-signed, and other issuers
 - Upgrading cert-manager across major versions may require CRD migration — consult the cert-manager upgrade notes before changing `chart_version`
