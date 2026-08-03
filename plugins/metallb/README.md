@@ -83,3 +83,6 @@ the fields you provide at install time.
   ranges only apply to newly created Services until existing ones are recreated
 - See the [MetalLB configuration docs](https://metallb.io/configuration/) for advanced topics like
   multiple pools, BGP communities, and per-Service IP requests
+- If you're pointing at your Orion deployment via a local `hosts` file entry rather than DNS, note
+  that installing this plugin gives the ingress controller a new `LoadBalancer` IP from
+  `address_pool` — update that `hosts` entry to match, or it will keep resolving to the old address
