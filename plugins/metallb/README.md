@@ -39,6 +39,10 @@ the fields you provide at install time.
   ConfigMap (a cluster-level prerequisite outside this plugin's control)
 - For `bgp` mode: an upstream router configured to peer with the cluster nodes and accept routes for
   the configured ASNs
+- **K3s clusters:** disable K3s's built-in `ServiceLB` (Klipper) before installing this plugin — both
+  it and MetalLB try to satisfy `LoadBalancer` Services, and leaving both enabled causes them to fight
+  over the same Services. Add `--disable servicelb` to the K3s server flags (or `disable: servicelb`
+  in `/etc/rancher/k3s/config.yaml`) and restart the `k3s` service
 - No prior MetalLB installation in the cluster
 
 ---
@@ -70,6 +74,9 @@ the fields you provide at install time.
 
 ## Notes
 
+- **`bgp` mode is unverified on our hardware** — only `layer2` mode has been tested against our
+  clusters so far. If you use `bgp`, validate peering and route advertisement against your own
+  router before relying on it
 - Switching `mode` after install replaces the advertisement resource (`L2Advertisement` or
   `BGPPeer`/`BGPAdvertisement`) but keeps the same `IPAddressPool`
 - IPs already leased to running Services are not affected by changing `address_pool`, but new
