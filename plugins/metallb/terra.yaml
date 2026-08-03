@@ -11,9 +11,9 @@ tags:
   - load-balancer
 fields:
   - name: chart_version
-    description: Version of the MetalLB Helm chart to install.
+    description: Version of the MetalLB Helm chart to install. (e.g. 0.14.9)
     required: true
-    default: "0.14.9"
+    default: 0.14.9
     type: string
   - name: mode
     description: >-
