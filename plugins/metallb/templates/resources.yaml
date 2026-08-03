@@ -1,6 +1,12 @@
 ---
-# Applied after the metallb ArgoCD Application (templates/installer.yaml) reports Healthy, so the
-# IPAddressPool/L2Advertisement/BGPPeer CRDs installed by the upstream chart already exist.
+# The metallb.io CRDs (IPAddressPool, L2Advertisement, BGPPeer, BGPAdvertisement) are installed by
+# the nested MetalLB Application (templates/installer.yaml), which syncs as its own separate,
+# asynchronous ArgoCD Application. sync-wave alone cannot guarantee these CRDs exist yet by the time
+# this wave runs, since ArgoCD only gates on wave-0 health if the destination cluster has a custom
+# health check registered for the `Application` kind — not guaranteed on every cluster. So each
+# resource below also sets `SkipDryRunOnMissingResource=true`: this skips the dry-run validation
+# that otherwise hard-fails when the CRD isn't registered yet, and relies on selfHeal + automated
+# sync to retry the resource once the CRD actually exists.
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
@@ -8,6 +14,7 @@ metadata:
   namespace: metallb-system
   annotations:
     argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   addresses:
     {{- range splitList "," .Values.address_pool }}
@@ -22,6 +29,7 @@ metadata:
   namespace: metallb-system
   annotations:
     argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   ipAddressPools:
     - {{ .Release.Name }}-pool
@@ -33,6 +41,7 @@ metadata:
   namespace: metallb-system
   annotations:
     argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   myASN: {{ .Values.bgp_my_asn }}
   peerASN: {{ .Values.bgp_peer_asn }}
@@ -45,6 +54,7 @@ metadata:
   namespace: metallb-system
   annotations:
     argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   ipAddressPools:
     - {{ .Release.Name }}-pool
