@@ -1,0 +1,52 @@
+resource_id: metallb
+name: MetalLB
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/metallb/assets/logo.png
+description: |
+  Bare-metal LoadBalancer implementation for Kubernetes clusters. Assigns real external
+  IPs to LoadBalancer Services using Layer 2 (ARP/NDP) or BGP advertisement. https://metallb.io/
+category: Networking
+tags:
+  - cluster-level
+  - networking
+  - load-balancer
+fields:
+  - name: chart_version
+    description: Version of the MetalLB Helm chart to install.
+    required: true
+    default: "0.14.9"
+    type: string
+  - name: mode
+    description: >-
+      Advertisement mode used to announce LoadBalancer IPs to the network. "layer2" answers
+      ARP/NDP requests directly and needs no router support. "bgp" peers with an upstream
+      router and requires the bgp_* fields below.
+    required: true
+    default: layer2
+    type: select
+    options:
+      - layer2
+      - bgp
+  - name: address_pool
+    description: >-
+      One or more IP ranges or CIDRs to allocate to LoadBalancer Services, comma-separated
+      (e.g. "192.168.1.240-192.168.1.250" or "10.0.0.0/24,10.0.1.0/28"). Used in both modes.
+    required: true
+    type: string
+  - name: bgp_my_asn
+    description: >-
+      ASN MetalLB will use when peering with the upstream router. Only used when mode is "bgp".
+    required: false
+    default: 64512
+    type: int
+  - name: bgp_peer_asn
+    description: >-
+      ASN of the upstream BGP router peer. Only used when mode is "bgp".
+    required: false
+    default: 64512
+    type: int
+  - name: bgp_peer_address
+    description: >-
+      IP address of the upstream BGP router to peer with. Only used when mode is "bgp".
+    required: false
+    default: ""
+    type: string

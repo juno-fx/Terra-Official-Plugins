@@ -1,0 +1,51 @@
+---
+# Applied after the metallb ArgoCD Application (templates/installer.yaml) reports Healthy, so the
+# IPAddressPool/L2Advertisement/BGPPeer CRDs installed by the upstream chart already exist.
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: {{ .Release.Name }}-pool
+  namespace: metallb-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  addresses:
+    {{- range splitList "," .Values.address_pool }}
+    - {{ trim . | quote }}
+    {{- end }}
+---
+{{- if eq .Values.mode "layer2" }}
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: {{ .Release.Name }}-l2
+  namespace: metallb-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  ipAddressPools:
+    - {{ .Release.Name }}-pool
+{{- else if eq .Values.mode "bgp" }}
+apiVersion: metallb.io/v1beta1
+kind: BGPPeer
+metadata:
+  name: {{ .Release.Name }}-peer
+  namespace: metallb-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  myASN: {{ .Values.bgp_my_asn }}
+  peerASN: {{ .Values.bgp_peer_asn }}
+  peerAddress: {{ .Values.bgp_peer_address | quote }}
+---
+apiVersion: metallb.io/v1beta1
+kind: BGPAdvertisement
+metadata:
+  name: {{ .Release.Name }}-bgp-adv
+  namespace: metallb-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  ipAddressPools:
+    - {{ .Release.Name }}-pool
+{{- end }}
