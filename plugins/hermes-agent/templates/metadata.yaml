@@ -37,14 +37,19 @@ data:
         - readonly-ns
         - admin-ns
     - name: persistence_size
-      description: "Persistent volume size (e.g. 1Gi, 500Mi)."
+      description: "Persistent volume size (e.g. 5Gi, 500Mi)."
       type: string
       required: false
-      default: "1Gi"
+      default: "5Gi"
     - name: persistence_storage_class
       description: "Storage class for the persistent volume."
       type: k8sStorageClass
       required: false
+    - name: termination_grace_period
+      description: "Seconds Kubernetes waits for a graceful shutdown (gateway drain + DB checkpoint) before force-killing. Raise on spot/preemptible nodes."
+      type: int
+      required: false
+      default: 120
   env_hints: |
     - name: ANTHROPIC_API_KEY
       description: Anthropic Console API key, used when the agent is configured to use Claude models.
@@ -54,4 +59,3 @@ data:
       description: OpenRouter API key for flexible access to many hosted models.
     - name: HERMES_MODEL
       description: Overrides the default model used by the agent.
-

@@ -13,15 +13,21 @@ data:
 
     log() { echo "[init] $*"; }
 
-    # Phase 1 — install sudo + tmux (small, fast). Needed immediately for
-    # privilege-drop via sudo.  Build tools (gcc/g++/make) come later in
-    # Phase 3 so the gateway can start without waiting for compilation.
-    if ! command -v sudo > /dev/null 2>&1; then
-      log "Installing sudo and tmux..."
+    # Phase 1 — ensure runtime deps (small, fast). sudo is needed immediately
+    # for the privilege-drop that starts the gateway; tmux backs wetty; sqlite3
+    # backs the state.db integrity self-heal in db-heal.sh. Build tools
+    # (gcc/g++/make) come later in Phase 3 so the gateway starts without waiting
+    # for compilation.
+    MISSING=""
+    command -v sudo    > /dev/null 2>&1 || MISSING="$MISSING sudo"
+    command -v tmux    > /dev/null 2>&1 || MISSING="$MISSING tmux"
+    command -v sqlite3 > /dev/null 2>&1 || MISSING="$MISSING sqlite3"
+    if [ -n "$MISSING" ]; then
+      log "Installing runtime deps:$MISSING"
       apt-get update -qq
-      apt-get install -y sudo tmux 2>&1
+      apt-get install -y $MISSING 2>&1
     else
-      log "sudo already installed, skipping..."
+      log "runtime deps present, skipping..."
     fi
 
     # --- User/group remap (only when PUID != 0) ---
@@ -77,11 +83,16 @@ data:
     _SU=""
     [ "${PUID:-0}" != "0" ] && _SU="sudo -E -u hermes"
 
+    # Graceful shutdown on termination (e.g. spot-instance reclaim / pod
+    # eviction). Delegates to shutdown.sh, which drains the gateway and
+    # checkpoints state.db so it is never left mid-write. This backstops the
+    # container preStop hook — whichever fires first performs the clean stop.
     cleanup() {
-      log "Shutting down..."
-      kill "${GATEWAY_PID:-}" "${DASHBOARD_PID:-}" "${WETTY_PID:-}" 2>/dev/null || true
+      log "Received termination signal — shutting down gracefully..."
+      /opt/init/shutdown.sh || true
+      kill "${DASHBOARD_PID:-}" "${WETTY_PID:-}" 2>/dev/null || true
       wait
-      exit
+      exit 0
     }
     trap cleanup TERM INT
 
@@ -92,6 +103,11 @@ data:
         "$@"
       fi
     }
+
+    # Phase 1.5 — verify state.db integrity and auto-recover if corrupt, BEFORE
+    # the gateway opens it. Defends against unclean shutdowns (spot reclaim,
+    # OOM-kill) that can corrupt the SQLite state DB.
+    /opt/init/db-heal.sh || true
 
     # Phase 2 — start gateway + dashboard (fast, no build tools needed)
     log "Starting gateway..."
@@ -128,3 +144,99 @@ data:
     _start_wetty &
 
     wait
+
+  db-heal.sh: |
+    #!/bin/bash
+    # Verify the hermes state.db on startup and auto-salvage it if corrupt.
+    #
+    # A hard, unclean shutdown (spot-instance reclaim, OOM-kill, node loss) can
+    # tear a WAL checkpoint mid-write and corrupt the SQLite state DB, after
+    # which every agent turn fails to persist ("session storage could not be
+    # written"). This script runs BEFORE the gateway opens the DB: it checks
+    # integrity and, if the DB is malformed, salvages the recoverable rows with
+    # sqlite3's .recover into a fresh DB, drops the (rebuildable) FTS index so
+    # hermes recreates it cleanly on open, and swaps it in — keeping a
+    # timestamped copy of the corrupt original.
+    #
+    # Runs as the container user (root) — no sudo. Restores hermes ownership
+    # via chown afterward, matching write-config.sh's convention.
+    set -u
+
+    HERMES_HOME="${HERMES_HOME:-/opt/data}"
+    DB="${HERMES_HOME}/state.db"
+    PUID="${PUID:-1000}"
+    PGID="${PGID:-1000}"
+
+    log() { echo "[db-heal] $*"; }
+
+    [ -f "$DB" ] || { log "no state.db yet — nothing to check"; exit 0; }
+
+    if ! command -v sqlite3 > /dev/null 2>&1; then
+      log "sqlite3 not available — skipping integrity check"
+      exit 0
+    fi
+
+    if sqlite3 "$DB" 'PRAGMA quick_check;' 2>/dev/null | head -1 | grep -qx 'ok'; then
+      log "state.db integrity OK"
+      exit 0
+    fi
+
+    log "state.db FAILED integrity check — attempting offline salvage via .recover"
+    TS="$(date +%Y%m%d_%H%M%S)"
+    BK="${DB}.corrupt.${TS}"
+    cp -a "$DB" "$BK" 2>/dev/null || true
+    [ -f "${DB}-wal" ] && cp -a "${DB}-wal" "${BK}-wal" 2>/dev/null || true
+    [ -f "${DB}-shm" ] && cp -a "${DB}-shm" "${BK}-shm" 2>/dev/null || true
+
+    REC="${DB}.recovered.${TS}"
+    rm -f "$REC"
+    sqlite3 "$BK" '.recover' 2>/dev/null | sqlite3 "$REC" 2>/dev/null
+
+    if [ -f "$REC" ] && sqlite3 "$REC" 'PRAGMA integrity_check;' 2>/dev/null | head -1 | grep -qx 'ok'; then
+      # Drop the (rebuildable) FTS objects + .recover's orphan table so hermes
+      # recreates a clean full-text index from the canonical messages table.
+      DROPS="$(sqlite3 "$REC" "SELECT 'DROP '||CASE WHEN type='trigger' THEN 'TRIGGER' ELSE 'TABLE' END||' IF EXISTS \"'||name||'\";' FROM sqlite_master WHERE name LIKE 'messages_fts%';" 2>/dev/null)"
+      sqlite3 "$REC" "DROP TABLE IF EXISTS lost_and_found; ${DROPS} VACUUM;" 2>/dev/null || true
+      mv -f "$REC" "$DB"
+      rm -f "${DB}-wal" "${DB}-shm"
+      chown "${PUID}:${PGID}" "$DB" 2>/dev/null || true
+      log "state.db salvaged — corrupt copy preserved at ${BK}"
+    else
+      rm -f "$REC" 2>/dev/null || true
+      log "WARNING: automatic salvage FAILED — original left in place; manual repair required (backup at ${BK})"
+    fi
+
+  shutdown.sh: |
+    #!/bin/bash
+    # Graceful shutdown for the hermes-agent container.
+    #
+    # Invoked by the container's preStop hook (and, as a backstop, by start.sh's
+    # TERM/INT trap). Drains the gateway — which finishes any in-flight turn,
+    # checkpoints and closes state.db — then forces a final WAL checkpoint so
+    # the on-disk database is fully consistent before the container exits. This
+    # is what prevents a spot-instance reclaim from tearing a write and
+    # corrupting the DB.
+    #
+    # Runs as the container user (root) — no sudo. Restores hermes ownership
+    # via chown afterward.
+    set -u
+
+    HERMES_HOME="${HERMES_HOME:-/opt/data}"
+    DB="${HERMES_HOME}/state.db"
+    HERMES_BIN="/opt/hermes/.venv/bin/hermes"
+    PUID="${PUID:-1000}"
+    PGID="${PGID:-1000}"
+
+    log() { echo "[shutdown] $*"; }
+
+    log "stopping gateway (drains in-flight turns, checkpoints and closes state.db)"
+    "$HERMES_BIN" gateway stop 2>/dev/null || true
+
+    if command -v sqlite3 > /dev/null 2>&1 && [ -f "$DB" ]; then
+      log "forcing final WAL checkpoint (TRUNCATE)"
+      sqlite3 "$DB" 'PRAGMA wal_checkpoint(TRUNCATE);' 2>/dev/null || true
+      chown "${PUID}:${PGID}" "$DB" 2>/dev/null || true
+      [ -f "${DB}-wal" ] && chown "${PUID}:${PGID}" "${DB}-wal" 2>/dev/null || true
+      [ -f "${DB}-shm" ] && chown "${PUID}:${PGID}" "${DB}-shm" 2>/dev/null || true
+    fi
+    log "graceful shutdown complete"
