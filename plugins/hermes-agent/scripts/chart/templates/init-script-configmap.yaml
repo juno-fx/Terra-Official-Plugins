@@ -158,16 +158,23 @@ data:
     # hermes recreates it cleanly on open, and swaps it in — keeping a
     # timestamped copy of the corrupt original.
     #
-    # Runs as the container user (root) — no sudo. Restores hermes ownership
-    # via chown afterward, matching write-config.sh's convention.
+    # Runs as the hermes user: when invoked as root with a PUID remap active,
+    # it re-execs itself via sudo so every file it creates is hermes-owned
+    # from the start — no chown fix-up needed. Under PUID=0 (legacy mode) it
+    # stays root, matching the rest of the container.
     set -u
 
     HERMES_HOME="${HERMES_HOME:-/opt/data}"
     DB="${HERMES_HOME}/state.db"
     PUID="${PUID:-1000}"
-    PGID="${PGID:-1000}"
 
     log() { echo "[db-heal] $*"; }
+
+    # start.sh installs sudo in Phase 1, before this runs, so the demotion is
+    # guaranteed whenever a PUID remap is active.
+    if [ "$(id -u)" = "0" ] && [ "$PUID" != "0" ] && command -v sudo > /dev/null 2>&1; then
+      exec sudo -E -u hermes "$0" "$@"
+    fi
 
     [ -f "$DB" ] || { log "no state.db yet — nothing to check"; exit 0; }
 
@@ -195,11 +202,10 @@ data:
     if [ -f "$REC" ] && sqlite3 "$REC" 'PRAGMA integrity_check;' 2>/dev/null | head -1 | grep -qx 'ok'; then
       # Drop the (rebuildable) FTS objects + .recover's orphan table so hermes
       # recreates a clean full-text index from the canonical messages table.
-      DROPS="$(sqlite3 "$REC" "SELECT 'DROP '||CASE WHEN type='trigger' THEN 'TRIGGER' ELSE 'TABLE' END||' IF EXISTS \"'||name||'\";' FROM sqlite_master WHERE name LIKE 'messages_fts%';" 2>/dev/null)"
+      DROPS="$(sqlite3 "$REC" "SELECT 'DROP '||CASE WHEN type='trigger' THEN 'TRIGGER' ELSE 'TABLE' END||' IF EXISTS \"'||replace(name,'\"','\"\"')||'\";' FROM sqlite_master WHERE name LIKE 'messages_fts%';" 2>/dev/null)"
       sqlite3 "$REC" "DROP TABLE IF EXISTS lost_and_found; ${DROPS} VACUUM;" 2>/dev/null || true
       mv -f "$REC" "$DB"
       rm -f "${DB}-wal" "${DB}-shm"
-      chown "${PUID}:${PGID}" "$DB" 2>/dev/null || true
       log "state.db salvaged — corrupt copy preserved at ${BK}"
     else
       rm -f "$REC" 2>/dev/null || true
@@ -217,17 +223,25 @@ data:
     # is what prevents a spot-instance reclaim from tearing a write and
     # corrupting the DB.
     #
-    # Runs as the container user (root) — no sudo. Restores hermes ownership
-    # via chown afterward.
+    # Runs as the hermes user — the same user the gateway runs as: when
+    # invoked as root with a PUID remap active, it re-execs itself via sudo,
+    # so it never leaves root-owned WAL/SHM files behind. Under PUID=0
+    # (legacy mode) it stays root, matching the rest of the container.
     set -u
 
     HERMES_HOME="${HERMES_HOME:-/opt/data}"
     DB="${HERMES_HOME}/state.db"
     HERMES_BIN="/opt/hermes/.venv/bin/hermes"
     PUID="${PUID:-1000}"
-    PGID="${PGID:-1000}"
 
     log() { echo "[shutdown] $*"; }
+
+    # If the preStop hook fires before start.sh Phase 1 has installed sudo,
+    # fall through as root — the gateway isn't running yet and the checkpoint
+    # below changes no file ownership, so that path is safe.
+    if [ "$(id -u)" = "0" ] && [ "$PUID" != "0" ] && command -v sudo > /dev/null 2>&1; then
+      exec sudo -E -u hermes "$0" "$@"
+    fi
 
     log "stopping gateway (drains in-flight turns, checkpoints and closes state.db)"
     "$HERMES_BIN" gateway stop 2>/dev/null || true
@@ -235,8 +249,5 @@ data:
     if command -v sqlite3 > /dev/null 2>&1 && [ -f "$DB" ]; then
       log "forcing final WAL checkpoint (TRUNCATE)"
       sqlite3 "$DB" 'PRAGMA wal_checkpoint(TRUNCATE);' 2>/dev/null || true
-      chown "${PUID}:${PGID}" "$DB" 2>/dev/null || true
-      [ -f "${DB}-wal" ] && chown "${PUID}:${PGID}" "${DB}-wal" 2>/dev/null || true
-      [ -f "${DB}-shm" ] && chown "${PUID}:${PGID}" "${DB}-shm" 2>/dev/null || true
     fi
     log "graceful shutdown complete"
