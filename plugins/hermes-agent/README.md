@@ -55,7 +55,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `repo` | **string** · Optional · Default: `hermes-agent`<br>Hermes image repository |
 | `tag` | **string** · Optional · Default: `latest`<br>Hermes image tag |
 | `cluster_access` | **select** · Optional · Default: `none`<br>Kubernetes RBAC access level for the agent (`none`, `readonly-ns`, `admin-ns`) |
-| `persistence_size` | **string** · Optional · Default: `5Gi`<br>Persistent volume size for agent state storage |
+| `persistence_size` | **string** · Optional · Default: `10Gi`<br>Persistent volume size for agent state storage |
 | `persistence_storage_class` | **k8sStorageClass** · Optional<br>Storage class for the persistent volume |
 | `termination_grace_period` | **int** · Optional · Default: `120`<br>Seconds Kubernetes waits for a graceful shutdown (gateway drain + DB checkpoint) before force-killing. Raise on spot/preemptible nodes |
 

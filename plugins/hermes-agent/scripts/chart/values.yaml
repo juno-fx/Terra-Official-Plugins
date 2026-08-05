@@ -10,7 +10,7 @@ cpu: 500m
 memory: 1Gi
 cpuLimit: 2000m
 memoryLimit: 4Gi
-persistence_size: 5Gi
+persistence_size: 10Gi
 persistence_storage_class: local-path
 termination_grace_period: 120
 git_port: 9418

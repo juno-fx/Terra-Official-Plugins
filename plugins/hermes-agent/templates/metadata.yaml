@@ -40,7 +40,7 @@ data:
       description: "Persistent volume size (e.g. 5Gi, 500Mi)."
       type: string
       required: false
-      default: "5Gi"
+      default: "10Gi"
     - name: persistence_storage_class
       description: "Storage class for the persistent volume."
       type: k8sStorageClass
