@@ -10,7 +10,10 @@ data:
 
     if [ -n "$GIT_URL" ]; then
       CLONE_DIR="$(mktemp -d /tmp/XXXXXXXX)"
-      git clone --branch "$GIT_REF" "$GIT_URL" "$CLONE_DIR"
+      git clone "$GIT_URL" "$CLONE_DIR"
+      if [ -n "$GIT_REF" ]; then
+        git -C "$CLONE_DIR" checkout "$GIT_REF"
+      fi
       WORK_ROOT="$CLONE_DIR"
     elif [ -n "$SOURCE_PATH" ]; then
       WORK_ROOT="$SOURCE_PATH"

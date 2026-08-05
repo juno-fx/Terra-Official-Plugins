@@ -11,7 +11,7 @@ data:
   description: "Python runtime environment — clone, build, and run your application"
   fields: |
     - name: icon
-      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/main/plugins/runtime-python/assets/icon.svg"
+      default: "https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/runtime-python/assets/icon.svg?raw=true"
     - name: registry
       description: "Container registry"
       type: string

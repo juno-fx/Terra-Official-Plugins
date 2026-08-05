@@ -2,7 +2,7 @@ name: runtime-cpp
 user:
 registry: docker.io
 repo: gcc
-tag: "latest"
+tag: "16"
 group:
 cpu: "1"
 memory: "1Gi"
