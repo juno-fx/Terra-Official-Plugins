@@ -55,8 +55,9 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `repo` | **string** · Optional · Default: `hermes-agent`<br>Hermes image repository |
 | `tag` | **string** · Optional · Default: `latest`<br>Hermes image tag |
 | `cluster_access` | **select** · Optional · Default: `none`<br>Kubernetes RBAC access level for the agent (`none`, `readonly-ns`, `admin-ns`) |
-| `persistence_size` | **string** · Optional · Default: `1Gi`<br>Persistent volume size for agent state storage |
+| `persistence_size` | **string** · Optional · Default: `5Gi`<br>Persistent volume size for agent state storage |
 | `persistence_storage_class` | **k8sStorageClass** · Optional<br>Storage class for the persistent volume |
+| `termination_grace_period` | **int** · Optional · Default: `120`<br>Seconds Kubernetes waits for a graceful shutdown (gateway drain + DB checkpoint) before force-killing. Raise on spot/preemptible nodes |
 
 ### Custom Environment Variables
 
@@ -68,6 +69,15 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 | `OPENAI_API_KEY` | API key for OpenAI or any OpenAI-compatible endpoint (also used for local Ollama setups). |
 | `OPENROUTER_API_KEY` | OpenRouter API key for flexible access to many hosted models. |
 | `HERMES_MODEL` | Overrides the default model used by the agent. |
+
+---
+
+## Resilience
+
+Hermes Agent is built to survive unclean node loss (AWS spot-instance reclaims, preemptible nodes, OOM kills):
+
+- **Graceful shutdown** — on pod termination, a preStop hook (backed by a signal trap in the init script) drains the gateway, finishes any in-flight turn, and forces a final WAL checkpoint so the SQLite state database is never left mid-write. Tune the window with the `termination_grace_period` launch field.
+- **Startup self-heal** — before the gateway opens the state database, an integrity check runs. If the database is corrupt (e.g. after a hard node loss), the recoverable rows are salvaged into a fresh database automatically. Only if the salvage *fails* is the corrupt original kept (as `state.db.corrupt.<timestamp>`) for manual repair — the 2 newest such backups are retained, older ones pruned so repeated corruption cannot fill the data volume.
 
 ---
 

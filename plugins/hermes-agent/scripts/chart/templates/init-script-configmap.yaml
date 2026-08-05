@@ -155,8 +155,10 @@ data:
     # written"). This script runs BEFORE the gateway opens the DB: it checks
     # integrity and, if the DB is malformed, salvages the recoverable rows with
     # sqlite3's .recover into a fresh DB, drops the (rebuildable) FTS index so
-    # hermes recreates it cleanly on open, and swaps it in — keeping a
-    # timestamped copy of the corrupt original.
+    # hermes recreates it cleanly on open, and swaps it in. On success the
+    # corrupt copy is deleted; only a FAILED salvage keeps it (as
+    # state.db.corrupt.<timestamp>) so the DB can be repaired manually — the
+    # 2 newest such backups are retained, older ones pruned.
     #
     # Runs as the hermes user: when invoked as root with a PUID remap active,
     # it re-execs itself via sudo so every file it creates is hermes-owned
@@ -195,6 +197,16 @@ data:
     [ -f "${DB}-wal" ] && cp -a "${DB}-wal" "${BK}-wal" 2>/dev/null || true
     [ -f "${DB}-shm" ] && cp -a "${DB}-shm" "${BK}-shm" 2>/dev/null || true
 
+    # Retention: keep only the 2 newest corrupt backups (leftovers from failed
+    # salvages) so repeated corruption can't fill the data volume. Sort by the
+    # timestamp embedded in the filename — cp -a preserves mtimes, so mtime
+    # order is unreliable here.
+    ls -1 "${DB}".corrupt.* 2>/dev/null | grep -vE -- '-(wal|shm)$' | sort -r | tail -n +3 | \
+      while read -r OLD; do
+        log "pruning old corrupt backup: ${OLD}"
+        rm -f "$OLD" "${OLD}-wal" "${OLD}-shm"
+      done
+
     REC="${DB}.recovered.${TS}"
     rm -f "$REC"
     sqlite3 "$BK" '.recover' 2>/dev/null | sqlite3 "$REC" 2>/dev/null
@@ -206,7 +218,8 @@ data:
       sqlite3 "$REC" "DROP TABLE IF EXISTS lost_and_found; ${DROPS} VACUUM;" 2>/dev/null || true
       mv -f "$REC" "$DB"
       rm -f "${DB}-wal" "${DB}-shm"
-      log "state.db salvaged — corrupt copy preserved at ${BK}"
+      rm -f "$BK" "${BK}-wal" "${BK}-shm"
+      log "state.db salvaged — corrupt copy deleted"
     else
       rm -f "$REC" 2>/dev/null || true
       log "WARNING: automatic salvage FAILED — original left in place; manual repair required (backup at ${BK})"
