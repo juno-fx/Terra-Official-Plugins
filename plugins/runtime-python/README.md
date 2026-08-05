@@ -55,7 +55,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 |-------|---------|
 | `registry` | **string** · Required · Default: `docker.io`<br>Container registry for the runtime image |
 | `repo` | **string** · Required · Default: `python`<br>Runtime image repository |
-| `tag` | **string** · Required · Default: `3.12`<br>Runtime image tag (Python version) |
+| `tag` | **string** · Required · Default: `3.14`<br>Runtime image tag (Python version) |
 | `git_url` | **string** · Optional<br>Git repository URL to clone (leave empty when using `source_path`) |
 | `git_ref` | **string** · Optional · Default: `main`<br>Git reference to check out — branch, tag, or commit SHA |
 | `source_path` | **string** · Optional<br>Path to existing code on disk (alternative to git clone) |
@@ -82,3 +82,4 @@ These fields are configured when authoring the workload template in **Genesis** 
 - `run_command` must start a foreground process that listens on `port`; if nothing listens, the startup probe fails and the workload restarts
 - Use `ingress-noauth` only for applications that implement their own authentication or run in trusted network environments
 - Private repositories are not supported by the built-in clone step — use `source_path` with a volume mount for private code
+- The default `python` image ships with `pip` and `venv`, but **not** `poetry` or `uv` — for repos using those tools, prepend an install step to `build_command` (e.g. `pip install poetry && poetry install` or `pip install uv && uv sync`)

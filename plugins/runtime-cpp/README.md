@@ -59,7 +59,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `git_url` | **string** · Optional<br>Git repository URL to clone (leave empty when using `source_path`) |
 | `git_ref` | **string** · Optional · Default: `main`<br>Git reference to check out — branch, tag, or commit SHA |
 | `source_path` | **string** · Optional<br>Path to existing code on disk (alternative to git clone) |
-| `build_command` | **string** · Optional · Default: `g++ -o app main.cpp`<br>Build command run in the work root, e.g. `g++ -o app main.cpp`, `cmake -B build && cmake --build build` |
+| `build_command` | **string** · Optional · Default: `g++ -o app main.cpp`<br>Build command run in the work root, e.g. `g++ -o app main.cpp` or `make` |
 | `run_command` | **string** · Required · Default: `./app`<br>Command that starts your application, e.g. `./app` |
 | `port` | **int** · Required · Default: `8080`<br>Port your application listens on |
 | `network_mode` | **select** · Required · Default: `ingress-auth`<br>How to expose the application (see below) |
@@ -82,3 +82,4 @@ These fields are configured when authoring the workload template in **Genesis** 
 - `run_command` must start a foreground process that listens on `port`; if nothing listens, the startup probe fails and the workload restarts
 - Use `ingress-noauth` only for applications that implement their own authentication or run in trusted network environments
 - Private repositories are not supported by the built-in clone step — use `source_path` with a volume mount for private code
+- The default `gcc` image ships with `g++` and `make`, but **not** `cmake` — for CMake-based projects, prepend an install step to `build_command` (e.g. `apt-get update && apt-get install -y cmake && cmake -B build && cmake --build build`) or point `registry`/`repo`/`tag` at a custom image that includes CMake

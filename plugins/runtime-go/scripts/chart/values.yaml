@@ -2,7 +2,7 @@ name: runtime-go
 user:
 registry: docker.io
 repo: golang
-tag: "1.22"
+tag: "1.26"
 group:
 cpu: "1"
 memory: "1Gi"

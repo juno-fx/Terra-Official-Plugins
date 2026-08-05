@@ -2,7 +2,7 @@ name: runtime-python
 user:
 registry: docker.io
 repo: python
-tag: "3.12"
+tag: "3.14"
 group:
 cpu: "1"
 memory: "1Gi"

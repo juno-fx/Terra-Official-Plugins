@@ -55,7 +55,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 |-------|---------|
 | `registry` | **string** · Required · Default: `docker.io`<br>Container registry for the runtime image |
 | `repo` | **string** · Required · Default: `golang`<br>Runtime image repository |
-| `tag` | **string** · Required · Default: `1.22`<br>Runtime image tag (Go version) |
+| `tag` | **string** · Required · Default: `1.26`<br>Runtime image tag (Go version) |
 | `git_url` | **string** · Optional<br>Git repository URL to clone (leave empty when using `source_path`) |
 | `git_ref` | **string** · Optional · Default: `main`<br>Git reference to check out — branch, tag, or commit SHA |
 | `source_path` | **string** · Optional<br>Path to existing code on disk (alternative to git clone) |
