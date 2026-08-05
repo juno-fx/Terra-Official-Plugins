@@ -12,6 +12,8 @@
 
 JavaScript (Node.js) runtime environment for running your own applications on the Juno platform. Point it at a git repository (or code already on disk), define a build command and a run command, and it will clone, install dependencies, and serve your Node.js application — no custom Docker image required.
 
+These runtime plugins are intentionally generic — a fast starting point for the common case: a straightforward repo that builds with the standard tooling and starts a server listening on a port. Projects with heavier requirements (pnpm or modern Yarn, private git repositories, multi-service builds, or apps that can't serve under a path prefix) will need some customization: adjust the build/run commands, point the image fields at a custom image with the right toolchain baked in, or mount code through a volume. See the Notes section below for known limitations and workarounds.
+
 ---
 
 ## How It Works
