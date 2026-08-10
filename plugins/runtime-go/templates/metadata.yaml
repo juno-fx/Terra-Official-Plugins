@@ -28,7 +28,7 @@ data:
       required: true
       default: "1.26"
     - name: git_url
-      description: "Git repository URL to clone (leave empty when using source_path)"
+      description: "Git repository URL to clone (leave empty when using source_path). WARNING: any credential embedded in this URL is stored in plaintext in the pod spec and in the workload record, and is readable by anyone with namespace-level read access. Use only short-lived, read-only, single-repository tokens."
       type: string
       required: false
       default: ""

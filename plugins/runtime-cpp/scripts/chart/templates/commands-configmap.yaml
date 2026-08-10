@@ -10,7 +10,10 @@ data:
 
     if [ -n "$GIT_URL" ]; then
       CLONE_DIR="$(mktemp -d /tmp/XXXXXXXX)"
+      set +x
       git clone "$GIT_URL" "$CLONE_DIR"
+      git -C "$CLONE_DIR" remote set-url origin "$(printf '%s' "$GIT_URL" | sed -E 's#^(https?)://[^/@]+@#\1://#')"
+      set -x
       if [ -n "$GIT_REF" ]; then
         git -C "$CLONE_DIR" checkout "$GIT_REF"
       fi

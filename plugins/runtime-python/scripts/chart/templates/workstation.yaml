@@ -69,7 +69,7 @@ spec:
           command: ["/commands/entrypoint.sh"]
           env:
             - name: JUNO_WORKSTATION
-              value: "{{ .Values.name }}"
+              value: {{ .Values.name | quote }}
             - name: JUNO_PROJECT
               valueFrom:
                 fieldRef:
@@ -79,25 +79,25 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
             - name: USER
-              value: "{{ .Values.user }}"
+              value: {{ .Values.user | quote }}
             - name: HOME
-              value: "/home/{{ .Values.user }}"
+              value: {{ printf "/home/%s" .Values.user | quote }}
             - name: UID
-              value: "{{ .Values.puid }}"
+              value: {{ .Values.puid | quote }}
             - name: GID
-              value: "{{ .Values.guid }}"
+              value: {{ .Values.guid | quote }}
             - name: PREFIX
-              value: "/polaris/{{ .Values.name }}/"
+              value: {{ printf "/polaris/%s/" .Values.name | quote }}
             - name: GIT_URL
-              value: "{{ .Values.git_url }}"
+              value: {{ .Values.git_url | quote }}
             - name: SOURCE_PATH
-              value: "{{ .Values.source_path }}"
+              value: {{ .Values.source_path | quote }}
             - name: RUN_COMMAND
-              value: "{{ .Values.run_command }}"
+              value: {{ .Values.run_command | quote }}
             - name: GIT_REF
-              value: "{{ .Values.git_ref }}"
+              value: {{ .Values.git_ref | quote }}
             - name: BUILD_COMMAND
-              value: "{{ .Values.build_command }}"
+              value: {{ .Values.build_command | quote }}
             {{- if .Values.env }}{{- include "runtime-custom-env" . | nindent 12 }}{{- end }}
           resources:
             requests:
