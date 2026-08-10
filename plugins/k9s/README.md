@@ -66,7 +66,7 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 
 | Variable | Description |
 |----------|--------------|
-| `EDITOR` | Text editor invoked by k9s's `e` (edit resource) command. |
+| `EDITOR` | Text editor invoked by the k9s `e` (edit resource) command. |
 
 ---
 
