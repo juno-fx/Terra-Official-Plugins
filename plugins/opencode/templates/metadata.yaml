@@ -46,6 +46,13 @@ data:
       type: string
       required: true
       default: "ingress-nginx"
+    - name: cluster_access
+      description: "Kubernetes RBAC access level for this agent."
+      type: select
+      required: false
+      options:
+        - readonly-ns
+        - admin-ns
   env_hints: |
     - name: ANTHROPIC_API_KEY
       description: Anthropic API key, auto-detected by opencode for Claude models.

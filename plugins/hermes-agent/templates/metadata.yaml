@@ -31,9 +31,7 @@ data:
       description: "Kubernetes RBAC access level for this agent."
       type: select
       required: false
-      default: none
       options:
-        - none
         - readonly-ns
         - admin-ns
     - name: persistence_size
@@ -44,7 +42,7 @@ data:
     - name: persistence_storage_class
       description: "Storage class for the persistent volume."
       type: k8sStorageClass
-      required: false
+      required: true
     - name: termination_grace_period
       description: "Seconds Kubernetes waits for a graceful shutdown (gateway drain + DB checkpoint) before force-killing. Raise on spot/preemptible nodes."
       type: int

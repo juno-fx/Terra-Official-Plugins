@@ -36,8 +36,5 @@ timezone: "America/New_York"
 storage_class: ""
 storage_size: "10Gi"
 
-# Ingress
-publicAccess: false
-
-# Kubernetes RBAC access level for this agent: none | readonly-ns | admin-ns
-cluster_access: none
+# Kubernetes RBAC access level for this agent: readonly-ns | admin-ns
+cluster_access:

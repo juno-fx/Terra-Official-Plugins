@@ -41,18 +41,11 @@ data:
       type: string
       required: true
       default: "10Gi"
-    - name: publicAccess
-      description: "Allow public access (disable authentication)"
-      type: boolean
-      required: true
-      default: false
     - name: cluster_access
       description: "Kubernetes RBAC access level for this agent."
       type: select
       required: false
-      default: none
       options:
-        - none
         - readonly-ns
         - admin-ns
   env_hints: |

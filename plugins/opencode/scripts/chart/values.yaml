@@ -27,3 +27,6 @@ timezone: "America/New_York"
 storage_class:
 storage_size: "1Gi"
 ingressNamespace: ingress-nginx
+
+# Kubernetes RBAC access level for this agent: readonly-ns | admin-ns
+cluster_access:
