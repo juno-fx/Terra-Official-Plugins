@@ -8,10 +8,6 @@ data:
   chart: "{{ .Release.Name }}-scripts-configmap"
   description: "Web-based file browser with drag-and-drop upload. Mount workspace volumes to browse and upload files."
   fields: |
-    - name: workspace
-      description: "Optional target workspace name. If set, the URL becomes /filebrowser/<workspace>. Otherwise uses the workload name."
-      required: false
-      type: string
     - name: registry
       description: "Container registry"
       required: true
@@ -36,20 +32,6 @@ data:
       description: "Memory request"
       required: true
       default: "256Mi"
-    - name: dataPersistent
-      description: "Enable persistent storage for uploaded files and database. When enabled, creates a PVC. Default: false (ephemeral emptyDir)."
-      required: false
-      type: boolean
-      default: "false"
-    - name: storageClass
-      description: "Storage class for the data PVC. Leave empty for cluster default."
-      required: false
-      type: string
-      default: ""
-    - name: storageSize
-      description: "Persistent volume size for uploaded files and database."
-      required: false
-      default: "10Gi"
     - name: root
       description: "Root filesystem path visible in FileBrowser. Set to '/' to browse the entire container filesystem, or '/data' to restrict to the data volume only."
       required: false

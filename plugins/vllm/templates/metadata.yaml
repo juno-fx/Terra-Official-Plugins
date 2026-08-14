@@ -21,7 +21,7 @@ data:
     - name: tag
       description: "Image tag"
       required: true
-      default: "0.14.1"
+      default: "latest"
     - name: model
       description: "HuggingFace model name to serve (e.g., Qwen/Qwen3.6-35B-A3B-FP8)"
       required: true
