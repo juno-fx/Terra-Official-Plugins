@@ -16,7 +16,7 @@ spec:
       labels:
         kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
     spec:
-      {{- if ne .Values.cluster_access "none" }}
+      {{- if .Values.cluster_access }}
       serviceAccountName: "{{ .Values.name }}"
       automountServiceAccountToken: true
       {{- else }}
@@ -27,31 +27,6 @@ spec:
       imagePullSecrets:
         - name: "{{ .Values.pullSecret }}"
       {{- end }}
-
-      # Node affinity — target workstation nodes
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: juno-innovations.com/workstation
-                    operator: In
-                    values:
-                      - "true"
-                  {{- if .Values.selector }}
-                  {{- range .Values.selector }}
-                  - key: {{ .key | quote }}
-                    operator: In
-                    values:
-                      - {{ .value | quote }}
-                  {{- end }}
-                  {{- end }}
-
-      # Tolerate workstation taint
-      tolerations:
-        - key: "juno-innovations.com/workstation"
-          operator: "Exists"
-          effect: "NoSchedule"
 
       containers:
         # Main container: claude-code

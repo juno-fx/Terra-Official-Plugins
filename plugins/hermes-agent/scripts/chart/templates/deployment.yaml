@@ -25,7 +25,7 @@ spec:
       # Give the container time to drain the gateway and checkpoint state.db
       # before SIGKILL — critical on spot/preemptible nodes. See preStop below.
       terminationGracePeriodSeconds: {{ .Values.termination_grace_period | default 120 }}
-      {{- if ne .Values.cluster_access "none" }}
+      {{- if .Values.cluster_access }}
       serviceAccountName: "{{ .Values.name }}"
       automountServiceAccountToken: true
       {{- else }}

@@ -68,8 +68,6 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /config
-            - name: filebrowser-data
-              mountPath: /data
             - name: tmp-cache
               mountPath: /tmp/cache
             {{- if .Values.volumeMounts }}

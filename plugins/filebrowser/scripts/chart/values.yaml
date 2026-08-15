@@ -22,7 +22,7 @@ plugins: []
 _kuiper:
 
 # Filebrowser settings
-root: "/data"
+root: "/"
 registry: "docker.io"
 repo: "filebrowser/filebrowser"
 tag: "latest"
