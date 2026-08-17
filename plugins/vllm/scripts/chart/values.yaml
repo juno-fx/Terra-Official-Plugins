@@ -25,7 +25,7 @@ _kuiper:
 # vLLM image configuration
 registry: "docker.io"
 repo: "vllm/vllm-openai"
-tag: "0.14.1"
+tag: "latest"
 
 # Model to serve
 model: ""

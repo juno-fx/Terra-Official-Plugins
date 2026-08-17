@@ -56,7 +56,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `timezone` | **string** · Required · Default: `America/New_York`<br>Timezone for the Claude Code instance |
 | `storage_class` | **k8sStorageClass** · Optional<br>Storage class for the persistent `/data` disk |
 | `storage_size` | **string** · Required · Default: `10Gi`<br>Storage size for the persistent `/data` disk |
-| `publicAccess` | **boolean** · Required · Default: `false`<br>Allow public access (disable Hubble authentication) |
+| `cluster_access` | **select** · Optional<br>Kubernetes RBAC access level for the workstation (unset = no cluster access, `readonly-ns`, `admin-ns`) |
 
 ### Custom Environment Variables
 
@@ -75,4 +75,5 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 - Claude API credentials are not set via the install-time fields above — configure them as custom environment variables at workload launch (see table above), e.g. `ANTHROPIC_API_KEY`
 - The nginx sidecar provides browser-accessible proxying for the wetty terminal interface
 - Project files and Claude Code configuration are persisted to the `/data` volume across workload restarts
-- Setting `publicAccess` to `true` removes authentication from the workstation endpoint — use only in trusted network environments
+- The workstation endpoint always authenticates through Hubble — there is no option to disable authentication
+- The `cluster_access` field controls whether the workstation can interact with Kubernetes resources — leave unset for no cluster access, use `readonly-ns` for safe exploration, `admin-ns` only when the workstation needs to manage workloads

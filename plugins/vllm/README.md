@@ -54,7 +54,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 |-------|---------|
 | `registry` | **string** · Required · Default: `docker.io`<br>Container registry for the vLLM image |
 | `repo` | **string** · Required · Default: `vllm/vllm-openai`<br>vLLM image repository |
-| `tag` | **string** · Required · Default: `0.14.1`<br>vLLM image tag |
+| `tag` | **string** · Required · Default: `latest`<br>vLLM image tag |
 | `model` | **string** · Required<br>HuggingFace model name to serve (e.g. `Qwen/Qwen3.6-35B-A3B-FP8`) |
 | `served_model_name` | **string** · Optional<br>Override the model name returned in API responses |
 | `hf_token` | **string** · Optional · Sensitive<br>HuggingFace Hub token for gated models — stored as a Kubernetes Secret and injected as `HF_TOKEN` |

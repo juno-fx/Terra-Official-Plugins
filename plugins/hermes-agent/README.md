@@ -54,9 +54,9 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `registry` | **string** · Optional · Default: `nousresearch`<br>Container registry for the Hermes image |
 | `repo` | **string** · Optional · Default: `hermes-agent`<br>Hermes image repository |
 | `tag` | **string** · Optional · Default: `latest`<br>Hermes image tag |
-| `cluster_access` | **select** · Optional · Default: `none`<br>Kubernetes RBAC access level for the agent (`none`, `readonly-ns`, `admin-ns`) |
+| `cluster_access` | **select** · Optional<br>Kubernetes RBAC access level for the agent (unset = no cluster access, `readonly-ns`, `admin-ns`) |
 | `persistence_size` | **string** · Optional · Default: `10Gi`<br>Persistent volume size for agent state storage |
-| `persistence_storage_class` | **k8sStorageClass** · Optional<br>Storage class for the persistent volume |
+| `persistence_storage_class` | **k8sStorageClass** · Required<br>Storage class for the persistent volume |
 | `termination_grace_period` | **int** · Optional · Default: `120`<br>Seconds Kubernetes waits for a graceful shutdown (gateway drain + DB checkpoint) before force-killing. Raise on spot/preemptible nodes |
 
 ### Custom Environment Variables
@@ -83,6 +83,6 @@ Hermes Agent is built to survive unclean node loss (AWS spot-instance reclaims, 
 
 ## Notes
 
-- The `cluster_access` field controls whether Hermes can interact with Kubernetes resources — use `readonly-ns` for safe exploration, `admin-ns` only when the agent needs to manage workloads
+- The `cluster_access` field controls whether Hermes can interact with Kubernetes resources — leave unset for no cluster access, use `readonly-ns` for safe exploration, `admin-ns` only when the agent needs to manage workloads
 - LLM provider API keys are not set via the install-time fields above — configure them either as custom environment variables at workload launch (see table above) or at the application level within the Hermes WebUI after launch
 - Hermes supports OpenAI-compatible APIs, making it compatible with any provider that follows the OpenAI API specification
