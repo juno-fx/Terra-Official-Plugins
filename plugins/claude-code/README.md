@@ -24,6 +24,7 @@ Claude Code is Anthropic's AI coding agent, delivered as a browser-accessible we
 
 - A Kubernetes storage class available in the cluster
 - API credentials for Claude (`ANTHROPIC_API_KEY` or equivalent) — set via the workload's environment variables at launch
+- Outbound internet access (DNS + HTTPS) from workload pods — required for `claude` CLI login/auth and API calls
 
 ---
 
@@ -77,3 +78,4 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 - Project files and Claude Code configuration are persisted to the `/data` volume across workload restarts
 - The workstation endpoint always authenticates through Hubble — there is no option to disable authentication
 - The `cluster_access` field controls whether the workstation can interact with Kubernetes resources — leave unset for no cluster access, use `readonly-ns` for safe exploration, `admin-ns` only when the workstation needs to manage workloads
+- The workload's network policy allows only DNS and outbound HTTPS (TCP 443) — enough for `claude` CLI login, the Anthropic API, git-over-https, and npm/package installs. Other outbound protocols/ports are blocked

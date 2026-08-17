@@ -24,6 +24,19 @@ spec:
           port: 8080
         - protocol: TCP
           port: {{ .Values.ttyd_port }}
+  egress:
+    # DNS — required to resolve any external host below
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
         - protocol: UDP
           port: 53
-  egress: []
+        - protocol: TCP
+          port: 53
+    # HTTPS — required for `claude` CLI login/auth and API calls (Anthropic API,
+    # git remotes, npm/package registries)
+    - ports:
+        - protocol: TCP
+          port: 443
