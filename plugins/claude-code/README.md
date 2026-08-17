@@ -24,7 +24,7 @@ Claude Code is Anthropic's AI coding agent, delivered as a browser-accessible we
 
 - A Kubernetes storage class available in the cluster
 - API credentials for Claude (`ANTHROPIC_API_KEY` or equivalent) — set via the workload's environment variables at launch
-- Full outbound internet access from workload pods — the boot process runs `apt-get update`/`apt-get install` on every start (over plain HTTP), and users can run arbitrary package installs (apt/npm/pip/curl/etc.) inside the terminal session
+- Unrestricted outbound network access in the workload's namespace (see Notes) — required for `apt`/`npm`/`pip` installs and the Claude API
 
 ---
 
@@ -78,4 +78,4 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 - Project files and Claude Code configuration are persisted to the `/data` volume across workload restarts
 - The workstation endpoint always authenticates through Hubble — there is no option to disable authentication
 - The `cluster_access` field controls whether the workstation can interact with Kubernetes resources — leave unset for no cluster access, use `readonly-ns` for safe exploration, `admin-ns` only when the workstation needs to manage workloads
-- The workload's network policy restricts inbound traffic (ingress) but does not restrict outbound traffic (egress) — the boot script's apt install runs over plain HTTP, and this is an interactive terminal where users may need to reach arbitrary hosts/ports for package installs
+- The workload's network policy restricts inbound traffic only (ingress). It sets no egress rules, so outbound access is controlled entirely by your namespace/cluster — if it default-denies egress, add your own allow rule for this workload (DNS + internet, or your internal mirrors/proxy if airgapped)
