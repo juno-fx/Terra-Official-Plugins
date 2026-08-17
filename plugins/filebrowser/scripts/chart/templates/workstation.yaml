@@ -53,7 +53,7 @@ spec:
             - --root={{ .Values.root }}
             - --baseURL=/filebrowser/{{ .Values.name }}
             - --log=stdout
-            - --database=/data/filebrowser.db
+            - --database=/tmp/filebrowser.db
             - --username={{ .Values.user }}
             - --noauth
             - --cacheDir=/tmp/cache
