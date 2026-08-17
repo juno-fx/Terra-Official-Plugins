@@ -9,7 +9,7 @@ data:
   config.yaml: |
     port: "8080"
     address: "0.0.0.0"
-    root: "/data"
+    root: "{{ .Values.root }}"
     baseURL: "/filebrowser/{{ .Values.name }}"
     log: "stdout"
     database: "/data/filebrowser.db"
