@@ -8,9 +8,14 @@ spec:
   podSelector:
     matchLabels:
       kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+  # Egress is intentionally unrestricted: the boot script runs `apt-get update`/
+  # `apt-get install` on every pod start (over plain HTTP, not HTTPS — Debian
+  # mirrors don't use TLS), and this is an interactive coding terminal where
+  # users run arbitrary package installs (apt/npm/pip/curl/etc.) against
+  # arbitrary hosts and ports. Enumerating an egress allowlist isn't practical
+  # here; only Ingress is restricted.
   policyTypes:
     - Ingress
-    - Egress
   ingress:
     - from:
         - namespaceSelector:
@@ -24,19 +29,3 @@ spec:
           port: 8080
         - protocol: TCP
           port: {{ .Values.ttyd_port }}
-  egress:
-    # DNS — required to resolve any external host below
-    - to:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: kube-system
-      ports:
-        - protocol: UDP
-          port: 53
-        - protocol: TCP
-          port: 53
-    # HTTPS — required for `claude` CLI login/auth and API calls (Anthropic API,
-    # git remotes, npm/package registries)
-    - ports:
-        - protocol: TCP
-          port: 443
