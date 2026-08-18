@@ -42,7 +42,7 @@ data:
       required: true
       default: "10Gi"
     - name: cluster_access
-      description: "Kubernetes RBAC access level for this agent."
+      description: "Kubernetes RBAC access level for this agent. This is for the workspace it lives in."
       type: select
       required: false
       options:

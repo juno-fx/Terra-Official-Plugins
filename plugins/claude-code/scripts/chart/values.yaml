@@ -38,3 +38,5 @@ storage_size: "10Gi"
 
 # Kubernetes RBAC access level for this agent: readonly-ns | admin-ns
 cluster_access:
+
+ingressNamespace: "ingress-nginx"
