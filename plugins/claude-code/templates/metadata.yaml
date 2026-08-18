@@ -48,6 +48,11 @@ data:
       options:
         - readonly-ns
         - admin-ns
+    - name: ingressNamespace
+      description: "Namespace of the ingress controller for plugin access"
+      type: string
+      required: true
+      default: "ingress-nginx"
   env_hints: |
     - name: ANTHROPIC_API_KEY
       description: Anthropic Console API key used by the claude CLI to authenticate.
