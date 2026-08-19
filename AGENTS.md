@@ -75,12 +75,21 @@ this embedded chart at workload launch time using the field values defined in `t
 
 **Install target:** `argocd` namespace
 
+**The `workload` tag** — every workload template's `terra.yaml` tags array must include `workload`
+alongside `cluster-level`. The Terra app store uses this tag to drive its workloads filter, so a
+workload template without it will not appear when users filter the store by workloads.
+
+**Only workload template plugins may carry this tag.** Do not add it to a namespaced or cluster-level
+plugin — those install a running service directly and are not launchable workloads, so tagging one
+puts it in a store filter it does not belong in. If a plugin has no `templates/metadata.yaml` carrying
+the `kuiper.juno-innovations.com/chart` label, it does not get the `workload` tag.
+
 **Directory structure:**
 
 ```
 plugins/my-template/
 ├── Chart.yaml
-├── terra.yaml                          # tags: [cluster-level], fields: []
+├── terra.yaml                          # tags: [cluster-level, workload], fields: []
 ├── values.yaml
 ├── templates/
 │   ├── metadata.yaml                   # THE CONTRACT — discovery label + fields schema + env_hints: [...]
