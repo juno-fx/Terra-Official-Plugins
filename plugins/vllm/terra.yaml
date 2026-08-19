@@ -9,4 +9,5 @@ tags:
   - gpu
   - inference
   - cluster-level
+  - workload
 fields: []

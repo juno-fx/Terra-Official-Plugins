@@ -2,6 +2,7 @@ resource_id: hermes-agent
 name: hermes-agent
 icon: https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/hermes-agent/scripts/assets/hermes-logo.png?raw=true
 description: Hermes AI agent with multi-provider support (OpenRouter, OpenAI, Anthropic, Ollama) and WebUI.
+category: AI
 tags:
 - llm
 - ai-agent
