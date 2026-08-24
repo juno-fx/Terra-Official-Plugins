@@ -42,7 +42,7 @@ fields:
     default: true
   - name: cluster_namespace
     description: Namespace the Slurm cluster is deployed into. Use a distinct value per Slurm cluster.
-    required: false
+    required: true
     type: string
     default: slurm
   - name: worker_replicas
