@@ -75,12 +75,21 @@ this embedded chart at workload launch time using the field values defined in `t
 
 **Install target:** `argocd` namespace
 
+**The `workload` tag** — every workload template's `terra.yaml` tags array must include `workload`
+alongside `cluster-level`. The Terra app store uses this tag to drive its workloads filter, so a
+workload template without it will not appear when users filter the store by workloads.
+
+**Only workload template plugins may carry this tag.** Do not add it to a namespaced or cluster-level
+plugin — those install a running service directly and are not launchable workloads, so tagging one
+puts it in a store filter it does not belong in. If a plugin has no `templates/metadata.yaml` carrying
+the `kuiper.juno-innovations.com/chart` label, it does not get the `workload` tag.
+
 **Directory structure:**
 
 ```
 plugins/my-template/
 ├── Chart.yaml
-├── terra.yaml                          # tags: [cluster-level], fields: []
+├── terra.yaml                          # tags: [cluster-level, workload], fields: []
 ├── values.yaml
 ├── templates/
 │   ├── metadata.yaml                   # THE CONTRACT — discovery label + fields schema + env_hints: [...]
@@ -374,7 +383,7 @@ See `plugins/helios/scripts/chart/templates/workstation.yaml` for the full refer
 | `icon` | yes | Icon URL or identifier shown in the Terra app store |
 | `description` | yes | Short description shown in the Terra app store |
 | `category` | yes | Category grouping in the Terra app store |
-| `tags` | yes | List of tags. Include `cluster-level` for cluster-level plugins |
+| `tags` | yes | List of tags. Include `cluster-level` for cluster-level plugins. Include `workload` **only** for workload template plugins — it drives the Terra app store's workloads filter |
 | `fields` | yes | List of install-time field definitions (can be empty `[]`) |
 | `editable` | no | `true` \| `false` — allows users to edit field values after install. Default: `false` |
 | `compatibility` | no | Pip-style platform version constraint string. Terra blocks install if not met. Example: `genesis-deployment>=3.0.2,orion-deployment>=3.1.0` |
@@ -579,6 +588,7 @@ All types above plus:
 4. **Namespaced:** add your Kubernetes objects to `templates/resources.yaml` (any valid K8s manifests)
 5. **Cluster-level:** add your Kubernetes objects to `templates/resources.yaml` (ArgoCD `Application` delegating to upstream chart is a common pattern)
 6. **Workload template:**
+   - Edit `terra.yaml` — add `workload` to `tags` so the plugin appears in the app store's workloads filter
    - Edit `templates/metadata.yaml` — set `description`, tune `fields:`
    - Edit `scripts/chart/values.yaml` — ensure all field names are present as keys
    - Edit `scripts/chart/templates/workstation.yaml` — set correct image, ports, probes; set `juno-innovations.com/workload` annotation to match `metadata.yaml`

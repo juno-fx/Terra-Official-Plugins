@@ -25,7 +25,10 @@ plugins: []
 _kuiper:
 timezone: "America/New_York"
 storage_class:
-storage_size: "1Gi"
+storage_size: "10Gi"
+webhooks_public: false
+webhook_rate_limit: 10
+webhook_allow_cidrs:
 nginx_registry: "docker.io"
 nginx_repo: "nginx"
 nginx_tag: "latest"

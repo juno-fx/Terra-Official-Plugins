@@ -12,4 +12,5 @@ tags:
   - cluster-level
   - runtime
   - go
+  - workload
 fields: []

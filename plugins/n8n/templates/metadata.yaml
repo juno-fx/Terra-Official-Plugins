@@ -41,12 +41,28 @@ data:
       default: 10Gi
       required: true
       type: string
+    - name: webhooks_public
+      description: "Allow public access to the n8n webhook paths (the editor stays authenticated)"
+      type: boolean
+      required: true
+      default: false
+    - name: webhook_rate_limit
+      description: "Requests per second allowed on the public webhook paths"
+      type: int
+      required: false
+      default: 10
+    - name: webhook_allow_cidrs
+      description: "Comma separated CIDR ranges allowed to reach the public webhook paths, e.g. 203.0.113.0/24,198.51.100.7/32"
+      type: string
+      required: false
   env_hints: |
-    - name: N8N_BASIC_AUTH_ACTIVE
-      description: Enables HTTP basic auth in front of the n8n editor UI (set to "true").
-    - name: N8N_BASIC_AUTH_USER
-      description: Username for basic auth, used when N8N_BASIC_AUTH_ACTIVE is enabled.
-    - name: N8N_BASIC_AUTH_PASSWORD
-      description: Password for basic auth, used when N8N_BASIC_AUTH_ACTIVE is enabled.
     - name: N8N_ENCRYPTION_KEY
       description: Custom key n8n uses to encrypt stored credentials. Set this to keep credentials decryptable across restarts/re-deploys.
+    - name: N8N_PROXY_HOPS
+      description: Number of reverse proxies in front of n8n. Set to "2" for the ingress controller and the nginx sidecar, so webhook nodes see the real caller IP rather than the ingress IP.
+    - name: EXECUTIONS_DATA_PRUNE
+      description: Prunes old execution records ("true" or "false"). Without pruning, execution history grows until the volume fills.
+    - name: EXECUTIONS_DATA_MAX_AGE
+      description: Hours of execution history to keep when pruning is enabled (e.g. "336" for two weeks).
+    - name: N8N_DIAGNOSTICS_ENABLED
+      description: Set to "false" to disable outbound telemetry.
