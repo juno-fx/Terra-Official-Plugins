@@ -15,21 +15,21 @@ spec:
     - host: {{ .Values.host }}
       http:
         paths:
-          - path: "/polaris/{{ .Values.name }}/webhook/"
+          - path: "/{{ .Release.Namespace }}/n8n/{{ .Values.name }}/webhook/"
             pathType: Prefix
             backend:
               service:
                 name: {{ .Release.Name }}
                 port:
                   number: 8080
-          - path: "/polaris/{{ .Values.name }}/webhook-test/"
+          - path: "/{{ .Release.Namespace }}/n8n/{{ .Values.name }}/webhook-test/"
             pathType: Prefix
             backend:
               service:
                 name: {{ .Release.Name }}
                 port:
                   number: 8080
-          - path: "/polaris/{{ .Values.name }}/webhook-waiting/"
+          - path: "/{{ .Release.Namespace }}/n8n/{{ .Values.name }}/webhook-waiting/"
             pathType: Prefix
             backend:
               service:

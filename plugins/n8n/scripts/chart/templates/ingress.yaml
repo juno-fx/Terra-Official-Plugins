@@ -11,7 +11,7 @@ spec:
     - host: {{ .Values.host }}
       http:
         paths:
-          - path: "/{{ .Release.Namespace }}/polaris/{{ .Values.name }}/"
+          - path: "/{{ .Release.Namespace }}/n8n/{{ .Values.name }}/"
             pathType: Prefix
             backend:
               service:

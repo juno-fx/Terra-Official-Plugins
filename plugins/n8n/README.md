@@ -57,7 +57,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `timezone` | **string** · Required · Default: `America/New_York`<br>Timezone for the n8n instance (affects scheduled workflow execution) |
 | `storage_class` | **k8sStorageClass** · Required<br>Storage class for the n8n workflow data persistent volume |
 | `storage_size` | **string** · Required · Default: `10Gi`<br>Size of the persistent volume for workflow and credential storage |
-| `webhooks_public` | **boolean** · Required · Default: `false`<br>Allows public access to the n8n webhook paths, while the editor, REST API, and credential store stay behind authentication |
+| `webhooks_public` | **boolean** · Required · Default: `false`<br>Allows public access to the n8n webhook paths under `/<namespace>/n8n/<workload-name>/`, while the editor, REST API, and credential store stay behind authentication |
 | `webhook_rate_limit` | **int** · Optional · Default: `10`<br>Requests per second allowed on the public webhook paths |
 | `webhook_allow_cidrs` | **string** · Optional<br>Comma separated CIDR ranges allowed to reach the public webhook paths, e.g. `203.0.113.0/24,198.51.100.7/32`. Leave empty to accept any source |
 
@@ -80,7 +80,8 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 - n8n workflows, credentials, and execution history are stored in the persistent volume — data persists across workload restarts
 - The `timezone` setting affects when scheduled workflows (cron-based) trigger — set it to match your team's primary timezone
 - With `webhooks_public` disabled (the default) every path is behind the Juno session gate, so calls from third-party services are rejected at the ingress before n8n receives them, so enable it for any workflow driven by an inbound webhook
-- Enabling `webhooks_public` exposes only `/webhook/`, `/webhook-test/`, and `/webhook-waiting/`; the editor, REST API, and credential store stay authenticated
+- n8n is served under `/<namespace>/n8n/<workload-name>/`, where `<namespace>` is the environment the workload runs in — this full path is passed to the container as `N8N_PATH`, so the webhook URLs n8n displays in the editor already include it
+- Enabling `webhooks_public` exposes only the `webhook/`, `webhook-test/`, and `webhook-waiting/` sub-paths — the full public URL to hand to a third-party service is `https://<host>/<namespace>/n8n/<workload-name>/webhook/<path>`; the editor, REST API, and credential store stay authenticated
 - Authenticate exposed webhooks in the webhook node itself (header auth, basic auth, or a signature check) and narrow the source with `webhook_allow_cidrs` where the calling platform publishes its IP ranges
 - n8n has a fair-code license; for commercial use, review [n8n's licensing terms](https://github.com/n8n-io/n8n/blob/master/LICENSE.md)
 - Each workload instance is an isolated n8n environment with its own credential store

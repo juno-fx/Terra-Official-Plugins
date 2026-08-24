@@ -10,7 +10,7 @@ data:
         listen 8080;
         server_name _;
 
-        location /{{ .Release.Namespace }}/polaris/{{ .Values.name }}/socket.io/ {
+        location /{{ .Release.Namespace }}/n8n/{{ .Values.name }}/socket.io/ {
             proxy_pass http://127.0.0.1:5678;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
@@ -21,8 +21,8 @@ data:
             proxy_set_header X-Forwarded-Proto $scheme;
         }
 
-        location /{{ .Release.Namespace }}/polaris/{{ .Values.name }}/ {
-            rewrite ^/{{ .Release.Namespace }}/polaris/{{ .Values.name }}/(.*) /$1 break;
+        location /{{ .Release.Namespace }}/n8n/{{ .Values.name }}/ {
+            rewrite ^/{{ .Release.Namespace }}/n8n/{{ .Values.name }}/(.*) /$1 break;
             proxy_pass http://127.0.0.1:5678;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
