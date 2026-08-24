@@ -111,7 +111,7 @@ fields:
     type: string
   - name: sssd_secret
     description: |
-      Name of a Secret in the "slurm" namespace holding an sssd.conf under the key "sssd.conf", used by the
+      Name of a Secret in the "cluster_namespace" holding an sssd.conf under the key "sssd.conf", used by the
       login node to resolve and authenticate users against your directory. See this plugin's README for
       the file's structure and a worked LDAP example.
 
