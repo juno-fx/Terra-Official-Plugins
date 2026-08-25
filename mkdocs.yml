@@ -131,18 +131,28 @@ nav:
 - Plugins:
   - AI:
     - 'plugins/AI/*.md'
-  - CG:
-    - 'plugins/CG/*.md'
-  - Compositing:
-    - 'plugins/Compositing/*.md'
+  - Automation:
+    - 'plugins/Automation/*.md'
+  - Cloud Management:
+    - 'plugins/Cloud Management/*.md'
+  - Compute:
+    - 'plugins/Compute/*.md'
+  - Computing:
+    - 'plugins/Computing/*.md'
   - Data Science:
     - 'plugins/Data Science/*.md'
   - Desktop Plugin:
     - 'plugins/Desktop Plugin/*.md'
+  - Development:
+    - 'plugins/Development/*.md'
+  - Gaming:
+    - 'plugins/Gaming/*.md'
   - Hardware:
     - 'plugins/Hardware/*.md'
   - Helios Plugin:
     - 'plugins/Helios Plugin/*.md'
+  - Identity & Security:
+    - 'plugins/Identity & Security/*.md'
   - Infrastructure:
     - 'plugins/Infrastructure/*.md'
   - Monitoring:
@@ -151,12 +161,12 @@ nav:
     - 'plugins/Networking/*.md'
   - Rendering Management:
     - 'plugins/Rendering Management/*.md'
-  - Software Development:
-    - 'plugins/Software Development/*.md'
-  - Utility:
-    - 'plugins/Utility/*.md'
-  - VDI:
-    - 'plugins/VDI/*.md'
+  - Storage:
+    - 'plugins/Storage/*.md'
+  - Virtualization:
+    - 'plugins/Virtualization/*.md'
+  - VirtualMachine:
+    - 'plugins/VirtualMachine/*.md'
   - Web:
     - 'plugins/Web/*.md'
   - Workstations:
