@@ -257,7 +257,7 @@ connects to; it is `ClusterIP` by default, so nothing is exposed outside the clu
 | `chart_version` | **select** · Required · Default: `1.2.1`<br>Version applied to all three Slinky charts |
 | `install_crds` | **boolean** · Optional · Default: `true`<br>Install the Slinky CRDs. Set `false` on any additional install so it does not contend with the first one over cluster-scoped CRDs |
 | `install_operator` | **boolean** · Optional · Default: `true`<br>Install the operator and webhook into the `slinky` namespace. The operator is a cluster singleton |
-| `cluster_namespace` | **string** · Optional · Default: `slurm`<br>Namespace for the Slurm cluster. Use a distinct value per cluster — see [Multiple Slurm Clusters](#multiple-slurm-clusters) |
+| `cluster_namespace` | **string** · Required · Default: `slurm`<br>Namespace for the Slurm cluster. Use a distinct value per cluster — see [Multiple Slurm Clusters](#multiple-slurm-clusters) |
 | `worker_replicas` | **int** · Optional · Default: `2`<br>Number of `slurmd` compute node pods. Supports scale-to-zero. Cannot exceed your schedulable node count — see [Also required](#also-required) |
 | `worker_cpu` | **string** · Optional · Default: `2`<br>CPU request and limit per compute node. Becomes the node's CPU count in Slurm |
 | `worker_memory` | **string** · Optional · Default: `4Gi`<br>Memory request and limit per compute node. Becomes the node's `RealMemory` in Slurm |
@@ -269,6 +269,7 @@ connects to; it is `ClusterIP` by default, so nothing is exposed outside the clu
 | `accounting_db_secret` | **string** · Optional · *(no default)*<br>Secret in `cluster_namespace` holding the accounting DB password under key `password`. **Required when accounting is enabled** — create it first. Passed by reference, so the password never appears in an ArgoCD `Application` spec |
 | `ldap_ca_secret` | **string** · Optional · *(no default)*<br>Secret in `cluster_namespace` holding your LDAP CA under key `ca.crt`, mounted at `/etc/ssl/ldap-ca/ca.crt`. Use this for a private or self-signed certificate — with it, verification stays on (`reqcert = demand`) |
 | `sssd_secret` | **string** · **Required** · *(no default)*<br>Name of a Secret in `cluster_namespace` holding `sssd.conf`. **Create it before installing** — see [Prerequisites](#prerequisites). Without it no one can log in |
+| `home_pvc` | **string** · Optional · *(no default)*<br>Name of a **ReadWriteMany** PVC in `cluster_namespace`, mounted at `/home` on the login node and every compute node. Without it a batch job writes its output on whichever compute node ran it, where you cannot read it — see [Home directories](#home-directories) |
 
 ---
 
