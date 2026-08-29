@@ -1,0 +1,13 @@
+resource_id: argo-workflows
+name: Argo Workflows
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/argo-workflows/assets/logo.png
+description: Argo Workflows is an open source container-native workflow engine for orchestrating parallel jobs on Kubernetes. https://argo-workflows.readthedocs.io/en/stable/
+category: Infrastructure
+tags:
+  - kubernetes
+fields:
+  - name: chart_version
+    description: Version of the argo-workflows chart to install.
+    required: true
+    default: 0.45.27
+    type: string
