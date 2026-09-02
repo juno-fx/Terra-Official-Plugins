@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Release.Name }}-game"
+spec:
+  type: {{ .Values.service_type }}
+  selector:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+  ports:
+    - port: {{ .Values.game_port }}
+      targetPort: {{ .Values.game_port }}
+      protocol: UDP
+      name: game
+      {{- if and (eq .Values.service_type "NodePort") .Values.game_node_port }}
+      nodePort: {{ .Values.game_node_port }}
+      {{- end }}
+    - port: {{ .Values.query_port }}
+      targetPort: {{ .Values.query_port }}
+      protocol: UDP
+      name: query
+      {{- if and (eq .Values.service_type "NodePort") .Values.query_node_port }}
+      nodePort: {{ .Values.query_node_port }}
+      {{- end }}
+{{- if .Values.rcon_enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Release.Name }}-rcon"
+  annotations:
+    kuiper.juno-innovations.com/connection: "port=25575"
+spec:
+  type: ClusterIP
+  selector:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+  ports:
+    - port: 25575
+      targetPort: 25575
+      protocol: TCP
+      name: rcon
+{{- end }}

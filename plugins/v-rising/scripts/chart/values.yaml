@@ -1,0 +1,41 @@
+# Kuiper-injected standard values — do not remove
+name: v-rising
+user:
+group:
+cpu: "1"
+memory: "1Gi"
+cpuLimit: null
+memoryLimit: null
+idx: 0
+guid: 0
+puid: 0
+host:
+pullSecret:
+session:
+volumeMounts: []
+volumes: []
+env:
+  - name: JUNO
+    value: "true"
+selector:
+plugins: []
+_kuiper:
+
+# Fields from templates/metadata.yaml
+registry: trueosiris
+repo: vrising
+tag: latest
+server_name: "Juno V Rising Server"
+world_name: world1
+game_port: 9876
+query_port: 9877
+service_type: NodePort
+game_node_port:
+query_node_port:
+rcon_enabled: false
+rcon_password:
+storage_class:
+server_storage_size: 20Gi
+data_storage_size: 10Gi
+node_affinity_key:
+node_affinity_value:

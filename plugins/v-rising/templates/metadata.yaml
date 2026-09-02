@@ -1,0 +1,118 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-terra-metadata"
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+  annotations:
+    juno-innovations.com/workload: "Server"
+data:
+  chart: "{{ .Release.Name }}-scripts-configmap"
+  description: "V Rising dedicated server. The upstream binaries are Windows-only, so the image runs them under Wine on a headless X server."
+  fields: |
+    - name: icon
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/v-rising/assets/logo.png"
+    - name: registry
+      description: "Registry to pull the image from"
+      type: string
+      required: true
+      default: "trueosiris"
+    - name: repo
+      description: "Repository to pull the image from. The image bundles SteamCMD, Wine and Xvfb and installs Steam app 1829350 on first boot."
+      type: string
+      required: true
+      default: "vrising"
+    - name: tag
+      description: "Tag to pull the image from"
+      type: string
+      required: true
+      default: "latest"
+    - name: server_name
+      description: "Server name shown in the in-game server browser"
+      type: string
+      required: true
+      default: "Juno V Rising Server"
+    - name: world_name
+      description: "World save name. Saves live under this folder on the persistent data volume, so changing it starts a fresh world."
+      type: string
+      required: true
+      default: "world1"
+    - name: game_port
+      description: "UDP game port clients connect to"
+      type: int
+      required: true
+      default: 9876
+    - name: query_port
+      description: "UDP Steam query port. Must be the game port plus one, or the server will not appear in the server list."
+      type: int
+      required: true
+      default: 9877
+    - name: service_type
+      description: "How the server is reachable from outside the cluster"
+      type: select
+      required: true
+      default: "NodePort"
+      options:
+        - NodePort
+        - LoadBalancer
+        - ClusterIP
+    - name: game_node_port
+      description: "Pin the external NodePort for the game port (30000-32767). Leave blank to let Kubernetes assign one. NodePort service type only."
+      type: int
+      required: false
+    - name: query_node_port
+      description: "Pin the external NodePort for the query port. Must be the game NodePort plus one for the server to be listed. Leave blank to let Kubernetes assign one."
+      type: int
+      required: false
+    - name: rcon_enabled
+      description: "Enable the RCON admin console on TCP 25575"
+      type: boolean
+      required: true
+      default: false
+    - name: rcon_password
+      description: "RCON password. Required when RCON is enabled."
+      type: string
+      required: false
+    - name: storage_class
+      description: "Storage class used for both the server and world volumes"
+      required: true
+      type: k8sStorageClass
+    - name: server_storage_size
+      description: "Size of the volume holding the SteamCMD server install. The download is roughly 5Gi and grows with each patch."
+      type: string
+      required: true
+      default: "20Gi"
+    - name: data_storage_size
+      description: "Size of the volume holding world saves, settings and logs"
+      type: string
+      required: true
+      default: "10Gi"
+    - name: node_affinity_key
+      description: "Optional node label key. When set, the server is only scheduled onto nodes carrying this label."
+      type: string
+      required: false
+    - name: node_affinity_value
+      description: "Optional value for the node label key above. Leave blank to match any node that carries the key regardless of its value."
+      type: string
+      required: false
+  env_hints: |
+    - name: TZ
+      description: Timezone the server clock and log timestamps use, e.g. America/New_York. Defaults to Europe/Brussels.
+    - name: BRANCH
+      description: Steam branch to install, for pinning a legacy server build such as legacy-1.0.x-pc. Defaults to the current release.
+    - name: LOGDAYS
+      description: How many days of server logs to keep on the data volume before rotating them out. Defaults to 30.
+    - name: HOST_SETTINGS_Password
+      description: Password players must enter to join. Leave unset for an open server.
+    - name: HOST_SETTINGS_Description
+      description: Longer server description shown alongside the name in the server browser.
+    - name: HOST_SETTINGS_MaxConnectedUsers
+      description: Maximum simultaneous players. Defaults to 40.
+    - name: HOST_SETTINGS_ListOnMasterServer
+      description: Set to true to advertise the server publicly in the in-game browser.
+    - name: HOST_SETTINGS_ListOnEOS
+      description: Set to true to advertise the server through Epic Online Services so friends can find it.
+    - name: GAME_SETTINGS_GameModeType
+      description: PvP or PvE. Defaults to PvP.
+    - name: GAME_SETTINGS_ClanSize
+      description: Maximum members per clan. Defaults to 4.

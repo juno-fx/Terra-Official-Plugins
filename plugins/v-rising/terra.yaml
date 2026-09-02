@@ -1,0 +1,14 @@
+resource_id: v-rising
+name: V Rising
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/v-rising/assets/logo.png
+description: A vampire survival game where players raise their castle, hunt for blood and conquer the world of Vardoran.
+category: Gaming
+compatibility: genesis-deployment>=3.0.0-beta.1, orion-deployment>=3.0.0-beta.1
+tags:
+  - v-rising
+  - survival
+  - multiplayer
+  - vampire
+  - cluster-level
+  - workload
+fields: []
