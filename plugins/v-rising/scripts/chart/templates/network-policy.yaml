@@ -16,9 +16,9 @@ spec:
   ingress:
     - ports:
         - protocol: UDP
-          port: {{ .Values.game_port }}
+          port: {{ include "v-rising.gamePort" . }}
         - protocol: UDP
-          port: {{ .Values.query_port }}
+          port: {{ include "v-rising.queryPort" . }}
   # SteamCMD pulls the server files from Valve's CDN on first boot, and the server
   # reaches out to the Steam and EOS master servers to list itself.
   egress:

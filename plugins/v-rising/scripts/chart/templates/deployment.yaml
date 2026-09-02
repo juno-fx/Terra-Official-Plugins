@@ -14,18 +14,7 @@ metadata:
   name: "{{ .Release.Name }}"
   annotations:
     juno-innovations.com/workload: "Server"
-    {{- /*
-      Report the port a player actually dials. With NodePort that is the
-      auto-derived pair from _helpers.tpl, not game_port/query_port.
-    */}}
-    {{- $gp := .Values.game_port }}
-    {{- $qp := .Values.query_port }}
-    {{- if eq .Values.service_type "NodePort" }}
-    {{- $np := include "v-rising.autoNodePort" . | int }}
-    {{- $gp = $np }}
-    {{- $qp = add $np 1 }}
-    {{- end }}
-    kuiper.juno-innovations.com/connection: "game_port={{ $gp }},query_port={{ $qp }}"
+    kuiper.juno-innovations.com/connection: "game_port={{ include "v-rising.gamePort" . }},query_port={{ include "v-rising.queryPort" . }}"
 spec:
   replicas: 1
   selector:
@@ -94,10 +83,10 @@ spec:
               {{- end }}
             {{- end }}
           ports:
-            - containerPort: {{ .Values.game_port }}
+            - containerPort: {{ include "v-rising.gamePort" . }}
               protocol: UDP
               name: game
-            - containerPort: {{ .Values.query_port }}
+            - containerPort: {{ include "v-rising.queryPort" . }}
               protocol: UDP
               name: query
           env:
@@ -105,10 +94,11 @@ spec:
               value: {{ .Values.server_name | quote }}
             - name: WORLDNAME
               value: {{ .Values.world_name | quote }}
+            {{- /* Must equal the externally reachable port — see _helpers.tpl */}}
             - name: GAMEPORT
-              value: {{ .Values.game_port | quote }}
+              value: {{ include "v-rising.gamePort" . | quote }}
             - name: QUERYPORT
-              value: {{ .Values.query_port | quote }}
+              value: {{ include "v-rising.queryPort" . | quote }}
             {{- if .Values.server_password }}
             - name: HOST_SETTINGS_Password
               valueFrom:

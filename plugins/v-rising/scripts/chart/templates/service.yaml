@@ -17,14 +17,14 @@ spec:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
   ports:
     - name: game
-      port: {{ .Values.game_port }}
+      port: {{ include "v-rising.gamePort" . }}
       targetPort: game
       protocol: UDP
       {{- if eq .Values.service_type "NodePort" }}
       nodePort: {{ $autoNP }}
       {{- end }}
     - name: query
-      port: {{ .Values.query_port }}
+      port: {{ include "v-rising.queryPort" . }}
       targetPort: query
       protocol: UDP
       {{- if eq .Values.service_type "NodePort" }}

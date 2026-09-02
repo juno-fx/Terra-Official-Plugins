@@ -25,3 +25,34 @@
 {{- end -}}
 {{- add 30000 (mod $sum 2767) -}}
 {{- end -}}
+
+{{/*
+  Effective game / query ports.
+
+  These resolve to the SAME number inside the container and outside it. Under
+  NodePort the server must bind the derived nodePort itself — kube-proxy DNATs
+  nodeIP:31282 to the pod, but V Rising answers and advertises on the port it
+  believes it owns, so a container bound to 9876 leaves the client waiting on a
+  reply that never comes (connection timeout).
+
+  Binding the nodePort directly also makes the advertised port the reachable
+  one, which is what lets the server browser work at all.
+
+  For LoadBalancer / ClusterIP there is no port translation, so the plain
+  container ports are already correct.
+*/}}
+{{- define "v-rising.gamePort" -}}
+{{- if eq .Values.service_type "NodePort" -}}
+{{- include "v-rising.autoNodePort" . -}}
+{{- else -}}
+{{- .Values.game_port -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "v-rising.queryPort" -}}
+{{- if eq .Values.service_type "NodePort" -}}
+{{- add (include "v-rising.autoNodePort" . | int) 1 -}}
+{{- else -}}
+{{- .Values.query_port -}}
+{{- end -}}
+{{- end -}}

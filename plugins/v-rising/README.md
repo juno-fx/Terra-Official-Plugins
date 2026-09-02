@@ -114,7 +114,11 @@ then join `<node-ip>:<game nodePort>`. The `kuiper.juno-innovations.com/connecti
 
 **Collisions:** because the pair is derived rather than allocated, two instances can in principle land on the same ports and the second apply is rejected. Rename the instance to re-derive.
 
-**Server browser visibility:** NodePort cannot help here. The server advertises its container ports (9876/9877) to the Steam and EOS master servers, and those never match the nodePort mapping — so a browser-listed entry points at the wrong port. Direct Connect is unaffected. For working browser listing you need `LoadBalancer` (where the advertised ports are the real ones) or hostPort.
+**The server binds the derived port directly.** Under NodePort the container listens on the nodePort itself, not on 9876/9877 — `GAMEPORT`, `QUERYPORT`, the containerPort, the Service port and the nodePort are all the same number. This matters: kube-proxy will DNAT `nodeIP:31282` into a pod bound to 9876, but V Rising answers and advertises on the port it believes it owns, so a translated port leaves the client waiting for a reply that never arrives — a **connection timeout**, not a refusal.
+
+**Server browser visibility works as a result.** Because the advertised port is the reachable port, a server with `HOST_SETTINGS_ListOnSteam` / `HOST_SETTINGS_ListOnEOS` set to `true` lists correctly and is joinable from the browser. (This is where the plugin diverges from `conan-exiles`, which keeps its container on 7777/7778 and accepts that browser listing cannot work under NodePort.)
+
+Under `LoadBalancer` or `ClusterIP` there is no port translation, so the container uses 9876/9877 as normal.
 
 ### Launch-Time Validation
 
@@ -159,7 +163,8 @@ Any `ServerHostSettings.json` or `ServerGameSettings.json` key can be reached wi
 - Game traffic is **UDP**, so it does not go through the platform's nginx ingress. Reach the server through the NodePort or LoadBalancer address, not an HTTP endpoint.
 - World data persists across restarts as long as the data volume is retained. The server volume can be deleted safely — it is re-downloaded.
 - A `NetworkPolicy` scopes ingress to the two UDP ports. They stay open to all sources — players are arbitrary external clients. Egress is unrestricted because SteamCMD needs Valve's CDN and the server needs the master servers.
-- There is no RCON. The container ports (9876/9877) are fixed internally and are not launch fields; the externally dialable ports are the auto-derived pair.
+- There is no RCON.
+- The container ports are not launch fields. Under NodePort they are the auto-derived pair; under LoadBalancer/ClusterIP they are 9876/9877.
 - `tag` defaults to `latest`, which with `imagePullPolicy: IfNotPresent` means a node keeps whatever `latest` it first pulled and two nodes can end up on different builds. For a server whose save format is version-sensitive, pin an explicit tag such as `2.1`.
 - No `securityContext` is set, so the container runs as the image default and both PVCs are root-owned. Kuiper's injected `user`/`group`/`puid`/`guid` are unused. This is deliberate pending a live test — SteamCMD and Wine in this image expect to run as root, and forcing a UID is a plausible way to break first boot.
 - No readiness or liveness probes. First boot downloads several GB through SteamCMD, so the Service endpoint goes live before the server is listening. Kubernetes cannot probe UDP directly, so a correct probe needs an `exec` against the image — also pending a live test.
