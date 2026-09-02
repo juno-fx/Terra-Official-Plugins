@@ -90,14 +90,36 @@ spec:
               protocol: UDP
               name: query
           env:
+            {{- /*
+              SERVERNAME / WORLDNAME / GAMEPORT / QUERYPORT are NOT authoritative.
+              The image's /start.sh turns them into CLI flags only (-serverName,
+              -saveName, -gamePort, -queryPort) and the V Rising server ignores
+              those in favour of ServerHostSettings.json — which persists on the
+              data volume, so the values from the very first boot win forever.
+              Observed directly: a server launched with "-gamePort 30218" bound
+              9876, the value left in the JSON.
+
+              Only HOST_SETTINGS_* reaches the JSON (start.sh pipes them through
+              jq on every boot), so every setting that must actually take effect
+              is declared that way below. The plain vars are kept because the
+              image expects them and they cost nothing.
+            */}}
             - name: SERVERNAME
               value: {{ .Values.server_name | quote }}
             - name: WORLDNAME
               value: {{ .Values.world_name | quote }}
-            {{- /* Must equal the externally reachable port — see _helpers.tpl */}}
             - name: GAMEPORT
               value: {{ include "v-rising.gamePort" . | quote }}
             - name: QUERYPORT
+              value: {{ include "v-rising.queryPort" . | quote }}
+            {{- /* Authoritative: written into ServerHostSettings.json each boot. */}}
+            - name: HOST_SETTINGS_Name
+              value: {{ .Values.server_name | quote }}
+            - name: HOST_SETTINGS_SaveName
+              value: {{ .Values.world_name | quote }}
+            - name: HOST_SETTINGS_Port
+              value: {{ include "v-rising.gamePort" . | quote }}
+            - name: HOST_SETTINGS_QueryPort
               value: {{ include "v-rising.queryPort" . | quote }}
             {{- if .Values.server_password }}
             - name: HOST_SETTINGS_Password
