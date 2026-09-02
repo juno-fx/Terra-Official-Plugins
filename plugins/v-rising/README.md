@@ -72,6 +72,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `service_type` | **select** · Required · Default: `NodePort`<br>`NodePort`, `LoadBalancer` or `ClusterIP` |
 | `game_node_port` | **int** · Optional<br>Pin the external NodePort for the game port (`30000`–`32767`). Blank lets Kubernetes assign one |
 | `query_node_port` | **int** · Optional<br>Pin the external NodePort for the query port — must be `game_node_port + 1` |
+| `server_password` | **string** · Optional<br>Password players must enter to join. Blank leaves the server open |
 | `rcon_enabled` | **boolean** · Required · Default: `false`<br>Enable the RCON admin console on TCP `25575` |
 | `rcon_password` | **string** · Optional<br>RCON password — required when RCON is enabled |
 | `storage_class` | **k8sStorageClass** · Required<br>Storage class for both volumes |
@@ -101,6 +102,46 @@ This is a hard requirement (`requiredDuringSchedulingIgnoredDuringExecution`) �
 
 Pinning to a known node is also the practical way to get stable external ports: `NodePort` reaches the server through *any* node's IP, but players need one address, and `game_node_port` / `query_node_port` only stay adjacent if you pin them.
 
+### Reaching the Server
+
+Players join with **Direct Connect** using the **game port** (the query port is what the browser uses to enumerate servers, not what you dial).
+
+With `service_type: NodePort` the port a player dials is the *nodePort*, not `game_port` — and the server advertises `game_port` to the Steam and EOS master servers. If those two numbers disagree, the server appears in the browser and then fails to connect.
+
+The default NodePort range is `30000-32767`, so `9876` cannot be a nodePort. To make browser listing work, move the port pair into that range and pin it to match:
+
+```
+game_port:        30000
+query_port:       30001
+game_node_port:   30000
+query_node_port:  30001
+```
+
+Internal and external ports are now identical, the `+1` adjacency the browser requires is preserved, and the advertised port is the reachable one. Ugly numbers, but correct.
+
+If you only ever use Direct Connect and never want the server listed, the mismatch is harmless — leave the defaults and hand players `nodeIP:<nodePort>`.
+
+The `kuiper.juno-innovations.com/connection` annotation Hubble reads reports the externally dialable port: the pinned nodePorts when set, `auto-assigned` when not, and `game_port`/`query_port` directly for `LoadBalancer` and `ClusterIP`.
+
+### Launch-Time Validation
+
+The chart refuses to render, with an explanatory message, when:
+
+- `query_port` is not `game_port + 1` — the server would run but never be listed
+- `rcon_enabled` is true with an empty `rcon_password` — would expose the admin console
+- `node_affinity_value` is set without `node_affinity_key` — the value alone does nothing
+- `storage_class` is empty — would silently fall back to the cluster default StorageClass
+
+Each of these otherwise fails silently at runtime, which is far harder to diagnose than a failed launch.
+
+### Passwords and Visibility
+
+`server_password` and `rcon_password` are optional. When either is set, the chart renders a `Secret` named `<release>-credentials` and the StatefulSet references it with `secretKeyRef` — the values do not appear in the pod spec. This follows the pattern in `plugins/vllm`.
+
+Be clear on what that does and does not buy you: the Secret keeps the passwords out of `kubectl get statefulset -o yaml`, but Kubernetes Secrets are base64-encoded, not encrypted, and anyone who can read Secrets in the namespace can read them. The value also travels through Kuiper as an ordinary Helm value, because the workload field schema has no password or secret type. Treat this as keeping credentials out of casual view, not as secret management.
+
+**Password and visibility are independent knobs.** A password gates *joining*; it does not hide the server. A passworded server still appears in the browser with a lock icon if `HOST_SETTINGS_ListOnSteam` / `HOST_SETTINGS_ListOnEOS` are true. To keep it out of the listing entirely, leave those false — the server is then reachable only by Direct Connect, whether or not it has a password.
+
 ### Custom Environment Variables
 
 | Variable | Description |
@@ -108,10 +149,10 @@ Pinning to a known node is also the practical way to get stable external ports: 
 | `TZ` | Timezone the server clock and log timestamps use, e.g. `America/New_York`. Defaults to `Europe/Brussels`. |
 | `BRANCH` | Steam branch to install, for pinning a legacy server build such as `legacy-1.0.x-pc`. Defaults to the current release. |
 | `LOGDAYS` | How many days of server logs to keep on the data volume before rotating them out. Defaults to `30`. |
-| `HOST_SETTINGS_Password` | Password players must enter to join. Leave unset for an open server. |
 | `HOST_SETTINGS_Description` | Longer server description shown alongside the name in the server browser. |
 | `HOST_SETTINGS_MaxConnectedUsers` | Maximum simultaneous players. Defaults to `40`. |
 | `HOST_SETTINGS_ListOnMasterServer` | Set to `true` to advertise the server publicly in the in-game browser. |
+| `HOST_SETTINGS_ListOnSteam` | Set to `true` to advertise the server through the Steam master server. Needed for the server to appear in the Steam-backed browser listing. |
 | `HOST_SETTINGS_ListOnEOS` | Set to `true` to advertise the server through Epic Online Services so friends can find it. |
 | `GAME_SETTINGS_GameModeType` | `PvP` or `PvE`. Defaults to `PvP`. |
 | `GAME_SETTINGS_ClanSize` | Maximum members per clan. Defaults to `4`. |
@@ -127,4 +168,8 @@ Any `ServerHostSettings.json` or `ServerGameSettings.json` key can be reached wi
 - Game traffic is **UDP**, so it does not go through the platform's nginx ingress. Reach the server through the NodePort or LoadBalancer address, not an HTTP endpoint.
 - World data persists across restarts as long as the data volume is retained. The server volume can be deleted safely — it is re-downloaded.
 - RCON is off by default. When enabled it is exposed only as a ClusterIP service, reachable from inside the cluster.
+- A `NetworkPolicy` restricts RCON (TCP 25575) to pods in the same namespace. The UDP game and query ports stay open to all sources — players are arbitrary external clients. Egress is unrestricted because SteamCMD needs Valve's CDN and the server needs the master servers.
+- `tag` defaults to `latest`, which with `imagePullPolicy: IfNotPresent` means a node keeps whatever `latest` it first pulled and two nodes can end up on different builds. For a server whose save format is version-sensitive, pin an explicit tag such as `2.1`.
+- No `securityContext` is set, so the container runs as the image default and both PVCs are root-owned. Kuiper's injected `user`/`group`/`puid`/`guid` are unused. This is deliberate pending a live test — SteamCMD and Wine in this image expect to run as root, and forcing a UID is a plausible way to break first boot.
+- No readiness or liveness probes. First boot downloads several GB through SteamCMD, so the Service endpoint goes live before the server is listening. Kubernetes cannot probe UDP directly, so a correct probe needs an `exec` against the image — also pending a live test.
 - See the [trueosiris/vrising documentation](https://github.com/TrueOsiris/docker-vrising) for the full image reference, and [playvrising.com](https://playvrising.com/) for the game itself.

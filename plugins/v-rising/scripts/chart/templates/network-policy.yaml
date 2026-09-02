@@ -1,0 +1,34 @@
+{{- /*
+  RCON is plaintext TCP. Without a policy, every pod in the cluster can reach it on 25575.
+  Game and query traffic stays open — players are arbitrary external clients, so there is
+  no meaningful source to restrict them to.
+*/ -}}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: "{{ .Release.Name }}"
+spec:
+  podSelector:
+    matchLabels:
+      kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - ports:
+        - protocol: UDP
+          port: {{ .Values.game_port }}
+        - protocol: UDP
+          port: {{ .Values.query_port }}
+    {{- if .Values.rcon_enabled }}
+    # RCON is reachable only from inside this namespace, not the whole cluster.
+    - from:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 25575
+    {{- end }}
+  # SteamCMD pulls the server files from Valve's CDN on first boot, and the server
+  # reaches out to the Steam and EOS master servers to list itself.
+  egress:
+    - {}

@@ -32,6 +32,7 @@ query_port: 9877
 service_type: NodePort
 game_node_port:
 query_node_port:
+server_password:
 rcon_enabled: false
 rcon_password:
 storage_class:

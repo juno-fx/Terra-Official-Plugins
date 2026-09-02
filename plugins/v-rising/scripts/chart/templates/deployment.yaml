@@ -1,13 +1,38 @@
+{{- /*
+  Launch-time validation. These fail the render with a readable message rather than
+  producing a server that starts and then misbehaves in a way nobody can see.
+*/ -}}
+{{- if ne (int .Values.query_port) (add (int .Values.game_port) 1) }}
+{{- fail (printf "query_port must be game_port + 1 (got game_port=%v, query_port=%v). V Rising will not appear in the server browser otherwise." .Values.game_port .Values.query_port) }}
+{{- end }}
+{{- if and .Values.rcon_enabled (not .Values.rcon_password) }}
+{{- fail "rcon_enabled is true but rcon_password is empty. Set a password or disable RCON — the admin console would otherwise be exposed with no credential of your choosing." }}
+{{- end }}
+{{- if and .Values.node_affinity_value (not .Values.node_affinity_key) }}
+{{- fail "node_affinity_value was set without node_affinity_key. The value alone has no effect; set the key, or clear both." }}
+{{- end }}
+{{- if not .Values.storage_class }}
+{{- fail "storage_class is required. Leaving it empty would silently fall back to the cluster default StorageClass." }}
+{{- end }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: "{{ .Release.Name }}"
   annotations:
     juno-innovations.com/workload: "Server"
-    kuiper.juno-innovations.com/connection: "game_port={{ .Values.game_port }},query_port={{ .Values.query_port }}{{ if .Values.rcon_enabled }},rcon_port=25575{{ end }}"
+    {{- /*
+      Report the port a player actually dials. With NodePort that is the nodePort, which
+      only equals game_port when the admin pins them to match (see README).
+    */}}
+    {{- $gp := .Values.game_port }}
+    {{- $qp := .Values.query_port }}
+    {{- if eq .Values.service_type "NodePort" }}
+    {{- $gp = .Values.game_node_port | default "auto-assigned" }}
+    {{- $qp = .Values.query_node_port | default "auto-assigned" }}
+    {{- end }}
+    kuiper.juno-innovations.com/connection: "game_port={{ $gp }},query_port={{ $qp }}{{ if .Values.rcon_enabled }},rcon_port=25575{{ end }}"
 spec:
   replicas: 1
-  serviceName: "{{ .Release.Name }}-game"
   selector:
     matchLabels:
       kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
@@ -15,6 +40,9 @@ spec:
     metadata:
       labels:
         kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+      annotations:
+        # A world flush on shutdown is not something to interrupt for a bin-packing win.
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
     spec:
       automountServiceAccountToken: false
       # The server writes its world on shutdown — give Wine time to flush before the kill.
@@ -80,13 +108,20 @@ spec:
             {{- end }}
           env:
             - name: SERVERNAME
-              value: "{{ .Values.server_name }}"
+              value: {{ .Values.server_name | quote }}
             - name: WORLDNAME
-              value: "{{ .Values.world_name }}"
+              value: {{ .Values.world_name | quote }}
             - name: GAMEPORT
-              value: "{{ .Values.game_port }}"
+              value: {{ .Values.game_port | quote }}
             - name: QUERYPORT
-              value: "{{ .Values.query_port }}"
+              value: {{ .Values.query_port | quote }}
+            {{- if .Values.server_password }}
+            - name: HOST_SETTINGS_Password
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Name }}-credentials"
+                  key: HOST_SETTINGS_Password
+            {{- end }}
             {{- if .Values.rcon_enabled }}
             - name: HOST_SETTINGS_Rcon_Enabled
               value: "true"
@@ -94,12 +129,15 @@ spec:
               value: "25575"
             {{- if .Values.rcon_password }}
             - name: HOST_SETTINGS_Rcon_Password
-              value: "{{ .Values.rcon_password }}"
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Name }}-credentials"
+                  key: HOST_SETTINGS_Rcon_Password
             {{- end }}
             {{- end }}
             {{- range .Values.env }}
-            - name: {{ .name }}
-              value: "{{ .value }}"
+            - name: {{ .name | quote }}
+              value: {{ .value | quote }}
             {{- end }}
           volumeMounts:
             - name: server

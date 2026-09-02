@@ -64,6 +64,10 @@ data:
       description: "Pin the external NodePort for the query port. Must be the game NodePort plus one for the server to be listed. Leave blank to let Kubernetes assign one."
       type: int
       required: false
+    - name: server_password
+      description: "Password players must enter to join. Leave blank for an open server. Listing and password are independent — a passworded server still appears in the browser, with a lock."
+      type: string
+      required: false
     - name: rcon_enabled
       description: "Enable the RCON admin console on TCP 25575"
       type: boolean
@@ -102,14 +106,14 @@ data:
       description: Steam branch to install, for pinning a legacy server build such as legacy-1.0.x-pc. Defaults to the current release.
     - name: LOGDAYS
       description: How many days of server logs to keep on the data volume before rotating them out. Defaults to 30.
-    - name: HOST_SETTINGS_Password
-      description: Password players must enter to join. Leave unset for an open server.
     - name: HOST_SETTINGS_Description
       description: Longer server description shown alongside the name in the server browser.
     - name: HOST_SETTINGS_MaxConnectedUsers
       description: Maximum simultaneous players. Defaults to 40.
     - name: HOST_SETTINGS_ListOnMasterServer
       description: Set to true to advertise the server publicly in the in-game browser.
+    - name: HOST_SETTINGS_ListOnSteam
+      description: Set to true to advertise the server through the Steam master server. Needed for the server to appear in the Steam-backed browser listing.
     - name: HOST_SETTINGS_ListOnEOS
       description: Set to true to advertise the server through Epic Online Services so friends can find it.
     - name: GAME_SETTINGS_GameModeType
