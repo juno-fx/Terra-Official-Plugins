@@ -11,7 +11,7 @@
 
 ## Overview
 
-The V Rising plugin provides a workload template for running self-hosted [V Rising](https://playvrising.com/) dedicated servers within the Juno platform. Each workload gets its own persistent world storage, its own game and query ports, and an optional RCON admin console.
+The V Rising plugin provides a workload template for running self-hosted [V Rising](https://playvrising.com/) dedicated servers within the Juno platform. Each workload gets its own persistent world storage and a deterministic pair of external game and query ports.
 
 Stunlock Studios ships the dedicated server ([Steam app `1829350`](https://store.steampowered.com/app/1604030/V_Rising/)) as a **Windows binary only** — there is no native Linux build. The `trueosiris/vrising` image handles this by bundling SteamCMD, Wine and Xvfb: on first boot it pulls the Windows server files with `+@sSteamCmdForcePlatformType windows`, then runs them under Wine on a headless X server. Nothing about the Wine layer is exposed as a workload field — it is entirely internal to the image.
 
@@ -26,7 +26,6 @@ Each launched workload creates:
 - A **StatefulSet** running the server under Wine
 - Two **PersistentVolumeClaims** — one for the SteamCMD server install (`/mnt/vrising/server`), one for world saves and settings (`/mnt/vrising/persistentdata`)
 - A **Service** exposing the UDP game and query ports
-- An optional **ClusterIP Service** for RCON when it is enabled
 
 ---
 
@@ -68,12 +67,8 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `tag` | **string** · Required · Default: `latest`<br>Image tag |
 | `server_name` | **string** · Required · Default: `Juno V Rising Server`<br>Name shown in the in-game server browser |
 | `world_name` | **string** · Required · Default: `world1`<br>World save folder on the data volume — changing it starts a fresh world |
-| `game_port` | **int** · Required · Default: `9876`<br>UDP game port clients connect to |
-| `query_port` | **int** · Required · Default: `9877`<br>UDP Steam query port — must be `game_port + 1` |
 | `service_type` | **select** · Required · Default: `NodePort`<br>`NodePort`, `LoadBalancer` or `ClusterIP`. NodePort auto-derives the external port pair from the instance name |
 | `server_password` | **string** · Optional<br>Password players must enter to join. Blank leaves the server open |
-| `rcon_enabled` | **boolean** · Required · Default: `false`<br>Enable the RCON admin console on TCP `25575` |
-| `rcon_password` | **string** · Optional<br>RCON password — required when RCON is enabled |
 | `storage_class` | **k8sStorageClass** · Required<br>Storage class for both volumes |
 | `server_storage_size` | **string** · Required · Default: `20Gi`<br>Volume for the SteamCMD server install (~5Gi, grows with each patch) |
 | `data_storage_size` | **string** · Required · Default: `10Gi`<br>Volume for world saves, settings and logs |
@@ -119,14 +114,12 @@ then join `<node-ip>:<game nodePort>`. The `kuiper.juno-innovations.com/connecti
 
 **Collisions:** because the pair is derived rather than allocated, two instances can in principle land on the same ports and the second apply is rejected. Rename the instance to re-derive.
 
-**Server browser visibility:** NodePort cannot help here. The server advertises `game_port`/`query_port` (9876/9877) to the Steam and EOS master servers, and those never match the nodePort mapping — so a browser-listed entry points at the wrong port. Direct Connect is unaffected. For working browser listing you need `LoadBalancer` (where the advertised ports are the real ones) or hostPort.
+**Server browser visibility:** NodePort cannot help here. The server advertises its container ports (9876/9877) to the Steam and EOS master servers, and those never match the nodePort mapping — so a browser-listed entry points at the wrong port. Direct Connect is unaffected. For working browser listing you need `LoadBalancer` (where the advertised ports are the real ones) or hostPort.
 
 ### Launch-Time Validation
 
 The chart refuses to render, with an explanatory message, when:
 
-- `query_port` is not `game_port + 1` — the server would run but never be listed
-- `rcon_enabled` is true with an empty `rcon_password` — would expose the admin console
 - `node_affinity_value` is set without `node_affinity_key` — the value alone does nothing
 - `storage_class` is empty — would silently fall back to the cluster default StorageClass
 
@@ -134,7 +127,7 @@ Each of these otherwise fails silently at runtime, which is far harder to diagno
 
 ### Passwords and Visibility
 
-`server_password` and `rcon_password` are optional. When either is set, the chart renders a `Secret` named `<release>-credentials` and the StatefulSet references it with `secretKeyRef` — the values do not appear in the pod spec. This follows the pattern in `plugins/vllm`.
+`server_password` is optional. When set, the chart renders a `Secret` named `<release>-credentials` and the StatefulSet references it with `secretKeyRef` — the value does not appear in the pod spec. This follows the pattern in `plugins/vllm`.
 
 Be clear on what that does and does not buy you: the Secret keeps the passwords out of `kubectl get statefulset -o yaml`, but Kubernetes Secrets are base64-encoded, not encrypted, and anyone who can read Secrets in the namespace can read them. The value also travels through Kuiper as an ordinary Helm value, because the workload field schema has no password or secret type. Treat this as keeping credentials out of casual view, not as secret management.
 
@@ -155,7 +148,7 @@ Be clear on what that does and does not buy you: the Secret keeps the passwords 
 | `GAME_SETTINGS_GameModeType` | `PvP` or `PvE`. Defaults to `PvP`. |
 | `GAME_SETTINGS_ClanSize` | Maximum members per clan. Defaults to `4`. |
 
-Any `ServerHostSettings.json` or `ServerGameSettings.json` key can be reached with the same `HOST_SETTINGS_` / `GAME_SETTINGS_` prefix convention — nested keys join with an underscore, as in `HOST_SETTINGS_Rcon_Password`.
+Any `ServerHostSettings.json` or `ServerGameSettings.json` key can be reached with the same `HOST_SETTINGS_` / `GAME_SETTINGS_` prefix convention — nested keys join with an underscore, as in `HOST_SETTINGS_ListOnSteam`.
 
 ---
 
@@ -165,8 +158,8 @@ Any `ServerHostSettings.json` or `ServerGameSettings.json` key can be reached wi
 - The first boot downloads several gigabytes of server files through SteamCMD and can take a while before the server accepts connections. Subsequent restarts reuse the server volume.
 - Game traffic is **UDP**, so it does not go through the platform's nginx ingress. Reach the server through the NodePort or LoadBalancer address, not an HTTP endpoint.
 - World data persists across restarts as long as the data volume is retained. The server volume can be deleted safely — it is re-downloaded.
-- RCON is off by default. When enabled it is exposed only as a ClusterIP service, reachable from inside the cluster.
-- A `NetworkPolicy` restricts RCON (TCP 25575) to pods in the same namespace. The UDP game and query ports stay open to all sources — players are arbitrary external clients. Egress is unrestricted because SteamCMD needs Valve's CDN and the server needs the master servers.
+- A `NetworkPolicy` scopes ingress to the two UDP ports. They stay open to all sources — players are arbitrary external clients. Egress is unrestricted because SteamCMD needs Valve's CDN and the server needs the master servers.
+- There is no RCON. The container ports (9876/9877) are fixed internally and are not launch fields; the externally dialable ports are the auto-derived pair.
 - `tag` defaults to `latest`, which with `imagePullPolicy: IfNotPresent` means a node keeps whatever `latest` it first pulled and two nodes can end up on different builds. For a server whose save format is version-sensitive, pin an explicit tag such as `2.1`.
 - No `securityContext` is set, so the container runs as the image default and both PVCs are root-owned. Kuiper's injected `user`/`group`/`puid`/`guid` are unused. This is deliberate pending a live test — SteamCMD and Wine in this image expect to run as root, and forcing a UID is a plausible way to break first boot.
 - No readiness or liveness probes. First boot downloads several GB through SteamCMD, so the Service endpoint goes live before the server is listening. Kubernetes cannot probe UDP directly, so a correct probe needs an `exec` against the image — also pending a live test.

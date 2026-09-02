@@ -17,7 +17,11 @@
 {{- define "v-rising.autoNodePort" -}}
 {{- $sum := 0 -}}
 {{- range $i, $run := regexFindAll "[0-9]+" (sha256sum .Release.Name) -1 -}}
-{{- $sum = add $sum (int $run) -}}
+{{- /* mod inside the loop, not just at the end: keeps $sum bounded so a name
+       whose digit-runs sum past int64 cannot wrap negative and derive a port
+       below 30000. Modular arithmetic distributes over addition, so this yields
+       an identical port to the plain sum for every non-overflowing name. */ -}}
+{{- $sum = mod (add $sum (int $run)) 2767 -}}
 {{- end -}}
 {{- add 30000 (mod $sum 2767) -}}
 {{- end -}}

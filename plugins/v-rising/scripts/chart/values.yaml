@@ -27,8 +27,12 @@ repo: vrising
 tag: latest
 server_name: "Juno V Rising Server"
 world_name: world1
+# Container ports. Deliberately NOT launch fields — the externally dialable
+# ports are the auto-derived nodePair, so exposing these would only invite an
+# adjacency mistake. Kept here so the values are named rather than magic.
 game_port: 9876
 query_port: 9877
+
 service_type: NodePort
 # NodePorts are auto-derived as an adjacent pair from the instance name
 # (see templates/_helpers.tpl) — there is deliberately no user override.
@@ -37,8 +41,6 @@ service_type: NodePort
 nodeSelector:
   kubernetes.io/arch: amd64
 server_password:
-rcon_enabled: false
-rcon_password:
 storage_class:
 server_storage_size: 20Gi
 data_storage_size: 10Gi

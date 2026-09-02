@@ -37,16 +37,6 @@ data:
       type: string
       required: true
       default: "world1"
-    - name: game_port
-      description: "UDP game port clients connect to"
-      type: int
-      required: true
-      default: 9876
-    - name: query_port
-      description: "UDP Steam query port. Must be the game port plus one, or the server will not appear in the server list."
-      type: int
-      required: true
-      default: 9877
     - name: service_type
       description: "How the server is reachable from outside the cluster. With NodePort the external port pair is auto-derived from the instance name and is stable across syncs."
       type: select
@@ -58,15 +48,6 @@ data:
         - ClusterIP
     - name: server_password
       description: "Password players must enter to join. Leave blank for an open server. Listing and password are independent — a passworded server still appears in the browser, with a lock."
-      type: string
-      required: false
-    - name: rcon_enabled
-      description: "Enable the RCON admin console on TCP 25575"
-      type: boolean
-      required: true
-      default: false
-    - name: rcon_password
-      description: "RCON password. Required when RCON is enabled."
       type: string
       required: false
     - name: storage_class

@@ -2,12 +2,6 @@
   Launch-time validation. These fail the render with a readable message rather than
   producing a server that starts and then misbehaves in a way nobody can see.
 */ -}}
-{{- if ne (int .Values.query_port) (add (int .Values.game_port) 1) }}
-{{- fail (printf "query_port must be game_port + 1 (got game_port=%v, query_port=%v). V Rising will not appear in the server browser otherwise." .Values.game_port .Values.query_port) }}
-{{- end }}
-{{- if and .Values.rcon_enabled (not .Values.rcon_password) }}
-{{- fail "rcon_enabled is true but rcon_password is empty. Set a password or disable RCON — the admin console would otherwise be exposed with no credential of your choosing." }}
-{{- end }}
 {{- if and .Values.node_affinity_value (not .Values.node_affinity_key) }}
 {{- fail "node_affinity_value was set without node_affinity_key. The value alone has no effect; set the key, or clear both." }}
 {{- end }}
@@ -31,7 +25,7 @@ metadata:
     {{- $gp = $np }}
     {{- $qp = add $np 1 }}
     {{- end }}
-    kuiper.juno-innovations.com/connection: "game_port={{ $gp }},query_port={{ $qp }}{{ if .Values.rcon_enabled }},rcon_port=25575{{ end }}"
+    kuiper.juno-innovations.com/connection: "game_port={{ $gp }},query_port={{ $qp }}"
 spec:
   replicas: 1
   selector:
@@ -106,11 +100,6 @@ spec:
             - containerPort: {{ .Values.query_port }}
               protocol: UDP
               name: query
-            {{- if .Values.rcon_enabled }}
-            - containerPort: 25575
-              protocol: TCP
-              name: rcon
-            {{- end }}
           env:
             - name: SERVERNAME
               value: {{ .Values.server_name | quote }}
@@ -126,19 +115,6 @@ spec:
                 secretKeyRef:
                   name: "{{ .Release.Name }}-credentials"
                   key: HOST_SETTINGS_Password
-            {{- end }}
-            {{- if .Values.rcon_enabled }}
-            - name: HOST_SETTINGS_Rcon_Enabled
-              value: "true"
-            - name: HOST_SETTINGS_Rcon_Port
-              value: "25575"
-            {{- if .Values.rcon_password }}
-            - name: HOST_SETTINGS_Rcon_Password
-              valueFrom:
-                secretKeyRef:
-                  name: "{{ .Release.Name }}-credentials"
-                  key: HOST_SETTINGS_Rcon_Password
-            {{- end }}
             {{- end }}
             {{- range .Values.env }}
             - name: {{ .name | quote }}
