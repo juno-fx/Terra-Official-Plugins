@@ -30,8 +30,12 @@ world_name: world1
 game_port: 9876
 query_port: 9877
 service_type: NodePort
-game_node_port:
-query_node_port:
+# NodePorts are auto-derived as an adjacent pair from the instance name
+# (see templates/_helpers.tpl) — there is deliberately no user override.
+
+# The server is a Windows x86-64 binary run under Wine; arm64 nodes cannot run it.
+nodeSelector:
+  kubernetes.io/arch: amd64
 server_password:
 rcon_enabled: false
 rcon_password:

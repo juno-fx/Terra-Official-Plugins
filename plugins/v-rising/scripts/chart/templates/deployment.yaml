@@ -21,14 +21,15 @@ metadata:
   annotations:
     juno-innovations.com/workload: "Server"
     {{- /*
-      Report the port a player actually dials. With NodePort that is the nodePort, which
-      only equals game_port when the admin pins them to match (see README).
+      Report the port a player actually dials. With NodePort that is the
+      auto-derived pair from _helpers.tpl, not game_port/query_port.
     */}}
     {{- $gp := .Values.game_port }}
     {{- $qp := .Values.query_port }}
     {{- if eq .Values.service_type "NodePort" }}
-    {{- $gp = .Values.game_node_port | default "auto-assigned" }}
-    {{- $qp = .Values.query_node_port | default "auto-assigned" }}
+    {{- $np := include "v-rising.autoNodePort" . | int }}
+    {{- $gp = $np }}
+    {{- $qp = add $np 1 }}
     {{- end }}
     kuiper.juno-innovations.com/connection: "game_port={{ $gp }},query_port={{ $qp }}{{ if .Values.rcon_enabled }},rcon_port=25575{{ end }}"
 spec:
@@ -52,6 +53,10 @@ spec:
       imagePullSecrets:
         - name: "{{ .Values.pullSecret }}"
       {{- end }}
+
+      {{- /* The server is a Windows x86-64 binary under Wine — arm64 nodes cannot run it. */}}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
 
       {{- if or .Values.node_affinity_key .Values.selector }}
       affinity:

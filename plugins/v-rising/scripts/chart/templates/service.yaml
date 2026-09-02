@@ -1,3 +1,12 @@
+{{- /*
+  Game servers listen on raw UDP — the Service carries the traffic directly.
+  Do NOT add an ingress for game traffic: nginx ingress is HTTP/HTTPS only and
+  cannot proxy game packets.
+
+  NodePort pairs are auto-derived from the instance name so game/query stay
+  adjacent (N / N+1). See _helpers.tpl for why.
+*/ -}}
+{{- $autoNP := include "v-rising.autoNodePort" . | int }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -7,19 +16,19 @@ spec:
   selector:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
   ports:
-    - port: {{ .Values.game_port }}
-      targetPort: {{ .Values.game_port }}
+    - name: game
+      port: {{ .Values.game_port }}
+      targetPort: game
       protocol: UDP
-      name: game
-      {{- if and (eq .Values.service_type "NodePort") .Values.game_node_port }}
-      nodePort: {{ .Values.game_node_port }}
+      {{- if eq .Values.service_type "NodePort" }}
+      nodePort: {{ $autoNP }}
       {{- end }}
-    - port: {{ .Values.query_port }}
-      targetPort: {{ .Values.query_port }}
+    - name: query
+      port: {{ .Values.query_port }}
+      targetPort: query
       protocol: UDP
-      name: query
-      {{- if and (eq .Values.service_type "NodePort") .Values.query_node_port }}
-      nodePort: {{ .Values.query_node_port }}
+      {{- if eq .Values.service_type "NodePort" }}
+      nodePort: {{ add $autoNP 1 }}
       {{- end }}
 {{- if .Values.rcon_enabled }}
 ---
@@ -34,8 +43,8 @@ spec:
   selector:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
   ports:
-    - port: 25575
-      targetPort: 25575
+    - name: rcon
+      port: 25575
+      targetPort: rcon
       protocol: TCP
-      name: rcon
 {{- end }}

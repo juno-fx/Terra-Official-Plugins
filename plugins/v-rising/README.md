@@ -34,6 +34,7 @@ Each launched workload creates:
 
 - Platform versions: `genesis-deployment >= 3.0.0-beta.1`, `orion-deployment >= 3.0.0-beta.1`
 - A Kubernetes storage class available in the cluster for the server and world volumes
+- **amd64 nodes only** — the server is a Windows x86-64 binary under Wine, so the chart pins `kubernetes.io/arch: amd64`. arm64 nodes cannot run it.
 - Nodes with **AVX support** — the server binary requires it. On mixed clusters, use the node affinity fields below to keep the workload off nodes that lack it.
 - Roughly **2 CPU cores and 8Gi of memory** per server in practice. Set `cpu` and `memory` accordingly at launch — the platform defaults of `1` / `1Gi` are not enough to run a world.
 
@@ -69,9 +70,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `world_name` | **string** · Required · Default: `world1`<br>World save folder on the data volume — changing it starts a fresh world |
 | `game_port` | **int** · Required · Default: `9876`<br>UDP game port clients connect to |
 | `query_port` | **int** · Required · Default: `9877`<br>UDP Steam query port — must be `game_port + 1` |
-| `service_type` | **select** · Required · Default: `NodePort`<br>`NodePort`, `LoadBalancer` or `ClusterIP` |
-| `game_node_port` | **int** · Optional<br>Pin the external NodePort for the game port (`30000`–`32767`). Blank lets Kubernetes assign one |
-| `query_node_port` | **int** · Optional<br>Pin the external NodePort for the query port — must be `game_node_port + 1` |
+| `service_type` | **select** · Required · Default: `NodePort`<br>`NodePort`, `LoadBalancer` or `ClusterIP`. NodePort auto-derives the external port pair from the instance name |
 | `server_password` | **string** · Optional<br>Password players must enter to join. Blank leaves the server open |
 | `rcon_enabled` | **boolean** · Required · Default: `false`<br>Enable the RCON admin console on TCP `25575` |
 | `rcon_password` | **string** · Optional<br>RCON password — required when RCON is enabled |
@@ -100,28 +99,27 @@ node_affinity_value: "true"
 
 This is a hard requirement (`requiredDuringSchedulingIgnoredDuringExecution`) — the pod stays `Pending` if no node matches. Any node selectors Kuiper injects through the platform's standard `selector` value are ANDed onto the same term, so a template-level label and a platform-level one both apply.
 
-Pinning to a known node is also the practical way to get stable external ports: `NodePort` reaches the server through *any* node's IP, but players need one address, and `game_node_port` / `query_node_port` only stay adjacent if you pin them.
+Pinning to a known node is also how players get one stable address to type. The port pair is already stable — it is derived from the instance name — but `NodePort` answers on *every* node's IP, and with a local-path style StorageClass the pod is tied to whichever node it first landed on anyway.
 
 ### Reaching the Server
 
-Players join with **Direct Connect** using the **game port** (the query port is what the browser uses to enumerate servers, not what you dial).
+Players join with **Direct Connect** using the **game port** — the query port is what the client and browser use to *query* the server, not what you dial.
 
-With `service_type: NodePort` the port a player dials is the *nodePort*, not `game_port` — and the server advertises `game_port` to the Steam and EOS master servers. If those two numbers disagree, the server appears in the browser and then fails to connect.
+With `service_type: NodePort` (the default) the external port pair is **auto-derived from the instance name**, not chosen by you. The V Rising client queries at `entered-port + 1`, so the two nodePorts must be adjacent; Kubernetes would otherwise assign two random unrelated ports and the query would miss. The chart sums the decimal digit-runs of `sha256(release-name)` and folds the result into `30000..32766`, so `game = N` and `query = N + 1`.
 
-The default NodePort range is `30000-32767`, so `9876` cannot be a nodePort. To make browser listing work, move the port pair into that range and pin it to match:
+This is a direct port of the approach in the `conan-exiles` plugin in [aldmbmtl/Terra-Games](https://github.com/aldmbmtl/Terra-Games).
+
+The derivation is **deterministic and stable** across ArgoCD syncs and Kuiper re-renders — the same instance name always gets the same pair — and there is deliberately **no user override**. Find the pair with:
 
 ```
-game_port:        30000
-query_port:       30001
-game_node_port:   30000
-query_node_port:  30001
+kubectl get svc <release>-game -n <namespace> -o jsonpath='{.spec.ports[*].nodePort}'
 ```
 
-Internal and external ports are now identical, the `+1` adjacency the browser requires is preserved, and the advertised port is the reachable one. Ugly numbers, but correct.
+then join `<node-ip>:<game nodePort>`. The `kuiper.juno-innovations.com/connection` annotation Hubble reads reports the same pair.
 
-If you only ever use Direct Connect and never want the server listed, the mismatch is harmless — leave the defaults and hand players `nodeIP:<nodePort>`.
+**Collisions:** because the pair is derived rather than allocated, two instances can in principle land on the same ports and the second apply is rejected. Rename the instance to re-derive.
 
-The `kuiper.juno-innovations.com/connection` annotation Hubble reads reports the externally dialable port: the pinned nodePorts when set, `auto-assigned` when not, and `game_port`/`query_port` directly for `LoadBalancer` and `ClusterIP`.
+**Server browser visibility:** NodePort cannot help here. The server advertises `game_port`/`query_port` (9876/9877) to the Steam and EOS master servers, and those never match the nodePort mapping — so a browser-listed entry points at the wrong port. Direct Connect is unaffected. For working browser listing you need `LoadBalancer` (where the advertised ports are the real ones) or hostPort.
 
 ### Launch-Time Validation
 

@@ -48,7 +48,7 @@ data:
       required: true
       default: 9877
     - name: service_type
-      description: "How the server is reachable from outside the cluster"
+      description: "How the server is reachable from outside the cluster. With NodePort the external port pair is auto-derived from the instance name and is stable across syncs."
       type: select
       required: true
       default: "NodePort"
@@ -56,14 +56,6 @@ data:
         - NodePort
         - LoadBalancer
         - ClusterIP
-    - name: game_node_port
-      description: "Pin the external NodePort for the game port (30000-32767). Leave blank to let Kubernetes assign one. NodePort service type only."
-      type: int
-      required: false
-    - name: query_node_port
-      description: "Pin the external NodePort for the query port. Must be the game NodePort plus one for the server to be listed. Leave blank to let Kubernetes assign one."
-      type: int
-      required: false
     - name: server_password
       description: "Password players must enter to join. Leave blank for an open server. Listing and password are independent — a passworded server still appears in the browser, with a lock."
       type: string
