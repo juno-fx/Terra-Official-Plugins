@@ -83,8 +83,6 @@ data:
       description: Longer server description shown alongside the name in the server browser.
     - name: HOST_SETTINGS_MaxConnectedUsers
       description: Maximum simultaneous players. Defaults to 40.
-    - name: HOST_SETTINGS_ListOnMasterServer
-      description: Set to true to advertise the server publicly in the in-game browser.
     - name: HOST_SETTINGS_ListOnSteam
       description: Set to true to advertise the server through the Steam master server. Needed for the server to appear in the Steam-backed browser listing.
     - name: HOST_SETTINGS_ListOnEOS

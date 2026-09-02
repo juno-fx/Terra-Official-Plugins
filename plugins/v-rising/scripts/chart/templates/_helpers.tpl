@@ -56,3 +56,8 @@
 {{- .Values.query_port -}}
 {{- end -}}
 {{- end -}}
+
+{{/* Game port as 4-digit uppercase hex — /proc/net/udp lists ports that way. */}}
+{{- define "v-rising.gamePortHex" -}}
+{{- printf "%04X" (include "v-rising.gamePort" . | int) -}}
+{{- end -}}

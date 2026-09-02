@@ -69,6 +69,36 @@ spec:
         - name: v-rising
           imagePullPolicy: IfNotPresent
           image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
+          {{- /*
+            First boot pulls several GB through SteamCMD, so the container is
+            alive long before the server is reachable. Without a startup probe
+            the pod reports Ready immediately and the Service endpoint goes live
+            pointing at nothing.
+
+            The startup probe checks /proc/net/udp for the port actually bound
+            (ports there are hex) rather than merely that a process exists —
+            that is precisely the failure that made this server unreachable, so
+            it is the condition worth gating on. Liveness uses the cheaper
+            process check so a transient probe quirk cannot kill a live world.
+            Both /proc/net/udp and `ps` were confirmed present in this image.
+          */}}
+          startupProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - 'grep -qi ":{{ include "v-rising.gamePortHex" . }} " /proc/net/udp'
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 90
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - 'ps aux | grep -q "[V]RisingServer.exe"'
+            periodSeconds: 30
+            failureThreshold: 6
           resources:
             requests:
               memory: "{{ .Values.memory }}"

@@ -146,7 +146,6 @@ Be clear on what that does and does not buy you: the Secret keeps the passwords 
 | `LOGDAYS` | How many days of server logs to keep on the data volume before rotating them out. Defaults to `30`. |
 | `HOST_SETTINGS_Description` | Longer server description shown alongside the name in the server browser. |
 | `HOST_SETTINGS_MaxConnectedUsers` | Maximum simultaneous players. Defaults to `40`. |
-| `HOST_SETTINGS_ListOnMasterServer` | Set to `true` to advertise the server publicly in the in-game browser. |
 | `HOST_SETTINGS_ListOnSteam` | Set to `true` to advertise the server through the Steam master server. Needed for the server to appear in the Steam-backed browser listing. |
 | `HOST_SETTINGS_ListOnEOS` | Set to `true` to advertise the server through Epic Online Services so friends can find it. |
 | `GAME_SETTINGS_GameModeType` | `PvP` or `PvE`. Defaults to `PvP`. |
@@ -166,6 +165,6 @@ Any `ServerHostSettings.json` or `ServerGameSettings.json` key can be reached wi
 - There is no RCON.
 - The container ports are not launch fields. Under NodePort they are the auto-derived pair; under LoadBalancer/ClusterIP they are 9876/9877.
 - `tag` defaults to `latest`, which with `imagePullPolicy: IfNotPresent` means a node keeps whatever `latest` it first pulled and two nodes can end up on different builds. For a server whose save format is version-sensitive, pin an explicit tag such as `2.1`.
-- No `securityContext` is set, so the container runs as the image default and both PVCs are root-owned. Kuiper's injected `user`/`group`/`puid`/`guid` are unused. This is deliberate pending a live test — SteamCMD and Wine in this image expect to run as root, and forcing a UID is a plausible way to break first boot.
-- No readiness or liveness probes. First boot downloads several GB through SteamCMD, so the Service endpoint goes live before the server is listening. Kubernetes cannot probe UDP directly, so a correct probe needs an `exec` against the image — also pending a live test.
+- No `securityContext` is set, and that is deliberate: the server, `wineserver64` and the Wine helper processes were all observed running as **root** in a live launch. Forcing a UID or `fsGroup` would likely break startup. Both PVCs are therefore root-owned, and Kuiper's injected `user`/`group`/`puid`/`guid` are unused.
+- A **startup probe** greps `/proc/net/udp` for the game port in hex, so the pod is not Ready until the server is genuinely bound — Kubernetes cannot probe UDP directly, and a bare process check would not have caught the port-binding bug. It allows 15 minutes (`90 x 10s`) for the first SteamCMD download. **Liveness** uses a cheaper `ps` check so a transient probe result cannot kill a live world. Both commands were run verbatim against a live pod and exit 0.
 - See the [trueosiris/vrising documentation](https://github.com/TrueOsiris/docker-vrising) for the full image reference, and [playvrising.com](https://playvrising.com/) for the game itself.
