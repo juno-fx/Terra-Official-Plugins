@@ -13,30 +13,3 @@ data:
     : "${PGID:=1000}"
     : "${NAME:=hermes-agent}"
     : "${NAMESPACE:?NAMESPACE must be set}"
-
-    echo "Fixing ownership for PUID=${PUID}:${PGID}"
-    chown -R "${PUID}:${PGID}" /opt/data
-
-    mkdir -p /opt/data/dashboard-themes
-
-    # --- Copy theme ---
-    if [ ! -f /opt/data/dashboard-themes/juno.yaml ]; then
-      cp /opt/templates/theme/juno.yaml /opt/data/dashboard-themes/juno.yaml
-    fi
-
-    # --- Substitute init script template ---
-    sed -e "s/__NAME__/${NAME}/g" -e "s/__NAMESPACE__/${NAMESPACE}/g" \
-      /opt/templates/init/start.sh > /opt/init/start.sh
-    chmod 755 /opt/init/start.sh
-
-    # --- Install helper scripts (graceful shutdown + DB self-heal) ---
-    for _s in db-heal.sh shutdown.sh; do
-      sed -e "s/__NAME__/${NAME}/g" -e "s/__NAMESPACE__/${NAMESPACE}/g" \
-        "/opt/templates/init/${_s}" > "/opt/init/${_s}"
-      chmod 755 "/opt/init/${_s}"
-    done
-
-    # --- Substitute nginx template ---
-    sed -e "s/__NAME__/${NAME}/g" -e "s/__NAMESPACE__/${NAMESPACE}/g" \
-      /opt/templates/nginx/nginx.conf > /opt/proxy/nginx.conf
-    chmod 644 /opt/proxy/nginx.conf
