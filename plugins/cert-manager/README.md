@@ -46,6 +46,7 @@ For a full list of supported issuers, see the [cert-manager documentation](https
 | Field | Details |
 |-------|---------|
 | `chart_version` | **string** · Required · Default: `v1.19.1`<br>The cert-manager Helm chart version to install |
+| `enable_gateway_api` | **boolean** · Required · Default: `false`<br>Reconcile Gateway resources as well as Ingresses. Turn this on when the cluster routes through the Gateway API |
 
 ---
 
@@ -53,7 +54,9 @@ For a full list of supported issuers, see the [cert-manager documentation](https
 
 Installing this plugin only installs the cert-manager controller and CRDs. It does **not** issue any certificates by itself — nothing happens until you create two more resources yourself.
 
-Neither this plugin nor cert-manager creates these for you — they're plain Kubernetes manifests you must apply to the cluster yourself, e.g. `kubectl apply -f cluster-issuer.yaml`, or commit them to a repo your GitOps tooling (ArgoCD) watches.
+Neither this plugin nor cert-manager creates these for you. They are plain Kubernetes manifests you must apply to the cluster yourself, e.g. `kubectl apply -f cluster-issuer.yaml`, or commit them to a repo your GitOps tooling (ArgoCD) watches.
+
+The **Certificate Issuer** plugin creates the ClusterIssuer for you from the app store, with fields for the ACME server, the challenge type and the DNS provider credential. Install that instead if you would rather not hand-apply the manifest below.
 
 ### 1. An Issuer or ClusterIssuer
 
@@ -101,3 +104,5 @@ Once both exist, cert-manager sees the annotated Ingress, runs the challenge, fe
 - After installation, you must create an `Issuer` or `ClusterIssuer` resource to begin issuing certificates — cert-manager itself does not issue certificates without a configured issuer (see [Issuing Certificates](#issuing-certificates-required--not-automatic) above)
 - See the [cert-manager issuer documentation](https://cert-manager.io/docs/configuration/issuers/) for setup guides for Let's Encrypt, self-signed, and other issuers
 - Upgrading cert-manager across major versions may require CRD migration — consult the cert-manager upgrade notes before changing `chart_version`
+- On the Gateway API, TLS is configured on the Gateway listener rather than on the route, so a certificate covers a listener and not an individual workload. Set `enable_gateway_api` and annotate the Gateway itself with `cert-manager.io/cluster-issuer`
+- The Gateway API integration needs the Gateway CRDs present before cert-manager starts, otherwise the controller logs that it cannot watch them
