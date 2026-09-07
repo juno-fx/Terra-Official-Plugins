@@ -8,6 +8,8 @@ cpu: "1"
 memory: "1Gi"
 cpuLimit: null
 memoryLimit: null
+rheaRepo: rhea
+rheaTag: v1.2.3
 rheaCpu: 200m
 rheaMemory: 100Mi
 rheaCpuLimit: 350m
