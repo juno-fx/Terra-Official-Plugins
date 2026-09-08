@@ -121,6 +121,7 @@ nav:
     - workflow.md
     - configuration.md
     - plugin-fields.md
+    - custom-domains.md
     - Workload Templates:
       - workload-templates.md
       - workload-guides.md
