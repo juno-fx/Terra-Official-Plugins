@@ -66,8 +66,8 @@ data:
         - ingress-noauth
         - clusterip
         - nodeport
-    - name: hostname
-      description: "Serve the application at its own domain, for example app.example.com, instead of a path on the platform host. Requires network_mode ingress-noauth, since the platform session cookie is not sent to another domain"
+    - name: domain
+      description: "Domain the application is published under when network_mode is ingress-noauth. The workload is served at <workload name>.<domain>, so every instance launched from this template gets its own hostname"
       type: string
       required: false
     - name: tls_issuer

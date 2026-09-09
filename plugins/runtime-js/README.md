@@ -65,7 +65,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `run_command` | **string** · Required · Default: `node main.js`<br>Command that starts your application, e.g. `node main.js`, `npm start` |
 | `port` | **int** · Required · Default: `8080`<br>Port your application listens on |
 | `network_mode` | **select** · Required · Default: `ingress-auth`<br>How to expose the application (see below) |
-| `hostname` | **string** · Optional<br>Serve the application at its own domain, for example `shop.example.com`, instead of a path on the platform host. Requires `network_mode` `ingress-noauth` |
+| `domain` | **string** · Optional<br>Domain the application is published under, for example `apps.example.com`. The workload is served at `<name>.<domain>`. Requires `network_mode` `ingress-noauth` |
 | `tls_issuer` | **string** · Optional<br>cert-manager ClusterIssuer used to obtain the certificate for that domain |
 | `publish_dns` | **boolean** · Optional · Default: `false`<br>Annotate the route so the ExternalDNS plugin creates the DNS record |
 | `gpu` | **boolean** · Required<br>Attach a GPU to the workload |
@@ -99,11 +99,13 @@ The example is a plain Node `http` server that reads `PREFIX` and listens on por
 
 ## Serving on Your Own Domain
 
-With `network_mode` set to `ingress-noauth`, setting `hostname` publishes the application at the root of that domain rather than under a path on the platform host. `PREFIX` becomes `/`, so an application that reads it serves its own links correctly, and the platform path redirects to the new address.
+With `network_mode` set to `ingress-noauth`, setting `domain` publishes the application at `<workload name>.<domain>`, served from the root of that host rather than under a path on the platform host. `PREFIX` becomes `/`, so an application that reads it serves its own links correctly.
 
-The `ingress-noauth` requirement is not arbitrary. The platform session cookie is scoped to the Orion host and is never sent to another domain, so the Hubble gate cannot protect a custom domain. Rather than publish an unprotected route from a mode that claims to be authenticated, a hostname set under `ingress-auth` changes nothing.
+The hostname is derived rather than typed, so instances launched from the same template never collide: each workload has its own name and therefore its own hostname. Naming the workload at launch is how you pick the address, for example `my-app.domain.com` alongside `my-app-dev.domain.com`.
 
-Add a DNS record pointing the hostname at the cluster ingress address, or set `publish_dns` and let the ExternalDNS plugin create it. The Domain Manager page shows the record to add and whether it currently resolves.
+The `ingress-noauth` requirement is not arbitrary. The platform session cookie is scoped to the Orion host and is never sent to another domain, so the Hubble gate cannot protect a custom domain. Rather than publish an unprotected route from a mode that claims to be authenticated, a domain set under `ingress-auth` changes nothing.
+
+A single wildcard record for `*.<domain>` pointing at the cluster ingress address covers every workload at once, or set `publish_dns` and let the ExternalDNS plugin create each hostname's record. The Domain Manager page shows the record to add and whether it currently resolves.
 
 ---
 

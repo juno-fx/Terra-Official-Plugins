@@ -1,26 +1,27 @@
-{{- if and .Values.hostname (eq .Values.network_mode "ingress-noauth") }}
+{{- if and .Values.domain (eq .Values.network_mode "ingress-noauth") }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ .Values.name }}-domain-ingress
+  {{- if or .Values.tls_issuer .Values.publish_dns }}
   annotations:
-    kubernetes.io/ingress.class: nginx
     {{- if .Values.tls_issuer }}
     cert-manager.io/cluster-issuer: {{ .Values.tls_issuer }}
     {{- end }}
     {{- if .Values.publish_dns }}
     external-dns.alpha.kubernetes.io/enable: "true"
-    external-dns.alpha.kubernetes.io/hostname: {{ .Values.hostname }}
+    external-dns.alpha.kubernetes.io/hostname: {{ .Values.name }}.{{ .Values.domain }}
     {{- end }}
+  {{- end }}
 spec:
   {{- if .Values.tls_issuer }}
   tls:
     - hosts:
-        - {{ .Values.hostname }}
+        - {{ .Values.name }}.{{ .Values.domain }}
       secretName: {{ .Values.name }}-tls
   {{- end }}
   rules:
-    - host: {{ .Values.hostname }}
+    - host: {{ .Values.name }}.{{ .Values.domain }}
       http:
         paths:
           - path: "/"
