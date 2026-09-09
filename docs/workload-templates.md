@@ -318,6 +318,16 @@ This requires `inotifywait` (available in the devbox shell).
 
 ---
 
+## Schema Changes and Existing Templates
+
+Updating a plugin updates the schema in the catalog, not the templates already authored from it. A workload template in Genesis stays on the schema version it was created with, so fields added by a plugin update do not appear on its launch form, and a workload launched from it renders the old chart.
+
+Relaunching or recreating the workload changes nothing, because the template is the thing that is pinned. Move the template onto the new chart with the **Migrate** button on its row in Genesis, fill in the new fields, and then launch. The [Genesis workload documentation](https://docs.juno-innovations.com/Orion-Documentation/latest/genesis/workloads/#upgrade) covers the migration flow in full.
+
+This matters to plugin authors as much as operators: after shipping a new field, the symptom of an unmigrated template is indistinguishable from the field not working.
+
+---
+
 ## Common Mistakes
 
 | Mistake                                            | Symptom                                    | Fix                                                |
@@ -328,6 +338,7 @@ This requires `inotifywait` (available in the devbox shell).
 | Missing `juno-innovations.com/workload` annotation | Not categorized in Hubble                  | Add to both `metadata.yaml` and `workstation.yaml` |
 | `packaged-scripts.yaml` hand-edited                | Overwritten on next `make package`         | Edit `scripts/` instead                            |
 | Large assets in `scripts/`                         | Exceeds 1MiB ConfigMap limit               | Use `make check-size`, trim assets                 |
+| New field added, template not migrated             | Field absent from launch form; old chart renders | Migrate the template in Genesis, then relaunch |
 
 ---
 
