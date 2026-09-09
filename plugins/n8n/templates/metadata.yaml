@@ -27,11 +27,6 @@ data:
       type: string
       required: true
       default: "latest"
-    - name: timezone
-      description: "Timezone to use for the n8n instance"
-      type: string
-      required: true
-      default: "America/New_York"
     - name: storage_class
       description: Storage class to use for the game disk
       required: true

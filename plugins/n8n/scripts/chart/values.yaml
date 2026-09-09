@@ -23,7 +23,6 @@ env:
 selector:
 plugins: []
 _kuiper:
-timezone: "America/New_York"
 storage_class:
 storage_size: "10Gi"
 webhooks_public: false
