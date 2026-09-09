@@ -25,9 +25,4 @@ spec:
           port: {{ trim . | int }}
         {{- end }}
         {{- end }}
-  {{- if .Values.allow_egress }}
-  egress:
-    - {}
-  {{- else }}
   egress: []
-  {{- end }}

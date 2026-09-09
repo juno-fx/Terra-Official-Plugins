@@ -60,7 +60,6 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `nginx_tag` | **string** · Required · Default: `1.29.3`<br>nginx proxy image tag |
 | `publicAccess` | **boolean** · Required · Default: `false`<br>Disable authentication and allow unauthenticated browser access to the terminal |
 | `published_ports` | **string** · Optional<br>Extra container ports the ingress controller may reach, comma separated, for example `8000,8080`. Needed to publish an application running inside the session |
-| `allow_egress` | **boolean** · Optional · Default: `false`<br>Allow outbound traffic from the session. Off by default, which blocks all egress including DNS |
 
 ### Custom Environment Variables
 
@@ -79,7 +78,7 @@ The terminal is served on port 3001 and the NetworkPolicy admits traffic on that
 
 List the ports in `published_ports` and the policy will admit them as well. From there, the Domain Route plugin publishes the port at a hostname with TLS.
 
-The same policy blocks all outbound traffic, including DNS, so an application that calls an API, clones a repository or installs a package needs `allow_egress` turned on as well. Both are off by default, so a session stays as locked down as it is today unless you ask for otherwise.
+Outbound traffic is governed by the workspace rules under Network in Genesis, so nothing here touches egress.
 
 The terminal keeps its own authenticated route throughout. Publishing an application port does not expose the terminal, and `publicAccess` stays off.
 
@@ -88,7 +87,6 @@ A session serving an application therefore looks like this:
 | Field | Value |
 |-------|-------|
 | `published_ports` | `8000`, the port your application listens on |
-| `allow_egress` | `true` if the application needs to reach anything outside the cluster |
 | `publicAccess` | left off, the terminal stays authenticated |
 
 then one Domain Route install pointing at the session on port 8000.
