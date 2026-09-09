@@ -57,7 +57,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `timezone` | **string** · Required · Default: `America/New_York`<br>Timezone for the n8n instance (affects scheduled workflow execution) |
 | `storage_class` | **k8sStorageClass** · Required<br>Storage class for the n8n workflow data persistent volume |
 | `storage_size` | **string** · Required · Default: `10Gi`<br>Size of the persistent volume for workflow and credential storage |
-| `hostname` | **string** · Optional<br>Serve this instance at its own domain, for example `n8n.example.com`, instead of a path on the platform host |
+| `domain` | **string** · Optional<br>Domain this instance is published under, for example `example.com`. The instance is served at `<name>.<domain>`, so instances never collide |
 | `tls_issuer` | **string** · Optional<br>cert-manager ClusterIssuer used to obtain the certificate for that domain. Requires the Certificate Issuer plugin |
 | `publish_dns` | **boolean** · Optional · Default: `false`<br>Annotate the route so the ExternalDNS plugin creates the DNS record |
 | `webhooks_public` | **boolean** · Required · Default: `false`<br>Allows public access to the n8n webhook paths under `/<namespace>/n8n/<workload-name>/`, while the editor, REST API, and credential store stay behind authentication |
@@ -80,14 +80,14 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 
 ## Serving n8n on Your Own Domain
 
-Set `hostname` and the instance moves off the shared platform path onto a domain of its own. The chart then serves n8n from the root of that host, points `WEBHOOK_URL`, `N8N_HOST` and `N8N_PATH` at it, and redirects the old platform path to the new address so links in Hubble keep working.
+Set `domain` and the instance moves off the shared platform path onto a hostname of its own, `<workload name>.<domain>`. The chart then serves n8n from the root of that host and points `WEBHOOK_URL`, `N8N_HOST` and `N8N_PATH` at it. The hostname is derived from the workload name, so several instances under one template never collide, and naming the workload at launch is how you pick the address. The platform path route is not rendered in this mode, since n8n can only serve one base path, and Hubble lists the domain endpoint instead.
 
 Two things follow from that, and both are deliberate:
 
-- Webhook URLs become `https://<hostname>/webhook/<id>`, which is the form every managed n8n host uses, and third-party callers reach them without any extra setup. `webhooks_public` is not used in this mode
+- Webhook URLs become `https://<name>.<domain>/webhook/<id>`, which is the form every managed n8n host uses, and third-party callers reach them without any extra setup. `webhooks_public` is not used in this mode
 - The Hubble session gate cannot apply to another domain, because the platform session cookie is never sent there. n8n's own user management is the gate, so set an owner account on first launch and keep it
 
-Add a DNS record for the hostname pointing at the cluster ingress address before launching, or set `publish_dns` and let ExternalDNS create it. The Domain Manager page shows the exact record and whether it currently resolves.
+Point a wildcard record for `*.<domain>` at the cluster ingress address, or set `publish_dns` and let ExternalDNS create each instance's record. The Domain Manager page shows the exact record and whether it currently resolves.
 
 ---
 
@@ -98,7 +98,7 @@ Add a DNS record for the hostname pointing at the cluster ingress address before
 - With `webhooks_public` disabled (the default) every path is behind the Juno session gate, so calls from third-party services are rejected at the ingress before n8n receives them, so enable it for any workflow driven by an inbound webhook
 - n8n is served under `/<namespace>/n8n/<workload-name>/`, where `<namespace>` is the environment the workload runs in — this full path is passed to the container as `N8N_PATH`, so the webhook URLs n8n displays in the editor already include it
 - Enabling `webhooks_public` exposes only the `webhook/`, `webhook-test/`, and `webhook-waiting/` sub-paths — the full public URL to hand to a third-party service is `https://<host>/<namespace>/n8n/<workload-name>/webhook/<path>`; the editor, REST API, and credential store stay authenticated
-- With `hostname` set the whole instance lives on that domain, so the editor, the REST API and the webhooks are all served there and n8n's own login is what protects them
+- With `domain` set the whole instance lives on its own hostname, so the editor, the REST API and the webhooks are all served there and n8n's own login is what protects them
 - Authenticate exposed webhooks in the webhook node itself (header auth, basic auth, or a signature check) and narrow the source with `webhook_allow_cidrs` where the calling platform publishes its IP ranges
 - n8n has a fair-code license; for commercial use, review [n8n's licensing terms](https://github.com/n8n-io/n8n/blob/master/LICENSE.md)
 - Each workload instance is an isolated n8n environment with its own credential store

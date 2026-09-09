@@ -10,7 +10,7 @@ data:
         listen 8080;
         server_name _;
 
-    {{- if .Values.hostname }}
+    {{- if .Values.domain }}
 
         location / {
             proxy_pass http://127.0.0.1:5678;
