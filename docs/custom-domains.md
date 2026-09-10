@@ -41,7 +41,6 @@ metadata:
     {{- end }}
     {{- if .Values.publish_dns }}
     external-dns.alpha.kubernetes.io/enable: "true"
-    external-dns.alpha.kubernetes.io/hostname: {{ .Values.name }}.{{ .Values.domain }}
     {{- end }}
   {{- end }}
 spec:
