@@ -87,7 +87,11 @@ spec:
             - name: GID
               value: {{ .Values.guid | quote }}
             - name: PREFIX
+              {{- if and .Values.hostname (eq .Values.network_mode "ingress-noauth") }}
+              value: "/"
+              {{- else }}
               value: {{ printf "/%s/polaris/%s/" .Release.Namespace .Values.name | quote }}
+              {{- end }}
             - name: GIT_URL
               value: {{ .Values.git_url | quote }}
             - name: SOURCE_PATH

@@ -1,0 +1,41 @@
+resource_id: domain-manager
+name: Domain Manager
+icon: https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/domain-manager/assets/icon.svg?raw=true
+description: A page inside Genesis listing every hostname published from this cluster, the DNS record each one needs, whether that record currently points at the cluster, and the state of its certificate.
+category: Networking
+tags:
+  - cluster-level
+  - dashboard
+  - networking
+  - dns
+editable: true
+fields:
+  - name: host
+    description: The DNS name of your Genesis host.
+    required: true
+    type: string
+  - name: prefix
+    description: Connection URL prefix. i.e. `/domains`. This doesn't need changing in most cases.
+    required: true
+    default: /domains
+    type: string
+  - name: registry
+    description: Registry to pull the image from.
+    required: true
+    default: docker.io
+    type: string
+  - name: repo
+    description: Repository to pull the image from.
+    required: true
+    default: python
+    type: string
+  - name: tag
+    description: Tag to pull the image from.
+    required: true
+    default: "3.13-alpine"
+    type: string
+  - name: namespace
+    description: Namespace the page runs in. Created if it does not exist.
+    required: true
+    default: domain-manager
+    type: string

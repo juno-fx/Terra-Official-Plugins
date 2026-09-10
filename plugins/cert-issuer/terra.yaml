@@ -1,0 +1,81 @@
+resource_id: cert-issuer
+name: Certificate Issuer
+icon: https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/cert-issuer/assets/icon.svg?raw=true
+description: Creates the ACME ClusterIssuer that cert-manager needs before it can issue any certificate. Supports Let's Encrypt over HTTP-01, or DNS-01 with Route53 and Cloudflare for wildcard certificates. https://cert-manager.io/docs/configuration/acme/
+category: Infrastructure
+tags:
+  - cluster-level
+  - networking
+  - tls
+  - dns
+editable: true
+fields:
+  - name: issuer_name
+    description: Name of the ClusterIssuer. Workloads reference this name in their tls_issuer field.
+    required: true
+    default: letsencrypt-prod
+    type: string
+  - name: email
+    description: Contact address registered with the ACME account. Expiry warnings are sent here.
+    required: true
+    type: string
+  - name: acme_server
+    description: ACME directory to register against. Use staging while testing, it issues untrusted certificates but has far higher rate limits.
+    required: true
+    default: https://acme-v02.api.letsencrypt.org/directory
+    type: select
+    options:
+      - https://acme-v02.api.letsencrypt.org/directory
+      - https://acme-staging-v02.api.letsencrypt.org/directory
+  - name: solver
+    description: How domain ownership is proven. http01 needs the hostname to already resolve to this cluster. dns01 writes a TXT record instead and is the only option that can issue wildcard certificates.
+    required: true
+    default: http01
+    type: select
+    options:
+      - http01
+      - dns01
+  - name: ingress_class
+    description: Ingress class used to serve the HTTP-01 challenge. Must match the class Orion routes through.
+    required: false
+    default: nginx
+    type: string
+  - name: dns_provider
+    description: DNS provider used for the dns01 challenge.
+    required: false
+    default: cloudflare
+    type: select
+    options:
+      - cloudflare
+      - route53
+  - name: dns_secret_name
+    description: Name of an existing Secret in the cert-manager namespace holding the provider credential. Leave empty to have this plugin create one from dns_token.
+    required: false
+    type: string
+  - name: dns_secret_key
+    description: Key inside that Secret holding the credential.
+    required: false
+    default: token
+    type: string
+  - name: dns_token
+    description: Cloudflare API token, or AWS secret access key. Only used when dns_secret_name is empty. Until Terra has a secret field type this value is stored in the plugin's Helm values, so prefer dns_secret_name in production.
+    required: false
+    type: string
+  - name: aws_region
+    description: AWS region for the route53 provider.
+    required: false
+    default: us-east-1
+    type: string
+  - name: aws_hosted_zone_id
+    description: Route53 hosted zone id. Leave empty to let cert-manager discover the zone.
+    required: false
+    type: string
+  - name: aws_access_key_id
+    description: AWS access key id for the route53 provider. Leave empty on EKS to use the node or IRSA credentials.
+    required: false
+    type: string
+  - name: cert_manager_namespace
+    description: Namespace cert-manager runs in. Challenge credentials are read from this namespace.
+    required: true
+    default: cert-manager
+    type: string

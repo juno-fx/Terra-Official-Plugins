@@ -1,4 +1,4 @@
-{{- if .Values.webhooks_public }}
+{{- if and .Values.webhooks_public (not .Values.hostname) }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:

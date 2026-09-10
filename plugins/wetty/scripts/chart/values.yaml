@@ -30,3 +30,5 @@ nginx_registry: "docker.io"
 nginx_repo: "nginx"
 nginx_tag: "1.29.3"
 ingressNamespace: ingress-nginx
+published_ports: ""
+allow_egress: false

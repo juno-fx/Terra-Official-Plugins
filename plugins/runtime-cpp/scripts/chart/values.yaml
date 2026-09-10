@@ -30,3 +30,6 @@ env:
 selector:
 plugins: []
 _kuiper:
+hostname: ""
+tls_issuer: ""
+publish_dns: false

@@ -50,6 +50,15 @@ data:
       type: string
       required: true
       default: "1.29.3"
+    - name: published_ports
+      description: "Extra container ports the ingress controller may reach, so an application running inside the session can be published with the Domain Route plugin. Comma separated, for example 8000,8080. The terminal itself is always reachable"
+      type: string
+      required: false
+    - name: allow_egress
+      description: "Allow outbound traffic from the session. Off by default, which blocks all egress including DNS. Turn this on for a session that needs to reach package registries, APIs or anything else outside the cluster"
+      type: boolean
+      required: false
+      default: false
     - name: publicAccess
       description: "Allow public access (disable authentication)"
       type: boolean
