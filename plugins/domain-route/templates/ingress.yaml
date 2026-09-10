@@ -9,7 +9,6 @@ metadata:
     {{- end }}
     {{- if .Values.publish_dns }}
     external-dns.alpha.kubernetes.io/enable: "true"
-    external-dns.alpha.kubernetes.io/hostname: {{ .Values.hostname }}
     {{- end }}
     {{- if eq .Values.auth "basic" }}
     {{- if not .Values.basic_auth_secret }}
