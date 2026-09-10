@@ -57,7 +57,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `timezone` | **string** · Required · Default: `America/New_York`<br>Timezone for the n8n instance (affects scheduled workflow execution) |
 | `storage_class` | **k8sStorageClass** · Required<br>Storage class for the n8n workflow data persistent volume |
 | `storage_size` | **string** · Required · Default: `10Gi`<br>Size of the persistent volume for workflow and credential storage |
-| `domain` | **string** · Optional<br>Domain this instance is published under, for example `example.com`. The instance is served at `<name>.<domain>`, so instances never collide |
+| `domain` | **string** · Optional<br>Domain this instance is published under, for example `example.com`. The instance is served at `<name>.<domain>` |
 | `tls_issuer` | **string** · Optional<br>cert-manager ClusterIssuer used to obtain the certificate for that domain. Requires the Certificate Issuer plugin |
 | `publish_dns` | **boolean** · Optional · Default: `false`<br>Annotate the route so the ExternalDNS plugin creates the DNS record |
 | `webhooks_public` | **boolean** · Required · Default: `false`<br>Allows public access to the n8n webhook paths under `/<namespace>/n8n/<workload-name>/`, while the editor, REST API, and credential store stay behind authentication |
@@ -80,7 +80,7 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 
 ## Serving n8n on Your Own Domain
 
-Set `domain` and the instance moves off the shared platform path onto a hostname of its own, `<workload name>.<domain>`. The chart then serves n8n from the root of that host and points `WEBHOOK_URL`, `N8N_HOST` and `N8N_PATH` at it. The hostname is derived from the workload name, so several instances under one template never collide, and naming the workload at launch is how you pick the address. The platform path route is not rendered in this mode, since n8n can only serve one base path, and Hubble lists the domain endpoint instead.
+Set `domain` and the instance moves off the shared platform path onto a hostname of its own, `<workload name>.<domain>`. The chart then serves n8n from the root of that host and points `WEBHOOK_URL`, `N8N_HOST` and `N8N_PATH` at it. The hostname is derived from the workload name, and naming the workload at launch is how you pick the address. Two workloads sharing both name and domain, for example from different projects, would claim the same hostname, so keep names unique per domain. This needs the Certificate Manager and Certificate Issuer plugins for TLS, and either the ExternalDNS plugin with `publish_dns` or a wildcard record for `*.<domain>`. The platform path route is not rendered in this mode, since n8n can only serve one base path, and Hubble lists the domain endpoint instead.
 
 Two things follow from that, and both are deliberate:
 

@@ -42,7 +42,7 @@ data:
       required: true
       type: string
     - name: domain
-      description: "Domain this instance is published under, for example example.com. The instance is served at <workload name>.<domain>, so every instance gets its own hostname. Leave empty to keep the platform path"
+      description: "Domain this instance is published under, for example example.com. The instance is served at <workload name>.<domain>. Needs the Certificate Manager and Certificate Issuer plugins for TLS, and the ExternalDNS plugin or a wildcard DNS record. Leave empty to keep the platform path"
       type: string
       required: false
     - name: tls_issuer
