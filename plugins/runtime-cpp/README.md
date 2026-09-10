@@ -65,6 +65,9 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `run_command` | **string** · Required · Default: `./app`<br>Command that starts your application, e.g. `./app` |
 | `port` | **int** · Required · Default: `8080`<br>Port your application listens on |
 | `network_mode` | **select** · Required · Default: `ingress-auth`<br>How to expose the application (see below) |
+| `domain` | **string** · Optional<br>Domain the application is published under, for example `apps.example.com`. The workload is served at `<name>.<domain>`. Requires `network_mode` `ingress-noauth` |
+| `tls_issuer` | **string** · Optional<br>cert-manager ClusterIssuer used to obtain the certificate for that domain |
+| `publish_dns` | **boolean** · Optional · Default: `false`<br>Annotate the route so the ExternalDNS plugin creates the DNS record |
 | `gpu` | **boolean** · Required<br>Attach a GPU to the workload |
 
 ### Network Modes
@@ -92,6 +95,17 @@ The example is a minimal socket HTTP server that reads `PREFIX` and listens on p
 `build_command` and `run_command` are evaluated independently, each starting from the repository root — a
 `cd` in one does not carry over to the other.
 
+---
+
+## Serving on Your Own Domain
+
+With `network_mode` set to `ingress-noauth`, setting `domain` publishes the application at `<workload name>.<domain>`, served from the root of that host. `PREFIX` becomes `/`, so an application that reads it serves its own links correctly, and the platform path route is not rendered, since the application can no longer serve it once its base path moves.
+
+The hostname is derived from the workload name, and end users can pass a custom workload name from the Hubble frontend, which is how an address like `my-app.domain.com` is chosen alongside `my-app-dev.domain.com`. Derived does not mean collision proof: two workloads launched with the same name and the same domain, for example from different projects, would claim the same hostname, and the second route will fail. Keep names unique per domain.
+
+This needs the Certificate Manager and Certificate Issuer plugins for TLS, and either the ExternalDNS plugin with `publish_dns` enabled or a wildcard DNS record for `*.<domain>` pointing at the cluster ingress address. The Domain Manager page shows the record to add and whether it currently resolves.
+
+A domain only takes effect under `ingress-noauth`. The reasoning, which applies to every plugin that publishes a custom domain, is covered in [Custom Domains](../../docs/custom-domains.md).
 ---
 
 ## Notes
