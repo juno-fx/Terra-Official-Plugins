@@ -1,0 +1,6 @@
+host:
+prefix: /domains
+registry: docker.io
+repo: python
+tag: "3.13-alpine"
+namespace: domain-manager

@@ -1,0 +1,270 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Values.namespace }}
+data:
+  app.py: |
+    import html
+    import json
+    import os
+    import socket
+    import ssl
+    import urllib.error
+    import urllib.request
+    from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+    API = "https://{}:{}".format(
+        os.environ.get("KUBERNETES_SERVICE_HOST", "kubernetes.default.svc"),
+        os.environ.get("KUBERNETES_SERVICE_PORT", "443"),
+    )
+    TOKEN_PATH = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+    CA_PATH = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+    PREFIX = os.environ.get("PREFIX", "/domains").rstrip("/")
+    PORT = int(os.environ.get("PORT", "8080"))
+    PLATFORM_HOST = os.environ.get("PLATFORM_HOST", "")
+
+
+    def api_get(path):
+        try:
+            with open(TOKEN_PATH) as handle:
+                token = handle.read().strip()
+            request = urllib.request.Request(API + path, headers={"Authorization": "Bearer " + token})
+            context = ssl.create_default_context(cafile=CA_PATH)
+            with urllib.request.urlopen(request, timeout=10, context=context) as response:
+                return json.load(response)
+        except (urllib.error.HTTPError, urllib.error.URLError, OSError):
+            return {"items": []}
+
+
+    def resolve(name):
+        try:
+            return {info[4][0] for info in socket.getaddrinfo(name, None)}
+        except socket.gaierror:
+            return set()
+
+
+    def is_address(value):
+        try:
+            socket.inet_pton(socket.AF_INET, value)
+            return True
+        except OSError:
+            pass
+        try:
+            socket.inet_pton(socket.AF_INET6, value)
+            return True
+        except OSError:
+            return False
+
+
+    def gateway_addresses():
+        addresses = {}
+        for gateway in api_get("/apis/gateway.networking.k8s.io/v1/gateways").get("items", []):
+            meta = gateway["metadata"]
+            entries = gateway.get("status", {}).get("addresses", [])
+            addresses[(meta["namespace"], meta["name"])] = [e["value"] for e in entries if e.get("value")]
+        return addresses
+
+
+    def certificate_states():
+        states = {}
+        for certificate in api_get("/apis/cert-manager.io/v1/certificates").get("items", []):
+            namespace = certificate["metadata"]["namespace"]
+            secret = certificate["spec"].get("secretName", "")
+            ready = "Pending"
+            for condition in certificate.get("status", {}).get("conditions", []):
+                if condition.get("type") == "Ready":
+                    ready = "Ready" if condition.get("status") == "True" else condition.get("reason", "Not ready")
+            states[(namespace, secret)] = ready
+        return states
+
+
+    def collect():
+        rows = {}
+
+        def row_for(host, namespace):
+            return rows.setdefault(host, {
+                "host": host,
+                "namespace": namespace,
+                "routes": [],
+                "addresses": set(),
+                "secret": "",
+            })
+
+        for ingress in api_get("/apis/networking.k8s.io/v1/ingresses").get("items", []):
+            namespace = ingress["metadata"]["namespace"]
+            name = ingress["metadata"]["name"]
+            published = [
+                entry.get("ip") or entry.get("hostname")
+                for entry in ingress.get("status", {}).get("loadBalancer", {}).get("ingress", [])
+            ]
+            secrets = {}
+            for block in ingress.get("spec", {}).get("tls", []):
+                for host in block.get("hosts", []):
+                    secrets[host] = block.get("secretName", "")
+            for rule in ingress.get("spec", {}).get("rules", []):
+                host = rule.get("host")
+                if not host:
+                    continue
+                row = row_for(host, namespace)
+                row["routes"].append(name)
+                row["addresses"].update(address for address in published if address)
+                row["secret"] = row["secret"] or secrets.get(host, "")
+
+        gateways = gateway_addresses()
+        for route in api_get("/apis/gateway.networking.k8s.io/v1/httproutes").get("items", []):
+            namespace = route["metadata"]["namespace"]
+            name = route["metadata"]["name"]
+            published = []
+            for parent in route.get("spec", {}).get("parentRefs", []):
+                published.extend(gateways.get((parent.get("namespace", namespace), parent["name"]), []))
+            for host in route.get("spec", {}).get("hostnames", []):
+                row = row_for(host, namespace)
+                row["routes"].append(name)
+                row["addresses"].update(published)
+
+        certificates = certificate_states()
+        for row in rows.values():
+            row["certificate"] = certificates.get((row["namespace"], row["secret"]), "") if row["secret"] else ""
+
+        return sorted(rows.values(), key=lambda row: row["host"])
+
+
+    def record_for(addresses):
+        for address in sorted(addresses):
+            if is_address(address):
+                return "A", address
+        for address in sorted(addresses):
+            return "CNAME", address
+        return "", ""
+
+
+    def status_for(host, addresses):
+        resolved = resolve(host)
+        if not resolved:
+            return "missing", "No record found"
+        expected = set()
+        for address in addresses:
+            expected |= {address} if is_address(address) else resolve(address)
+        if not expected:
+            return "unknown", ", ".join(sorted(resolved))
+        if resolved & expected:
+            return "ok", "Pointing here"
+        return "wrong", "Points at " + ", ".join(sorted(resolved))
+
+
+    def page():
+        rows = collect()
+        addresses = set()
+        for row in rows:
+            addresses |= row["addresses"]
+        kind, target = record_for(addresses)
+
+        body = [HEADER]
+        if target:
+            body.append(
+                "<p class=\"lead\">Point a hostname at this cluster by adding "
+                "<code>{} &rarr; {}</code>, then publish it from a workload or a Domain Route.</p>".format(
+                    kind, html.escape(target)
+                )
+            )
+        else:
+            body.append(
+                "<p class=\"lead\">No ingress address has been published yet. "
+                "Once the ingress controller reports one, the record to add is shown here.</p>"
+            )
+
+        if not rows:
+            body.append("<p class=\"empty\">Nothing is published from this cluster yet.</p>")
+        else:
+            body.append("<table><thead><tr><th>Hostname</th><th>Project</th><th>Routes</th>"
+                        "<th>Record</th><th>DNS</th><th>Certificate</th></tr></thead><tbody>")
+            for row in rows:
+                row_kind, row_target = record_for(row["addresses"])
+                state, detail = status_for(row["host"], row["addresses"])
+                record = "{} &rarr; {}".format(row_kind, html.escape(row_target)) if row_target else "not published"
+                certificate = row["certificate"] or "none"
+                platform = " <span class=\"tag\">platform host</span>" if row["host"] == PLATFORM_HOST else ""
+                body.append(
+                    "<tr><td><code>{}</code>{}</td><td>{}</td><td>{}</td><td><code>{}</code></td>"
+                    "<td><span class=\"pill {}\">{}</span></td><td>{}</td></tr>".format(
+                        html.escape(row["host"]),
+                        platform,
+                        html.escape(row["namespace"]),
+                        len(row["routes"]),
+                        record,
+                        state,
+                        html.escape(detail),
+                        html.escape(certificate),
+                    )
+                )
+            body.append("</tbody></table>")
+
+        body.append(FOOTER)
+        return "".join(body)
+
+
+    HEADER = """<!doctype html>
+    <html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <title>Domain Manager</title>
+    <style>
+      body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; padding: 2rem;
+             background: #12141a; color: #e6e8ee; }
+      h1 { font-size: 1.35rem; margin: 0 0 0.5rem; font-weight: 600; }
+      .lead { color: #a5abbb; margin: 0 0 1.5rem; }
+      .empty { color: #a5abbb; }
+      table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+      th { text-align: left; font-weight: 600; color: #a5abbb; padding: 0.6rem 0.8rem;
+           border-bottom: 1px solid #2a2e3a; }
+      td { padding: 0.7rem 0.8rem; border-bottom: 1px solid #1e222c; vertical-align: top; }
+      code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.85rem; }
+      .pill { display: inline-block; padding: 0.15rem 0.55rem; border-radius: 999px; font-size: 0.8rem; }
+      .pill.ok { background: #12351f; color: #6ee7a0; }
+      .pill.missing { background: #3a2a12; color: #f0b464; }
+      .pill.wrong { background: #3a1720; color: #f08c9b; }
+      .pill.unknown { background: #23262f; color: #a5abbb; }
+      .tag { font-size: 0.72rem; color: #a5abbb; border: 1px solid #2a2e3a; border-radius: 4px;
+             padding: 0.05rem 0.35rem; margin-left: 0.4rem; }
+      footer { margin-top: 1.5rem; color: #6f7688; font-size: 0.82rem; }
+    </style>
+    </head>
+    <body>
+    <h1>Domain Manager</h1>
+    """
+
+    FOOTER = """<footer>Reload to refresh. Hostnames appear here once a workload or a Domain Route publishes them.</footer>
+    </body>
+    </html>
+    """
+
+
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            path = self.path.split("?")[0]
+            if PREFIX and path.startswith(PREFIX):
+                path = path[len(PREFIX):]
+            path = "/" + path.lstrip("/")
+            if path == "/healthz":
+                self.respond(200, "text/plain", "ok")
+                return
+            if path not in ("/", ""):
+                self.respond(404, "text/plain", "not found")
+                return
+            self.respond(200, "text/html; charset=utf-8", page())
+
+        def respond(self, status, content_type, body):
+            payload = body.encode("utf-8")
+            self.send_response(status)
+            self.send_header("Content-Type", content_type)
+            self.send_header("Content-Length", str(len(payload)))
+            self.end_headers()
+            self.wfile.write(payload)
+
+        def log_message(self, fmt, *args):
+            pass
+
+
+    if __name__ == "__main__":
+        ThreadingHTTPServer(("", PORT), Handler).serve_forever()
