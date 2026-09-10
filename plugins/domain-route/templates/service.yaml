@@ -1,0 +1,14 @@
+{{- if eq .Values.target_kind "workload" }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  selector:
+    {{ .Values.selector_label }}: "{{ .Values.target_name }}"
+  ports:
+    - port: {{ .Values.target_port }}
+      targetPort: {{ .Values.target_port }}
+      protocol: TCP
+      name: http
+{{- end }}
