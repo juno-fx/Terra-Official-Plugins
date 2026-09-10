@@ -320,9 +320,14 @@ This requires `inotifywait` (available in the devbox shell).
 
 ## Schema Changes and Existing Templates
 
-Updating a plugin updates the schema in the catalog, not the templates already authored from it. A workload template in Genesis stays on the schema version it was created with, so fields added by a plugin update do not appear on its launch form, and a workload launched from it renders the old chart.
+Updating a plugin updates the schema in the catalog, not the templates already authored from it. A workload template in Genesis stays on the schema version it was created with, so fields added by a plugin update do not appear on its launch form, and a workload launched from it renders the old chart. The refresh button on the workloads table in Genesis makes sure the cache is reading the latest workload schemas.
 
-Relaunching or recreating the workload changes nothing, because the template is the thing that is pinned. Move the template onto the new chart with the **Migrate** button on its row in Genesis, fill in the new fields, and then launch. The [Genesis workload documentation](https://docs.juno-innovations.com/Orion-Documentation/latest/genesis/workloads/#upgrade) covers the migration flow in full.
+Relaunching or recreating the workload changes nothing, because the template is the thing that is pinned. What Genesis offers on the template row depends on what changed:
+
+- a chart updated with **no new fields** shows an **Upgrade** button, which moves the template straight onto the latest chart
+- a chart that **added fields** shows a **Migrate** button, which routes to the template's edit form so the new fields can be filled in before the move
+
+The [Genesis workload documentation](https://docs.juno-innovations.com/Orion-Documentation/latest/genesis/workloads/#upgrade) covers both flows in full.
 
 This matters to plugin authors as much as operators: after shipping a new field, the symptom of an unmigrated template is indistinguishable from the field not working.
 
