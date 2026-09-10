@@ -36,17 +36,14 @@ spec:
             {{- end }}
           {{- end }}
           annotationFilter: {{ .Values.annotation_filter | quote }}
-          {{- if eq .Values.provider "aws" }}
-          extraArgs:
-            - --aws-region={{ .Values.aws_region }}
-          {{- if .Values.aws_role_arn }}
+          {{- if and (eq .Values.provider "aws") .Values.aws_role_arn }}
           serviceAccount:
             annotations:
               eks.amazonaws.com/role-arn: {{ .Values.aws_role_arn | quote }}
           {{- end }}
-          {{- end }}
-          {{- if eq .Values.provider "cloudflare" }}
+          {{- if or (eq .Values.provider "cloudflare") (and (eq .Values.provider "aws") .Values.aws_access_key_id) }}
           env:
+            {{- if eq .Values.provider "cloudflare" }}
             - name: CF_API_TOKEN
               {{- if .Values.cloudflare_secret_name }}
               valueFrom:
@@ -56,6 +53,18 @@ spec:
               {{- else }}
               value: {{ .Values.cloudflare_api_token | quote }}
               {{- end }}
+            {{- else }}
+            {{- if not .Values.aws_secret_name }}
+            {{- fail "aws_access_key_id is set but aws_secret_name is empty - create a Secret holding the secret access key in the external-dns namespace and name it here (see the plugin README)" }}
+            {{- end }}
+            - name: AWS_ACCESS_KEY_ID
+              value: {{ .Values.aws_access_key_id | quote }}
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.aws_secret_name }}
+                  key: {{ .Values.aws_secret_key }}
+            {{- end }}
           {{- end }}
           {{- if .Values.extra_values }}
           {{ .Values.extra_values | nindent 10 }}

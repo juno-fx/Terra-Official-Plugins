@@ -7,7 +7,9 @@ domain_filters: ""
 txt_owner_id: "default"
 policy: upsert-only
 aws_role_arn: ""
-aws_region: "us-east-1"
+aws_access_key_id: ""
+aws_secret_name: ""
+aws_secret_key: secret-access-key
 cloudflare_secret_name: ""
 cloudflare_secret_key: token
 cloudflare_api_token: ""

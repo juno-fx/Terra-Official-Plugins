@@ -58,10 +58,18 @@ fields:
     description: "IAM role ARN to annotate onto the ServiceAccount for IRSA (AWS provider only). Requires an OIDC-enabled cluster (EKS) with the role's trust policy configured for this ServiceAccount."
     required: false
     type: string
-  - name: aws_region
-    description: "AWS region (AWS provider only)."
+  - name: aws_access_key_id
+    description: "AWS access key id for static credentials (AWS provider only). Leave empty on EKS to use IRSA via aws_role_arn."
     required: false
-    default: "us-east-1"
+    type: string
+  - name: aws_secret_name
+    description: "Name of an existing Secret in the external-dns namespace holding the AWS secret access key. Required when aws_access_key_id is set."
+    required: false
+    type: string
+  - name: aws_secret_key
+    description: "Key inside that Secret holding the secret access key."
+    required: false
+    default: secret-access-key
     type: string
   - name: cloudflare_secret_name
     description: "Name of an existing Secret in the external-dns namespace holding the Cloudflare API token (Cloudflare provider only). Preferred over cloudflare_api_token, which is stored in plain Helm values."
