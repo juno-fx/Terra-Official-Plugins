@@ -1,0 +1,114 @@
+# ExternalDNS
+
+![ExternalDNS](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/external-dns/assets/logo.png)
+
+**Category:** Networking
+**Type:** Cluster Service
+**Tags:** `cluster-level` · `dns` · `networking`
+
+---
+
+## Overview
+
+ExternalDNS synchronizes exposed Kubernetes Services and Ingresses with external DNS providers, currently AWS Route53 and Cloudflare. Once installed, DNS records are created and kept up to date automatically based on hostnames discovered from cluster resources, instead of managing them by hand.
+
+For provider setup details, see the [ExternalDNS documentation](https://kubernetes-sigs.github.io/external-dns/).
+
+---
+
+## How It Works
+
+**Cluster Service** - Installed once per cluster by an administrator, as an ArgoCD `Application` delegating to the upstream `external-dns` Helm chart. Once active, ExternalDNS watches the configured `sources` (Services, Ingresses, etc.) across the cluster and manages matching DNS records in the configured provider.
+
+This plugin locks ExternalDNS down to **opt-in only**, see [Opting an Ingress In](#opting-an-ingress-in-required) below. Nothing gets a DNS record unless it's explicitly annotated.
+
+---
+
+## Prerequisites
+
+- An account/zone with the target DNS provider (a Route53 hosted zone, or a Cloudflare zone)
+- For AWS with IRSA: an OIDC-enabled cluster (EKS) and an IAM role trust policy configured for the `external-dns` ServiceAccount. Vanilla k3s/kubeadm clusters without OIDC federation use static credentials through `aws_access_key_id` and `aws_secret_name` instead
+- For Cloudflare: an API token with `Zone:Read` and `DNS:Edit` permissions
+
+---
+
+## Installation
+
+1. Open **Terra** and navigate to the **Plugin Marketplace**
+2. Search for **"ExternalDNS"**
+3. Click **Install**
+4. Fill in the configuration fields below
+5. Click **Confirm** to deploy
+
+---
+
+## Configuration
+
+### Install-Time Fields
+
+| Field | Details |
+|-------|---------|
+| `chart_version` | **string** · Required · Default: `1.21.1`<br>The external-dns Helm chart version to install |
+| `provider` | **select** · Required · Default: `aws`<br>DNS provider to sync records to. Options: `aws`, `cloudflare` |
+| `sources` | **multi** · Required · Default: `service, ingress`<br>Kubernetes resource types to watch for hostnames. Options: `service`, `ingress`, `gateway-httproute`, `gateway-grpcroute`, `istio-gateway`, `istio-virtualservice`, `node` |
+| `domain_filters` | **string** · Optional<br>Comma-separated list of domains to manage (e.g. `example.com,example.org`). Leave empty to manage every zone visible to the provider |
+| `txt_owner_id` | **string** · Required · Default: `default`<br>Unique identifier written into TXT registry records, must be unique per external-dns instance sharing the same zones |
+| `policy` | **select** · Required · Default: `upsert-only`<br>`upsert-only` never deletes DNS records when the backing resource is removed; `sync` also deletes them |
+| `aws_role_arn` | **string** · Optional<br>IAM role ARN annotated onto the ServiceAccount for IRSA (AWS provider only) |
+| `aws_access_key_id` | **string** · Optional<br>Static AWS access key id. Leave empty on EKS and use `aws_role_arn` |
+| `aws_secret_name` | **string** · Optional<br>Existing Secret in the `external-dns` namespace holding the secret access key. Required when `aws_access_key_id` is set |
+| `aws_secret_key` | **string** · Optional · Default: `secret-access-key`<br>Key inside that Secret |
+| `cloudflare_secret_name` | **string** · Optional<br>Existing Secret in the `external-dns` namespace holding the Cloudflare API token. Preferred over `cloudflare_api_token` |
+| `cloudflare_secret_key` | **string** · Optional · Default: `token`<br>Key inside that Secret |
+| `cloudflare_api_token` | **string** · Optional<br>Cloudflare API token with `Zone:Read` and `DNS:Edit` permissions. Only used when `cloudflare_secret_name` is empty |
+| `annotation_filter` | **string** · Required · Default: `external-dns.alpha.kubernetes.io/enable=true`<br>Only resources carrying this annotation are considered. See [Opting an Ingress In](#opting-an-ingress-in-required) |
+| `extra_values` | **string** · Optional<br>Additional raw Helm values (YAML) merged into the chart, use for anything not covered above (e.g. Cloudflare `zone_id_filter`/`proxied`, legacy API key+email auth) |
+
+---
+
+## Opting an Ingress In (Required)
+
+This plugin ships `annotation_filter` set to `external-dns.alpha.kubernetes.io/enable=true`. ExternalDNS will **ignore every Ingress/Service by default**, even if its host matches `domain_filters`, unless it carries this exact annotation:
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    external-dns.alpha.kubernetes.io/enable: "true"
+spec:
+  rules:
+    - host: myapp.example.com
+      ...
+```
+
+Without this annotation, no DNS record gets created, no matter what else is configured. This is intentional, it prevents every Ingress in the cluster from silently getting a public DNS record the moment this plugin is installed.
+
+Workload templates that publish a custom hostname set this annotation for you when `publish_dns` is enabled, so nothing extra is needed for those.
+
+---
+
+## Notes
+
+- Ingresses/Services need `external-dns.alpha.kubernetes.io/enable: "true"` set to get picked up at all, see [Opting an Ingress In](#opting-an-ingress-in-required) above. Widen `annotation_filter` only if you want every matching host in the cluster to get a record
+- `policy: sync` will delete DNS records when their backing Service/Ingress is removed, only enable this once you trust the setup, `upsert-only` is the safer default
+- `txt_owner_id` must be unique if you run more than one ExternalDNS instance against the same DNS zone, otherwise the two instances will fight over ownership of the same records
+- IRSA (`aws_role_arn`) only works on clusters with an IAM OIDC provider configured (standard on EKS). On clusters without OIDC federation, use static credentials: the access key id goes in `aws_access_key_id` and the secret access key comes from a Secret, never from plain values:
+
+    ```bash
+    kubectl create secret generic aws-dns-credentials \
+      --namespace external-dns \
+      --from-literal=secret-access-key=<your secret access key>
+    ```
+
+- Route53 is a global service, so no region is configured anywhere in this plugin
+- `cloudflare_api_token` is injected as a plain env var value on the ExternalDNS container and is visible in the ArgoCD Application spec. Create the Secret yourself and point `cloudflare_secret_name` at it for anything production:
+
+    ```bash
+    kubectl create secret generic cloudflare-api-token \
+      --namespace external-dns \
+      --from-literal=token=<your token>
+    ```
+
+- On a cluster running the Gateway API, add `gateway-httproute` to `sources`. Routes created as HTTPRoutes are invisible to ExternalDNS otherwise, and the upstream chart grants the matching RBAC on `gateways` and `httproutes` automatically once that source is selected
+- `extra_values` is merged in as raw Helm values alongside the structured fields above, see the [chart's values.yaml](https://github.com/kubernetes-sigs/external-dns/blob/master/charts/external-dns/values.yaml) for the full set of options it accepts

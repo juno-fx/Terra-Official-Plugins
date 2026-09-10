@@ -1,0 +1,95 @@
+resource_id: external-dns
+name: ExternalDNS
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/external-dns/assets/logo.png
+description: Synchronizes exposed Kubernetes Services and Ingresses with external DNS providers (AWS Route53, Cloudflare). https://github.com/kubernetes-sigs/external-dns
+category: Networking
+tags:
+  - cluster-level
+  - dns
+  - networking
+editable: true
+fields:
+  - name: chart_version
+    description: Version of the external-dns chart to install.
+    required: true
+    default: "1.21.1"
+    type: string
+  - name: provider
+    description: "DNS provider to sync records to."
+    required: true
+    default: aws
+    type: select
+    options:
+      - aws
+      - cloudflare
+  - name: sources
+    description: "Kubernetes resource types to watch for DNS record hostnames."
+    required: true
+    default:
+      - service
+      - ingress
+    type: multi
+    options:
+      - service
+      - ingress
+      - gateway-httproute
+      - gateway-grpcroute
+      - istio-gateway
+      - istio-virtualservice
+      - node
+  - name: domain_filters
+    description: "Comma-separated list of domains to manage (e.g. example.com,example.org). Leave empty to manage all zones visible to the provider."
+    required: false
+    type: string
+  - name: txt_owner_id
+    description: "Unique identifier written into the TXT registry records. Must be unique per external-dns instance sharing the same zones, to prevent two instances from fighting over the same records."
+    required: true
+    default: "default"
+    type: string
+  - name: policy
+    description: "upsert-only never deletes DNS records when the backing Service/Ingress is removed. sync also deletes them, only use once you trust the setup."
+    required: true
+    default: upsert-only
+    type: select
+    options:
+      - upsert-only
+      - sync
+  - name: aws_role_arn
+    description: "IAM role ARN to annotate onto the ServiceAccount for IRSA (AWS provider only). Requires an OIDC-enabled cluster (EKS) with the role's trust policy configured for this ServiceAccount."
+    required: false
+    type: string
+  - name: aws_access_key_id
+    description: "AWS access key id for static credentials (AWS provider only). Leave empty on EKS to use IRSA via aws_role_arn."
+    required: false
+    type: string
+  - name: aws_secret_name
+    description: "Name of an existing Secret in the external-dns namespace holding the AWS secret access key. Required when aws_access_key_id is set."
+    required: false
+    type: string
+  - name: aws_secret_key
+    description: "Key inside that Secret holding the secret access key."
+    required: false
+    default: secret-access-key
+    type: string
+  - name: cloudflare_secret_name
+    description: "Name of an existing Secret in the external-dns namespace holding the Cloudflare API token (Cloudflare provider only). Preferred over cloudflare_api_token, which is stored in plain Helm values."
+    required: false
+    type: string
+  - name: cloudflare_secret_key
+    description: "Key inside that Secret holding the token."
+    required: false
+    default: token
+    type: string
+  - name: cloudflare_api_token
+    description: "Cloudflare API token with Zone:Read and DNS:Edit permissions (Cloudflare provider only). Only used when cloudflare_secret_name is empty."
+    required: false
+    type: string
+  - name: annotation_filter
+    description: "Only resources carrying this annotation are considered. The default makes DNS opt-in per workload, which is what the workload templates set when a custom hostname is published."
+    required: true
+    default: "external-dns.alpha.kubernetes.io/enable=true"
+    type: string
+  - name: extra_values
+    description: "Additional raw Helm values (YAML) merged into the chart, use this for anything not covered above (e.g. Cloudflare zone_id_filter/proxied, legacy API key+email auth)."
+    required: false
+    type: string
