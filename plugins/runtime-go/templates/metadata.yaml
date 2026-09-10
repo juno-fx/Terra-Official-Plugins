@@ -67,7 +67,7 @@ data:
         - clusterip
         - nodeport
     - name: domain
-      description: "Domain the application is published under when network_mode is ingress-noauth. The workload is served at <workload name>.<domain>, so every instance launched from this template gets its own hostname"
+      description: "Domain the application is published under when network_mode is ingress-noauth. The workload is served at <workload name>.<domain>. Needs the Certificate Manager and Certificate Issuer plugins for TLS, and the ExternalDNS plugin or a wildcard DNS record"
       type: string
       required: false
     - name: tls_issuer

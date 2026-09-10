@@ -99,14 +99,13 @@ The example is a minimal socket HTTP server that reads `PREFIX` and listens on p
 
 ## Serving on Your Own Domain
 
-With `network_mode` set to `ingress-noauth`, setting `domain` publishes the application at `<workload name>.<domain>`, served from the root of that host rather than under a path on the platform host. `PREFIX` becomes `/`, so an application that reads it serves its own links correctly.
+With `network_mode` set to `ingress-noauth`, setting `domain` publishes the application at `<workload name>.<domain>`, served from the root of that host. `PREFIX` becomes `/`, so an application that reads it serves its own links correctly, and the platform path route is not rendered, since the application can no longer serve it once its base path moves.
 
-The hostname is derived rather than typed, so instances launched from the same template never collide: each workload has its own name and therefore its own hostname. Naming the workload at launch is how you pick the address, for example `my-app.domain.com` alongside `my-app-dev.domain.com`.
+The hostname is derived from the workload name, and end users can pass a custom workload name from the Hubble frontend, which is how an address like `my-app.domain.com` is chosen alongside `my-app-dev.domain.com`. Derived does not mean collision proof: two workloads launched with the same name and the same domain, for example from different projects, would claim the same hostname, and the second route will fail. Keep names unique per domain.
 
-The `ingress-noauth` requirement is not arbitrary. The platform session cookie is scoped to the Orion host and is never sent to another domain, so the Hubble gate cannot protect a custom domain. Rather than publish an unprotected route from a mode that claims to be authenticated, a domain set under `ingress-auth` changes nothing.
+This needs the Certificate Manager and Certificate Issuer plugins for TLS, and either the ExternalDNS plugin with `publish_dns` enabled or a wildcard DNS record for `*.<domain>` pointing at the cluster ingress address. The Domain Manager page shows the record to add and whether it currently resolves.
 
-A single wildcard record for `*.<domain>` pointing at the cluster ingress address covers every workload at once, or set `publish_dns` and let the ExternalDNS plugin create each hostname's record. The Domain Manager page shows the record to add and whether it currently resolves.
-
+A domain only takes effect under `ingress-noauth`. The reasoning, which applies to every plugin that publishes a custom domain, is covered in [Custom Domains](../../docs/custom-domains.md).
 ---
 
 ## Notes

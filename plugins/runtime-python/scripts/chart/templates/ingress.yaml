@@ -21,7 +21,7 @@ spec:
                   number: {{ .Values.port }}
 {{- end }}
 
-{{- if eq .Values.network_mode "ingress-noauth" }}
+{{- if and (eq .Values.network_mode "ingress-noauth") (not .Values.domain) }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
