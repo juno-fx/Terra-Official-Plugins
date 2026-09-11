@@ -1,0 +1,142 @@
+resource_id: vcluster-juno
+name: vCluster Juno
+icon: https://raw.githubusercontent.com/loft-sh/vcluster/main/docs/static/media/vcluster-logo-dark.svg
+description: |
+  Deploy a fully isolated virtual cluster (vCluster) with a complete Juno
+  deployment running inside it. Each install creates its own Kubernetes
+  control plane with ArgoCD and the full Juno stack (Genesis, Titan, Terra,
+  Metrics Gatherer, Rhea), giving true multi-tenancy with full isolation of
+  namespaces, CRDs, and RBAC while sharing the host cluster's nodes. The
+  vCluster control plane runs inside your project namespace.
+
+  Requires: an ingress controller on the host cluster and DNS for the Juno
+  hostname pointing at it. Exposing the vCluster API via ingress additionally
+  requires ssl-passthrough to be enabled on the ingress controller.
+category: Infrastructure
+tags:
+  - vcluster
+  - multi-tenancy
+  - isolation
+  - sub-cluster
+editable: true
+fields:
+  - name: juno_hostname
+    description: |
+      DNS hostname for the Juno web UI running inside the virtual cluster
+      (e.g. juno-tenant1.example.com). DNS must resolve to the host cluster's
+      ingress controller BEFORE installation.
+    required: true
+    type: string
+  - name: vcluster_hostname
+    description: |
+      Optional DNS hostname to expose the virtual cluster's Kubernetes API
+      via the host ingress controller (e.g. vcluster-tenant1.example.com).
+      Requires ssl-passthrough support on the ingress controller. Leave empty
+      to keep the API internal to the host cluster.
+    required: false
+    type: string
+  - name: auth_type
+    description: Authentication method for the Juno deployment inside the vCluster.
+    required: true
+    type: select
+    options:
+      - basic
+      - google
+      - cognito
+      - ldap
+  - name: titan_owner
+    description: Initial admin username (owner) for the Juno deployment.
+    required: true
+    type: string
+  - name: titan_uid
+    description: POSIX UID of the owner.
+    required: false
+    type: int
+    default: 1000
+  - name: titan_email
+    description: Email address of the owner.
+    required: true
+    type: string
+  - name: basic_auth_email
+    description: Basic auth email (required if auth_type=basic).
+    required: false
+    type: string
+  - name: basic_auth_password
+    description: Basic auth password (required if auth_type=basic).
+    required: false
+    type: string
+  - name: google_client_id
+    description: Google OAuth client ID (required if auth_type=google).
+    required: false
+    type: string
+  - name: google_client_secret
+    description: Google OAuth client secret (required if auth_type=google).
+    required: false
+    type: string
+  - name: cognito_client_id
+    description: AWS Cognito client ID (required if auth_type=cognito).
+    required: false
+    type: string
+  - name: cognito_client_secret
+    description: AWS Cognito client secret (required if auth_type=cognito).
+    required: false
+    type: string
+  - name: cognito_issuer
+    description: AWS Cognito issuer URL (required if auth_type=cognito).
+    required: false
+    type: string
+  - name: ldap_uri
+    description: LDAP server URI (required if auth_type=ldap).
+    required: false
+    type: string
+  - name: ldap_bind_dn
+    description: LDAP bind DN (required if auth_type=ldap).
+    required: false
+    type: string
+  - name: ldap_bind_password
+    description: LDAP bind password (required if auth_type=ldap).
+    required: false
+    type: string
+  - name: ldap_search_base
+    description: LDAP search base DN (required if auth_type=ldap).
+    required: false
+    type: string
+  - name: sync_host_nodes
+    description: |
+      Pass the host cluster's real nodes through to the virtual cluster.
+      When false (default), the vCluster schedules onto a single virtual node.
+      When true, all host nodes and their labels are visible inside the vCluster.
+    required: false
+    type: boolean
+    default: false
+  - name: label_nodes
+    description: |
+      Label all nodes inside the virtual cluster with
+      juno-innovations.com/service=true and juno-innovations.com/workstation=true
+      so the Juno services and workloads can schedule. Disable only if you
+      manage node labels inside the vCluster yourself.
+    required: false
+    type: boolean
+    default: true
+  - name: k8s_version
+    description: Kubernetes version for the virtual cluster control plane.
+    required: false
+    type: string
+    default: "v1.31.0"
+  - name: vcluster_chart_version
+    description: vCluster Helm chart version (https://charts.loft.sh).
+    required: false
+    type: string
+    default: "0.35.1"
+  - name: argocd_version
+    description: |
+      ArgoCD version to install inside the virtual cluster. Use "stable" or a
+      release tag (e.g. v3.4.4).
+    required: false
+    type: string
+    default: "stable"
+  - name: genesis_chart_version
+    description: Genesis-Deployment chart revision (branch or tag) to deploy inside the virtual cluster.
+    required: false
+    type: string
+    default: "main"

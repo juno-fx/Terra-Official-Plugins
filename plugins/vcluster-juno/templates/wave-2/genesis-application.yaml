@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-genesis-application
+  labels:
+    {{- include "vcluster-juno.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+data:
+  genesis-application.yaml: |
+    apiVersion: argoproj.io/v1alpha1
+    kind: Application
+    metadata:
+      # Genesis introspects its own ArgoCD Application by this exact name
+      # (Juno-Bootstrap convention) — do not rename.
+      name: genesis
+      namespace: argocd
+      labels:
+        {{- include "vcluster-juno.labels" . | nindent 8 }}
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: default
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: argocd
+      # Genesis introspects spec.sources (plural) — keep the multi-source form.
+      sources:
+        - repoURL: {{ .Values.genesis_chart_repo }}
+          path: .
+          targetRevision: {{ .Values.genesis_chart_version | quote }}
+          helm:
+            releaseName: genesis
+            values: |
+              host: {{ .Values.juno_hostname | quote }}
+              ingressClassName: nginx
+              titan:
+                owner: {{ .Values.titan_owner | quote }}
+                uid: {{ .Values.titan_uid }}
+                email: {{ .Values.titan_email | quote }}
+              env:
+                {{- include "vcluster-juno.authEnv" . | trim | nindent 16 }}
+            parameters:
+              - name: "env.NEXTAUTH_URL"
+                value: "https://{{ .Values.juno_hostname }}/api/auth"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true

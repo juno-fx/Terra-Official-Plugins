@@ -1,0 +1,36 @@
+# === Hostnames ===
+juno_hostname:
+vcluster_hostname: ""
+
+# === Juno auth ===
+auth_type: basic
+titan_owner:
+titan_uid: 1000
+titan_email:
+basic_auth_email: ""
+basic_auth_password: ""
+google_client_id: ""
+google_client_secret: ""
+cognito_client_id: ""
+cognito_client_secret: ""
+cognito_issuer: ""
+ldap_uri: ""
+ldap_bind_dn: ""
+ldap_bind_password: ""
+ldap_search_base: ""
+
+# === vCluster behavior ===
+sync_host_nodes: false
+label_nodes: true
+
+# === Versions ===
+k8s_version: "v1.31.0"
+vcluster_chart_version: "0.35.1"
+argocd_version: "stable"
+genesis_chart_version: "main"
+genesis_chart_repo: "https://github.com/juno-fx/Genesis-Deployment.git"
+vcluster_chart_repo: "https://charts.loft.sh"
+
+# This will be autopopulated by Terra in airgapped envs. The default here will be overriden on Terra versions > v1.0.4
+_juno_terra_image_pull_secrets: []
+_juno_terra_image: "junoinnovations/terra@sha256:7a39b5cee9772db6eed0f1d37b22a46a9f18e6a917cf3fa9f4316bb312a4be5a"
