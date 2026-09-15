@@ -16,7 +16,7 @@ fields:
     default: letsencrypt-prod
     type: string
   - name: email
-    description: Contact address registered with the ACME account. Expiry warnings are sent here.
+    description: Contact address registered with the ACME account, used by Let's Encrypt for account and policy notices. It no longer sends expiry warnings, cert-manager renews automatically.
     required: true
     type: string
   - name: acme_server

@@ -53,7 +53,7 @@ Two challenge types are supported:
 | Field | Details |
 |-------|---------|
 | `issuer_name` | **string** · Required · Default: `letsencrypt-prod`<br>Name of the ClusterIssuer. This is the value workloads put in their `tls_issuer` field |
-| `email` | **string** · Required<br>Contact address registered with the ACME account, used for expiry warnings |
+| `email` | **string** · Required<br>Contact address registered with the ACME account, used for account and policy notices. Let's Encrypt stopped sending expiry warnings in June 2025, so renewal relies on cert-manager |
 | `acme_server` | **select** · Required · Default: production<br>Let's Encrypt production or staging directory |
 | `solver` | **select** · Required · Default: `http01`<br>`http01` or `dns01` |
 | `ingress_class` | **string** · Optional · Default: `nginx`<br>Ingress class used to serve the HTTP-01 challenge |
