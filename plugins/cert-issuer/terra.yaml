@@ -48,34 +48,15 @@ fields:
     options:
       - cloudflare
       - route53
-  - name: dns_secret_name
-    description: Name of an existing Secret in the cert-manager namespace holding the provider credential. Leave empty to have this plugin create one from dns_token.
+  - name: secret_name
+    description: Name of the Secret holding the DNS provider credential. It must be in the namespace cert-manager runs in, since a ClusterIssuer can only read Secrets from there. Required for Cloudflare. For Route53, leave empty to use ambient credentials such as IRSA.
     required: false
     type: string
-  - name: dns_secret_key
-    description: Key inside that Secret holding the credential.
+  - name: secret_key
+    description: Key inside that Secret holding the Cloudflare API token. Route53 reads the fixed keys aws_access_key_id and aws_secret_access_key from the same Secret, so this is only used for Cloudflare.
     required: false
-    default: token
-    type: string
-  - name: dns_token
-    description: Cloudflare API token, or AWS secret access key. Only used when dns_secret_name is empty. Until Terra has a secret field type this value is stored in the plugin's Helm values, so prefer dns_secret_name in production.
-    required: false
-    type: string
-  - name: aws_region
-    description: AWS region for the route53 provider.
-    required: false
-    default: us-east-1
     type: string
   - name: aws_hosted_zone_id
     description: Route53 hosted zone id. Leave empty to let cert-manager discover the zone.
     required: false
-    type: string
-  - name: aws_access_key_id
-    description: AWS access key id for the route53 provider. Leave empty on EKS to use the node or IRSA credentials.
-    required: false
-    type: string
-  - name: cert_manager_namespace
-    description: Namespace cert-manager runs in. Challenge credentials are read from this namespace.
-    required: true
-    default: cert-manager
     type: string

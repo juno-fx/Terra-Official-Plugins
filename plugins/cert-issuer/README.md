@@ -31,17 +31,18 @@ Two challenge types are supported:
 
 - The Certificate Manager plugin installed and healthy
 - For HTTP-01, a hostname already resolving to the cluster ingress address
-- For DNS-01, an API token for Cloudflare, or an access key or IRSA role for Route53
+- For DNS-01, a credential Secret in the cert-manager namespace, see [Credentials](#credentials), or IRSA for Route53
 
 ---
 
 ## Installation
 
-1. Open **Terra** and navigate to the **Plugin Marketplace**
-2. Search for **"Certificate Issuer"**
-3. Click **Install**
-4. Fill in the configuration fields below
-5. Click **Confirm** to deploy
+1. For DNS-01, create the credential Secret first, see [Credentials](#credentials)
+2. Open **Terra** and navigate to the **Plugin Marketplace**
+3. Search for **"Certificate Issuer"**
+4. Click **Install**
+5. Fill in the configuration fields below
+6. Click **Confirm** to deploy
 
 ---
 
@@ -57,29 +58,48 @@ Two challenge types are supported:
 | `solver` | **select** · Required · Default: `http01`<br>`http01` or `dns01` |
 | `ingress_class` | **string** · Optional · Default: `nginx`<br>Ingress class used to serve the HTTP-01 challenge |
 | `dns_provider` | **select** · Optional · Default: `cloudflare`<br>`cloudflare` or `route53`, used only with `dns01` |
-| `dns_secret_name` | **string** · Optional<br>Existing Secret in the cert-manager namespace holding the credential. Leave empty to have the plugin create one from `dns_token` |
-| `dns_secret_key` | **string** · Optional · Default: `token`<br>Key inside that Secret |
-| `dns_token` | **string** · Optional<br>Cloudflare API token or AWS secret access key, used only when `dns_secret_name` is empty |
-| `aws_region` | **string** · Optional · Default: `us-east-1`<br>Region for the route53 provider |
+| `secret_name` | **string** · Optional<br>Name of the credential Secret in the cert-manager namespace. Required for Cloudflare. For Route53, leave empty to use ambient credentials such as IRSA |
+| `secret_key` | **string** · Optional<br>Key holding the Cloudflare API token. Route53 reads fixed key names, see [Credentials](#credentials) |
 | `aws_hosted_zone_id` | **string** · Optional<br>Route53 hosted zone id. Leave empty to let cert-manager discover the zone |
-| `aws_access_key_id` | **string** · Optional<br>Access key id for route53. Leave empty on EKS to use IRSA or node credentials |
-| `cert_manager_namespace` | **string** · Required · Default: `cert-manager`<br>Namespace cert-manager runs in, where challenge credentials are read from |
 
 ---
 
 ## Credentials
 
-`dns_token` is written into the plugin's Helm values, which means it is visible in the ArgoCD Application spec. Terra has no secret field type yet, so for anything holding a production DNS credential, create the Secret out of band and reference it with `dns_secret_name` instead:
+The plugin never takes a credential as a form value. For DNS-01 you create a Secret, then point the plugin at it with `secret_name` and `secret_key`.
+
+The Secret must live in the namespace cert-manager runs in, `cert-manager` when installed from Terra. A ClusterIssuer's Secret references carry no namespace: cert-manager always reads them from its own namespace, so a Secret created anywhere else is never found and the plugin has no namespace field to set.
+
+### Cloudflare
+
+Store the API token under a single key:
 
 ```bash
 kubectl create secret generic cloudflare-api-token \
   --namespace cert-manager \
-  --from-literal=token=<your token>
+  --from-literal=api-token=YOUR_TOKEN
 ```
 
-The Cloudflare token needs `Zone:Read` and `DNS:Edit` on the zones being certified. Nothing else.
+Then set `secret_name` to `cloudflare-api-token` and `secret_key` to `api-token`. The token needs `Zone:Read` and `DNS:Edit` on the zones being certified, nothing else.
 
-cert-manager does not share credentials with the ExternalDNS plugin even when both talk to the same provider, so each holds its own token.
+### Route53
+
+cert-manager needs the access key id and the secret access key as two separate values, so the Secret holds both under these fixed key names:
+
+```bash
+kubectl create secret generic aws-dns-credentials \
+  --namespace cert-manager \
+  --from-literal=aws_access_key_id=YOUR_ACCESS_KEY \
+  --from-literal=aws_secret_access_key=YOUR_SECRET_KEY
+```
+
+Then set `secret_name` to `aws-dns-credentials`. `secret_key` is not used for Route53.
+
+On EKS with IRSA, leave `secret_name` empty and cert-manager uses the role attached to its own ServiceAccount.
+
+The IAM identity needs `route53:GetChange`, `route53:ChangeResourceRecordSets` and `route53:ListResourceRecordSets` on the zone, plus `route53:ListHostedZonesByName` when `aws_hosted_zone_id` is left empty.
+
+cert-manager does not share credentials with the ExternalDNS plugin even when both talk to the same provider, so each holds its own Secret in its own namespace.
 
 ---
 
@@ -108,3 +128,5 @@ cert-manager runs the challenge, writes the certificate into `app-tls`, and rene
 - Wildcard certificates require `dns01`. HTTP-01 has no way to prove ownership of every name under a domain
 - The issuer is cluster wide, so one install serves every project and every workload
 - Changing `issuer_name` after workloads reference it leaves those workloads pointing at an issuer that no longer exists. Keep the name stable
+- Route53 has no regional endpoints, but the AWS SDK still wants a region to sign requests, so the issuer sets `us-east-1`. cert-manager ignores it on EKS with IRSA, where the pod identity webhook provides the region
+- Choosing Cloudflare without naming a Secret and key stops the install with a message saying what to set, rather than deploying an issuer that can never become ready
