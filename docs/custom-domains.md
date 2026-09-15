@@ -24,16 +24,16 @@ With `domain` empty, the chart renders exactly what it rendered before the field
 
 ## What the Chart Does
 
-When a domain is set, three things change together.
+When a domain is set, the chart's existing Ingress changes shape rather than a second one being added. There is one routing object per workload, and switching a workload into domain mode updates it in place.
 
-**A second Ingress is rendered** for `<name>.<domain>`, serving `/`, with a `tls` block and the cert-manager annotation when an issuer is named, and the ExternalDNS annotations when `publish_dns` is on. No ingress class is set, so the route follows the cluster default:
+**The Ingress moves to the domain.** The same object, in the same `ingress.yaml`, serves `<name>.<domain>` at `/`, gains a `tls` block and the cert-manager annotation when an issuer is named, and the ExternalDNS annotation when `publish_dns` is on. No ingress class is set, so the route follows the cluster default. With no domain it renders exactly as it always did:
 
 ```yaml
-{{- if .Values.domain }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Values.name }}-domain-ingress
+  name: {{ .Values.name }}-ingress
+  {{- if .Values.domain }}
   {{- if or .Values.tls_issuer .Values.publish_dns }}
   annotations:
     {{- if .Values.tls_issuer }}
@@ -43,22 +43,29 @@ metadata:
     external-dns.alpha.kubernetes.io/enable: "true"
     {{- end }}
   {{- end }}
+  {{- else }}
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/auth-url: "..."
+  {{- end }}
 spec:
-  {{- if .Values.tls_issuer }}
+  {{- if and .Values.domain .Values.tls_issuer }}
   tls:
     - hosts:
         - {{ .Values.name }}.{{ .Values.domain }}
       secretName: {{ .Values.name }}-tls
   {{- end }}
   rules:
-    - host: {{ .Values.name }}.{{ .Values.domain }}
-      ...
-{{- end }}
+    - host: {{ if .Values.domain }}{{ .Values.name }}.{{ .Values.domain }}{{ else }}{{ .Values.host }}{{ end }}
+      http:
+        paths:
+          - path: {{ if .Values.domain }}"/"{{ else }}"/{{ .Release.Namespace }}/<prefix>/{{ .Values.name }}/"{{ end }}
+            ...
 ```
 
 **The application is told it now lives at the root.** An application can only serve one base path at a time, so this is not optional. Whatever the chart uses to communicate the prefix has to switch to `/`: `PREFIX` for the runtime templates, `N8N_PATH` and `WEBHOOK_URL` for n8n. Any sidecar that rewrites the prefix has to serve the root instead.
 
-**The platform path is retired.** Once the application serves the root, the old prefix cannot serve it correctly. n8n stops rendering the platform Ingress in domain mode, so Hubble lists the domain endpoint instead. Do not reach for a controller-specific redirect annotation here, since the catalog is moving off a hardcoded ingress class.
+**The platform path goes away.** Because the one Ingress now points at the domain, the old prefix is no longer routed, which is correct: once the application serves the root it could not answer on the prefix anyway. Hubble lists the domain endpoint instead. Do not reach for a controller-specific redirect annotation to keep the old path alive, since the catalog is moving off a hardcoded ingress class.
 
 ---
 
@@ -120,8 +127,8 @@ Two ways to run this, and they are not exclusive.
 ## Adding This to a Plugin
 
 1. Add `domain`, `tls_issuer` and `publish_dns` to `scripts/chart/values.yaml` and to `templates/metadata.yaml`
-2. Add `templates/domain-ingress.yaml` serving `<name>.<domain>`, guarded on `domain` and on whatever makes the exposure explicit for that workload
+2. Extend the existing `ingress.yaml` with `if` blocks so the one Ingress serves `<name>.<domain>` when a domain is set, guarded on whatever makes the exposure explicit for that workload
 3. Switch the base path the application is given, and the sidecar configuration if there is one
-4. Decide what happens to the platform path route, which cannot serve the application once its base path moves. n8n stops rendering it
+4. Keep one Ingress object per workload rather than adding a second file, so switching modes updates it in place
 5. Diff `helm template` with default values against the previous revision. It must be identical
 6. Run `make package <plugin>` and document the fields in the plugin README
