@@ -12,7 +12,7 @@ spec:
   project: default
   destination:
     server: https://kubernetes.default.svc
-    namespace: external-dns
+    namespace: {{ .Values.secret_namespace | default "external-dns" }}
   sources:
     - repoURL: https://kubernetes-sigs.github.io/external-dns/
       chart: external-dns
@@ -36,34 +36,41 @@ spec:
             {{- end }}
           {{- end }}
           annotationFilter: {{ .Values.annotation_filter | quote }}
-          {{- if and (eq .Values.provider "aws") .Values.aws_role_arn }}
+          {{- if and .Values.secret_name (not .Values.secret_key) }}
+          {{- fail "secret_name is set but secret_key is empty - name the key inside the Secret that holds the credential (see the plugin README)" }}
+          {{- end }}
+          {{- if eq .Values.provider "cloudflare" }}
+          {{- if not .Values.secret_name }}
+          {{- fail "the cloudflare provider needs an API token - create a Secret holding it and set secret_namespace, secret_name and secret_key (see the plugin README)" }}
+          {{- end }}
+          env:
+            - name: CF_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secret_name }}
+                  key: {{ .Values.secret_key }}
+          {{- else if .Values.aws_role_arn }}
           serviceAccount:
             annotations:
               eks.amazonaws.com/role-arn: {{ .Values.aws_role_arn | quote }}
-          {{- end }}
-          {{- if or (eq .Values.provider "cloudflare") (and (eq .Values.provider "aws") .Values.aws_access_key_id) }}
+          {{- else }}
           env:
-            {{- if eq .Values.provider "cloudflare" }}
-            - name: CF_API_TOKEN
-              {{- if .Values.cloudflare_secret_name }}
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.cloudflare_secret_name }}
-                  key: {{ .Values.cloudflare_secret_key }}
-              {{- else }}
-              value: {{ .Values.cloudflare_api_token | quote }}
-              {{- end }}
-            {{- else }}
-            {{- if not .Values.aws_secret_name }}
-            {{- fail "aws_access_key_id is set but aws_secret_name is empty - create a Secret holding the secret access key in the external-dns namespace and name it here (see the plugin README)" }}
-            {{- end }}
-            - name: AWS_ACCESS_KEY_ID
-              value: {{ .Values.aws_access_key_id | quote }}
-            - name: AWS_SECRET_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.aws_secret_name }}
-                  key: {{ .Values.aws_secret_key }}
+            - name: AWS_DEFAULT_REGION
+              value: us-east-1
+            {{- if .Values.secret_name }}
+            - name: AWS_SHARED_CREDENTIALS_FILE
+              value: /etc/aws/credentials
+          extraVolumes:
+            - name: aws-credentials
+              secret:
+                secretName: {{ .Values.secret_name }}
+                items:
+                  - key: {{ .Values.secret_key }}
+                    path: credentials
+          extraVolumeMounts:
+            - name: aws-credentials
+              mountPath: /etc/aws
+              readOnly: true
             {{- end }}
           {{- end }}
           {{- if .Values.extra_values }}

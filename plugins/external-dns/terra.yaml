@@ -55,33 +55,20 @@ fields:
       - upsert-only
       - sync
   - name: aws_role_arn
-    description: "IAM role ARN to annotate onto the ServiceAccount for IRSA (AWS provider only). Requires an OIDC-enabled cluster (EKS) with the role's trust policy configured for this ServiceAccount."
+    description: "IAM role ARN to annotate onto the ServiceAccount for IRSA (AWS provider only). When set, the secret fields are ignored. Requires an OIDC-enabled cluster (EKS) with the role's trust policy configured for this ServiceAccount."
     required: false
     type: string
-  - name: aws_access_key_id
-    description: "AWS access key id for static credentials (AWS provider only). Leave empty on EKS to use IRSA via aws_role_arn."
+  - name: secret_namespace
+    description: "Namespace external-dns is installed into, and where the credential Secret must exist, since a pod can only read Secrets from its own namespace. Defaults to external-dns."
+    required: false
+    default: external-dns
+    type: string
+  - name: secret_name
+    description: "Name of the Secret holding the provider credential. Required for Cloudflare. For AWS, leave empty when using aws_role_arn or node credentials."
     required: false
     type: string
-  - name: aws_secret_name
-    description: "Name of an existing Secret in the external-dns namespace holding the AWS secret access key. Required when aws_access_key_id is set."
-    required: false
-    type: string
-  - name: aws_secret_key
-    description: "Key inside that Secret holding the secret access key."
-    required: false
-    default: secret-access-key
-    type: string
-  - name: cloudflare_secret_name
-    description: "Name of an existing Secret in the external-dns namespace holding the Cloudflare API token (Cloudflare provider only). Preferred over cloudflare_api_token, which is stored in plain Helm values."
-    required: false
-    type: string
-  - name: cloudflare_secret_key
-    description: "Key inside that Secret holding the token."
-    required: false
-    default: token
-    type: string
-  - name: cloudflare_api_token
-    description: "Cloudflare API token with Zone:Read and DNS:Edit permissions (Cloudflare provider only). Only used when cloudflare_secret_name is empty."
+  - name: secret_key
+    description: "Key inside that Secret. For Cloudflare it holds the API token, for AWS a credentials file in the same format as the Crossplane AWS Provider plugin (see the plugin README)."
     required: false
     type: string
   - name: annotation_filter
