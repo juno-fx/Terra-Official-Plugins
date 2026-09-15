@@ -1,22 +1,38 @@
-{{- if not .Values.domain }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ .Values.name }}-ingress
+  {{- if .Values.domain }}
+  {{- if or .Values.tls_issuer .Values.publish_dns }}
+  annotations:
+    {{- if .Values.tls_issuer }}
+    cert-manager.io/cluster-issuer: {{ .Values.tls_issuer }}
+    {{- end }}
+    {{- if .Values.publish_dns }}
+    external-dns.alpha.kubernetes.io/enable: "true"
+    {{- end }}
+  {{- end }}
+  {{- else }}
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/auth-url: "http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/"
     nginx.ingress.kubernetes.io/use-regex: "true"
+  {{- end }}
 spec:
+  {{- if and .Values.domain .Values.tls_issuer }}
+  tls:
+    - hosts:
+        - {{ .Values.name }}.{{ .Values.domain }}
+      secretName: {{ .Values.name }}-tls
+  {{- end }}
   rules:
-    - host: {{ .Values.host }}
+    - host: {{ if .Values.domain }}{{ .Values.name }}.{{ .Values.domain }}{{ else }}{{ .Values.host }}{{ end }}
       http:
         paths:
-          - path: "/{{ .Release.Namespace }}/n8n/{{ .Values.name }}/"
+          - path: {{ if .Values.domain }}"/"{{ else }}"/{{ .Release.Namespace }}/n8n/{{ .Values.name }}/"{{ end }}
             pathType: Prefix
             backend:
               service:
                 name: {{ .Release.Name }}
                 port:
                   number: 8080
-{{- end }}
