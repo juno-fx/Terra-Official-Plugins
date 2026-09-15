@@ -21,7 +21,6 @@ spec:
         - name: domain-manager
           image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
           imagePullPolicy: IfNotPresent
-          command: ["python3", "/app/app.py"]
           env:
             - name: PREFIX
               value: "{{ .Values.prefix }}"
@@ -45,13 +44,6 @@ spec:
             readOnlyRootFilesystem: true
             capabilities:
               drop: ["ALL"]
-          volumeMounts:
-            - name: app
-              mountPath: /app
-      volumes:
-        - name: app
-          configMap:
-            name: {{ .Release.Name }}
 ---
 apiVersion: v1
 kind: Service

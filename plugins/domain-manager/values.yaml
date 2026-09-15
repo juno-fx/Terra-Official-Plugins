@@ -1,6 +1,6 @@
 host:
 prefix: /domains
-registry: docker.io
-repo: python
-tag: "3.13-alpine"
+registry: ghcr.io
+repo: umer-jahangier/domain-manager
+tag: "0.1.0"
 namespace: domain-manager

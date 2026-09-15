@@ -61,10 +61,16 @@ The page then appears in Genesis at the configured prefix.
 |-------|---------|
 | `host` | **string** · Required<br>The DNS name of your Genesis host. Also used to mark which row is the platform host |
 | `prefix` | **string** · Required · Default: `/domains`<br>Path the page is served on |
-| `registry` | **string** · Required · Default: `docker.io`<br>Registry to pull the image from |
-| `repo` | **string** · Required · Default: `python`<br>Image repository |
-| `tag` | **string** · Required · Default: `3.13-alpine`<br>Image tag |
+| `registry` | **string** · Required · Default: `ghcr.io`<br>Registry to pull the image from |
+| `repo` | **string** · Required · Default: `umer-jahangier/domain-manager`<br>Image repository |
+| `tag` | **string** · Required · Default: `0.1.0`<br>Image version. Published versions are listed in the [image repository](https://github.com/umer-jahangier/domain-manager) |
 | `namespace` | **string** · Required · Default: `domain-manager`<br>Namespace the page runs in, created if absent |
+
+---
+
+## The Image
+
+The page ships as a versioned container image built from [umer-jahangier/domain-manager](https://github.com/umer-jahangier/domain-manager), published for `linux/amd64` and `linux/arm64`. Each release is tested, started and health checked before it is pushed, and `tag` pins the version this plugin runs, so upgrading the page is a field change in Terra.
 
 ---
 

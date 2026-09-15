@@ -22,17 +22,17 @@ fields:
   - name: registry
     description: Registry to pull the image from.
     required: true
-    default: docker.io
+    default: ghcr.io
     type: string
   - name: repo
     description: Repository to pull the image from.
     required: true
-    default: python
+    default: umer-jahangier/domain-manager
     type: string
   - name: tag
-    description: Tag to pull the image from.
+    description: Image version to run. See https://github.com/umer-jahangier/domain-manager for published versions.
     required: true
-    default: "3.13-alpine"
+    default: "0.1.0"
     type: string
   - name: namespace
     description: Namespace the page runs in. Created if it does not exist.
