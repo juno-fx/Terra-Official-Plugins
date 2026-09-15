@@ -49,11 +49,11 @@ fields:
       - cloudflare
       - route53
   - name: secret_name
-    description: Name of the Secret holding the DNS provider credential. It must be in the namespace cert-manager runs in, since a ClusterIssuer can only read Secrets from there. Required for Cloudflare. For Route53, leave empty to use ambient credentials such as IRSA.
+    description: Name of an existing Secret holding the DNS provider credential. This plugin does not create the Secret, it must be created with kubectl first, in the namespace cert-manager runs in, since a ClusterIssuer can only read Secrets from there (see the plugin README). Required for Cloudflare. For Route53, leave empty to use ambient credentials such as IRSA.
     required: false
     type: string
   - name: secret_key
-    description: Key inside that Secret holding the Cloudflare API token. Route53 reads the fixed keys aws_access_key_id and aws_secret_access_key from the same Secret, so this is only used for Cloudflare.
+    description: Name of the key inside that Secret, for example api-token. This is only a key name, never the token itself, which lives in the Secret. Route53 reads the fixed key names aws_access_key_id and aws_secret_access_key, so this is only used for Cloudflare.
     required: false
     type: string
   - name: aws_hosted_zone_id
