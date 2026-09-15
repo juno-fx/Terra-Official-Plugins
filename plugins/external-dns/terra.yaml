@@ -64,11 +64,11 @@ fields:
     default: external-dns
     type: string
   - name: secret_name
-    description: "Name of the Secret holding the provider credential. Required for Cloudflare. For AWS, leave empty when using aws_role_arn or node credentials."
+    description: "Name of an existing Secret holding the provider credential. This plugin does not create the Secret, it must be created with kubectl first (see the plugin README). Required for Cloudflare. For AWS, leave empty when using aws_role_arn or node credentials."
     required: false
     type: string
   - name: secret_key
-    description: "Key inside that Secret. For Cloudflare it holds the API token, for AWS a credentials file in the same format as the Crossplane AWS Provider plugin (see the plugin README)."
+    description: "Name of the key inside that Secret, for example api-token or credentials. This is only a key name, never the token itself, which lives in the Secret (see the plugin README)."
     required: false
     type: string
   - name: annotation_filter
