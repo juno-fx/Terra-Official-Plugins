@@ -449,6 +449,14 @@ nginx.ingress.kubernetes.io/auth-url: "http://genesis.{{ .Release.Namespace }}.s
 nginx.ingress.kubernetes.io/auth-signin: /unauthorized/
 ```
 
+**Custom domain routes cannot use either gate.** The platform session cookie is scoped to the
+platform host and the browser never sends it to another domain, so an `auth-url` subrequest on a
+custom domain rejects every caller, authenticated or not. Any route a plugin publishes on its own
+hostname is therefore outside the platform gate by construction. Plugins must make that exposure
+explicit rather than silent: only honour a domain from a state that already declares itself
+unauthenticated (the runtime templates require `network_mode: ingress-noauth`), or rely on the
+application's own login (n8n), or put basic auth or a CIDR allow list in front (domain-route).
+
 ### Plugin-Author Annotations
 
 These are set by plugin authors in their Helm chart templates.
