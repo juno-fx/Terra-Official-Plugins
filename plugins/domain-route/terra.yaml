@@ -1,0 +1,89 @@
+resource_id: domain-route
+name: Domain Route
+icon: https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/domain-route/assets/icon.svg?raw=true
+description: Publishes a running workload, or an application listening inside a Helios or Wetty session, at a custom domain with TLS and an optional DNS record. Install one per hostname you want to serve.
+category: Networking
+tags:
+  - networking
+  - dns
+  - tls
+  - ingress
+editable: true
+fields:
+  - name: hostname
+    description: Hostname to serve on, for example app.example.com. A DNS record for it must point at the cluster ingress address.
+    required: true
+    type: string
+  - name: target_kind
+    description: "workload selects the pods of a running workload by label. service points at a Service that already exists in this project."
+    required: true
+    default: workload
+    type: select
+    options:
+      - workload
+      - service
+  - name: target_name
+    description: Name of the workload instance, or of the Service, to send traffic to.
+    required: true
+    type: string
+  - name: target_port
+    description: Port to send traffic to. For a workload target this is the container port, which does not need to be published by the workload itself. For a service target it is the port on that Service.
+    required: true
+    default: 8080
+    type: int
+  - name: selector_label
+    description: "Label the target workload carries. Helios and the runtime templates use juno-innovations.com/workstation, most others use kuiper.juno-innovations.com/kuiper-instance."
+    required: false
+    default: juno-innovations.com/workstation
+    type: select
+    options:
+      - juno-innovations.com/workstation
+      - kuiper.juno-innovations.com/kuiper-instance
+  - name: path
+    description: Path prefix served on the hostname. Leave at / unless the application expects to live under a sub-path.
+    required: true
+    default: /
+    type: string
+  - name: backend_protocol
+    description: Protocol the target speaks. Helios serves HTTPS, most other workloads serve HTTP.
+    required: true
+    default: HTTP
+    type: select
+    options:
+      - HTTP
+      - HTTPS
+  - name: tls_issuer
+    description: cert-manager ClusterIssuer used to obtain a certificate, for example letsencrypt-prod. Leave empty to serve without requesting one.
+    required: false
+    type: string
+  - name: publish_dns
+    description: Annotate the route so the ExternalDNS plugin creates the record for this hostname.
+    required: true
+    default: false
+    type: boolean
+  - name: ingress_class
+    description: Ingress class to publish through.
+    required: true
+    default: nginx
+    type: string
+  - name: auth
+    description: "none leaves authentication to the application. basic puts HTTP basic auth in front, using an existing Secret of type htpasswd."
+    required: true
+    default: none
+    type: select
+    options:
+      - none
+      - basic
+  - name: basic_auth_secret
+    description: Name of an htpasswd Secret in this project, used when auth is basic.
+    required: false
+    type: string
+  - name: rate_limit
+    description: Requests per second allowed from a single source address. Leave at 0 for no limit.
+    required: false
+    default: 0
+    type: int
+  - name: allow_cidrs
+    description: Comma separated CIDR ranges allowed to reach this route. Leave empty to accept any source.
+    required: false
+    type: string

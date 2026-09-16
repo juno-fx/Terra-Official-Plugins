@@ -1,0 +1,44 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "{{ .Values.backend_protocol }}"
+    {{- if .Values.tls_issuer }}
+    cert-manager.io/cluster-issuer: {{ .Values.tls_issuer }}
+    {{- end }}
+    {{- if .Values.publish_dns }}
+    external-dns.alpha.kubernetes.io/enable: "true"
+    {{- end }}
+    {{- if eq .Values.auth "basic" }}
+    {{- if not .Values.basic_auth_secret }}
+    {{- fail "auth is basic but basic_auth_secret is empty - create an htpasswd Secret in this project and name it here (see the plugin README)" }}
+    {{- end }}
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: {{ .Values.basic_auth_secret }}
+    {{- end }}
+    {{- if gt (int .Values.rate_limit) 0 }}
+    nginx.ingress.kubernetes.io/limit-rps: "{{ .Values.rate_limit }}"
+    {{- end }}
+    {{- if .Values.allow_cidrs }}
+    nginx.ingress.kubernetes.io/whitelist-source-range: "{{ .Values.allow_cidrs }}"
+    {{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress_class }}
+  {{- if .Values.tls_issuer }}
+  tls:
+    - hosts:
+        - {{ .Values.hostname }}
+      secretName: {{ .Release.Name }}-tls
+  {{- end }}
+  rules:
+    - host: {{ .Values.hostname }}
+      http:
+        paths:
+          - path: {{ .Values.path | quote }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ if eq .Values.target_kind "workload" }}{{ .Release.Name }}{{ else }}{{ .Values.target_name }}{{ end }}
+                port:
+                  number: {{ .Values.target_port }}
