@@ -24,7 +24,7 @@ data:
       required: true
       type: boolean
     - name: efi
-      description: Enable Secure Boot for the VM
+      description: Boot with UEFI firmware instead of legacy BIOS. (required for Secure Boot and Windows 11)
       default: false
       required: true
       type: boolean
