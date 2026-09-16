@@ -11,8 +11,10 @@ metadata:
 spec:
   type: NodePort
   ports:
-    - protocol: {{ .protocol }}
-      port: {{ .vm_port }}
+    # name must match the EndpointSlice port name (kube-proxy maps by name)
+    - name: {{ .name }}
+      protocol: {{ .protocol }}
+      port: {{ .service_port }}
       targetPort: {{ .service_port }}
 ---
 # EndpointSlice links the selectless service to the backend IP.

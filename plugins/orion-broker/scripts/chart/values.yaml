@@ -30,4 +30,3 @@ ports:
   - name: port
     protocol: TCP
     service_port: 443
-    vm_port: 443

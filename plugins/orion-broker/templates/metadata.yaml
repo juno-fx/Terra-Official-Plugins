@@ -24,11 +24,6 @@ data:
           required: true
           type: string
           default: port
-        - name: vm_port
-          description: Port number on the backend
-          required: true
-          default: 443
-          type: int
         - name: service_port
           description: Port number to expose outside the backend
           required: true

@@ -27,15 +27,14 @@ points at the backend IP. NodePorts are **auto-assigned** by Kubernetes
 | Field | Default | Purpose |
 |-------|---------|---------|
 | `ip` | *required* | IP address of the externally managed backend running the Orion broker (single address for now) |
-| `ports` | `[{name: port, port: 443, service_port: 443, protocol: TCP}]` | Repeatable list of ports to expose from the backend |
+| `ports` | `[{name: port, service_port: 443, protocol: TCP}]` | Repeatable list of ports to expose from the backend |
 
 Each `ports` entry has:
 
 | Sub-field | Default | Purpose |
 |-----------|---------|---------|
-| `name` | `port` | Name of the port (service is named `<workload>-port-<name>`) |
-| `vm_port` | `443` | Service port |
-| `service_port` | `443` | Port on the backend |
+| `name` | `port` | Name of the port — used as the Service port name and in `<workload>-port-<name>` resources |
+| `service_port` | `443` | Port on the backend (also the Service port) |
 | `protocol` | `TCP` | `TCP` or `UDP` |
 
 ## Access
