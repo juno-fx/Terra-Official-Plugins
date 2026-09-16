@@ -1,0 +1,37 @@
+# One NodePort Service + matching EndpointSlice per entry in the `ports` list.
+# Selector-less on purpose: each service routes to the externally managed
+# backend via its matching EndpointSlice (targeting ip), NOT to a pod.
+# NodePorts are auto-assigned by Kubernetes (30000-32767 range).
+{{- if .Values.ports }}
+{{ range .Values.ports }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $.Values.name }}-port-{{ .name }}
+spec:
+  type: NodePort
+  ports:
+    - protocol: {{ .protocol }}
+      port: {{ .vm_port }}
+      targetPort: {{ .service_port }}
+---
+# EndpointSlice links the selectless service to the backend IP.
+# The kubernetes.io/service-name label must match the Service name exactly.
+# IPv4 only for now.
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: {{ $.Values.name }}-port-{{ .name }}
+  labels:
+    kubernetes.io/service-name: {{ $.Values.name }}-port-{{ .name }}
+addressType: IPv4
+ports:
+  - name: {{ .name }}
+    protocol: {{ .protocol }}
+    port: {{ .service_port }}
+endpoints:
+  - addresses:
+      - "{{ $.Values.ip }}"
+---
+{{ end }}
+{{- end }}
