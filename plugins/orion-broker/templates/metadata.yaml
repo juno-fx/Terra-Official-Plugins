@@ -10,6 +10,11 @@ data:
   chart: "{{ .Release.Name }}-scripts-configmap"
   description: "Orion connection broker proxy for externally managed infrastructure"
   fields: |
+    - name: icon
+      description: "Icon for the workload"
+      type: string
+      required: false
+      default: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/orion-broker/assets/logo.png
     - name: ip
       description: "IP address of the externally managed backend running the Orion broker (single address for now)"
       type: string
