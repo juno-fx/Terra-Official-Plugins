@@ -26,6 +26,9 @@ _kuiper:
 timezone: "America/New_York"
 storage_class:
 storage_size: "10Gi"
+hostname: ""
+tls_issuer: ""
+publish_dns: false
 webhooks_public: false
 webhook_rate_limit: 10
 webhook_allow_cidrs:

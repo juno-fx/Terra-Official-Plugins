@@ -41,8 +41,21 @@ data:
       default: 10Gi
       required: true
       type: string
+    - name: hostname
+      description: "Serve this instance at its own domain, for example n8n.example.com, instead of a path on the platform host. Leave empty to keep the platform path"
+      type: string
+      required: false
+    - name: tls_issuer
+      description: "cert-manager ClusterIssuer used to obtain the certificate for that domain, for example letsencrypt-prod. Only used when a hostname is set"
+      type: string
+      required: false
+    - name: publish_dns
+      description: "Annotate the route so the ExternalDNS plugin creates the DNS record for that domain"
+      type: boolean
+      required: false
+      default: false
     - name: webhooks_public
-      description: "Allow public access to the n8n webhook paths (the editor stays authenticated)"
+      description: "Allow public access to the n8n webhook paths (the editor stays authenticated). Not used when a hostname is set, since the whole instance is then served from that domain"
       type: boolean
       required: true
       default: false
