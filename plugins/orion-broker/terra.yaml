@@ -1,0 +1,16 @@
+resource_id: orion-broker
+name: Orion Broker
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/orion-broker/assets/logo.png
+description: |
+  Orion connection broker proxy for externally managed infrastructure. Creates
+  NodePort services that route external clients to the backend's Orion
+  broker.
+category: Workstations
+tags:
+  - cluster-level
+  - workload
+  - vdi
+  - orion
+  - juno
+fields: []
+editable: false

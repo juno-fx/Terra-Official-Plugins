@@ -1,0 +1,3 @@
+# Default values for the plugin install (Terra install-time only).
+# Workload template parameters are defined in templates/metadata.yaml under the `fields:` key,
+# and are passed as Helm values to scripts/chart/ at workload launch time by Kuiper.
