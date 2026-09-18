@@ -1,0 +1,86 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-external-dns
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    - post-delete-finalizer.argocd.argoproj.io
+    - post-delete-finalizer.argocd.argoproj.io/cleanup
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {{ .Values.secret_namespace | default "external-dns" }}
+  sources:
+    - repoURL: https://kubernetes-sigs.github.io/external-dns/
+      chart: external-dns
+      targetRevision: {{ .Values.chart_version }}
+      helm:
+        releaseName: external-dns
+        values: |
+          provider:
+            name: {{ .Values.provider }}
+          policy: {{ .Values.policy }}
+          registry: txt
+          txtOwnerId: {{ .Values.txt_owner_id | quote }}
+          sources:
+            {{- range .Values.sources }}
+            - {{ . }}
+            {{- end }}
+          {{- if .Values.domain_filters }}
+          domainFilters:
+            {{- range splitList "," .Values.domain_filters }}
+            - {{ . | trim }}
+            {{- end }}
+          {{- end }}
+          annotationFilter: {{ .Values.annotation_filter | quote }}
+          {{- if and .Values.secret_name (not .Values.secret_key) }}
+          {{- fail "secret_name is set but secret_key is empty - name the key inside the Secret that holds the credential (see the plugin README)" }}
+          {{- end }}
+          {{- if eq .Values.provider "cloudflare" }}
+          {{- if not .Values.secret_name }}
+          {{- fail "the cloudflare provider needs an API token - create a Secret holding it and set secret_namespace, secret_name and secret_key (see the plugin README)" }}
+          {{- end }}
+          env:
+            - name: CF_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secret_name }}
+                  key: {{ .Values.secret_key }}
+          {{- else if .Values.aws_role_arn }}
+          serviceAccount:
+            annotations:
+              eks.amazonaws.com/role-arn: {{ .Values.aws_role_arn | quote }}
+          {{- else }}
+          env:
+            - name: AWS_DEFAULT_REGION
+              value: us-east-1
+            {{- if .Values.secret_name }}
+            - name: AWS_SHARED_CREDENTIALS_FILE
+              value: /etc/aws/credentials
+          extraVolumes:
+            - name: aws-credentials
+              secret:
+                secretName: {{ .Values.secret_name }}
+                items:
+                  - key: {{ .Values.secret_key }}
+                    path: credentials
+          extraVolumeMounts:
+            - name: aws-credentials
+              mountPath: /etc/aws
+              readOnly: true
+            {{- end }}
+          {{- end }}
+          {{- if .Values.extra_values }}
+          {{ .Values.extra_values | nindent 10 }}
+          {{- end }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - ServerSideApply=true
+      - CreateNamespace=true
