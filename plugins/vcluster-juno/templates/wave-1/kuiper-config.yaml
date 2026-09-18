@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-kuiper-config
+  labels:
+    {{- include "vcluster-juno.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+data:
+  _kuiper: deprecated
+  name: "{{ .Release.Name }}"
+  user: "{{ .Values.titan_owner }}"
+  group: "{{ .Release.Namespace }}"
+  puid: "{{ .Values.titan_uid }}"
+  guid: "{{ .Values.titan_uid }}"
+  host: "{{ .Values.juno_hostname }}"
+  icon: https://raw.githubusercontent.com/loft-sh/vcluster/main/docs/static/media/vcluster-logo-dark.svg
+  idx: "{{ .Release.Namespace }}-vcluster"
+  label: "{{ .Release.Namespace }}-vcluster"
+  type: Server
+  registry: ghcr.io
+  repo: loft-sh/vcluster-oss
+  tag: "{{ .Values.vcluster_chart_version }}"
+  cpu: "1"
+  cpuLimit: ""
+  memory: 1Gi
+  memoryLimit: ""
+  env: '[]'
+  volumeMounts: '[]'
+  volumes: '[]'
