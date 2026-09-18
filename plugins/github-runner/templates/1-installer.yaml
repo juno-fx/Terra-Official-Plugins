@@ -1,0 +1,77 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-installer
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: true
+      hostNetwork: true
+      hostPID: true
+      tolerations:
+        - key: "pool"
+          operator: "Exists"
+          effect: "NoSchedule"
+      nodeSelector:
+        {{- if .Values.pool  }}
+        pool: {{ .Values.pool }}
+        {{- end }}
+        {{- if eq .Values.architecture "x64" }}
+        kubernetes.io/arch: amd64
+        {{ end }}
+        {{- if eq .Values.architecture "arm64" }}
+        kubernetes.io/arch: arm64
+        {{ end }}
+      containers:
+        - name: installer
+          image: ubuntu:latest
+          securityContext:
+            privileged: true
+          env:
+            - name: INSTALL
+              value: "true"
+            - name: DESTINATION
+              value: "{{ .Values.install_volume.container_path }}{{ .Values.destination }}"
+            - name: VERSION
+              value: "{{ .Values.version }}"
+            - name: ARCHITECTURE
+              value: "{{ .Values.architecture }}"
+            - name: NAME
+              value: "{{ .Values.name }}"
+            - name: URL
+              value: "{{ .Values.url }}"
+            - name: TOKEN
+              value: "{{ .Values.token }}"
+          command: [ "/terra/bootstrap.sh" ]
+          volumeMounts:
+            - name: host
+              mountPath: /host
+            - name: installer
+              mountPath: /terra/bootstrap.sh
+              subPath: bootstrap.sh
+            - name: installer
+              mountPath: /terra/scripts.base64
+              subPath: packaged_scripts.base64
+            - name: mount
+              mountPath: {{ .Values.install_volume.container_path }}
+              {{- if .Values.install_volume.sub_path }}
+              subPath: {{ .Values.install_volume.sub_path }}
+              {{- end }}
+      volumes:
+        - name: host
+          hostPath:
+            path: /
+        - name: mount
+          persistentVolumeClaim:
+            claimName: {{ .Values.install_volume.name }}
+        - name: installer
+          configMap:
+            name: {{ .Release.Name }}-scripts-configmap
+            defaultMode: 0500
+

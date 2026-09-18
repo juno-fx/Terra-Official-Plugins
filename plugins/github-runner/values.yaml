@@ -1,0 +1,14 @@
+# configuration
+cpu: "2"
+memory: "4Gi"
+name:
+url:
+architecture: x64
+token:
+version: 2.329.0
+destination: /runners
+pool:
+install_volume:
+  name: apps-pv-claim
+  sub_path:
+  container_path: /apps
