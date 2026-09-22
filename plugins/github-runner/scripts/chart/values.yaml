@@ -1,0 +1,37 @@
+# These values are populated by Kuiper at workload launch time from the fields
+# defined in templates/metadata.yaml. They must match field names exactly.
+
+# Kuiper-injected standard values — do not remove
+name: github-runner
+user:
+group:
+cpu: "2"
+memory: "4Gi"
+cpuLimit: null
+memoryLimit: null
+idx: 0
+guid: 0
+puid: 0
+host:
+pullSecret:
+session:
+volumeMounts: []
+volumes: []
+env:
+  - name: JUNO
+    value: "true"
+selector:
+plugins: []
+_kuiper:
+
+# github-runner launch fields (templates/metadata.yaml)
+url:
+token:
+labels: juno
+version: latest
+architecture: x64
+baseImage: ubuntu:26.04
+tuneInotify: true
+pool:
+runnerStorageClass:
+runnerStorageSize: "1Gi"

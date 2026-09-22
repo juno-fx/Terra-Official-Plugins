@@ -1,0 +1,136 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{ .Release.Name }}"
+  annotations:
+    juno-innovations.com/workload: "Server"
+spec:
+  replicas: 1
+  serviceName: "{{ .Release.Name }}"
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+  template:
+    metadata:
+      labels:
+        kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+      annotations:
+        juno-innovations.com/workload: "Server"
+    spec:
+      hostname: "{{ .Values.name }}"
+      terminationGracePeriodSeconds: 45
+      automountServiceAccountToken: false
+
+      {{- if or .Values.pool .Values.selector }}
+      # Optional targeting: the pool field and any selector entries become plain
+      # nodeSelector rows (exact key/value match — same semantics as affinity
+      # matchExpressions). The pod tolerates NO node taints, so tainted nodes
+      # (including dedicated workstation nodes) will reject it.
+      nodeSelector:
+        {{- if .Values.pool }}
+        pool: {{ .Values.pool | quote }}
+        {{- end }}
+        {{- if .Values.selector }}
+        {{- range .Values.selector }}
+        {{ .key | quote }}: {{ .value | quote }}
+        {{- end }}
+        {{- end }}
+      {{- end }}
+
+      containers:
+        - name: runner
+          image: "{{ .Values.baseImage }}"
+          imagePullPolicy: IfNotPresent
+          # required by the nested toolchain: only --privileged gives the rw
+          # /sys the nested kubelet needs, and the privileged pod lands in the
+          # host cgroup namespace, which init.sh fixes by re-exec'ing into a
+          # private cgroup+mount namespace before handing off to run.sh.
+          securityContext:
+            privileged: true
+          command: ["/opt/nested-ci/init.sh"]
+          args: ["/payload/run.sh"]
+          resources:
+            requests:
+              cpu: "{{ .Values.cpu }}"
+              memory: "{{ .Values.memory }}"
+              # disk-backed emptyDir at /var/lib/containers counts against this
+              ephemeral-storage: "6Gi"
+            limits:
+              {{- if .Values.cpuLimit }}
+              cpu: "{{ .Values.cpuLimit }}"
+              {{- end }}
+              {{- if .Values.memoryLimit }}
+              memory: "{{ .Values.memoryLimit }}"
+              {{- end }}
+              ephemeral-storage: "12Gi"
+          env:
+            # nested-ci environment (see scripts/chart/files/init.sh)
+            - name: KIND_EXPERIMENTAL_PROVIDER
+              value: "podman"
+            - name: DOCKER_HOST
+              value: "unix:///run/podman/podman.sock"
+            - name: NESTED_CI_TUNE_INOTIFY
+              value: "{{ if .Values.tuneInotify }}1{{ else }}0{{ end }}"
+            # github-runner launch fields (scripts/chart/files/run.sh)
+            - name: RUNNER_URL
+              value: "{{ .Values.url }}"
+            - name: RUNNER_TOKEN
+              value: "{{ .Values.token }}"
+            - name: RUNNER_NAME
+              value: "{{ .Values.name }}"
+            - name: RUNNER_LABELS
+              value: "{{ .Values.labels }}"
+            - name: RUNNER_VERSION
+              value: "{{ .Values.version }}"
+            - name: RUNNER_ARCH
+              value: "{{ .Values.architecture }}"
+            {{- range .Values.env }}
+            - name: {{ .name | quote }}
+              value: {{ .value | quote }}
+            {{- end }}
+          volumeMounts:
+            - mountPath: /opt/nested-ci
+              name: nested-ci
+            - mountPath: /payload
+              name: payload
+            - mountPath: /var/lib/containers
+              name: containers-storage
+            - mountPath: /lib/modules
+              name: lib-modules
+            - mountPath: /work
+              name: work
+            - mountPath: /runner
+              name: runner-config
+            - mountPath: /var/log
+              name: varlog
+            - mountPath: /dev/shm
+              name: shm
+      volumes:
+        - name: nested-ci
+          configMap:
+            name: {{ .Release.Name }}-nested-ci
+            defaultMode: 0755
+        - name: payload
+          configMap:
+            name: {{ .Release.Name }}-payload
+            defaultMode: 0755
+        # podman graphroot MUST NOT sit on the container's own overlayfs
+        - name: containers-storage
+          emptyDir: {}
+        # the path must exist for kind's node bind-mount; host modules not needed
+        - name: lib-modules
+          emptyDir: {}
+        - name: work
+          emptyDir: {}
+        # persistent runner agent + registration config (survives restarts and
+        # the ~1h registration-token expiry; jobs' _work stays on the /work emptyDir)
+        - name: runner-config
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-runner-config
+        - name: varlog
+          emptyDir: {}
+        - name: shm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi
