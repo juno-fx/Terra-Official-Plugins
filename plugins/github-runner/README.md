@@ -88,7 +88,6 @@ a runner is provisioned through **Hubble**:
 | Field | Details |
 |-------|---------|
 | `url` | **string** · Required<br>GitHub repository or organization URL the runner registers to |
-| `token` | **string** · Required (stored sensitive)<br>Runner registration token (org/repo **Settings → Actions → Runners → New self-hosted runner**) or a PAT with `admin:org` / `repo` scope. Only needed for first registration — a live config on the PVC survives restarts without it (see Notes). Registration tokens expire after ~1 hour. **Stored in the workload metadata ConfigMap — treat as a short-lived credential.** |
 | `labels` | **string** · Default: `juno`<br>Comma-separated labels the runner advertises; workflows match them via `runs-on` |
 | `version` | **string** · Default: `latest`<br>GitHub runner version to install, or `latest` to resolve the newest release at launch |
 | `architecture` | **select** · Required · Default: `x64`<br>Runner binary architecture: `x64` or `arm64` |
@@ -102,9 +101,12 @@ a runner is provisioned through **Hubble**:
 
 ### Custom Environment Variables
 
-Genesis lets you add arbitrary environment variables to the workload at launch time. The runner's
-configuration is covered by the fields above; no commonly used custom variables are worth calling
-out.
+Genesis lets you add arbitrary environment variables to the workload at launch time (the `env`
+field, auto-injected into every schema). These are suggested for this workload:
+
+| Variable | Description |
+|----------|-------------|
+| `RUNNER_TOKEN` | Runner registration token (org/repo **Settings → Actions → Runners → New self-hosted runner**) or a PAT with `admin:org` / `repo` scope. Only needed for the first registration — a live config on the PVC survives restarts without it (see Notes). Registration tokens expire after ~1 hour. **Plain text (no `sensitive` masking) and stored in the workload metadata ConfigMap — treat as a short-lived credential.** |
 
 ---
 
@@ -164,7 +166,7 @@ more than capable of one per job):
   entirely, so the ~1-hour registration-token expiry is only a first-launch concern. Jobs'
   working directory (`_work`) stays on the ephemeral `/work` emptyDir, so build artifacts never
   grow the PVC. If the PVC is lost (or the workload is deleted and recreated), the next launch
-  re-registers from scratch — recreate the launch field `token` with a fresh value.
+  re-registers from scratch — re-add the `RUNNER_TOKEN` env var with a fresh value at launch.
 - **PVC caveats** — if the cluster has no default StorageClass, set `runnerStorageClass` or the
   PVC stays Pending. A ReadWriteOnce PVC binds to the first node the pod lands on; if the pod is
   rescheduled, the PVC keeps it pinned to that node (`safe-to-evict: false` limits eviction

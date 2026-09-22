@@ -26,7 +26,6 @@ _kuiper:
 
 # github-runner launch fields (templates/metadata.yaml)
 url:
-token:
 labels: juno
 version: latest
 architecture: x64

@@ -75,8 +75,6 @@ spec:
             # github-runner launch fields (scripts/chart/files/run.sh)
             - name: RUNNER_URL
               value: "{{ .Values.url }}"
-            - name: RUNNER_TOKEN
-              value: "{{ .Values.token }}"
             - name: RUNNER_NAME
               value: "{{ .Values.name }}"
             - name: RUNNER_LABELS

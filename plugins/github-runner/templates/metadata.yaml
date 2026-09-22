@@ -13,10 +13,6 @@ data:
     - name: url
       description: "GitHub repository or organization URL the runner registers to"
       required: true
-    - name: token
-      description: "Runner registration token (org/repo settings -> Actions -> Runners) or a PAT with admin:org / repo scope"
-      required: true
-      sensitive: true
     - name: labels
       description: "Comma-separated labels the runner advertises (workflows use these in runs-on)"
       default: "juno"
@@ -32,7 +28,7 @@ data:
         - arm64
       default: x64
     - name: baseImage
-      description: "Base image for the runner pod (toolchain is installed at runtime)"
+      description: "Base image for the runner pod (toolchain is installed per-job by the tooling action)"
       default: "ubuntu:26.04"
     - name: tuneInotify
       description: "Raise fs.inotify limits node-wide from inside the pod (needed for nested KinD; disable if nodes are pre-tuned)"
@@ -56,4 +52,5 @@ data:
       description: "PVC size for the runner agent + registration config"
       default: "1Gi"
   env_hints: |
-    []
+    - name: RUNNER_TOKEN
+      description: "Runner registration token (org/repo settings -> Actions -> Runners). Only needed for the first registration; the PVC config survives restarts."
