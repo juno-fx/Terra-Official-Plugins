@@ -72,7 +72,17 @@ else
   ok "runner agent already present"
 fi
 
-stage "3. register runner (only on first launch)"
+stage "3. runner .NET runtime dependencies (libicu, lttng)"
+# The agent is .NET-based; stock ubuntu images ship no libicu, so config.sh
+# dies with "Libicu's dependencies is missing for Dotnet Core 6.0". The agent
+# ships bin/installdependencies.sh with a distro-robust fallback chain
+# (libicu80..libicu52 + liblttng-ust). Idempotent -- agent + config persist on
+# the PVC, so this runs every boot and no-ops once installed.
+"$RUNNER_DIR/bin/installdependencies.sh" \
+  || fail "installdependencies.sh failed -- .NET runtime missing"
+ok "runner runtime dependencies installed"
+
+stage "4. register runner (only on first launch)"
 mkdir -p "$RUNNER_WORK_DIR"
 if [[ ! -f "$RUNNER_DIR/.runner" ]]; then
   ( cd "$RUNNER_DIR" && ./config.sh \
@@ -87,6 +97,6 @@ else
   ok "runner already registered ($RUNNER_NAME); skipping config.sh (token not needed)"
 fi
 
-stage "4. starting runner agent (exec)"
+stage "5. starting runner agent (exec)"
 cd "$RUNNER_DIR"
 exec ./run.sh
