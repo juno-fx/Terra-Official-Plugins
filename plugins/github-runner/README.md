@@ -27,7 +27,7 @@ launch a runner from the Workloads page like any other workload.
 The runner pod is a privileged pod whose first process (`init.sh`) fixes the one thing Kubernetes
 cannot express: a privileged pod runs in the **host cgroup namespace**, so `init.sh` re-execs into
 a private cgroup + mount namespace, remounts cgroup2 to the pod's own scope, delegates the cgroup
-controllers, and stages `/etc/containers` config plus a non-overlayfs graphroot. It then `exec`s
+controllers, and verifies the podman graphroot sits on non-overlayfs storage. It then `exec`s
 the payload script, which bootstraps a minimal apt base and downloads, registers and starts the
 GitHub Actions runner agent. The agent is the pod's command chain — `kubectl exec` cannot enter the
 unshared namespaces, so the agent must run this way.
@@ -152,7 +152,10 @@ more than capable of one per job):
   the kind node image (~900 MB into the emptyDir at `/var/lib/containers`). The emptyDir counts
   toward the ephemeral-storage request/limit (6 Gi / 12 Gi); rootfs writes are not.
 - **`/var/lib/containers`** is an `emptyDir` — podman's graphroot must not sit on the container's
-  overlayfs, which the pod satisfies without any PVC or host mount.
+  overlayfs, which the pod satisfies without any PVC or host mount. `/etc/containers` configs
+  (policy.json, registries.conf, storage.conf) are **not** pre-staged by the pod — Ubuntu's
+  `containers-common` package installs them at job time. (Pre-staging them collided with the
+  package's conffiles and broke `apt install podman` with an EOF conffile prompt.)
 - **systemd gap** — the tooling action's `systemctl enable --now podman.socket` step assumes
   systemd as PID 1 (live VM runners). Pods have no systemd, so under GitHub's default `bash -e`
   that step fails. Use a pod-compatible variant: create the socket with
@@ -160,7 +163,10 @@ more than capable of one per job):
   `--now`. This is action-side — the pod only guarantees a clean, install-capable, non-systemd
   environment.
 - **`/var/lib/containers`** is an `emptyDir` — podman's graphroot must not sit on the container's
-  overlayfs, which the pod satisfies without any PVC or host mount.
+  overlayfs, which the pod satisfies without any PVC or host mount. `/etc/containers` configs
+  (policy.json, registries.conf, storage.conf) are **not** pre-staged by the pod — Ubuntu's
+  `containers-common` package installs them at job time. (Pre-staging them collided with the
+  package's conffiles and broke `apt install podman` with an EOF conffile prompt.)
 - **Registration survives restarts** — the runner agent + registration config live on a PVC
   mounted at `/runner`. After the first successful registration, pod restarts skip registration
   entirely, so the ~1-hour registration-token expiry is only a first-launch concern. Jobs'

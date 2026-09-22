@@ -107,18 +107,6 @@ else
   (( have < 512 )) && log "WARNING: fs.inotify.max_user_instances=$have and tuning is disabled"
 fi
 
-# --------------------------------------------------- 3. containers/ system config
-# nixpkgs' (and several distros') podman ship no /etc/containers. Without
-# policy.json every image pull fails with "no policy.json file found".
-# Copied rather than mounted so a payload can still edit them.
-if [[ -d "$BASE_DIR/containers" ]]; then
-  mkdir -p /etc/containers
-  for f in "$BASE_DIR"/containers/*; do
-    [[ -e "/etc/containers/$(basename "$f")" ]] || cp "$f" /etc/containers/
-  done
-  log "containers config in place: $(ls /etc/containers | tr '\n' ' ')"
-fi
-
 # ------------------------------------------------------------ 4. docker shim
 if [[ -f "$BASE_DIR/bin/docker" && ! -e /usr/local/bin/docker ]]; then
   install -m 0755 "$BASE_DIR/bin/docker" /usr/local/bin/docker

@@ -3,8 +3,8 @@
 # github-runner payload
 #
 # Runs inside the nested-ci base pod: init.sh has already prepared the
-# environment (private cgroup/mount namespaces, /etc/containers config,
-# inotify limits, non-overlayfs graphroot). This script bootstraps a minimal
+# environment (private cgroup/mount namespaces, inotify limits,
+# non-overlayfs graphroot). This script bootstraps a minimal
 # apt base and execs the GitHub Actions runner agent.
 #
 # The toolchain (podman, devbox, kind, skaffold, gh, node, ...) is NOT

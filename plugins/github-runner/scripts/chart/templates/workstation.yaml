@@ -105,21 +105,10 @@ spec:
             - mountPath: /dev/shm
               name: shm
       volumes:
-        # NOTE: items must mirror EVERY data key in base-cm.yaml -- with items
-        # present, unmapped keys are not mounted at all (silent omission).
         - name: nested-ci
           configMap:
             name: {{ .Release.Name }}-nested-ci
             defaultMode: 0755
-            items:
-              - key: init.sh
-                path: init.sh
-              - key: policy.json
-                path: containers/policy.json
-              - key: registries.conf
-                path: containers/registries.conf
-              - key: storage.conf
-                path: containers/storage.conf
         - name: payload
           configMap:
             name: {{ .Release.Name }}-payload
