@@ -22,12 +22,22 @@ spec:
       terminationGracePeriodSeconds: 45
       automountServiceAccountToken: false
 
-      {{- if or .Values.pool .Values.selector }}
-      # Optional targeting: the pool field and any selector entries become plain
-      # nodeSelector rows (exact key/value match — same semantics as affinity
-      # matchExpressions). The pod tolerates NO node taints, so tainted nodes
-      # (including dedicated workstation nodes) will reject it.
+      {{- if or .Values.pool .Values.selector .Values.architecture }}
+      # nodeSelector rows: the architecture field ALWAYS adds a kubernetes.io/arch
+      # row (x64 -> amd64, arm64 -> arm64) so an arm64 runner can never land on an
+      # amd64 node ("Exec format error" crashloop). The pool field and any
+      # selector entries add further rows (exact key/value match). A selector
+      # entry for kubernetes.io/arch overrides the auto row. The pod tolerates NO
+      # node taints, so tainted nodes (including dedicated workstation nodes)
+      # will reject it.
+      {{- $sel := dict }}
+      {{- range .Values.selector }}
+      {{- $_ := set $sel .key .value }}
+      {{- end }}
       nodeSelector:
+        {{- if and .Values.architecture (not (hasKey $sel "kubernetes.io/arch")) }}
+        kubernetes.io/arch: {{ if eq .Values.architecture "x64" }}amd64{{ else }}{{ .Values.architecture }}{{ end }}
+        {{- end }}
         {{- if .Values.pool }}
         pool: {{ .Values.pool | quote }}
         {{- end }}

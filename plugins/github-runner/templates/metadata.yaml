@@ -20,7 +20,7 @@ data:
       description: "GitHub runner version to install (default: latest release)"
       default: "latest"
     - name: architecture
-      description: "Runner binary architecture"
+      description: "Runner binary architecture; also pins scheduling via the kubernetes.io/arch nodeSelector (x64 -> amd64, arm64 -> arm64)"
       required: true
       type: select
       options:

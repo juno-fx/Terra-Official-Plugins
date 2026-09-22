@@ -52,9 +52,12 @@ installed.
   kubectl label ns <namespace> pod-security.kubernetes.io/warn=privileged --overwrite
   ```
 
-- **Scheduling** — the pod schedules on any (untainted) node by default. Use the `pool` field to
-  target a labeled pool. The pod tolerates no node taints, so tainted nodes — including dedicated
-  workstation nodes — reject it.
+- **Scheduling** — the `architecture` field always adds a `kubernetes.io/arch` nodeSelector
+  (x64 → amd64, arm64 → arm64), so a runner lands on matching-architecture nodes; an arm64 runner
+  with no free arm node stays Pending (visible) instead of crashlooping on an amd64 node ("Exec
+  format error"). Use the `pool` field to target a labeled pool; `selector` entries add more rows
+  (a `kubernetes.io/arch` entry overrides the auto row). The pod tolerates no node taints, so
+  tainted nodes — including dedicated workstation nodes — reject it.
 - **Outbound access** to `github.com` (runner agent registration + job API) and everything the
   tooling action needs at job time (`get.jetify.com`, `cache.nixos.org`, `docker.io`, the GitHub
   release CDN, the container registries your jobs pull from).
@@ -90,7 +93,7 @@ a runner is provisioned through **Hubble**:
 | `url` | **string** · Required<br>GitHub repository or organization URL the runner registers to |
 | `labels` | **string** · Default: `juno`<br>Comma-separated labels the runner advertises; workflows match them via `runs-on` |
 | `version` | **string** · Default: `latest`<br>GitHub runner version to install, or `latest` to resolve the newest release at launch |
-| `architecture` | **select** · Required · Default: `x64`<br>Runner binary architecture: `x64` or `arm64` |
+| `architecture` | **select** · Required · Default: `x64`<br>Runner binary architecture: `x64` or `arm64`. Also adds a `kubernetes.io/arch` nodeSelector (x64 → amd64, arm64 → arm64) pinning the pod to matching nodes |
 | `baseImage` | **string** · Default: `ubuntu:26.04`<br>Base image for the pod. Keep it stock — the toolchain is installed at job time by the tooling action. Change only if you need a pinned/mirrored image in an air-gapped cluster |
 | `tuneInotify` | **boolean** · Required · Default: `true`<br>Raise `fs.inotify.max_user_instances` / `max_user_watches` from inside the pod. This is required for the nested KinD node's systemd to boot (at the default 128, systemd dies with "Failed to create control group inotify object" and kind only reports an opaque "could not find a log line that matches Multi-User System"). The limits are per-UID and *not* namespaced, so raising them changes the setting node-wide for every workload on that node (runtime only, not persisted). Disable if the cluster pre-tunes nodes via DaemonSet/machine config |
 | `pool` | **string** · Optional<br>Node pool label to schedule onto (adds a `pool=<value>` nodeSelector entry) |
