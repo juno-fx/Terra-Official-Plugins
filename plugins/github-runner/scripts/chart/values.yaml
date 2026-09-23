@@ -33,4 +33,4 @@ baseImage: ubuntu:26.04
 tuneInotify: true
 pool:
 runnerStorageClass:
-runnerStorageSize: "1Gi"
+runnerStorageSize: "50Gi"

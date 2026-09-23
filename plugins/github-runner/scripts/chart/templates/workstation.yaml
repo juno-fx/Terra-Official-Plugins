@@ -14,6 +14,7 @@ spec:
   template:
     metadata:
       labels:
+        juno-innovations.com/runner: "true"
         kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
       annotations:
         juno-innovations.com/workload: "Server"
@@ -21,6 +22,22 @@ spec:
       hostname: "{{ .Values.name }}"
       terminationGracePeriodSeconds: 45
       automountServiceAccountToken: false
+
+      # Soft anti-affinity: runners prefer their own node (preference only — a
+      # runner still lands on a shared node when no free one matches: e.g. more
+      # arm64 runners than arm nodes). The shared juno-innovations.com/runner
+      # label + namespaceSelector (all namespaces) spread runners cluster-wide,
+      # because runner workloads span namespaces. New placements only.
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    juno-innovations.com/runner: "true"
+                namespaceSelector: {}
+                topologyKey: kubernetes.io/hostname
 
       {{- if or .Values.pool .Values.selector .Values.architecture }}
       # nodeSelector rows: the architecture field ALWAYS adds a kubernetes.io/arch
@@ -64,7 +81,8 @@ spec:
             requests:
               cpu: "{{ .Values.cpu }}"
               memory: "{{ .Values.memory }}"
-              # disk-backed emptyDir at /var/lib/containers counts against this
+              # only the container writable layer (toolchain apt installs)
+              # counts against this — no disk-backed emptyDir remains
               ephemeral-storage: "6Gi"
             limits:
               {{- if .Values.cpuLimit }}
@@ -102,16 +120,21 @@ spec:
               name: nested-ci
             - mountPath: /payload
               name: payload
+            # everything writable lives on the single runner-config PVC:
+            # /runner at the volume root, graphroot / work / logs under subPaths
             - mountPath: /var/lib/containers
-              name: containers-storage
+              name: runner-config
+              subPath: containers
             - mountPath: /lib/modules
               name: lib-modules
             - mountPath: /work
-              name: work
+              name: runner-config
+              subPath: work
             - mountPath: /runner
               name: runner-config
             - mountPath: /var/log
-              name: varlog
+              name: runner-config
+              subPath: varlog
             - mountPath: /dev/shm
               name: shm
       volumes:
@@ -124,19 +147,11 @@ spec:
             name: {{ .Release.Name }}-payload
             defaultMode: 0755
         # podman graphroot MUST NOT sit on the container's own overlayfs
-        - name: containers-storage
-          emptyDir: {}
-        # the path must exist for kind's node bind-mount; host modules not needed
-        - name: lib-modules
-          emptyDir: {}
-        - name: work
-          emptyDir: {}
-        # persistent runner agent + registration config (survives restarts and
-        # the ~1h registration-token expiry; jobs' _work stays on the /work emptyDir)
         - name: runner-config
           persistentVolumeClaim:
             claimName: {{ .Release.Name }}-runner-config
-        - name: varlog
+        # the path must exist for kind's node bind-mount; host modules not needed
+        - name: lib-modules
           emptyDir: {}
         - name: shm
           emptyDir:

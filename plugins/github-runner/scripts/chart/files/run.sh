@@ -23,8 +23,8 @@ WORK="${WORK_DIR:-/work}"
 # agent + registration config live on the runner-config PVC: survives restarts
 # and the ~1h registration-token expiry (".runner" present => skip config.sh)
 RUNNER_DIR="${RUNNER_DIR:-/runner}"
-# jobs' working directory stays on the ephemeral /work emptyDir, so build
-# artifacts never grow the PVC
+# jobs' working directory lives on the runner-config PVC (subPath "work"),
+# alongside the graphroot (subPath "containers") and logs (subPath "varlog")
 RUNNER_WORK_DIR="${RUNNER_WORK_DIR:-/work/runner-work}"
 
 stage() { printf '\n\033[1;36m=== [%s] %s\033[0m\n' "$(date -u +%H:%M:%S)" "$*"; }

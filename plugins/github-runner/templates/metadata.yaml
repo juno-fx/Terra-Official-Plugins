@@ -49,8 +49,8 @@ data:
       required: false
       type: k8sStorageClass
     - name: runnerStorageSize
-      description: "PVC size for the runner agent + registration config"
-      default: "1Gi"
+      description: "PVC size for the runner agent, container storage, job workspace, and logs (all on one PVC)"
+      default: "50Gi"
   env_hints: |
     - name: RUNNER_TOKEN
       description: "Runner registration token (org/repo settings -> Actions -> Runners). Only needed for the first registration; the PVC config survives restarts."

@@ -56,8 +56,12 @@ installed.
   (x64 → amd64, arm64 → arm64), so a runner lands on matching-architecture nodes; an arm64 runner
   with no free arm node stays Pending (visible) instead of crashlooping on an amd64 node ("Exec
   format error"). Use the `pool` field to target a labeled pool; `selector` entries add more rows
-  (a `kubernetes.io/arch` entry overrides the auto row). The pod tolerates no node taints, so
-  tainted nodes — including dedicated workstation nodes — reject it.
+  (a `kubernetes.io/arch` entry overrides the auto row). Soft pod anti-affinity (preference, not a
+  requirement) spreads runners across nodes — every new runner prefers a host with no other runner,
+  matched cluster-wide across namespaces; it still lands on a shared node when no free one fits, and
+  only new placements are affected. (Cluster-wide matching is unavailable only if the cluster
+  enables the CrossNamespaceAffinity quota scope as a limited resource — not default.) The pod
+  tolerates no node taints, so tainted nodes — including dedicated workstation nodes — reject it.
 - **Outbound access** to `github.com` (runner agent registration + job API) and everything the
   tooling action needs at job time (`get.jetify.com`, `cache.nixos.org`, `docker.io`, the GitHub
   release CDN, the container registries your jobs pull from).
@@ -100,7 +104,7 @@ a runner is provisioned through **Hubble**:
 | `cpu` | **string** · Default: `2`<br>CPU cores requested |
 | `memory` | **string** · Default: `4Gi`<br>Memory requested |
 | `runnerStorageClass` | **string** · Optional<br>Storage class for the runner config PVC. Omit to use the default StorageClass |
-| `runnerStorageSize` | **string** · Default: `1Gi`<br>PVC size for the runner agent + registration config (~200 MB); jobs' build workspace stays on ephemeral storage |
+| `runnerStorageSize` | **string** · Default: `50Gi`<br>PVC size for the runner agent, container storage, job workspace, and logs — everything writable lives on this one PVC (see Notes) |
 
 ### Custom Environment Variables
 
@@ -152,10 +156,9 @@ more than capable of one per job):
 
 - **Cold start** — the pod installs only a minimal apt base; the toolchain install happens at job
   time into the pod's rootfs (the first job on a pod pays it), and each job that boots KinD pulls
-  the kind node image (~900 MB into the emptyDir at `/var/lib/containers`). The emptyDir counts
-  toward the ephemeral-storage request/limit (6 Gi / 12 Gi); rootfs writes are not.
-- **`/var/lib/containers`** is an `emptyDir` — podman's graphroot must not sit on the container's
-  overlayfs, which the pod satisfies without any PVC or host mount. `/etc/containers` configs
+  the kind node image (~900 MB into the PVC-backed graphroot at `/var/lib/containers`).
+- **`/var/lib/containers`** is a `subPath` on the runner-config PVC — podman's graphroot must not
+  sit on the container's own overlayfs, which the PVC satisfies. `/etc/containers` configs
   (policy.json, registries.conf, storage.conf) are **not** pre-staged by the pod — Ubuntu's
   `containers-common` package installs them at job time. (Pre-staging them collided with the
   package's conffiles and broke `apt install podman` with an EOF conffile prompt.)
@@ -165,17 +168,18 @@ more than capable of one per job):
   `podman system service --time=0 unix:///run/podman/podman.sock &`, or `systemctl enable` without
   `--now`. This is action-side — the pod only guarantees a clean, install-capable, non-systemd
   environment.
-- **`/var/lib/containers`** is an `emptyDir` — podman's graphroot must not sit on the container's
-  overlayfs, which the pod satisfies without any PVC or host mount. `/etc/containers` configs
+- **`/var/lib/containers`** is a `subPath` on the runner-config PVC — podman's graphroot must not
+  sit on the container's own overlayfs, which the PVC satisfies. `/etc/containers` configs
   (policy.json, registries.conf, storage.conf) are **not** pre-staged by the pod — Ubuntu's
   `containers-common` package installs them at job time. (Pre-staging them collided with the
   package's conffiles and broke `apt install podman` with an EOF conffile prompt.)
 - **Registration survives restarts** — the runner agent + registration config live on a PVC
   mounted at `/runner`. After the first successful registration, pod restarts skip registration
   entirely, so the ~1-hour registration-token expiry is only a first-launch concern. Jobs'
-  working directory (`_work`) stays on the ephemeral `/work` emptyDir, so build artifacts never
-  grow the PVC. If the PVC is lost (or the workload is deleted and recreated), the next launch
-  re-registers from scratch — re-add the `RUNNER_TOKEN` env var with a fresh value at launch.
+  working directory (`_work`) lives under the PVC (subPath `work`), so build artifacts grow the
+  PVC — size it (`runnerStorageSize`) for what your jobs produce. If the PVC is lost (or the
+  workload is deleted and recreated), the next launch re-registers from scratch — re-add the
+  `RUNNER_TOKEN` env var with a fresh value at launch.
 - **PVC caveats** — if the cluster has no default StorageClass, set `runnerStorageClass` or the
   PVC stays Pending. A ReadWriteOnce PVC binds to the first node the pod lands on; if the pod is
   rescheduled, the PVC keeps it pinned to that node (`safe-to-evict: false` limits eviction
