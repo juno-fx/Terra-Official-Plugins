@@ -50,8 +50,7 @@ stage "1. apt prerequisites"
 # lsb-release: tooling action runs `lsb_release -is`. The action installs the
 # rest of its own dependencies (git, make, wget, gh, ...) when needed.
 apt-get update -qq
-apt-get install -y -qq --no-install-recommends \
-  ca-certificates curl sudo jq lsb-release podman netavark >/dev/null
+apt-get install -y -qq ca-certificates curl sudo jq lsb-release podman netavark >/dev/null
 mkdir -p "$WORK"
 ok "apt packages installed"
 

@@ -12,7 +12,8 @@
 
 Self-hosted GitHub Actions runner as a workload. Each runner pod is a clean, install-capable
 environment (privileged, cgroup- and mount-namespaced, **KinD-capable**) running the runner agent —
-**no toolchain is pre-installed except podman**. Podman (plus netavark for bridge networking) is
+**no toolchain is pre-installed except podman**. Podman (with its recommended networking
+packages: netavark, nftables, aardvark-dns — plain apt install, no `--no-install-recommends`) is
 installed at pod boot along with its Docker-compatible API socket, so image builds work out of the
 box; the rest of the toolchain (kind, skaffold, kubectl, devbox, gh, …) is installed by workflow
 jobs at job time, typically via the team's existing tooling action — so an image built in this
@@ -102,7 +103,7 @@ a runner is provisioned through **Hubble**:
 | `labels` | **string** · Default: `juno`<br>Comma-separated labels the runner advertises; workflows match them via `runs-on` |
 | `version` | **string** · Default: `latest`<br>GitHub runner version to install, or `latest` to resolve the newest release at launch |
 | `architecture` | **select** · Required · Default: `x64`<br>Runner binary architecture: `x64` or `arm64`. Also adds a `kubernetes.io/arch` nodeSelector (x64 → amd64, arm64 → arm64) pinning the pod to matching nodes |
-| `baseImage` | **string** · Default: `ubuntu:26.04`<br>Base image for the pod. Keep it stock — the boot script installs podman + netavark, and the rest of the toolchain is installed at job time by the tooling action. Change only if you need a pinned/mirrored image in an air-gapped cluster |
+| `baseImage` | **string** · Default: `ubuntu:26.04`<br>Base image for the pod. Keep it stock — the boot script installs podman with its recommended networking packages (netavark, nftables, aardvark-dns), and the rest of the toolchain is installed at job time by the tooling action. Change only if you need a pinned/mirrored image in an air-gapped cluster |
 | `tuneInotify` | **boolean** · Required · Default: `true`<br>Raise `fs.inotify.max_user_instances` / `max_user_watches` from inside the pod. This is required for the nested KinD node's systemd to boot (at the default 128, systemd dies with "Failed to create control group inotify object" and kind only reports an opaque "could not find a log line that matches Multi-User System"). The limits are per-UID and *not* namespaced, so raising them changes the setting node-wide for every workload on that node (runtime only, not persisted). Disable if the cluster pre-tunes nodes via DaemonSet/machine config |
 | `pool` | **string** · Optional<br>Node pool label to schedule onto (adds a `pool=<value>` nodeSelector entry) |
 | `cpu` | **string** · Default: `2`<br>CPU cores requested |
@@ -160,7 +161,8 @@ cluster (the pod is more than capable of one per job):
 
 ## Notes
 
-- **Cold start** — the pod installs podman + netavark at boot (its Docker-compatible API socket
+- **Cold start** — the pod installs podman (with recommended: netavark, nftables, aardvark-dns)
+  at boot (its Docker-compatible API socket
   starts there too); the rest of the toolchain installs at job time into the pod's rootfs (the
   first job on a pod pays it), and each job that boots KinD pulls
   the kind node image (~900 MB into the PVC-backed graphroot at `/var/lib/containers`).
