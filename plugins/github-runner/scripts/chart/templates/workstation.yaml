@@ -98,6 +98,11 @@ spec:
               value: "podman"
             - name: DOCKER_HOST
               value: "unix:///run/podman/podman.sock"
+            # GitHub-hosted runners export USER to jobs; the pod runs as root,
+            # so hardcode the real value — makes `chown $(USER)` and friends
+            # work without an extra OS user.
+            - name: USER
+              value: "root"
             - name: NESTED_CI_TUNE_INOTIFY
               value: "{{ if .Values.tuneInotify }}1{{ else }}0{{ end }}"
             # github-runner launch fields (scripts/chart/files/run.sh)
