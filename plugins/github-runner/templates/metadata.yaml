@@ -28,7 +28,7 @@ data:
         - arm64
       default: x64
     - name: baseImage
-      description: "Base image for the runner pod (toolchain is installed per-job by the tooling action)"
+      description: "Base image for the runner pod (podman is installed at boot; the rest of the toolchain per-job by the tooling action)"
       default: "ubuntu:26.04"
     - name: tuneInotify
       description: "Raise fs.inotify limits node-wide from inside the pod (needed for nested KinD; disable if nodes are pre-tuned)"

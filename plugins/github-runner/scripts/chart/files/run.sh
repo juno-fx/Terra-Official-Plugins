@@ -7,11 +7,17 @@
 # non-overlayfs graphroot). This script bootstraps a minimal
 # apt base and execs the GitHub Actions runner agent.
 #
-# The toolchain (podman, devbox, kind, skaffold, gh, node, ...) is NOT
+# The rest of the toolchain (devbox, kind, skaffold, gh, node, ...) is NOT
 # installed here: workflow jobs install it per-job via the team's tooling
 # action (actions/runners/tooling). It writes into the pod's rootfs, so the
 # first job on a pod pays the install and later jobs on the same pod skip it
 # (tooling_needed check).
+#
+# podman IS installed here (plus netavark for bridge networking) and its
+# Docker-compatible API socket is started at boot (stage 5). Starting it pod-side
+# -- rather than in the tooling action -- keeps it alive for the pod's lifetime:
+# the runner kills the process tree of every job when it ends, so any socket
+# started from inside a job dies with that job.
 #
 # The agent MUST be exec'd from this pod command chain: kubectl exec cannot
 # enter the unshared cgroup/mount namespaces, so a runner started from an
@@ -45,7 +51,7 @@ stage "1. apt prerequisites"
 # rest of its own dependencies (git, make, wget, gh, ...) when needed.
 apt-get update -qq
 apt-get install -y -qq --no-install-recommends \
-  ca-certificates curl sudo jq lsb-release >/dev/null
+  ca-certificates curl sudo jq lsb-release podman netavark >/dev/null
 mkdir -p "$WORK"
 ok "apt packages installed"
 
@@ -97,6 +103,25 @@ else
   ok "runner already registered ($RUNNER_NAME); skipping config.sh (token not needed)"
 fi
 
-stage "5. starting runner agent (exec)"
+stage "5. podman docker shim + Docker-compatible API socket"
+# podman is installed at boot (not by the tooling action), so the socket is
+# owned by the pod: it starts before any job and is never a child of a job,
+# so the runner's job-end process-tree cleanup can't kill it. skopeo's
+# `docker-daemon:` transport talks to /var/run/docker.sock -> this socket.
+mkdir -p /run/podman
+ln -sf /usr/bin/podman /usr/bin/docker
+setsid nohup podman system service --time=0 unix:///run/podman/podman.sock \
+  >/var/log/podman-system-service.log 2>&1 &
+ln -sf /run/podman/podman.sock /var/run/docker.sock
+# socket binds async; wait up to 30s (non-fatal) before handing over to the agent
+for _ in $(seq 1 30); do
+  if curl -fsS --unix-socket /run/podman/podman.sock http://d/_ping >/dev/null 2>&1; then
+    ok "podman API socket live at /run/podman/podman.sock"
+    break
+  fi
+  sleep 1
+done
+
+stage "6. starting runner agent (exec)"
 cd "$RUNNER_DIR"
 exec ./run.sh

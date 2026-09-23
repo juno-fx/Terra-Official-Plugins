@@ -12,9 +12,11 @@
 
 Self-hosted GitHub Actions runner as a workload. Each runner pod is a clean, install-capable
 environment (privileged, cgroup- and mount-namespaced, **KinD-capable**) running the runner agent —
-**no toolchain is pre-installed**. Workflow jobs install the tools they need (podman, kind, skaffold,
-kubectl, devbox, gh, …) at job time, typically via the team's existing tooling action — so an image
-built in this plugin is a runner that can build images with podman and deploy them to a real (nested)
+**no toolchain is pre-installed except podman**. Podman (plus netavark for bridge networking) is
+installed at pod boot along with its Docker-compatible API socket, so image builds work out of the
+box; the rest of the toolchain (kind, skaffold, kubectl, devbox, gh, …) is installed by workflow
+jobs at job time, typically via the team's existing tooling action — so an image built in this
+plugin is a runner that can build images with podman and deploy them to a real (nested)
 KinD cluster, without a Docker socket, host mounts, or a Dockerfile to maintain.
 
 ---
@@ -32,11 +34,13 @@ the payload script, which bootstraps a minimal apt base and downloads, registers
 GitHub Actions runner agent. The agent is the pod's command chain — `kubectl exec` cannot enter the
 unshared namespaces, so the agent must run this way.
 
-Workflow jobs run inside the pod on a clean base. The first job on a pod installs the toolchain
-into the pod's rootfs (via the team's tooling action); later jobs on the same pod reuse it. The pod
+Podman is installed and its Docker-compatible API socket started at pod boot (stage 5 of the
+payload script) — the socket lives for the pod's lifetime, started by the pod's own init chain
+rather than by any job, so the runner's job-end process cleanup can't kill it. The rest of the
+toolchain is installed at job time: the first job on a pod installs it (via the team's tooling
+action) into the pod's rootfs; later jobs on the same pod reuse it. The pod
 exposes `KIND_EXPERIMENTAL_PROVIDER=podman` and `DOCKER_HOST=unix:///run/podman/podman.sock` so
-tooling that shells out to `docker` or boots a KinD cluster finds the right socket once podman is
-installed.
+tooling that shells out to `docker` or boots a KinD cluster finds the right socket on day one.
 
 ---
 
@@ -98,7 +102,7 @@ a runner is provisioned through **Hubble**:
 | `labels` | **string** · Default: `juno`<br>Comma-separated labels the runner advertises; workflows match them via `runs-on` |
 | `version` | **string** · Default: `latest`<br>GitHub runner version to install, or `latest` to resolve the newest release at launch |
 | `architecture` | **select** · Required · Default: `x64`<br>Runner binary architecture: `x64` or `arm64`. Also adds a `kubernetes.io/arch` nodeSelector (x64 → amd64, arm64 → arm64) pinning the pod to matching nodes |
-| `baseImage` | **string** · Default: `ubuntu:26.04`<br>Base image for the pod. Keep it stock — the toolchain is installed at job time by the tooling action. Change only if you need a pinned/mirrored image in an air-gapped cluster |
+| `baseImage` | **string** · Default: `ubuntu:26.04`<br>Base image for the pod. Keep it stock — the boot script installs podman + netavark, and the rest of the toolchain is installed at job time by the tooling action. Change only if you need a pinned/mirrored image in an air-gapped cluster |
 | `tuneInotify` | **boolean** · Required · Default: `true`<br>Raise `fs.inotify.max_user_instances` / `max_user_watches` from inside the pod. This is required for the nested KinD node's systemd to boot (at the default 128, systemd dies with "Failed to create control group inotify object" and kind only reports an opaque "could not find a log line that matches Multi-User System"). The limits are per-UID and *not* namespaced, so raising them changes the setting node-wide for every workload on that node (runtime only, not persisted). Disable if the cluster pre-tunes nodes via DaemonSet/machine config |
 | `pool` | **string** · Optional<br>Node pool label to schedule onto (adds a `pool=<value>` nodeSelector entry) |
 | `cpu` | **string** · Default: `2`<br>CPU cores requested |
@@ -119,8 +123,9 @@ field, auto-injected into every schema). These are suggested for this workload:
 
 ## Example workflow
 
-The pod ships no toolchain — each job installs what it needs, usually via the team's tooling action
-(the first job on a pod installs; later jobs are skipped by the action's `tooling_needed` check):
+The pod ships no toolchain except podman (installed at boot with its API socket live). Each job
+installs what else it needs, usually via the team's tooling action (the first job on a pod
+installs; later jobs are skipped by the action's `tooling_needed` check):
 
 ```yaml
 name: build
@@ -130,7 +135,8 @@ jobs:
     runs-on: [self-hosted, juno]
     steps:
       - uses: actions/checkout@v4
-      # installs podman, devbox, kind, skaffold, gh, node, ... into the pod's rootfs
+      # podman is already installed at pod boot; this installs devbox, kind,
+      # skaffold, gh, node, ... into the pod's rootfs
       - uses: <ci-repo>/actions/runners/tooling@main   # path to your tooling action
       - name: Build with podman
         run: |
@@ -138,8 +144,8 @@ jobs:
 ```
 
 The pod pre-sets `KIND_EXPERIMENTAL_PROVIDER=podman` and `DOCKER_HOST=unix:///run/podman/podman.sock`,
-so once the tooling action has installed podman, jobs can boot a nested KinD cluster (the pod is
-more than capable of one per job):
+and the socket is live from boot — no tooling action needed first — so jobs can boot a nested KinD
+cluster (the pod is more than capable of one per job):
 
 ```yaml
       - name: Bootstrap KinD and deploy
@@ -154,25 +160,23 @@ more than capable of one per job):
 
 ## Notes
 
-- **Cold start** — the pod installs only a minimal apt base; the toolchain install happens at job
-  time into the pod's rootfs (the first job on a pod pays it), and each job that boots KinD pulls
+- **Cold start** — the pod installs podman + netavark at boot (its Docker-compatible API socket
+  starts there too); the rest of the toolchain installs at job time into the pod's rootfs (the
+  first job on a pod pays it), and each job that boots KinD pulls
   the kind node image (~900 MB into the PVC-backed graphroot at `/var/lib/containers`).
 - **`/var/lib/containers`** is a `subPath` on the runner-config PVC — podman's graphroot must not
   sit on the container's own overlayfs, which the PVC satisfies. `/etc/containers` configs
   (policy.json, registries.conf, storage.conf) are **not** pre-staged by the pod — Ubuntu's
-  `containers-common` package installs them at job time. (Pre-staging them collided with the
-  package's conffiles and broke `apt install podman` with an EOF conffile prompt.)
-- **systemd gap** — the tooling action's `systemctl enable --now podman.socket` step assumes
-  systemd as PID 1 (live VM runners). Pods have no systemd, so under GitHub's default `bash -e`
-  that step fails. Use a pod-compatible variant: create the socket with
-  `podman system service --time=0 unix:///run/podman/podman.sock &`, or `systemctl enable` without
-  `--now`. This is action-side — the pod only guarantees a clean, install-capable, non-systemd
-  environment.
-- **`/var/lib/containers`** is a `subPath` on the runner-config PVC — podman's graphroot must not
-  sit on the container's own overlayfs, which the PVC satisfies. `/etc/containers` configs
-  (policy.json, registries.conf, storage.conf) are **not** pre-staged by the pod — Ubuntu's
-  `containers-common` package installs them at job time. (Pre-staging them collided with the
-  package's conffiles and broke `apt install podman` with an EOF conffile prompt.)
+  `containers-common` package installs them (stock registries.conf already lists `docker.io`).
+  (Pre-staging them collided with the package's conffiles and broke `apt install podman` with an
+  EOF conffile prompt.)
+- **Podman socket ownership** — podman and its Docker-compatible API socket (`/run/podman/podman.sock`,
+  symlinked at `/var/run/docker.sock`) are started by the pod's own init chain at boot (stage 5 of
+  the payload script), **not** by any workflow job. This matters: the GitHub runner kills the whole
+  process tree of a job when it ends, so a socket started from inside a job (the old tooling-action
+  approach) died with each job. A socket started by the pod before the agent exists is never a job's
+  child, so it survives job boundaries and lives for the pod's lifetime. Log: `/var/log/podman-system-service.log`.
+  `/run` is tmpfs, so pod restarts clear stale sockets; `--time=0` prevents idle eviction.
 - **Registration survives restarts** — the runner agent + registration config live on a PVC
   mounted at `/runner`. After the first successful registration, pod restarts skip registration
   entirely, so the ~1-hour registration-token expiry is only a first-launch concern. Jobs'
