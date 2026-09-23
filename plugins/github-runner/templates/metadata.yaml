@@ -10,6 +10,10 @@ data:
   chart: "{{ .Release.Name }}-scripts-configmap"
   description: "Self-hosted GitHub Actions runner with a nested podman + KinD build environment"
   fields: |
+    - name: icon
+      description: "Icon for the workload"
+      required: true
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/github-runner/assets/logo.png"
     - name: url
       description: "GitHub repository or organization URL the runner registers to"
       required: true

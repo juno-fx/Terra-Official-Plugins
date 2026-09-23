@@ -2,4 +2,4 @@ apiVersion: v1
 description: GitHub Actions runner with a nested podman + KinD build environment
 name: github-runner
 version: 0.0.0
-icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/github-runner/scripts/assets/logo.png
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/github-runner/assets/logo.png
