@@ -56,12 +56,7 @@ spec:
         kubernetes.io/arch: {{ if eq .Values.architecture "x64" }}amd64{{ else }}{{ .Values.architecture }}{{ end }}
         {{- end }}
         {{- if .Values.pool }}
-        pool: {{ .Values.pool | quote }}
-        {{- end }}
-        {{- if .Values.selector }}
-        {{- range .Values.selector }}
-        {{ .key | quote }}: {{ .value | quote }}
-        {{- end }}
+        kuiper.juno-innovations.com/github-runner-pool: {{ .Values.pool | quote }}
         {{- end }}
       {{- end }}
 

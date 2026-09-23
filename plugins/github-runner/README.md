@@ -1,6 +1,6 @@
 # GitHub Runner
 
-![GitHub Runner](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/github-runner/scripts/assets/logo.png)
+![GitHub Runner](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/github-runner/assets/logo.png)
 
 **Category:** CI/CD
 **Type:** Workload Template
@@ -60,7 +60,7 @@ tooling that shells out to `docker` or boots a KinD cluster finds the right sock
 - **Scheduling** — the `architecture` field always adds a `kubernetes.io/arch` nodeSelector
   (x64 → amd64, arm64 → arm64), so a runner lands on matching-architecture nodes; an arm64 runner
   with no free arm node stays Pending (visible) instead of crashlooping on an amd64 node ("Exec
-  format error"). Use the `pool` field to target a labeled pool; `selector` entries add more rows
+  format error"). Use the `kuiper.juno-innovations.com/github-runner-pool` field to target a labeled pool; `selector` entries add more rows
   (a `kubernetes.io/arch` entry overrides the auto row). Soft pod anti-affinity (preference, not a
   requirement) spreads runners across nodes — every new runner prefers a host with no other runner,
   matched cluster-wide across namespaces; it still lands on a shared node when no free one fits, and
