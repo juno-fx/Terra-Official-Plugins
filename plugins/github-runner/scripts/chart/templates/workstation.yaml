@@ -1,0 +1,159 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{ .Release.Name }}"
+  annotations:
+    juno-innovations.com/workload: "Server"
+spec:
+  replicas: 1
+  serviceName: "{{ .Release.Name }}"
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+  template:
+    metadata:
+      labels:
+        juno-innovations.com/runner: "true"
+        kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+      annotations:
+        juno-innovations.com/workload: "Server"
+    spec:
+      hostname: "{{ .Values.name }}"
+      terminationGracePeriodSeconds: 45
+      automountServiceAccountToken: false
+
+      # Soft anti-affinity: runners prefer their own node (preference only — a
+      # runner still lands on a shared node when no free one matches: e.g. more
+      # arm64 runners than arm nodes). The shared juno-innovations.com/runner
+      # label + namespaceSelector (all namespaces) spread runners cluster-wide,
+      # because runner workloads span namespaces. New placements only.
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    juno-innovations.com/runner: "true"
+                namespaceSelector: {}
+                topologyKey: kubernetes.io/hostname
+
+      {{- if or .Values.pool .Values.selector .Values.architecture }}
+      # nodeSelector rows: the architecture field ALWAYS adds a kubernetes.io/arch
+      # row (x64 -> amd64, arm64 -> arm64) so an arm64 runner can never land on an
+      # amd64 node ("Exec format error" crashloop). The pool field and any
+      # selector entries add further rows (exact key/value match). A selector
+      # entry for kubernetes.io/arch overrides the auto row. The pod tolerates NO
+      # node taints, so tainted nodes (including dedicated workstation nodes)
+      # will reject it.
+      {{- $sel := dict }}
+      {{- range .Values.selector }}
+      {{- $_ := set $sel .key .value }}
+      {{- end }}
+      nodeSelector:
+        {{- if and .Values.architecture (not (hasKey $sel "kubernetes.io/arch")) }}
+        kubernetes.io/arch: {{ if eq .Values.architecture "x64" }}amd64{{ else }}{{ .Values.architecture }}{{ end }}
+        {{- end }}
+        {{- if .Values.pool }}
+        kuiper.juno-innovations.com/github-runner-pool: {{ .Values.pool | quote }}
+        {{- end }}
+      {{- end }}
+
+      containers:
+        - name: runner
+          image: "{{ .Values.baseImage }}"
+          imagePullPolicy: IfNotPresent
+          # required by the nested toolchain: only --privileged gives the rw
+          # /sys the nested kubelet needs, and the privileged pod lands in the
+          # host cgroup namespace, which init.sh fixes by re-exec'ing into a
+          # private cgroup+mount namespace before handing off to run.sh.
+          securityContext:
+            privileged: true
+          command: ["/opt/nested-ci/init.sh"]
+          args: ["/payload/run.sh"]
+          resources:
+            requests:
+              cpu: "{{ .Values.cpu }}"
+              memory: "{{ .Values.memory }}"
+              # only the container writable layer (toolchain apt installs)
+              # counts against this — no disk-backed emptyDir remains
+              ephemeral-storage: "6Gi"
+            limits:
+              {{- if .Values.cpuLimit }}
+              cpu: "{{ .Values.cpuLimit }}"
+              {{- end }}
+              {{- if .Values.memoryLimit }}
+              memory: "{{ .Values.memoryLimit }}"
+              {{- end }}
+              ephemeral-storage: "12Gi"
+          env:
+            # nested-ci environment (see scripts/chart/files/init.sh)
+            - name: KIND_EXPERIMENTAL_PROVIDER
+              value: "podman"
+            - name: DOCKER_HOST
+              value: "unix:///run/podman/podman.sock"
+            # GitHub-hosted runners export USER to jobs; the pod runs as root,
+            # so hardcode the real value — makes `chown $(USER)` and friends
+            # work without an extra OS user.
+            - name: USER
+              value: "root"
+            - name: NESTED_CI_TUNE_INOTIFY
+              value: "{{ if .Values.tuneInotify }}1{{ else }}0{{ end }}"
+            # github-runner launch fields (scripts/chart/files/run.sh)
+            - name: RUNNER_URL
+              value: "{{ .Values.url }}"
+            - name: RUNNER_NAME
+              value: "{{ .Values.name }}"
+            - name: RUNNER_LABELS
+              value: "{{ .Values.labels }}"
+            - name: RUNNER_VERSION
+              value: "{{ .Values.version }}"
+            - name: RUNNER_ARCH
+              value: "{{ .Values.architecture }}"
+            {{- range .Values.env }}
+            - name: {{ .name | quote }}
+              value: {{ .value | quote }}
+            {{- end }}
+          volumeMounts:
+            - mountPath: /opt/nested-ci
+              name: nested-ci
+            - mountPath: /payload
+              name: payload
+            # everything writable lives on the single runner-config PVC:
+            # /runner at the volume root, graphroot / work / logs under subPaths
+            - mountPath: /var/lib/containers
+              name: runner-config
+              subPath: containers
+            - mountPath: /lib/modules
+              name: lib-modules
+            - mountPath: /work
+              name: runner-config
+              subPath: work
+            - mountPath: /runner
+              name: runner-config
+            - mountPath: /var/log
+              name: runner-config
+              subPath: varlog
+            - mountPath: /dev/shm
+              name: shm
+      volumes:
+        - name: nested-ci
+          configMap:
+            name: {{ .Release.Name }}-nested-ci
+            defaultMode: 0755
+        - name: payload
+          configMap:
+            name: {{ .Release.Name }}-payload
+            defaultMode: 0755
+        # podman graphroot MUST NOT sit on the container's own overlayfs
+        - name: runner-config
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-runner-config
+        # the path must exist for kind's node bind-mount; host modules not needed
+        - name: lib-modules
+          emptyDir: {}
+        - name: shm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi

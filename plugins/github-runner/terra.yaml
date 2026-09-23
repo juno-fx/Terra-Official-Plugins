@@ -1,0 +1,12 @@
+resource_id: github-runner
+name: GitHub Runner
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/github-runner/assets/logo.png
+description: Self-hosted GitHub Actions runner with a nested podman + KinD build environment
+category: CI/CD
+tags:
+  - cluster-level
+  - workload
+  - cicd
+  - github
+  - runner
+fields: []

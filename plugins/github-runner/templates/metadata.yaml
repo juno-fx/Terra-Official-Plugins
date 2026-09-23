@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-terra-metadata
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+  annotations:
+    juno-innovations.com/workload: "Server"
+data:
+  chart: "{{ .Release.Name }}-scripts-configmap"
+  description: "Self-hosted GitHub Actions runner with a nested podman + KinD build environment"
+  fields: |
+    - name: icon
+      description: "Icon for the workload"
+      required: true
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/github-runner/assets/logo.png"
+    - name: url
+      description: "GitHub repository or organization URL the runner registers to"
+      required: true
+    - name: labels
+      description: "Comma-separated labels the runner advertises (workflows use these in runs-on)"
+      default: "juno"
+    - name: version
+      description: "GitHub runner version to install (default: latest release)"
+      default: "latest"
+    - name: architecture
+      description: "Runner binary architecture; also pins scheduling via the kubernetes.io/arch nodeSelector (x64 -> amd64, arm64 -> arm64)"
+      required: true
+      type: select
+      options:
+        - x64
+        - arm64
+      default: x64
+    - name: baseImage
+      description: "Base image for the runner pod (podman is installed at boot; the rest of the toolchain per-job by the tooling action)"
+      default: "ubuntu:26.04"
+    - name: tuneInotify
+      description: "Raise fs.inotify limits node-wide from inside the pod (needed for nested KinD; disable if nodes are pre-tuned)"
+      required: true
+      type: boolean
+      default: true
+    - name: pool
+      description: "Compute pool label to schedule the runner onto (nodeSelector)"
+      required: false
+    - name: cpu
+      description: "CPU cores to allocate to the runner"
+      default: "2"
+    - name: memory
+      description: "Memory to allocate to the runner"
+      default: "4Gi"
+    - name: runnerStorageClass
+      description: "Storage class for the runner config PVC (default class when empty)"
+      required: false
+      type: k8sStorageClass
+    - name: runnerStorageSize
+      description: "PVC size for the runner agent, container storage, job workspace, and logs (all on one PVC)"
+      default: "50Gi"
+  env_hints: |
+    - name: RUNNER_TOKEN
+      description: "Runner registration token (org/repo settings -> Actions -> Runners). Only needed for the first registration; the PVC config survives restarts."
