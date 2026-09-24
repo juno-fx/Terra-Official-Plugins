@@ -1,0 +1,53 @@
+{{- $secretName := .Values.dns_secret_name | default (printf "%s-dns-credential" .Values.issuer_name) }}
+{{- if and (eq .Values.solver "dns01") (eq .Values.dns_provider "cloudflare") (not .Values.dns_secret_name) (not .Values.dns_token) }}
+{{- fail "the cloudflare dns01 solver needs a credential - set dns_token, or create a Secret in the cert-manager namespace and name it in dns_secret_name (see the plugin README)" }}
+{{- end }}
+{{- if and (eq .Values.solver "dns01") (not .Values.dns_secret_name) .Values.dns_token }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $secretName }}
+  namespace: {{ .Values.cert_manager_namespace }}
+type: Opaque
+stringData:
+  {{ .Values.dns_secret_key }}: {{ .Values.dns_token | quote }}
+{{- end }}
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: {{ .Values.issuer_name }}
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  acme:
+    server: {{ .Values.acme_server }}
+    email: {{ .Values.email }}
+    privateKeySecretRef:
+      name: {{ .Values.issuer_name }}-account-key
+    solvers:
+      {{- if eq .Values.solver "http01" }}
+      - http01:
+          ingress:
+            class: {{ .Values.ingress_class }}
+      {{- else if eq .Values.dns_provider "cloudflare" }}
+      - dns01:
+          cloudflare:
+            apiTokenSecretRef:
+              name: {{ $secretName }}
+              key: {{ .Values.dns_secret_key }}
+      {{- else }}
+      - dns01:
+          route53:
+            region: {{ .Values.aws_region }}
+            {{- if .Values.aws_hosted_zone_id }}
+            hostedZoneID: {{ .Values.aws_hosted_zone_id }}
+            {{- end }}
+            {{- if .Values.aws_access_key_id }}
+            accessKeyID: {{ .Values.aws_access_key_id }}
+            secretAccessKeySecretRef:
+              name: {{ $secretName }}
+              key: {{ .Values.dns_secret_key }}
+            {{- end }}
+      {{- end }}

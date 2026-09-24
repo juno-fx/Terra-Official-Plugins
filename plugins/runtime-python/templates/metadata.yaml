@@ -66,6 +66,19 @@ data:
         - ingress-noauth
         - clusterip
         - nodeport
+    - name: hostname
+      description: "Serve the application at its own domain, for example app.example.com, instead of a path on the platform host. Requires network_mode ingress-noauth, since the platform session cookie is not sent to another domain"
+      type: string
+      required: false
+    - name: tls_issuer
+      description: "cert-manager ClusterIssuer used to obtain the certificate for that domain, for example letsencrypt-prod"
+      type: string
+      required: false
+    - name: publish_dns
+      description: "Annotate the route so the ExternalDNS plugin creates the DNS record for that domain"
+      type: boolean
+      required: false
+      default: false
     - name: gpu
       description: "Attach a GPU"
       type: boolean

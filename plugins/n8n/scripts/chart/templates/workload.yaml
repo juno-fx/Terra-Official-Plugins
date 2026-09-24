@@ -44,6 +44,18 @@ spec:
               value: "true"
             - name: N8N_RUNNERS_ENABLED
               value: "true"
+            {{- if .Values.hostname }}
+            - name: N8N_PATH
+              value: "/"
+            - name: N8N_HOST
+              value: "{{ .Values.hostname }}"
+            - name: N8N_PROTOCOL
+              value: "https"
+            - name: WEBHOOK_URL
+              value: "https://{{ .Values.hostname }}/"
+            - name: N8N_EDITOR_BASE_URL
+              value: "https://{{ .Values.hostname }}/"
+            {{- else }}
             - name: N8N_PATH
               value: "/{{ .Release.Namespace }}/n8n/{{ .Values.name }}/"
             - name: N8N_HOST
@@ -52,6 +64,7 @@ spec:
               value: "https"
             - name: WEBHOOK_URL
               value: "https://{{ .Values.host }}/{{ .Release.Namespace }}/n8n/{{ .Values.name }}/"
+            {{- end }}
             {{- range .Values.env }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}
