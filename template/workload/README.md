@@ -1,5 +1,7 @@
 # PLUGIN
 
+<!-- TODO: reference the plugin logo at plugins/<plugin-name>/assets/logo.png
+     (see AGENTS.md — logos live in assets/, never inside scripts/). -->
 ![PLUGIN]()
 
 **Category:** <!-- TODO: e.g. AI · CG · Workstations · Data Science -->

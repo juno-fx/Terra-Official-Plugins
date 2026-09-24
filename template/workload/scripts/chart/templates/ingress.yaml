@@ -8,15 +8,28 @@ metadata:
     nginx.ingress.kubernetes.io/auth-url: "http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/"
     {{- end }}
     nginx.ingress.kubernetes.io/use-regex: "true"
+    # Optional Kuiper annotations. Uncomment to enable — see AGENTS.md for the full reference.
+    # Routes are matched by exact string, so use the full rendered path below.
+    #
+    # Hide internal paths (health checks, admin UIs) from the Hubble endpoint list.
+    # kuiper.juno-innovations.com/ingress-hide: "/{{ .Release.Namespace }}/{{ .Values.name }}/healthz"
+    #
+    # Append extra sub-paths to the endpoint list without adding Ingress rules.
+    # kuiper.juno-innovations.com/ingress-extras: "/{{ .Release.Namespace }}/{{ .Values.name }}/index.html"
 spec:
   rules:
     - host: {{ .Values.host }}
       http:
         paths:
-          - path: "/{{ .Release.Namespace }}/polaris/{{ .Values.name }}/"
+          # The path is namespaced so environments sharing a hostname cannot collide.
+          # If the app must serve under its own segment, add it here
+          # (e.g. /<namespace>/<segment>/<name>/) — every in-container reference,
+          # PREFIX env, nginx sidecar location, app base-URL — must match the
+          # rendered path exactly (the ingress never rewrites it).
+          - path: "/{{ .Release.Namespace }}/{{ .Values.name }}/"
             pathType: Prefix
             backend:
               service:
                 name: {{ .Values.name }}
                 port:
-                  number: 3000
+                  number: {{ .Values.port }}

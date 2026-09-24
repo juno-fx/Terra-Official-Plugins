@@ -35,19 +35,18 @@ data:
       type: string
       required: true
       default: "latest"
-    - name: gpu
-      description: "Attach a GPU to this workload"
-      type: boolean
-      required: true
     - name: publicAccess
       description: "Allow public access (disable authentication)"
       type: boolean
       required: true
       default: false
   # TODO: List commonly used custom environment variables for the upstream image.
-  # Remove any that conflict with vars already set in scripts/chart/templates/workstation.yaml
-  # (e.g. JUNO_WORKSTATION, JUNO_PROJECT, JUNO_ENVIRONMENT, USER, HOME, UID, GID, PREFIX).
-  # Leave as an empty list (env_hints: |\n    []) if the image has no commonly used custom env vars.
+  # Remove any that conflict with vars already set by the platform at runtime
+  # (JUNO_WORKSTATION, JUNO_PROJECT, JUNO_ENVIRONMENT, USER, HOME, UID, GID, PREFIX —
+  # see concepts/env.md). Leave as an empty list (env_hints: |\n    []) if the image
+  # has no commonly used custom env vars.
+  # Platform vars (JUNO_*, USER, HOME, UID, GID, PREFIX) are pass-through only — wire
+  # them into workload.yaml solely when the upstream image is built to read them (concepts/env.md).
   env_hints: |
     - name: TODO_VAR_NAME
       description: TODO — what this variable does and when to set it.

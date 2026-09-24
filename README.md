@@ -33,6 +33,10 @@ Choose the right type before you start:
 
 ---
 
+**New here?** Read `AGENTS.md` — plugin authoring starts at its *Adding a New Plugin — Checklist*
+(and probe the workload first: `concepts/probing.md`). The commands below are the mechanics
+around that flow.
+
 ## Quick Start
 
 ```bash
@@ -63,7 +67,7 @@ make verify
 |---------|-------------|
 | `make new-plugin` | Interactive scaffolding — creates correct boilerplate for your plugin type |
 | `make package <name>` | **Required** after any `scripts/` change — bundles scripts into a ConfigMap |
-| `make verify` | Checks all plugins have up-to-date packages — runs in CI on every push |
+| `make verify` | Checks all plugins have up-to-date packages **and** workload-template field↔values parity — runs in CI on every push |
 | `make check-size <name>` | Checks packaged size against the 1MiB Kubernetes ConfigMap limit |
 | `make watch <name>` | Auto-repackages when `scripts/` changes — useful during development |
 | `make test <name>` | Deploys plugin to a local Kind cluster with ArgoCD |

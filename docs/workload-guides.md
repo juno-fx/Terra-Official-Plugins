@@ -10,7 +10,7 @@ annotations in context with inline comments explaining the purpose of each.
 A standard web application workload. Demonstrates actions, connection details, and ingress
 endpoint control.
 
-```yaml title="scripts/chart/templates/workstation.yaml"
+```yaml title="scripts/chart/templates/workload.yaml"
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -19,7 +19,7 @@ metadata:
     # Declare the workload category for Hubble — shown on the running workload in the Hubble UI.
     # This value can be any string. It must match the value in templates/metadata.yaml:
     #   - metadata.yaml copy → read by Genesis to categorize the template in the catalog
-    #   - workstation.yaml copy → read by Hubble to label the active running workload
+    #   - workload.yaml copy → read by Hubble to label the active running workload
     juno-innovations.com/workload: "Application"
     # Whitelist which actions users can trigger on this StatefulSet via the Kuiper API.
     kuiper.juno-innovations.com/actions: "restart"

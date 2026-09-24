@@ -126,7 +126,7 @@ data:
 
 !!! warning "Annotation required on main workload too"
     The `juno-innovations.com/workload` annotation must also appear on the main workload object (StatefulSet/Deployment/etc.) in
-    `scripts/chart/templates/workstation.yaml`. This is how Hubble categorizes the running workload.
+    `scripts/chart/templates/workload.yaml`. This is how Hubble categorizes the running workload.
 
 ### `scripts/chart/` — The Embedded Helm Chart
 
@@ -141,7 +141,7 @@ scripts/
     ├── Chart.yaml
     ├── values.yaml            # All field names from metadata.yaml must exist here
     └── templates/
-        ├── workstation.yaml   # StatefulSet — the running workload
+        ├── workload.yaml   # StatefulSet — the running workload
         ├── service.yaml       # ClusterIP Service
         └── ingress.yaml       # nginx Ingress with Hubble auth
 ```
