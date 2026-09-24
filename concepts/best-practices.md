@@ -104,6 +104,9 @@ authoring time to web workloads, not to the scaffold.
 - [MUST] Never replicate Kuiper's anti-blacklist affinity injection
   (`concepts/affinity.md` — Kuiper-source fact)
 - [SHOULD] Tolerations only for real taints, matching the taint key
+- [SHOULD] Pod placement (avoid others / pack together) only with a probe-confirmed reason —
+  node contention or locality; `preferred` (soft) over `required` unless correctness depends
+  on it (`concepts/affinity.md`)
 - [Consider] `k8sPriority` for preemption-critical workloads
 
 ### Storage → `concepts/storage.md`
@@ -166,7 +169,7 @@ authoring time to web workloads, not to the scaffold.
 ## Anti-patterns
 
 - Decorative TCP probes — green while dead
-- Affinity for no reason — most workloads schedule anywhere
+- Affinity or pod placement (avoid/pack) for no reason — most workloads schedule anywhere
 - Secret in an env-var default — leaks into chart, README, and labels
 - Field without a `values.yaml` key — fails at launch, not at install
 - README/`env_hints` drift — docs disagree with what Genesis suggests
@@ -184,7 +187,8 @@ item; a documented deviation (README note) satisfies an item the author delibera
 - [ ] No secrets; least-privilege RBAC; web auth protected by default
 - [ ] Web workload: real `httpGet` probes on an unauthenticated endpoint
 - [ ] Requests present; limits if bounded; replicas honest
-- [ ] No affinity unless required; no anti-blacklist replication
+- [ ] No affinity unless required; no avoid/pack placement without a probe-confirmed
+      reason; no anti-blacklist replication
 - [ ] Storage via platform values, not hardcoded PVCs
 - [ ] GPU (if any): default off, both wirings on the same value
 - [ ] [WT] annotations: workload ×2, `kuiper-instance` ×3, `actions`/`connection` deliberate,

@@ -240,7 +240,7 @@ routes individual features to concepts.
 |-----------------|------|--------|
 | New plugin or new feature — what does it need? | `concepts/probing.md` | the ASK/SUGGEST probe checklist, feature→concept mapping |
 | Plugin quality, best practices, review bar | `concepts/best-practices.md` | **policy, not how-to** — the MUST/SHOULD/Consider quality bar, baseline hygiene, per-feature bars, type minimums, PR review checklist |
-| Node placement, affinity, tolerations, node selectors, `.Values.selector` | `concepts/affinity.md` | nodeAffinity/nodeSelector, taints/tolerations, Kuiper's anti-blacklist injection |
+| Node placement, affinity, tolerations, node selectors, `.Values.selector` | `concepts/affinity.md` | nodeAffinity/nodeSelector, podAffinity/podAntiAffinity — avoid others / pack together, taints/tolerations, Kuiper's anti-blacklist injection |
 | Resources, CPU/memory limits, priority classes, replicas, hostname | `concepts/scheduling.md` | `cpu`/`memory`/`cpuLimit`/`memoryLimit` wiring, `k8sPriority`, workload shape |
 | Storage, PVCs, volumes, mounts, storage classes, shared volumes, DataVolumes | `concepts/storage.md` | install-time vs launch-time storage, `volumeMounts`/`volumes`, `k8sStorageClass`/`dataVolume`, Kuiper-managed mount annotations |
 | GPU, CUDA, inference, `runtimeClassName` | `concepts/gpu.md` | `gpu` field, nvidia runtime, driver prerequisite, GPU-node targeting |
@@ -649,6 +649,7 @@ All types above plus:
 | `env_hints` in `metadata.yaml` and `README.md` fall out of sync | Docs disagree with what Genesis actually suggests | Keep both lists identical; update together |
 | Ingress path omits `{{ .Release.Namespace }}` | Passes in a single-environment cluster; once a second environment shares the hostname, launches fail with an admission-webhook 400 (`host … and path … is already defined in ingress <ns>/<name>`) part-way through, leaving a partial workload to clean up | Prefix the path with `/{{ .Release.Namespace }}/` (see Ingress Path Convention) |
 | Ingress path changed without updating the in-container path | nginx routes to the pod correctly, then the app 404s or serves a page whose assets all 404 — fails *after* looking like it worked | Update `PREFIX`, nginx `location`/`rewrite`/`sub_filter`, `--baseURL`/`ROOT_URL`/`base_url` and `HTTPRoute` rewrites in the same pass |
+| Required podAffinity/podAntiAffinity in a small cluster | Pods unschedulable — stranded at launch | Use `preferred` unless correctness requires `required` |
 
 ---
 

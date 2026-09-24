@@ -26,6 +26,7 @@ Walk these before touching `scripts/chart/`:
 | Env | Custom env vars the image supports? Built to read platform vars (PREFIX, USER, HOME, UID/GID, JUNO_*)? | `concepts/env.md` |
 | Image source | Private registry needing credentials? | `concepts/runtime.md` |
 | Node targeting | Must land on specific nodes (GPU, dedicated pools)? | `concepts/affinity.md` |
+| Placement relationships | Must avoid sharing a node with other workloads (GPU contention, noisy neighbors)? Must co-locate with a peer (cache, broker, low latency)? | `concepts/affinity.md` — pod placement |
 | Compute | OS-level VM (Windows, legacy OS, full kernel boot)? | `concepts/vm.md` |
 | Compute | Cloud instance (EC2, managed VM)? | `concepts/crossplane.md` |
 | Interface | Fronts existing externally-managed infrastructure (VDI broker, appliance, gateway)? | `concepts/connection-brokers.md` |
@@ -39,6 +40,8 @@ imply one, propose it — don't wait to be asked:
 |-------------------------|---------|
 | Chromium/Electron/browser-based app | `/dev/shm` memory-backed `emptyDir` mount (browsers fault without writable shared memory) |
 | ML inference, LLM, rendering, CUDA | GPU field + `runtimeClassName: nvidia` (`concepts/gpu.md`) |
+| GPU, rendering, batch/job fleets, runners, noisy neighbors | Avoid others — `podAntiAffinity` spread (`concepts/affinity.md`) |
+| Workload + node-local peer (cache, broker, database) with high-bandwidth / low-latency traffic | Pack together — `podAffinity` co-location (`concepts/affinity.md`) |
 | Web UI / webhook / API service | Ingress + auth decision (`concepts/ingress.md`) |
 | Persistent state, uploads, databases | Storage (`concepts/storage.md`) |
 | App needs base-path awareness | `PREFIX` env matching the ingress path (`concepts/ingress.md`) |
