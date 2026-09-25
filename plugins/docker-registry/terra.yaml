@@ -16,8 +16,8 @@ fields:
   - name: storageClass
     description: StorageClass for the registry PVC (leave empty for cluster default)
     type: string
-    required: true
+    required: false
   - name: user
     description: User who owns this workload instance
     type: string
-    required: true
+    required: false
