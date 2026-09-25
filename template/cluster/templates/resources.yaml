@@ -1,11 +1,37 @@
-# Put any valid Kubernetes objects here.
-# This can be Deployments, StatefulSets, Jobs, CronJobs, ConfigMaps, RBAC, etc.
-# There are no structural requirements — organize however makes sense for the plugin.
+# Your cluster-level plugin's Kubernetes objects go here. Installed into the
+# `argocd` namespace; the plugin creates and manages its own namespaces as needed.
 #
-# Cluster-level plugins install into the argocd namespace. They are expected to
-# create and manage their own namespaces if needed.
-#
-# A common pattern is to include an ArgoCD Application resource that delegates to
-# an upstream Helm chart, but any valid Kubernetes objects work.
-#
-# See docs/plugin-types.md for examples and guidance.
+# The common pattern is an ArgoCD Application delegating to an upstream Helm
+# chart (example below). Any valid manifests work — see
+# plugins/nvidia-gpu-operator/ for the full multi-source pattern.
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: "{{ .Release.Name }}-PLUGIN"
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {{ .Release.Name }}-PLUGIN   # namespace this chart manages
+  source:
+    repoURL: https://charts.example.com     # TODO: upstream Helm repo
+    chart: PLUGIN
+    targetRevision: "1.0.0"                 # TODO: upstream chart version
+    helm:
+      releaseName: "{{ .Release.Name }}-PLUGIN"
+      values: |
+        # Upstream chart values — wire them from your terra.yaml fields.
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+      - CreateNamespace=true
+
+# Cluster-level notes:
+# - RBAC scoped to what the plugin manages — no wildcard cluster-admin.
+# - No Kuiper annotations: ArgoCD syncs these directly, they have no effect
+#   (unlike workload templates).

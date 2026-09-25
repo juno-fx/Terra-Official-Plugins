@@ -33,6 +33,10 @@ Choose the right type before you start:
 
 ---
 
+**New here?** Read `AGENTS.md` — plugin authoring starts at its *Adding a New Plugin — Checklist*
+(and probe the workload first: `concepts/probing.md`). The commands below are the mechanics
+around that flow.
+
 ## Quick Start
 
 ```bash

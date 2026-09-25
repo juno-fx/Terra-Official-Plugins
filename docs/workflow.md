@@ -1,5 +1,8 @@
 # Workflow
 
+> **Authoring flow** — probe the workload first (`concepts/probing.md`), then follow AGENTS.md's
+> *Adding a New Plugin — Checklist*. This page covers the local test loop after scaffolding.
+
 ## Overview
 
 The development workflow is designed to focus on the raw Helm Chart development and then simulate the deployment

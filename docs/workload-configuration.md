@@ -4,6 +4,9 @@ This page covers all configuration options available when authoring a workload t
 field types for the Genesis workload form, Kuiper annotations for lifecycle and UI control,
 and ingress authentication patterns.
 
+> Tables on this page mirror `AGENTS.md` (authoritative quick reference) and
+> `concepts/labels-annotations.md` — keep all three in sync.
+
 ---
 
 ## Field Types
