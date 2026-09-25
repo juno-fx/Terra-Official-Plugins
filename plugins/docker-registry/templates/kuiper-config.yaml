@@ -9,11 +9,11 @@ data:
     admin
   name: |
     {{ .Release.Name }}
+  user: |
+    {{ .Values.user }}
   type: |
     Server
   label: |
     {{ .Release.Name }}
-  user: |
-    terra
   icon: |
     https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/docker-registry/assets/logo.png
