@@ -94,7 +94,7 @@ That case needs no change to the session's chart. A Service is only a label sele
 Two constraints decide whether this works for a given template:
 
 - the application must bind `0.0.0.0` inside the session rather than `127.0.0.1`, or nothing outside the pod can reach it
-- a NetworkPolicy on the workload must admit the port. Helios has none, so any port works. Jupyter admits any port from the proxy namespace. Wetty admits port 3001 only, so its `published_ports` field has to list the extra port. Its egress rule is not a problem, since NetworkPolicies only add allows and the workspace's own rules already permit egress
+- a NetworkPolicy on the workload must admit the port. Helios has none, so any port works, and Jupyter admits any port from the proxy namespace. Wetty admits port 3001 only, so an application on another port inside a Wetty session stays unreachable until that policy admits it. Egress is not the obstacle it looks like in the chart, since NetworkPolicies only add allows and the workspace rules under Network Security already permit it
 
 A template that restricts ports in a NetworkPolicy should expose a field for the extra ones, rather than requiring the policy to be edited by hand.
 
