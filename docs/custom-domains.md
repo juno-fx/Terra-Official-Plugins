@@ -16,7 +16,7 @@ A workload template that supports custom domains declares three fields, and noth
 | `tls_issuer` | string | empty | cert-manager ClusterIssuer used for the certificate |
 | `publish_dns` | boolean | `false` | Annotate the route so ExternalDNS creates the record |
 
-The hostname is derived from the workload name rather than typed, so instances launched from one template never collide, and naming the workload at launch is how an address like `my-app.example.com` is chosen next to `my-app-dev.example.com`.
+The hostname is derived from the workload name rather than typed, so two workloads launched from one template do not land on the same address, and naming the workload at launch is how an address like `my-app.example.com` is chosen next to `my-app-dev.example.com`. Workload names are unique within a project, not across a cluster, so the same name in two projects on the same domain still collides.
 
 With `domain` empty, the chart renders exactly what it rendered before the fields existed. That is the property to preserve when adding this to a plugin, and it is worth proving with a `helm template` diff rather than assuming it.
 
@@ -94,7 +94,7 @@ That case needs no change to the session's chart. A Service is only a label sele
 Two constraints decide whether this works for a given template:
 
 - the application must bind `0.0.0.0` inside the session rather than `127.0.0.1`, or nothing outside the pod can reach it
-- a NetworkPolicy on the workload must admit the port. Helios has none, so any port works. Jupyter admits any port from the proxy namespace. Wetty admits port 3001 only and denies all egress, so its `published_ports` and `allow_egress` fields have to be set
+- a NetworkPolicy on the workload must admit the port. Helios has none, so any port works. Jupyter admits any port from the proxy namespace. Wetty admits port 3001 only, so its `published_ports` field has to list the extra port. Its egress rule is not a problem, since NetworkPolicies only add allows and the workspace's own rules already permit egress
 
 A template that restricts ports in a NetworkPolicy should expose a field for the extra ones, rather than requiring the policy to be edited by hand.
 
