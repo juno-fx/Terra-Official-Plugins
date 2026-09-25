@@ -81,7 +81,7 @@ The session keeps serving its desktop or terminal on its own authenticated route
 Two things to know per template:
 
 - **Helios** has no NetworkPolicy, so any port works as soon as the application binds `0.0.0.0`
-- **Wetty** admits inbound traffic on port 3001 only, and denies all outbound traffic, so its `published_ports` and `allow_egress` fields have to be set on the session before a route to it can work
+- **Wetty** admits inbound traffic on port 3001 only, so a route to any other port in a Wetty session is refused by that policy. Publishing from Wetty needs the chart to admit the port first. Outbound traffic is not a problem, since the workspace rules under Network Security already allow it
 
 ---
 
