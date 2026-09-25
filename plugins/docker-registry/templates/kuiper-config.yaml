@@ -5,15 +5,9 @@ metadata:
   labels:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
 data:
-  group: |
-    admin
-  name: |
-    {{ .Release.Name }}
-  user: |
-    {{ .Values.user }}
-  type: |
-    Server
-  label: |
-    {{ .Release.Name }}
-  icon: |
-    https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/docker-registry/assets/logo.png
+  group: admin
+  name: {{ .Release.Name }}
+  user: {{ .Values.user }}
+  type: Server
+  label: {{ .Release.Name }}
+  icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/docker-registry/assets/logo.png
