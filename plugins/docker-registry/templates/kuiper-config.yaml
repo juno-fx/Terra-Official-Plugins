@@ -5,6 +5,8 @@ metadata:
   labels:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
 data:
+  group: |
+    admin
   name: |
     {{ .Release.Name }}
   type: |
