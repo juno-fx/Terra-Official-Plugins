@@ -16,13 +16,20 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: nfs-server
-          image: itsthenetwork/nfs-server-alpine:latest
+          image: gists/nfs-server
           imagePullPolicy: IfNotPresent
           securityContext:
-            privileged: true
+            capabilities:
+              add:
+                - SYS_ADMIN
+                - SETPCAP
           env:
-            - name: SHARED_DIRECTORY
+            - name: NFS_DIR
               value: /nfsshare
+            - name: NFS_DOMAIN
+              value: "*"
+            - name: NFS_OPTION
+              value: "fsid=0,rw,sync,insecure,no_subtree_check,nohide"
           ports:
             - name: nfs
               containerPort: 2049

@@ -8,7 +8,7 @@ tags:
   - nfs
   - persistent-volume
   - cluster-level
-editable: true
+editable: false
 fields:
   - name: size
     description: Size of the NFS share and its backing volume (e.g. 10Gi, 50Gi)
@@ -16,7 +16,7 @@ fields:
     required: true
     default: "10Gi"
   - name: storageClass
-    description: StorageClass backing the NFS server's storage (leave empty for cluster default)
+    description: StorageClass backing the NFS server's storage (leave empty for cluster default — a default StorageClass must exist)
     type: string
     required: false
   - name: port

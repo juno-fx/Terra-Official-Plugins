@@ -13,4 +13,4 @@ spec:
     - "port={{ .Values.port }}"
   nfs:
     server: localhost
-    path: /nfsshare
+    path: /
