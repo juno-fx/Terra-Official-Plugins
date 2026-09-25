@@ -1,6 +1,6 @@
 {{- if and (eq .Values.solver "dns01") (eq .Values.dns_provider "cloudflare") }}
 {{- if not .Values.secret_name }}
-{{- fail "the cloudflare dns01 solver needs an API token - create a Secret in the cert-manager namespace and set secret_name and secret_key (see the plugin README)" }}
+{{- fail (printf "the cloudflare dns01 solver needs an API token - create a Secret in the %s namespace and set secret_name and secret_key (see the plugin README)" .Values.secret_namespace) }}
 {{- end }}
 {{- if not .Values.secret_key }}
 {{- fail "secret_key is empty - name the key inside the Secret that holds the Cloudflare API token (see the plugin README)" }}

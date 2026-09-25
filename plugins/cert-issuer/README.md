@@ -58,7 +58,8 @@ Two challenge types are supported:
 | `solver` | **select** · Required · Default: `http01`<br>`http01` or `dns01` |
 | `ingress_class` | **string** · Optional · Default: `nginx`<br>Ingress class used to serve the HTTP-01 challenge |
 | `dns_provider` | **select** · Optional · Default: `cloudflare`<br>`cloudflare` or `route53`, used only with `dns01` |
-| `secret_name` | **string** · Optional<br>Name of the credential Secret in the cert-manager namespace. Required for Cloudflare. For Route53, leave empty to use ambient credentials such as IRSA |
+| `secret_namespace` | **string** · Optional · Default: `cert-manager`<br>Namespace the credential Secret is created in. Must be the namespace cert-manager runs in |
+| `secret_name` | **string** · Optional<br>Name of the credential Secret in `secret_namespace`. Required for Cloudflare. For Route53, leave empty to use ambient credentials such as IRSA |
 | `secret_key` | **string** · Optional<br>Key holding the Cloudflare API token. Route53 reads fixed key names, see [Credentials](#credentials) |
 | `aws_hosted_zone_id` | **string** · Optional<br>Route53 hosted zone id. Leave empty to let cert-manager discover the zone |
 
@@ -66,9 +67,9 @@ Two challenge types are supported:
 
 ## Credentials
 
-The plugin never takes a credential as a form value. For DNS-01 you create a Secret, then point the plugin at it with `secret_name` and `secret_key`.
+The plugin never takes a credential as a form value. For DNS-01 you create a Secret, then point the plugin at it with `secret_namespace`, `secret_name` and `secret_key`.
 
-The Secret must live in the namespace cert-manager runs in, `cert-manager` when installed from Terra. A ClusterIssuer's Secret references carry no namespace: cert-manager always reads them from its own namespace, so a Secret created anywhere else is never found and the plugin has no namespace field to set.
+`secret_namespace` has to be the namespace cert-manager runs in, `cert-manager` when installed from Terra, which is the default. A ClusterIssuer's Secret references carry no namespace of their own: cert-manager always reads them from its own namespace, so a Secret created anywhere else is never found. The field is there so the Secret's location is stated in the form, as it is for the other plugins that take a credential Secret, not because the Secret can live elsewhere.
 
 ### Cloudflare
 
