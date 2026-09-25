@@ -18,8 +18,9 @@ fields:
   - name: storageClass
     description: StorageClass backing the NFS server's storage (leave empty for cluster default — a default StorageClass must exist)
     type: string
-    required: false
+    required: true
   - name: port
     description: NodePort the NFS server listens on (30000-32767). Pods mount the share via localhost:<port>.
     type: int
     required: true
+    default: 32049
