@@ -73,15 +73,15 @@ Two kinds of target:
 The common case: a user is working in a session and starts an application on port 8000. Publishing it does not require exposing the session.
 
 1. Note the workload instance name as shown in Hubble
-2. Install this plugin into the project with `target_kind: workload`, `target_name` set to that instance, and `target_port` set to the port the application listens on
+2. Install this plugin into the project with `target_kind: workload`, `target_name` set to that instance, `target_port` set to the port the application listens on, and `selector_label` set to the label that template puts on its pods (below)
 3. Point the hostname at the cluster ingress address, or set `publish_dns` and let ExternalDNS create the record
 
 The session keeps serving its desktop or terminal on its own authenticated route, on port 3000 for Helios and 3001 for Wetty. Only the port named here is published, and it carries whatever authentication you configure below rather than the platform session gate.
 
 Two things to know per template:
 
-- **Helios** has no NetworkPolicy, so any port works as soon as the application binds `0.0.0.0`
-- **Wetty** admits inbound traffic on port 3001 only, so a route to any other port in a Wetty session is refused by that policy. Publishing from Wetty needs the chart to admit the port first. Outbound traffic is not a problem, since the workspace rules under Network Security already allow it
+- **Helios** labels its pods `juno-innovations.com/workstation`, the default. It has no NetworkPolicy, so any port works as soon as the application binds `0.0.0.0`
+- **Wetty** labels its pods `kuiper.juno-innovations.com/kuiper-instance`, so `selector_label` has to be changed from the default or the route returns 503. It admits inbound traffic on port 3001 only, so a route to any other port in a Wetty session is refused by that policy. Publishing from Wetty needs the chart to admit the port first. Outbound traffic is not a problem, since the workspace rules under Network Security already allow it
 
 ---
 

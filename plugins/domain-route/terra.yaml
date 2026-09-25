@@ -32,7 +32,7 @@ fields:
     default: 8080
     type: int
   - name: selector_label
-    description: "Label the target workload carries. Helios and the runtime templates use juno-innovations.com/workstation, most others use kuiper.juno-innovations.com/kuiper-instance."
+    description: "Label the target workload carries. Helios and the runtime templates use juno-innovations.com/workstation. Wetty, n8n and most others use kuiper.juno-innovations.com/kuiper-instance. A route with the wrong label returns 503."
     required: false
     default: juno-innovations.com/workstation
     type: select
