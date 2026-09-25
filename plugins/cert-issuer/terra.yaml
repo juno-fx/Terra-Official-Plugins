@@ -11,7 +11,7 @@ tags:
 editable: true
 fields:
   - name: issuer_name
-    description: Name of the ClusterIssuer. Workloads reference this name in their tls_issuer field.
+    description: Name of the ClusterIssuer. Workloads reference this name in their tls_issuer field. Check kubectl get clusterissuer before installing, since an existing issuer with this name is taken over and its configuration replaced, and uninstalling deletes it.
     required: true
     default: letsencrypt-prod
     type: string
