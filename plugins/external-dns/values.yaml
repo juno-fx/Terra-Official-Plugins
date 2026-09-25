@@ -1,0 +1,14 @@
+chart_version: "1.21.1"
+provider: aws
+sources:
+  - service
+  - ingress
+domain_filters: ""
+txt_owner_id: "default"
+policy: upsert-only
+aws_role_arn: ""
+secret_namespace: external-dns
+secret_name: ""
+secret_key: ""
+annotation_filter: "external-dns.alpha.kubernetes.io/enable=true"
+extra_values: ""
