@@ -53,7 +53,7 @@ fields:
       - HTTP
       - HTTPS
   - name: tls_issuer
-    description: cert-manager ClusterIssuer used to obtain a certificate, for example letsencrypt-prod. Leave empty to serve without requesting one.
+    description: cert-manager ClusterIssuer used to obtain a certificate, for example letsencrypt-prod. Leave empty to serve with the ingress controller's default certificate instead.
     required: false
     type: string
   - name: publish_dns

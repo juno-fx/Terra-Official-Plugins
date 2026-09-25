@@ -58,7 +58,7 @@ Two kinds of target:
 | `selector_label` | **select** · Optional · Default: `juno-innovations.com/workstation`<br>Label the target carries. Helios and the runtime templates use `juno-innovations.com/workstation`, most others use `kuiper.juno-innovations.com/kuiper-instance` |
 | `path` | **string** · Required · Default: `/`<br>Path prefix served on the hostname |
 | `backend_protocol` | **select** · Required · Default: `HTTP`<br>Protocol the target speaks. Helios serves HTTPS |
-| `tls_issuer` | **string** · Optional<br>cert-manager ClusterIssuer name. Leave empty to serve without requesting a certificate |
+| `tls_issuer` | **string** · Optional<br>cert-manager ClusterIssuer name. Leave empty to serve with the ingress controller's default certificate |
 | `publish_dns` | **boolean** · Required · Default: `false`<br>Annotate the route so ExternalDNS creates the record |
 | `ingress_class` | **string** · Required · Default: `nginx`<br>Ingress class to publish through |
 | `auth` | **select** · Required · Default: `none`<br>`none` leaves authentication to the application, `basic` puts HTTP basic auth in front |
@@ -119,5 +119,6 @@ kubectl create secret generic route-basic-auth --namespace <project> --from-file
 - Workloads that carry a NetworkPolicy only admit traffic from the ingress controller namespace. Routes created here arrive from exactly that namespace, so they are permitted, while a proxy running inside the project would not be
 - An application serving under a sub-path, which most platform workloads do, will not work at `/` on a custom domain. Either set `path` to the prefix the application expects, or use the workload template's own `hostname` field, which reconfigures the application to serve from the root
 - The Service created for a workload target is named after the install, so several routes against the same workload on different ports do not collide
+- Plain HTTP is always redirected to HTTPS, with or without `tls_issuer`. ingress-nginx exempts `/.well-known/acme-challenge` from that redirect by default, so HTTP-01 certificates still issue
 - Deleting the install removes the route and the Service, but not the certificate Secret. Remove that by hand if the hostname is gone for good
 - Leave `publish_dns` off when the record already exists, otherwise ExternalDNS and whoever owns the zone are both managing the same name

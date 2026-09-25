@@ -4,6 +4,7 @@ metadata:
   name: {{ .Release.Name }}
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: "{{ .Values.backend_protocol }}"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     {{- if .Values.tls_issuer }}
     cert-manager.io/cluster-issuer: {{ .Values.tls_issuer }}
     {{- end }}
