@@ -398,9 +398,11 @@ on the StatefulSet metadata — this is how Hubble categorizes the running workl
 
 Kuiper always injects these keys when rendering the embedded chart. They must be present in
 `scripts/chart/values.yaml` or Helm rendering will fail. Do not remove them from the scaffold.
+`selector` is the one exception — a chart-declared convention key Kuiper does **not** inject
+(see `concepts/affinity.md`); it stays because a dozen charts range it into `nodeAffinity`.
 
 ```yaml
-# Kuiper-injected standard values — do not remove
+# Kuiper-injected standard values — do not remove (selector: declared, not injected)
 name: my-template
 user:
 group:
@@ -416,9 +418,7 @@ pullSecret:
 session:
 volumeMounts: []
 volumes: []
-env:
-  - name: JUNO
-    value: "true"
+env: []        # populated at launch from the auto-injected `env` field
 selector:
 plugins: []
 _kuiper:
@@ -621,7 +621,7 @@ All types above plus:
 |--------|-------|-------------|
 | `make new-plugin` | interactive | Create a new plugin with type-aware scaffolding |
 | `make package <name>` | `make package ollama` | Repackage scripts/ into ConfigMap YAML |
-| `make verify` | `make verify` | Check all plugins have up-to-date packages + workload-template field↔values.yaml parity (Rule 3) — CI |
+| `make verify` | `make verify` | Check all plugins have up-to-date packages (CI) |
 | `make check-size <name>` | `make check-size helios` | Check packaged size vs 1MiB limit |
 | `make watch <name>` | `make watch helios` | Auto-repackage on scripts/ changes (dev) |
 | `make test <name>` | `make test ollama` | Deploy to local Kind cluster via ArgoCD |

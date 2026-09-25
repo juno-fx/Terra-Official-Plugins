@@ -15,9 +15,12 @@ memoryLimit: null
 publicAccess: false
 host:
 pullSecret:
-# Standard Kuiper-injected keys — do not remove (AGENTS.md). Inert until the chart
-# wires them; the probing checklist (AGENTS.md → concepts/probing.md) adds wiring
-# per workload needs.
+session:
+# Standard Kuiper-injected keys (AGENTS.md) — do not remove — plus `selector`,
+# a chart-declared convention key Kuiper does NOT inject (concepts/affinity.md).
+# All are inert until the chart wires them; the probing checklist
+# (AGENTS.md → concepts/probing.md) adds wiring per workload needs.
+idx: 0
 guid: 0
 puid: 0
 volumeMounts: []
@@ -25,3 +28,4 @@ volumes: []
 env: []
 selector:
 plugins: []
+_kuiper:

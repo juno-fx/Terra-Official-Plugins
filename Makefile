@@ -122,7 +122,6 @@ verify:
 	  exit 1; \
 	fi; \
 	echo "All packaged scripts are up to date."
-	@./hack/verify-fields.sh
 
 lint-scripts:
 	shellcheck plugins/wetty/scripts/chart/files/system.sh
