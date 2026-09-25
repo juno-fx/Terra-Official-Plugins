@@ -1,0 +1,25 @@
+resource_id: nfs-server
+name: NFS Server
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/nfs-server/assets/logo.png
+description: Self-hosted NFS server (NFSv4) exposing a share via NodePort and creating an orphaned Persistent Volume so it is picked up automatically by the storage UI.
+category: Storage
+tags:
+  - storage
+  - nfs
+  - persistent-volume
+  - cluster-level
+editable: true
+fields:
+  - name: size
+    description: Size of the NFS share and its backing volume (e.g. 10Gi, 50Gi)
+    type: string
+    required: true
+    default: "10Gi"
+  - name: storageClass
+    description: StorageClass backing the NFS server's storage (leave empty for cluster default)
+    type: string
+    required: false
+  - name: port
+    description: NodePort the NFS server listens on (30000-32767). Pods mount the share via localhost:<port>.
+    type: int
+    required: true
