@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Release.Name }}"
+spec:
+  revisionHistoryLimit: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "{{ .Release.Name }}"
+  template:
+    metadata:
+      labels:
+        app: "{{ .Release.Name }}"
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: nfs-server
+          image: gists/nfs-server
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            capabilities:
+              add:
+                - SYS_ADMIN
+                - SETPCAP
+          env:
+            - name: NFS_DIR
+              value: /nfsshare
+            - name: NFS_DOMAIN
+              value: "*"
+            - name: NFS_OPTION
+              value: "fsid=0,rw,sync,insecure,no_subtree_check,nohide"
+          ports:
+            - name: nfs
+              containerPort: 2049
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: 2049
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 2049
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          volumeMounts:
+            - name: data
+              mountPath: /nfsshare
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: "{{ .Release.Name }}-data"
