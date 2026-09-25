@@ -15,5 +15,5 @@ fields:
     default: "10Gi"
   - name: storageClass
     description: StorageClass for the registry PVC (leave empty for cluster default)
-    type: string
+    type: k8sStorageClass
     required: false
