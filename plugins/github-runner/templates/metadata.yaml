@@ -40,7 +40,7 @@ data:
       type: boolean
       default: true
     - name: pool
-      description: "Compute pool label to schedule the runner onto (nodeSelector)"
+      description: "Node pool to schedule the runner onto. Matches nodes labeled kuiper.juno-innovations.com/github-runner-pool=<value>"
       required: false
     - name: cpu
       description: "CPU cores to allocate to the runner"
