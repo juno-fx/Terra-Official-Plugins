@@ -60,7 +60,10 @@ tooling that shells out to `docker` or boots a KinD cluster finds the right sock
 - **Scheduling** — the `architecture` field always adds a `kubernetes.io/arch` nodeSelector
   (x64 → amd64, arm64 → arm64), so a runner lands on matching-architecture nodes; an arm64 runner
   with no free arm node stays Pending (visible) instead of crashlooping on an amd64 node ("Exec
-  format error"). Use the `kuiper.juno-innovations.com/github-runner-pool` field to target a labeled pool; `selector` entries add more rows
+  format error"). Set the `pool` field to target a dedicated set of nodes: it adds a
+  `kuiper.juno-innovations.com/github-runner-pool=<pool>` nodeSelector row, so the runner only
+  schedules onto nodes carrying that label with that value. Label the nodes first from the
+  **Network** page in the Genesis Admin dashboard. A pool value that no node carries leaves the runner Pending. `selector` entries add more rows
   (a `kubernetes.io/arch` entry overrides the auto row). Soft pod anti-affinity (preference, not a
   requirement) spreads runners across nodes — every new runner prefers a host with no other runner,
   matched cluster-wide across namespaces; it still lands on a shared node when no free one fits, and
@@ -105,7 +108,7 @@ a runner is provisioned through **Hubble**:
 | `architecture` | **select** · Required · Default: `x64`<br>Runner binary architecture: `x64` or `arm64`. Also adds a `kubernetes.io/arch` nodeSelector (x64 → amd64, arm64 → arm64) pinning the pod to matching nodes |
 | `baseImage` | **string** · Default: `ubuntu:26.04`<br>Base image for the pod. Keep it stock — the boot script installs podman with its recommended networking packages (netavark, nftables, aardvark-dns), and the rest of the toolchain is installed at job time by the tooling action. Change only if you need a pinned/mirrored image in an air-gapped cluster |
 | `tuneInotify` | **boolean** · Required · Default: `true`<br>Raise `fs.inotify.max_user_instances` / `max_user_watches` from inside the pod. This is required for the nested KinD node's systemd to boot (at the default 128, systemd dies with "Failed to create control group inotify object" and kind only reports an opaque "could not find a log line that matches Multi-User System"). The limits are per-UID and *not* namespaced, so raising them changes the setting node-wide for every workload on that node (runtime only, not persisted). Disable if the cluster pre-tunes nodes via DaemonSet/machine config |
-| `pool` | **string** · Optional<br>Node pool label to schedule onto (adds a `pool=<value>` nodeSelector entry) |
+| `pool` | **string** · Optional<br>Node pool to schedule onto. Adds a `kuiper.juno-innovations.com/github-runner-pool=<value>` nodeSelector entry, so the runner only lands on nodes labeled with that value (see Prerequisites → Scheduling) |
 | `cpu` | **string** · Default: `2`<br>CPU cores requested |
 | `memory` | **string** · Default: `4Gi`<br>Memory requested |
 | `runnerStorageClass` | **string** · Optional<br>Storage class for the runner config PVC. Omit to use the default StorageClass |
