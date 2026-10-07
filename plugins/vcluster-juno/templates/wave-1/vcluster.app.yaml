@@ -1,0 +1,104 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-vcluster
+  namespace: argocd
+  labels:
+    {{- include "vcluster-juno.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {{ include "vcluster-juno.namespace" . }}
+  sources:
+    - repoURL: {{ .Values.vcluster_chart_repo }}
+      chart: vcluster
+      targetRevision: {{ .Values.vcluster_chart_version | quote }}
+      helm:
+        releaseName: {{ .Release.Name }}
+        values: |
+          controlPlane:
+            distro:
+              k8s:
+                enabled: true
+                version: {{ include "vcluster-juno.k8sVersion" . | quote }}
+                apiServer:
+                  extraArgs:
+                    # The apiserver otherwise advertises its pod-local bind address
+                    # (127.0.0.1:6443) as jwks_uri in OIDC discovery, breaking
+                    # in-cluster JWT validation (Rhea service-to-service authn).
+                    - --service-account-jwks-uri=https://kubernetes.default.svc.cluster.local/openid/v1/jwks
+            statefulSet:
+              labels:
+                {{- include "vcluster-juno.labels" . | nindent 16 }}
+              pods:
+                labels:
+                  {{- include "vcluster-juno.labels" . | nindent 18 }}
+            proxy:
+              extraSANs:
+                - {{ .Release.Name }}.{{ include "vcluster-juno.namespace" . }}
+                - {{ .Release.Name }}.{{ include "vcluster-juno.namespace" . }}.svc
+                - {{ .Release.Name }}.{{ include "vcluster-juno.namespace" . }}.svc.cluster.local
+                {{- if .Values.vcluster_hostname }}
+                - {{ .Values.vcluster_hostname }}
+                {{- end }}
+            {{- if .Values.vcluster_hostname }}
+            ingress:
+              enabled: true
+              host: {{ .Values.vcluster_hostname | quote }}
+              pathType: ImplementationSpecific
+              labels:
+                {{- include "vcluster-juno.labels" . | nindent 16 }}
+              annotations:
+                nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+                nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+                nginx.ingress.kubernetes.io/ssl-redirect: "true"
+            {{- end }}
+            service:
+              labels:
+                {{- include "vcluster-juno.labels" . | nindent 16 }}
+          exportKubeConfig:
+            context: vcluster-{{ .Release.Name }}
+            server: {{ include "vcluster-juno.server" . | quote }}
+          sync:
+            toHost:
+              services:
+                enabled: true
+              persistentVolumeClaims:
+                enabled: true
+              configMaps:
+                enabled: true
+              secrets:
+                enabled: true
+              pods:
+                enabled: true
+              ingresses:
+                enabled: true
+            fromHost:
+              ingressClasses:
+                enabled: true
+              runtimeClasses:
+                enabled: true
+              storageClasses:
+                enabled: auto
+              csiDrivers:
+                enabled: auto
+              csiNodes:
+                enabled: auto
+              csiStorageCapacities:
+                enabled: auto
+              {{- if .Values.sync_host_nodes }}
+              nodes:
+                enabled: true
+                selector:
+                  all: true
+              {{- end }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true

@@ -1,0 +1,4 @@
+apiVersion: v1
+name: vcluster-juno
+version: 0.0.1
+icon: https://raw.githubusercontent.com/loft-sh/vcluster/main/docs/static/media/vcluster-logo-dark.svg
