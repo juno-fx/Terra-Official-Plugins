@@ -28,7 +28,7 @@ data:
     fi
 
     # Install wetty (like Hermes Agent's built-in wetty)
-    npm install -g wetty
+    npm install -g wetty@3.3.5
 
     # Download k9s binary from GitHub releases
     curl -fsSL -o /tmp/k9s.tar.gz https://github.com/derailed/k9s/releases/latest/download/k9s_Linux_amd64.tar.gz

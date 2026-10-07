@@ -33,7 +33,7 @@ data:
     fi
 
     # Install wetty (like Hermes Agent's built-in wetty)
-    npm install -g wetty
+    npm install -g wetty@3.3.5
 
     # Install opencode so the terminal has the CLI available
     export SHELL=/bin/sh
