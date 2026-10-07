@@ -1,0 +1,32 @@
+{{- if .Values.install_snapshot_api }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-snapshot-api
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    - post-delete-finalizer.argocd.argoproj.io
+    - post-delete-finalizer.argocd.argoproj.io/cleanup
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  sources:
+    - repoURL: https://github.com/kubernetes-csi/external-snapshotter
+      path: client/config/crd
+      targetRevision: {{ .Values.snapshot_api_version }}
+    - repoURL: https://github.com/kubernetes-csi/external-snapshotter
+      path: deploy/kubernetes/snapshot-controller
+      targetRevision: {{ .Values.snapshot_api_version }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+      - ServerSideApply=true
+      - CreateNamespace=true
+{{- end }}
