@@ -35,7 +35,7 @@ data:
     export SHELL=/bin/sh
 
     # Install wetty web terminal
-    npm install -g wetty 2>&1
+    npm install -g wetty@3.3.5 2>&1
 
     # Install Claude Code
     npm install -g @anthropic-ai/claude-code 2>&1
