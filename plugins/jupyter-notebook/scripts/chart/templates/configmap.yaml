@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-init-write-config"
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+data:
+  write-config.sh: |
+    #!/bin/sh
+    set -e
+
+    : "${PUID:=1000}"
+    : "${PGID:=1000}"
+    : "${NAME:=hermes-agent}"
+    : "${NAMESPACE:?NAMESPACE must be set}"
