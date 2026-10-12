@@ -48,17 +48,35 @@ data:
         echo "hermes:$USER_PASS" | chpasswd
       fi
 
-      # Fix ownership of the PVC data volume
-      chown hermes:hermes /opt/data
-      for sub in cron sessions logs hooks memories skills skins plans workspace home profiles; do
-        [ -d "/opt/data/$sub" ] && chown -R hermes:hermes "/opt/data/$sub"
-      done
+      # Ownership remap, gated by a marker on the PVC itself (survives pod
+      # restarts). The full-tree walk over /opt/hermes forces an overlayfs
+      # copy-up of the whole 2.2G image layer — measured > 15 min, blowing
+      # the startup-probe deadline and restart-looping the pod — so it must
+      # not run on every boot. Only a missing/stale marker (first launch, or
+      # this workload instance was reassigned a different user) pays the full
+      # cost. PVCs arrive with a foreign uid (e.g. 1000 after an
+      # image-seeded skeleton or clone), so the /opt/data walk is required —
+      # but only once per PUID/PGID.
+      PERMS_MARKER="/opt/data/.hermes-perms"
+      if [ "$(cat "$PERMS_MARKER" 2>/dev/null || true)" != "${PUID}:${PGID}" ]; then
+        log "Permissions marker missing or stale — running one-time remap"
 
-      # Fix ownership and permissions for the entire hermes tree and data dir.
-      # Image ships with UID 10000; after usermod all files show old UID.
-      # Synchronous — pod won't flag Ready until permissions are complete.
-      chown -R hermes:hermes /opt/hermes /opt/data 2>/dev/null || true
-      chmod -R o+rX /opt/hermes /opt/data 2>/dev/null || true
+        # /opt/hermes is read-only for hermes at runtime: installs (tool
+        # store, wetty) run as root in this script and writable state lives
+        # under /opt/data. The image ships the tree root-owned and
+        # world-readable, so no full chown is needed — just adopt stray
+        # uid-10000 files if a future image reintroduces them.
+        find /opt/hermes -uid 10000 -exec chown hermes:hermes {} + 2>/dev/null || true
+
+        # PVC: hermes must own all writable state.
+        chown -R hermes:hermes /opt/data 2>/dev/null || true
+
+        printf '%s:%s\n' "$PUID" "$PGID" > "$PERMS_MARKER"
+        chown hermes:hermes "$PERMS_MARKER" 2>/dev/null || true
+        log "Permissions remap complete"
+      else
+        log "Permissions marker matches ${PUID}:${PGID} — skipping remap"
+      fi
     else
       log "PUID=0, running as root (legacy mode)"
     fi
@@ -123,13 +141,26 @@ data:
     # start wetty.  Gateway + dashboard are already running so the agent
     # is usable while wetty compiles.
     _start_wetty() {
+      # Node comes from the image's managed tool store (e.g.
+      # /opt/hermes/tools/node-26.7.0-linux-x64), not /usr/local — so the npm
+      # global prefix is version-dependent and must be resolved at runtime.
+      # npm drops the `wetty` shim in <prefix>/bin, which is NOT on the
+      # default PATH, so put it there before the `command -v wetty` check
+      # (otherwise every boot reinstalls and `wetty` is unresolvable).
+      WETTY_PREFIX="$(npm prefix -g)"
+      export PATH="${WETTY_PREFIX}/bin:${PATH}"
+
       if ! command -v wetty > /dev/null 2>&1; then
         log "Installing build tools (gcc, g++, make)..."
         apt-get update -qq
         apt-get install -y gcc g++ make 2>&1
         log "Installing wetty..."
-        npm install -g wetty@3.3.5 2>&1
-        chmod +x /usr/local/lib/node_modules/wetty/build/main.js
+        # npm 12 (shipped in this image) blocks dependency lifecycle scripts by
+        # default. node-pty has no linux-x64 prebuild, so its install script
+        # must compile build/Release/pty.node or wetty dies at startup with
+        # "Failed to load native module: pty.node". The flag is accepted and
+        # ignored by npm 11, so it is safe on either major.
+        npm install -g --allow-scripts=node-pty,@parcel/watcher wetty@3.3.5 2>&1
       else
         log "wetty already installed, skipping..."
       fi

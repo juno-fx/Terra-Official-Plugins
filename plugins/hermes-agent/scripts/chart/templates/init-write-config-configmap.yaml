@@ -14,8 +14,16 @@ data:
     : "${NAME:=hermes-agent}"
     : "${NAMESPACE:?NAMESPACE must be set}"
 
-    echo "Fixing ownership for PUID=${PUID}:${PGID}"
-    chown -R "${PUID}:${PGID}" /opt/data
+    # One-time PVC ownership fix, gated by the marker start.sh writes after
+    # the full remap. Skipping steady-state boots avoids re-walking the whole
+    # volume before the main container even starts.
+    PERMS_MARKER="/opt/data/.hermes-perms"
+    if [ "$(cat "$PERMS_MARKER" 2>/dev/null || true)" != "${PUID}:${PGID}" ]; then
+      echo "Fixing ownership for PUID=${PUID}:${PGID}"
+      chown -R "${PUID}:${PGID}" /opt/data
+    else
+      echo "Ownership marker matches ${PUID}:${PGID} — skipping chown"
+    fi
 
     mkdir -p /opt/data/dashboard-themes
 
