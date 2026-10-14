@@ -28,13 +28,6 @@ terra_role:
 nginx_registry: "docker.io"
 nginx_repo: "nginx"
 nginx_tag: "latest"
-# defaults to 'traefik' (>2.0.0)  or 'ingress-nginx' (when using Orion <2.0.0)
-proxy_namespace:
-gateway:
-  name: orion
-  # fallback when gateway_namespace is unset (templates saved before the field existed)
-  namespace: argocd
-# baked to the Genesis namespace by templates/metadata.yaml at install time
-gateway_namespace:
+proxy_namespace: ingress-nginx
 persistence_size: 1Gi
 persistence_storage_class: local-path

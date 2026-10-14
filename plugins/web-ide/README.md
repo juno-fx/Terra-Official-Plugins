@@ -52,7 +52,6 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `nginx_registry` | **string** · Required · Default: `docker.io`<br>Container registry for the nginx proxy image |
 | `nginx_repo` | **string** · Required · Default: `nginx`<br>nginx proxy image repository |
 | `nginx_tag` | **string** · Required · Default: `latest`<br>nginx proxy image tag |
-| `gateway_namespace` | **string** · Optional · Default: the Genesis namespace<br>Namespace of the Orion Gateway the HTTPRoute attaches to (Gateway API only). Leave as-is unless the Gateway lives elsewhere |
 
 ### Custom Environment Variables
 
