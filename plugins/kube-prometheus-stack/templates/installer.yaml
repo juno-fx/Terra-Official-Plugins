@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: {{ .Release.Name }}-prometheus
-  namespace: argocd
+  namespace: {{ .Release.Namespace }}
   finalizers:
     - resources-finalizer.argocd.argoproj.io
     - post-delete-finalizer.argocd.argoproj.io
@@ -60,7 +60,7 @@ spec:
                     metrics: "enabled"
                 namespaceSelector:
                   matchNames:
-                    - argocd
+                    - {{ .Release.Namespace }}
                 endpoints:
                   - port: metrics
                     interval: 30s

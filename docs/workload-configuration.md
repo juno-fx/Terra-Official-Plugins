@@ -37,7 +37,7 @@ annotations:
 
 !!! note
     Workload templates must always be tagged `cluster-level` in `terra.yaml` — they are installed
-    into the `argocd` namespace by Terra.
+    into the Genesis namespace (`argocd` by default) by Terra.
 
 ```yaml
 annotations:

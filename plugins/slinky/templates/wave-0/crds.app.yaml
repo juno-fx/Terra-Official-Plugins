@@ -4,7 +4,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: {{ .Release.Name }}-slinky-crds
-  namespace: argocd
+  namespace: {{ .Release.Namespace }}
   annotations:
     # Wave 0 - the Slinky CRDs must exist before the operator or any Slurm CR.
     argocd.argoproj.io/sync-wave: "0"

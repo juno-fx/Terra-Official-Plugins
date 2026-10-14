@@ -161,7 +161,7 @@ authoring time to web workloads, not to the scaffold.
 - No Kuiper annotations — ArgoCD synced directly, they have no effect
 
 **[CL]**
-- Creates and manages its own namespaces; install target is `argocd`
+- Creates and manages its own namespaces; install target is the Genesis namespace (`argocd` by default) — never hardcode it, use `{{ .Release.Namespace }}`
 - ArgoCD `Application` delegating to an upstream chart is the common pattern
 - RBAC scoped to what the plugin manages — no wildcard cluster-admin
 - No Kuiper annotations (same reason as `[NS]`)

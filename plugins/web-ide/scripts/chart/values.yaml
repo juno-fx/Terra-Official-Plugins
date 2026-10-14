@@ -32,6 +32,9 @@ nginx_tag: "latest"
 proxy_namespace:
 gateway:
   name: orion
+  # fallback when gateway_namespace is unset (templates saved before the field existed)
   namespace: argocd
+# baked to the Genesis namespace by templates/metadata.yaml at install time
+gateway_namespace:
 persistence_size: 1Gi
 persistence_storage_class: local-path

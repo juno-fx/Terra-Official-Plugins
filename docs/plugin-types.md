@@ -11,14 +11,14 @@ differently depending on plugin type.
 | Type                     | When to use                                                                                                        | Install target     | Example                           |
 |--------------------------|--------------------------------------------------------------------------------------------------------------------|--------------------|-----------------------------------|
 | **Plugin / Application** | Any K8s workload in a project namespace — Deployment, Job, StatefulSet, anything                                   | Project namespace  | `ollama`, `firefox`, `deadline10` |
-| **Cluster-level**        | Cluster-wide infrastructure installed into the `argocd` namespace — must be tagged `cluster-level` in `terra.yaml` | `argocd` namespace | `nvidia-gpu-operator`, `longhorn` |
-| **Workload Template**    | Provide a reusable workload schema for Genesis/Kuiper — requires the `cluster-level` tag                           | `argocd` namespace | `helios`, `web-ide`               |
+| **Cluster-level**        | Cluster-wide infrastructure installed into the Genesis namespace — must be tagged `cluster-level` in `terra.yaml` | Genesis namespace | `nvidia-gpu-operator`, `longhorn` |
+| **Workload Template**    | Provide a reusable workload schema for Genesis/Kuiper — requires the `cluster-level` tag                           | Genesis namespace | `helios`, `web-ide`               |
 | **Dashboard**            | Embed a web UI as an iFrame in Genesis                                                                             | Project namespace  | `argocd-dashboard`                |
 
 Not sure which to use? Ask:
 
 - Does it install K8s objects into a project? → **Plugin / Application**
-- Does it need to install into the cluster root (`argocd` ns) and manage its own namespaces? → **Cluster-level**
+- Does it need to install into the cluster root (Genesis namespace, `argocd` by default) and manage its own namespaces? → **Cluster-level**
 - Do users launch individual workloads from it (desktops, notebooks, terminals)? → **Workload Template**
 - Is it just a web UI you want to embed in Genesis? → **Dashboard**
 
@@ -39,7 +39,7 @@ directory structure beyond the standard Helm chart layout.
 ## Cluster-Level
 
 Identical to a namespaced plugin mechanically — a standard Helm chart of any contents. The only
-difference is the install target: Terra installs cluster-level plugins into the `argocd` namespace
+difference is the install target: Terra installs cluster-level plugins into the Genesis namespace (`argocd` by default)
 instead of the project namespace. The plugin is expected to create and manage its own namespaces
 if needed.
 
