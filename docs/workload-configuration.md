@@ -169,6 +169,56 @@ sub-path like `/index.html` starts with no existing rule and is dropped without 
 
 ---
 
+#### Interconnects
+
+!!! note "Requires Orion Projects v4.8.1 or later"
+    Interconnects require Kuiper v4.7.1, which ships with Orion Projects v4.8.1 (Genesis v6.1.0). Earlier
+    versions ignore these annotations and do not return an `interconnects` list.
+
+```yaml
+annotations:
+  kuiper.juno-innovations.com/interconnect-mcp: "http://{{ .Release.Name }}:8080/mcp-server/http"
+```
+
+**Applies to:** Service  
+**Value format:** connection endpoint string
+
+Advertises a named connection point on the workload for other systems to consume, for example an
+MCP server endpoint an AI agent can connect to. The annotation key suffix `<name>` becomes the
+interconnect name, and the value is its endpoint. A Service can declare any number of interconnects.
+Annotations with a blank value are ignored.
+
+---
+
+```yaml
+annotations:
+  kuiper.juno-innovations.com/interconnect-description-mcp: "Connect to this workload's MCP server"
+```
+
+**Applies to:** Service  
+**Value format:** any string
+
+Optional human readable description for the interconnect with the matching `<name>`. A description
+is only used when an `interconnect-<name>` annotation with the same name exists on the Service.
+
+Kuiper returns interconnects from its `/all` endpoint in two places: on each Service resource that
+declares them, and collected into a top level `interconnects` list on the workload covering every
+Service in that workload. The two annotations above produce:
+
+```json
+"interconnects": [
+  {
+    "name": "mcp",
+    "endpoint": "http://my-release:8080/mcp-server/http",
+    "description": "Connect to this workload's MCP server"
+  }
+]
+```
+
+Like all Kuiper annotations, interconnect values are returned in plain text. Do not put secrets in them.
+
+---
+
 #### Crossplane
 
 ```yaml
