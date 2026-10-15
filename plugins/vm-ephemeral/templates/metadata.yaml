@@ -55,7 +55,7 @@ data:
       type: list
       fields:
         - name: name
-          description: Name of the port
+          description: Name of the port (lowercase letters, digits and '-', max 15 characters)
           required: true
           type: string
           default: ssh
