@@ -9,7 +9,7 @@ how the data flows from plugin through the platform to a running workload, and h
 
 A workload template is a plugin that defines a **reusable workload schema** for the Juno platform.
 
-- **At install time:** Terra installs it as an ArgoCD Application into the `argocd` namespace. No running
+- **At install time:** Terra installs it as an ArgoCD Application into the Genesis namespace (`argocd` by default). No running
   workload is created. What gets created is a pair of ConfigMaps.
 - **At launch time:** A user opens Genesis, picks a workload type, fills in parameters, and submits.
   Kuiper reads the stored schema, renders the embedded Helm chart with the user's values, and applies

@@ -60,7 +60,7 @@ ConfigMaps, RBAC, etc.) organized however makes sense for the plugin.
 ### 2. Cluster-Level Plugin
 
 Identical to a namespaced plugin mechanically — a standard Helm chart of any contents. The only
-difference is that Terra installs it into the `argocd` namespace instead of the user's project
+difference is that Terra installs it into the Genesis namespace (`argocd` by default) instead of the user's project
 namespace. The plugin is expected to create and manage its own namespaces if needed.
 
 **Identifying marker:**
@@ -68,7 +68,12 @@ namespace. The plugin is expected to create and manage its own namespaces if nee
 
 **Example:** `plugins/nvidia-gpu-operator/`, `plugins/longhorn/`, `plugins/cert-manager/`
 
-**Install target:** `argocd` namespace
+**Install target:** Genesis namespace (`argocd` by default)
+
+**Never hardcode `argocd` as a namespace** — Genesis can be deployed into a custom namespace. Anything
+that must live alongside Genesis/ArgoCD (ArgoCD `Application` CRs, Ingresses for `argocd-server`,
+`namespaceSelector`s that target Genesis) uses `{{ .Release.Namespace }}`. `argocd.argoproj.io/*`
+annotations and finalizers are API-group names, not namespaces — leave those alone.
 
 ---
 
@@ -88,7 +93,7 @@ this embedded chart at workload launch time using the field values defined in `t
 
 **Example:** `plugins/helios/`, `plugins/web-ide/`, `plugins/jupyter-notebook/`
 
-**Install target:** `argocd` namespace
+**Install target:** Genesis namespace (`argocd` by default)
 
 **The `workload` tag** — every workload template's `terra.yaml` tags array must include `workload`
 alongside `cluster-level`. The Terra app store uses this tag to drive its workloads filter, so a
@@ -307,7 +312,7 @@ scripts/                                    ← edit these files
 templates/packaged-scripts.yaml             ← generated, committed to git
 templates/packaged-scripts-cleanup.yaml     ← generated, committed to git
                 ↓ ArgoCD syncs
-ConfigMap in argocd namespace               ← Genesis reads packaged_scripts.base64
+ConfigMap in Genesis namespace              ← Genesis reads packaged_scripts.base64
                 ↓ Genesis catalog API
 Kuiper receives base64 chart string
                 ↓ b64decode → tar extract → helm template
@@ -322,7 +327,7 @@ Workload manifests applied to cluster
    - `<release>-terra-metadata` ConfigMap — carries the `kuiper.juno-innovations.com/chart` label and `fields:` schema
    - `<release>-scripts-configmap` ConfigMap — carries `packaged_scripts.base64` (the base64 gzip tarball of `scripts/`)
 
-2. **Genesis catalog:** Genesis lists all ConfigMaps in the `argocd` namespace with label `kuiper.juno-innovations.com/chart`.
+2. **Genesis catalog:** Genesis lists all ConfigMaps in the Genesis namespace with label `kuiper.juno-innovations.com/chart`.
    For each, it reads:
    - `data.fields` → the schema presented in the workload creation UI
    - `data.chart` → name of the scripts ConfigMap

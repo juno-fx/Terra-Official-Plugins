@@ -1,5 +1,5 @@
 # Your cluster-level plugin's Kubernetes objects go here. Installed into the
-# `argocd` namespace; the plugin creates and manages its own namespaces as needed.
+# Genesis namespace (`argocd` by default); the plugin creates and manages its own namespaces as needed.
 #
 # The common pattern is an ArgoCD Application delegating to an upstream Helm
 # chart (example below). Any valid manifests work — see
@@ -9,7 +9,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: "{{ .Release.Name }}-PLUGIN"
-  namespace: argocd
+  namespace: {{ .Release.Namespace }}
 spec:
   project: default
   destination:

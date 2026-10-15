@@ -3,7 +3,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: {{ .Release.Name }}-slurm
-  namespace: argocd
+  namespace: {{ .Release.Namespace }}
   annotations:
     # Wave 2 - the Slurm cluster is made of Slinky CRs, so it needs both the CRDs
     # and a running operator before it can reconcile.

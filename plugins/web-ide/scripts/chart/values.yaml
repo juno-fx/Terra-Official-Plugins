@@ -28,10 +28,6 @@ terra_role:
 nginx_registry: "docker.io"
 nginx_repo: "nginx"
 nginx_tag: "latest"
-# defaults to 'traefik' (>2.0.0)  or 'ingress-nginx' (when using Orion <2.0.0)
-proxy_namespace:
-gateway:
-  name: orion
-  namespace: argocd
+proxy_namespace: ingress-nginx
 persistence_size: 1Gi
 persistence_storage_class: local-path
