@@ -5,6 +5,7 @@ description: |
   Bare-metal LoadBalancer implementation for Kubernetes clusters. Assigns real external
   IPs to LoadBalancer Services using Layer 2 (ARP/NDP) or BGP advertisement. https://metallb.io/
 category: Networking
+editable: true
 tags:
   - cluster-level
   - networking

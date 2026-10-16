@@ -77,10 +77,16 @@ the fields you provide at install time.
 - **`bgp` mode is unverified on our hardware** — only `layer2` mode has been tested against our
   clusters so far. If you use `bgp`, validate peering and route advertisement against your own
   router before relying on it
-- Switching `mode` after install replaces the advertisement resource (`L2Advertisement` or
-  `BGPPeer`/`BGPAdvertisement`) but keeps the same `IPAddressPool`
-- IPs already leased to running Services are not affected by changing `address_pool`, but new
-  ranges only apply to newly created Services until existing ones are recreated
+- **All fields are editable after install** from Terra; ArgoCD applies the change in place
+- Growing `address_pool` is safe — Services keep their IPs, and the new addresses are available
+  to new Services. Shrinking it so it no longer covers an IP already assigned (especially the
+  ingress controller's) moves that Service to a new IP, breaking any DNS or `hosts` entry that
+  points at the old one
+- Switching `mode` replaces the advertisement resource (`L2Advertisement` or
+  `BGPPeer`/`BGPAdvertisement`) but keeps the same `IPAddressPool`. Every LoadBalancer IP stops
+  being announced until the new advertisement is working, so plan it as a maintenance change
+- Changing `chart_version` upgrades or downgrades MetalLB in place — check the
+  [MetalLB release notes](https://metallb.io/release-notes/) for CRD changes before a major jump
 - See the [MetalLB configuration docs](https://metallb.io/configuration/) for advanced topics like
   multiple pools, BGP communities, and per-Service IP requests
 - If you're pointing at your Orion deployment via a local `hosts` file entry rather than DNS, note
