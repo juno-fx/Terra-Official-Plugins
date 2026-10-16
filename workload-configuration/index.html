@@ -1089,6 +1089,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#interconnects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interconnects
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#crossplane" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1536,6 +1547,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#interconnects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interconnects
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#crossplane" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1763,17 +1785,53 @@ and the remainder is appended to that endpoint.</p>
 <p>Because matching is by prefix, an extra must begin with the full rendered ingress path. A bare
 sub-path like <code>/index.html</code> starts with no existing rule and is dropped without warning.</p>
 <hr />
-<h4 id="crossplane">Crossplane<a class="headerlink" href="#crossplane" title="Permanent link">&para;</a></h4>
+<h4 id="interconnects">Interconnects<a class="headerlink" href="#interconnects" title="Permanent link">&para;</a></h4>
+<div class="admonition note">
+<p class="admonition-title">Requires Orion Projects v4.8.1 or later</p>
+<p>Interconnects require Kuiper v4.7.1, which ships with Orion Projects v4.8.1 (Genesis v6.1.0). Earlier
+versions ignore these annotations and do not return an <code>interconnects</code> list.</p>
+</div>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">annotations</span><span class="p">:</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">kuiper.juno-innovations.com/expose</span><span class="p">:</span><span class="w"> </span><span class="s">"22,3389,5900"</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">kuiper.juno-innovations.com/interconnect-mcp</span><span class="p">:</span><span class="w"> </span><span class="s">"http://{{</span><span class="nv"> </span><span class="s">.Release.Name</span><span class="nv"> </span><span class="s">}}:8080/mcp-server/http"</span>
+</span></code></pre></div>
+<p><strong>Applies to:</strong> Service<br />
+<strong>Value format:</strong> connection endpoint string</p>
+<p>Advertises a named connection point on the workload for other systems to consume, for example an
+MCP server endpoint an AI agent can connect to. The annotation key suffix <code>&lt;name&gt;</code> becomes the
+interconnect name, and the value is its endpoint. A Service can declare any number of interconnects.
+Annotations with a blank value are ignored.</p>
+<hr />
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">annotations</span><span class="p">:</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nt">kuiper.juno-innovations.com/interconnect-description-mcp</span><span class="p">:</span><span class="w"> </span><span class="s">"Connect</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">this</span><span class="nv"> </span><span class="s">workload's</span><span class="nv"> </span><span class="s">MCP</span><span class="nv"> </span><span class="s">server"</span>
+</span></code></pre></div>
+<p><strong>Applies to:</strong> Service<br />
+<strong>Value format:</strong> any string</p>
+<p>Optional human readable description for the interconnect with the matching <code>&lt;name&gt;</code>. A description
+is only used when an <code>interconnect-&lt;name&gt;</code> annotation with the same name exists on the Service.</p>
+<p>Kuiper returns interconnects from its <code>/all</code> endpoint in two places: on each Service resource that
+declares them, and collected into a top level <code>interconnects</code> list on the workload covering every
+Service in that workload. The two annotations above produce:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nt">"interconnects"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="p">{</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mcp"</span><span class="p">,</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span><span class="nt">"endpoint"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://my-release:8080/mcp-server/http"</span><span class="p">,</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">    </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Connect to this workload's MCP server"</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="p">]</span>
+</span></code></pre></div>
+<p>Like all Kuiper annotations, interconnect values are returned in plain text. Do not put secrets in them.</p>
+<hr />
+<h4 id="crossplane">Crossplane<a class="headerlink" href="#crossplane" title="Permanent link">&para;</a></h4>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nt">annotations</span><span class="p">:</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nt">kuiper.juno-innovations.com/expose</span><span class="p">:</span><span class="w"> </span><span class="s">"22,3389,5900"</span>
 </span></code></pre></div>
 <p><strong>Applies to:</strong> Crossplane EC2 Instance<br />
 <strong>Value format:</strong> comma-separated port numbers</p>
 <p>Kuiper automatically creates a Kubernetes ExternalName Service exposing the listed ports for the
 EC2 instance once its DNS is available, making it reachable from within the cluster.</p>
 <hr />
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">annotations</span><span class="p">:</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nt">kuiper.juno-innovations.com/aws-remote-connection</span><span class="p">:</span><span class="w"> </span><span class="s">"true"</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nt">annotations</span><span class="p">:</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="nt">kuiper.juno-innovations.com/aws-remote-connection</span><span class="p">:</span><span class="w"> </span><span class="s">"true"</span>
 </span></code></pre></div>
 <p><strong>Applies to:</strong> Crossplane EC2 Instance<br />
 <strong>Value format:</strong> <code>"true"</code></p>
@@ -1781,8 +1839,8 @@ EC2 instance once its DNS is available, making it reachable from within the clus
 the EC2 Instance object once EC2 DNS is available. Required for connection details to appear in
 Hubble for EC2-backed workloads.</p>
 <hr />
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nt">annotations</span><span class="p">:</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">kuiper.juno-innovations.com/use-private-dns</span><span class="p">:</span><span class="w"> </span><span class="s">"true"</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nt">annotations</span><span class="p">:</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="nt">kuiper.juno-innovations.com/use-private-dns</span><span class="p">:</span><span class="w"> </span><span class="s">"true"</span>
 </span></code></pre></div>
 <p><strong>Applies to:</strong> Crossplane EC2 Instance<br />
 <strong>Value format:</strong> <code>"true"</code></p>
