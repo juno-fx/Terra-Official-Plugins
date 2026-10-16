@@ -78,7 +78,7 @@ spec:
               memory: "{{ .Values.memory }}"
               # only the container writable layer (toolchain apt installs)
               # counts against this — no disk-backed emptyDir remains
-              ephemeral-storage: "6Gi"
+            {{- if or .Values.cpuLimit .Values.memoryLimit }}
             limits:
               {{- if .Values.cpuLimit }}
               cpu: "{{ .Values.cpuLimit }}"
@@ -86,7 +86,7 @@ spec:
               {{- if .Values.memoryLimit }}
               memory: "{{ .Values.memoryLimit }}"
               {{- end }}
-              ephemeral-storage: "12Gi"
+            {{- end }}
           env:
             # nested-ci environment (see scripts/chart/files/init.sh)
             - name: KIND_EXPERIMENTAL_PROVIDER
