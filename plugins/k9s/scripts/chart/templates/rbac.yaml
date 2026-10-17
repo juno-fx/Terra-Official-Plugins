@@ -3,8 +3,6 @@ kind: ServiceAccount
 metadata:
   name: "{{ .Values.name }}"
   namespace: "{{ .Release.Namespace }}"
-  annotations:
-    kuiper.juno-innovations.com/hidden: "true"
   labels:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
 ---
@@ -13,8 +11,6 @@ kind: Role
 metadata:
   name: "{{ .Values.name }}-role"
   namespace: "{{ .Release.Namespace }}"
-  annotations:
-    kuiper.juno-innovations.com/hidden: "true"
   labels:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
 rules:
@@ -34,8 +30,6 @@ kind: RoleBinding
 metadata:
   name: "{{ .Values.name }}-binding"
   namespace: "{{ .Release.Namespace }}"
-  annotations:
-    kuiper.juno-innovations.com/hidden: "true"
   labels:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
 roleRef:
