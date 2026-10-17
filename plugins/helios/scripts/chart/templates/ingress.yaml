@@ -1,15 +1,13 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Values.name }}-ingress
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    {{- if not .Values.publicAccess }}
-    nginx.ingress.kubernetes.io/auth-url: "http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/"
-    {{- end }}
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+  name: "{{ .Release.Name }}"
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
 spec:
+  {{- if .Values.ingressClassName }}
+  ingressClassName: {{ .Values.ingressClassName }}
+  {{- end }}
   rules:
     - host: {{ .Values.host }}
       http:
@@ -18,6 +16,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ .Values.name }}
+                name: "{{ .Release.Name }}"
                 port:
                   number: 3000
