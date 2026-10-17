@@ -5,10 +5,10 @@ metadata:
   namespace: longhorn-system
   annotations:
     argocd.argoproj.io/sync-wave: "1"
-    nginx.ingress.kubernetes.io/auth-url: "http://genesis.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-service/{{ .Release.Name }}/"
-    nginx.ingress.kubernetes.io/auth-signin: /unauthorized/
 spec:
-  ingressClassName: nginx
+  {{- if .Values.ingressClassName }}
+  ingressClassName: {{ .Values.ingressClassName }}
+  {{- end }}
   rules:
     - host: "{{ .Values.host }}"
       http:

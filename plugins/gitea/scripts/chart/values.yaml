@@ -28,6 +28,7 @@ tag: "1.23"
 app_port: 3000
 
 # Nginx sidecar
+ingressClassName: ""
 nginx_registry: docker.io
 nginx_repo: nginx
 nginx_tag: "1.29.3"

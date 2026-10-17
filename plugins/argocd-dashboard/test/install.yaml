@@ -1,0 +1,6 @@
+host: argocd.test.example.com
+prefix: /argocd
+ingressClassName: nginx
+nginx_registry: docker.io
+nginx_repo: nginx
+nginx_tag: alpine

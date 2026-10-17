@@ -3,3 +3,7 @@ host:
 path: /
 username: admin
 password: admin
+ingressClassName: ""
+nginx_registry: "docker.io"
+nginx_repo: "nginx"
+nginx_tag: "alpine"

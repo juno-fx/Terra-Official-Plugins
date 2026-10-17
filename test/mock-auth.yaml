@@ -1,0 +1,66 @@
+# Mock auth server for test harness.
+# Returns 200 (pass) or 401 (block) based on /tmp/block file existence.
+# Accessed via two Service names: "hubble" and "genesis" (port 3000).
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-mock
+  labels:
+    app: auth-mock
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-mock
+  template:
+    metadata:
+      labels:
+        app: auth-mock
+    spec:
+      containers:
+        - name: server
+          image: python:3-alpine
+          command:
+            - python3
+            - -c
+            - |
+              import os
+              from http.server import HTTPServer, BaseHTTPRequestHandler
+              class H(BaseHTTPRequestHandler):
+                  def do_GET(self):
+                      if os.path.exists('/tmp/block'):
+                          self.send_response(401)
+                          self.end_headers()
+                          self.wfile.write(b'blocked')
+                      else:
+                          self.send_response(200)
+                          self.end_headers()
+                          self.wfile.write(b'passed')
+                  do_POST = do_GET
+              HTTPServer(('0.0.0.0', 3000), H).serve_forever()
+          ports:
+            - containerPort: 3000
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hubble
+spec:
+  ports:
+    - port: 3000
+      targetPort: 3000
+  selector:
+    app: auth-mock
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: genesis
+spec:
+  ports:
+    - port: 3000
+      targetPort: 3000
+  selector:
+    app: auth-mock

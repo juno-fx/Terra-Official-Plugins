@@ -27,11 +27,6 @@ data:
       type: string
       required: true
       default: "alpine"
-    - name: timezone
-      description: "Timezone to use for the k9s instance"
-      type: string
-      required: true
-      default: "America/New_York"
     - name: cluster_access
       description: "Kubernetes RBAC access level for the service account"
       type: select
@@ -40,6 +35,11 @@ data:
       options:
         - readonly-ns
         - admin-ns
+    - name: publicAccess
+      description: "Allow public access (disable authentication)"
+      type: boolean
+      required: true
+      default: false
     - name: ingressNamespace
       description: "Namespace of the ingress controller for plugin access"
       type: string

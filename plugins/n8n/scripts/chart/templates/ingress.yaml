@@ -12,11 +12,6 @@ metadata:
     external-dns.alpha.kubernetes.io/enable: "true"
     {{- end }}
   {{- end }}
-  {{- else }}
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/auth-url: "http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/"
-    nginx.ingress.kubernetes.io/use-regex: "true"
   {{- end }}
 spec:
   {{- if and .Values.domain .Values.tls_issuer }}
@@ -29,7 +24,7 @@ spec:
     - host: {{ if .Values.domain }}{{ .Values.name }}.{{ .Values.domain }}{{ else }}{{ .Values.host }}{{ end }}
       http:
         paths:
-          - path: {{ if .Values.domain }}"/"{{ else }}"/{{ .Release.Namespace }}/n8n/{{ .Values.name }}/"{{ end }}
+          - path: {{ if .Values.domain }}"/"{{ else }}"/{{ .Release.Namespace }}/{{ .Values.name }}/"{{ end }}
             pathType: Prefix
             backend:
               service:

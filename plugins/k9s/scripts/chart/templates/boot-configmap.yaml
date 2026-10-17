@@ -22,9 +22,15 @@ data:
     export SHELL=/bin/sh
 
     if [ "$PUID" != "0" ]; then
-      addgroup --gid "$PGID" "$USERNAME" 2>/dev/null || true
-      adduser --disabled-password --home /data --ingroup "$USERNAME" --uid "$PUID" "$USERNAME" 2>/dev/null || true
-      chsh -s /bin/bash "$USERNAME" 2>/dev/null || true
+      if EXISTING_USER=$(getent passwd "$PUID" 2>/dev/null | cut -d: -f1); then
+        # UID already exists — reuse it, update home/shell
+        usermod -d /data -s /bin/bash "$EXISTING_USER" 2>/dev/null || true
+        USERNAME="$EXISTING_USER"
+      else
+        addgroup --gid "$PGID" "$USERNAME" 2>/dev/null || true
+        adduser --disabled-password --home /data --ingroup "$USERNAME" --uid "$PUID" "$USERNAME" 2>/dev/null || true
+        chsh -s /bin/bash "$USERNAME" 2>/dev/null || true
+      fi
     fi
 
     # Install wetty (like Hermes Agent's built-in wetty)

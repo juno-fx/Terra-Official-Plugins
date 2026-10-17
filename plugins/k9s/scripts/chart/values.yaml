@@ -1,14 +1,14 @@
 name: k9s
 user:
-registry: docker.io
-repo: nginx
-tag: alpine
-ttyd_port: 7681
+ingressClassName: ""
+nginx_registry: "docker.io"
+nginx_repo: "nginx"
+nginx_tag: "alpine"
 group:
 cpu: "1"
 memory: "1Gi"
-cpuLimit: null
-memoryLimit: null
+cpuLimit: "1"
+memoryLimit: "1Gi"
 idx: 0
 guid: 0
 puid: 0

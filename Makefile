@@ -240,6 +240,85 @@ test: cluster dependencies
 	@kubectl -n argocd port-forward service/argocd-server 8080:80 > /dev/null 2>&1
 
 
+# --- Test harness ---
+.PHONY: deploy-test full-test test-harness-list test-harness-render-all test-harness-render test-harness-all test-harness-plugin test-cluster-up test-cluster-down
+
+# Safe — no cluster needed, just validates Helm rendering
+# Interactive deploy-test: deploys to existing cluster (run make test-cluster-up first)
+# Usage: make deploy-test helios
+deploy-test:
+	python3 test/run_test.py --deploy $(ARGS) --retries 5 --retry-delay 5
+
+test-harness-list:
+	python3 test/run_test.py --list
+
+test-harness-render-all:
+	python3 test/run_test.py --all --dry-run
+
+test-harness-render:
+	python3 test/run_test.py --plugin $(ARGS) --dry-run
+
+# Requires Kind cluster (guard built into script)
+test-harness-all: test-cluster-up
+	@python3 test/run_test.py --all; status=$$?; \
+	$(MAKE) test-cluster-down; \
+	exit $$status
+
+test-harness-plugin:
+	python3 test/run_test.py --plugin $(ARGS)
+
+# Full pipeline: render validation (no cluster) → cluster up → deploy tests → cluster down
+full-test:
+	@echo "=== Stage 1/3: Render validation (no cluster needed) ==="; \
+	python3 test/run_test.py --all --dry-run; \
+	if [ $$? -ne 0 ]; then \
+		echo "RENDER VALIDATION FAILED — aborting"; \
+		exit 1; \
+	fi; \
+	echo "=== Stage 2/3: Starting Kind cluster ==="; \
+	$(MAKE) test-cluster-up; \
+	if [ $$? -ne 0 ]; then \
+		echo "CLUSTER SETUP FAILED — aborting"; \
+		$(MAKE) test-cluster-down 2>/dev/null; \
+		exit 1; \
+	fi; \
+	echo "=== Stage 3/3: Full deploy + auth tests ==="; \
+	python3 test/run_test.py --all; \
+	status=$$?; \
+	$(MAKE) test-cluster-down; \
+	exit $$status
+
+CLUSTER_NAME := terra-plugins
+
+test-cluster-up:
+	# Remove stale cluster entry from previous failed runs (cleans kubeconfig too)
+	kind delete cluster --name $(CLUSTER_NAME) 2>/dev/null || true
+	# Clear any lingering kubectl proxy/port-forward processes from earlier runs
+	-pkill -f "kubectl port-forward" 2>/dev/null || true
+	bash test/patch-kind-config.sh test/kind-config.yaml
+	kind create cluster --name $(CLUSTER_NAME) --config test/kind-config.yaml.patched
+	kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+	# Install CRDs needed by certain plugins
+	kubectl apply -f test/crds/ 2>/dev/null || true
+	# Create common namespaces
+	kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
+	kubectl create namespace kube-system --dry-run=client -o yaml | kubectl apply -f -
+	# Remove ingress-nginx validating webhook (blocks Ingress creation in Kind)
+	kubectl delete validatingwebhookconfiguration ingress-nginx-admission 2>/dev/null || true
+	# Wait for controller pod to exist before waiting for ready
+	@for i in $$(seq 1 30); do \
+		if kubectl get pods -n ingress-nginx -l app.kubernetes.io/component=controller --no-headers 2>/dev/null | grep -q .; then break; fi; \
+		sleep 2; \
+	done; \
+	echo "Controller pod found, waiting for ready..."; \
+	kubectl wait --namespace ingress-nginx --for=condition=ready pod \
+		--selector=app.kubernetes.io/component=controller --timeout=120s; \
+	echo "Node labels configured in kind config"
+
+test-cluster-down:
+	kind delete cluster --name $(CLUSTER_NAME) 2>/dev/null || true
+	rm -f test/kind-config.yaml.patched
+
 # LEGACY
 test-%:
 	@echo "Legacy: Use 'make test $(subst test-,,$@)' instead."

@@ -17,16 +17,13 @@ spec:
         kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
 
     spec:
-      {{- if .Values.terra_role }}
-      serviceAccountName: {{ .Values.terra_role }}
-      {{- end }}
       hostname: "{{ .Values.name }}"
       containers:
         - name: nginx
           image: "{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}"
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 3001
+            - containerPort: 8080
               name: nginx
           volumeMounts:
             - name: nginx
@@ -86,7 +83,7 @@ spec:
       volumes:
         - name: tooling
           configMap:
-            name: "{{ .Values.name }}-tooling"
+            name: "{{ .Release.Name }}-tooling"
         - name: nginx
           configMap:
             name: "{{ .Values.name }}-nginx"

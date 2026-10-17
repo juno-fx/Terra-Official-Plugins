@@ -1,8 +1,9 @@
 name: opencode
 user:
-registry: docker.io
-repo: nginx
-tag: alpine
+ingressClassName: ""
+nginx_registry: "docker.io"
+nginx_repo: "nginx"
+nginx_tag: "alpine"
 ttyd_port: 7681
 group:
 cpu: "1"

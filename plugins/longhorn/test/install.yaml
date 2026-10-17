@@ -1,0 +1,3 @@
+host: longhorn.test.example.com
+prefix: /longhorn
+ingressClassName: nginx

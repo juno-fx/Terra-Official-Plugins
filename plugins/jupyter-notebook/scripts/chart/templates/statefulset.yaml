@@ -108,7 +108,7 @@ spec:
           workingDir: "/home/{{ .Values.user }}"
           env:
             - name: NOTEBOOK_ARGS
-              value: "--ServerApp.base_url=/{{ .Release.Namespace }}/polaris/{{ .Values.name }}/ --IdentityProvider.token= --ServerApp.root_dir=/home/{{ .Values.user }}"
+              value: "--ServerApp.base_url=/{{ .Release.Namespace }}/{{ .Values.name }}/ --IdentityProvider.token= --ServerApp.root_dir=/home/{{ .Values.user }}"
             # necessary to let it run when home dirs aren't yet mounted
             - name: CHOWN_HOME
               value: "yes"

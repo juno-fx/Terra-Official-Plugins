@@ -5,8 +5,8 @@ metadata:
   namespace: kube-system
 spec:
   ports:
-    - port: 4466
-      targetPort: 4466
+    - port: 8080
+      targetPort: 8080
       name: http
   selector:
     k8s-app: headlamp

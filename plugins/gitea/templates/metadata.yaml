@@ -25,6 +25,11 @@ data:
       type: string
       required: true
       default: "1.23"
+    - name: ingressClassName
+      description: "Ingress class name. Leave empty for cluster default."
+      type: string
+      required: false
+      default: ""
     - name: nginx_registry
       description: "Registry to pull the nginx sidecar image from"
       type: string

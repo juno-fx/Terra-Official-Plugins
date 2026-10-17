@@ -10,9 +10,9 @@ data:
         listen 8080;
         server_name _;
 
-        location /{{ .Release.Namespace }}/claude/{{ .Values.name }} {
+        location /{{ .Release.Namespace }}/{{ .Values.name }} {
             proxy_set_header Accept-Encoding "";
-            rewrite ^/{{ .Release.Namespace }}/claude/{{ .Values.name }}(/|$)(.*) /$2 break;
+            rewrite ^/{{ .Release.Namespace }}/{{ .Values.name }}(/|$)(.*) /$2 break;
             proxy_pass http://127.0.0.1:{{ .Values.ttyd_port }};
             proxy_http_version 1.1;
 
@@ -31,7 +31,7 @@ data:
             proxy_cache off;
 
             # Rewrite asset paths in HTML responses
-            sub_filter '/client/' '/{{ .Release.Namespace }}/claude/{{ .Values.name }}/client/';
+            sub_filter '/client/' '/{{ .Release.Namespace }}/{{ .Values.name }}/client/';
             sub_filter_types text/html;
             sub_filter_once off;
 

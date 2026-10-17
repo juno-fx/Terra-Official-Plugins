@@ -29,12 +29,14 @@ spec:
             requests:
               memory: "{{ .Values.memory }}"
               cpu: "{{ .Values.cpu }}"
+            {{- if or .Values.memoryLimit .Values.cpuLimit }}
             limits:
-              memory: "2Gi"
-              cpu: "2"
+              memory: "{{ .Values.memoryLimit }}"
+              cpu: "{{ .Values.cpuLimit }}"
+            {{- end }}
           ports:
-            - containerPort: {{ .Values.ttyd_port }}
-              name: ttyd
+            - containerPort: 3000
+              name: wetty
           env:
             {{- range .Values.env }}
             - name: {{ .name | quote }}
@@ -50,12 +52,12 @@ spec:
               value: "/data"
           startupProbe:
             tcpSocket:
-              port: {{ .Values.ttyd_port }}
+              port: 3000
             failureThreshold: 150
             periodSeconds: 2
           livenessProbe:
             tcpSocket:
-              port: {{ .Values.ttyd_port }}
+              port: 3000
             failureThreshold: 24
             periodSeconds: 5
           volumeMounts:
@@ -73,7 +75,7 @@ spec:
             {{- end }}
         - name: nginx
           imagePullPolicy: IfNotPresent
-          image: {{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}
+          image: "{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}"
           resources:
             requests:
               memory: "64Mi"
