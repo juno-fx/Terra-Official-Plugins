@@ -1,6 +1,6 @@
 resource_id: twingate
 name: twingate
-icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/twingate/scripts/assets/twingate.png
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/twingate/assets/logo.png
 description: Zero Trust VPN. Make sure you have all the required information from here https://github.com/Twingate/kubernetes-operator/wiki/Getting-Started.
 category: Networking
 tags:
