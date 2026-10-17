@@ -29,9 +29,11 @@ spec:
             requests:
               memory: "{{ .Values.memory }}"
               cpu: "{{ .Values.cpu }}"
+            {{- if or .Values.memoryLimit .Values.cpuLimit }}
             limits:
               memory: "{{ .Values.memoryLimit }}"
               cpu: "{{ .Values.cpuLimit }}"
+            {{- end }}
           ports:
             - containerPort: 3000
               name: wetty
