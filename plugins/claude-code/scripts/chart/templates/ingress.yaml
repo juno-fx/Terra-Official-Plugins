@@ -1,16 +1,13 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Values.name }}-ingress
+  name: "{{ .Release.Name }}"
   labels:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/auth-url: "http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/"
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/large-client-header-buffers: "4 16k"
-    nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
 spec:
+  {{- if .Values.ingressClassName }}
+  ingressClassName: {{ .Values.ingressClassName }}
+  {{- end }}
   rules:
     - host: {{ .Values.host }}
       http:
@@ -19,6 +16,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ .Values.name }}
+                name: "{{ .Release.Name }}"
                 port:
                   number: 8080
