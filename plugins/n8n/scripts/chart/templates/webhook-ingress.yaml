@@ -15,21 +15,21 @@ spec:
     - host: {{ .Values.host }}
       http:
         paths:
-          - path: "/{{ .Release.Namespace }}/n8n/{{ .Values.name }}/webhook/"
+          - path: "/{{ .Release.Namespace }}/{{ .Values.name }}/webhook/"
             pathType: Prefix
             backend:
               service:
                 name: {{ .Release.Name }}
                 port:
                   number: 8080
-          - path: "/{{ .Release.Namespace }}/n8n/{{ .Values.name }}/webhook-test/"
+          - path: "/{{ .Release.Namespace }}/{{ .Values.name }}/webhook-test/"
             pathType: Prefix
             backend:
               service:
                 name: {{ .Release.Name }}
                 port:
                   number: 8080
-          - path: "/{{ .Release.Namespace }}/n8n/{{ .Values.name }}/webhook-waiting/"
+          - path: "/{{ .Release.Namespace }}/{{ .Values.name }}/webhook-waiting/"
             pathType: Prefix
             backend:
               service:

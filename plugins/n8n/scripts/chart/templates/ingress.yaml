@@ -29,7 +29,7 @@ spec:
     - host: {{ if .Values.domain }}{{ .Values.name }}.{{ .Values.domain }}{{ else }}{{ .Values.host }}{{ end }}
       http:
         paths:
-          - path: {{ if .Values.domain }}"/"{{ else }}"/{{ .Release.Namespace }}/n8n/{{ .Values.name }}/"{{ end }}
+          - path: {{ if .Values.domain }}"/"{{ else }}"/{{ .Release.Namespace }}/{{ .Values.name }}/"{{ end }}
             pathType: Prefix
             backend:
               service:

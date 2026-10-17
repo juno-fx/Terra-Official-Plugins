@@ -13,7 +13,7 @@ spec:
     - host: {{ .Values.host }}
       http:
         paths:
-          - path: "/{{ .Release.Namespace }}/k9s/{{ .Values.name }}/"
+          - path: "/{{ .Release.Namespace }}/{{ .Values.name }}/"
             pathType: Prefix
             backend:
               service:

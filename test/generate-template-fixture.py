@@ -149,7 +149,7 @@ def generate(plugin_dir):
     # Determine ingress path prefix from common conventions
     # Default to /plugin/name/ for workload templates
     ingress_paths = [
-        {"path": "/plugin/__NAME__/"}
+        {"path": "/__NAMESPACE__/__NAME__/"}
     ]
 
     config = {

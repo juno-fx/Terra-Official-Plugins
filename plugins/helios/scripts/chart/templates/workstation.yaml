@@ -147,7 +147,7 @@ spec:
             - name: GID
               value: "{{ .Values.guid }}"
             - name: PREFIX
-              value: "/{{ .Release.Namespace }}/polaris/{{ .Values.name }}/"
+              value: "/{{ .Release.Namespace }}/{{ .Values.name }}/"
             {{- range .Values.env }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}

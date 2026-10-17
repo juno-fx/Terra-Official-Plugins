@@ -14,7 +14,7 @@ spec:
     - host: {{ .Values.host }}
       http:
         paths:
-          - path: "/{{ .Release.Namespace }}/gitea/{{ .Values.name }}/"
+          - path: "/{{ .Release.Namespace }}/{{ .Values.name }}/"
             pathType: Prefix
             backend:
               service:

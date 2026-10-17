@@ -90,7 +90,7 @@ spec:
             - name: GITEA__server__DOMAIN
               value: "{{ .Values.host }}"
             - name: GITEA__server__ROOT_URL
-              value: "https://{{ .Values.host }}/{{ .Release.Namespace }}/gitea/{{ .Values.name }}/"
+              value: "https://{{ .Values.host }}/{{ .Release.Namespace }}/{{ .Values.name }}/"
             - name: GITEA__server__SSH_DOMAIN
               value: "{{ .Values.host }}"
             - name: GITEA__server__DISABLE_SSH
@@ -136,7 +136,7 @@ spec:
             - name: HOME
               value: "/data"
             - name: PREFIX
-              value: "/{{ .Release.Namespace }}/gitea/{{ .Values.name }}/"
+              value: "/{{ .Release.Namespace }}/{{ .Values.name }}/"
             {{- range .Values.env }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}

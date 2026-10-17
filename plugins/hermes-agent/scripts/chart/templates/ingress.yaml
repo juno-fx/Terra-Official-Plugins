@@ -13,14 +13,14 @@ spec:
     - host: {{ .Values.host }}
       http:
         paths:
-          - path: "/{{ .Release.Namespace }}/hermes/{{ .Values.name }}/dashboard"
+          - path: "/{{ .Release.Namespace }}/{{ .Values.name }}/dashboard"
             pathType: Prefix
             backend:
               service:
                 name: {{ .Values.name }}
                 port:
                   number: 9119
-          - path: "/{{ .Release.Namespace }}/hermes/{{ .Values.name }}"
+          - path: "/{{ .Release.Namespace }}/{{ .Values.name }}"
             pathType: Prefix
             backend:
               service:

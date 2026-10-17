@@ -9,8 +9,8 @@ data:
       server {
         listen 3001;
         listen [::]:3001;
-        location /{{ .Release.Namespace }}/wetty/{{ .Values.name }} {
-          proxy_pass http://localhost:3000/{{ .Release.Namespace }}/wetty/{{ .Values.name }};
+        location /{{ .Release.Namespace }}/{{ .Values.name }} {
+          proxy_pass http://localhost:3000/{{ .Release.Namespace }}/{{ .Values.name }};
           proxy_http_version 1.1;
           proxy_set_header Upgrade $http_upgrade;
           proxy_set_header Connection "upgrade";

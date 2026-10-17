@@ -95,14 +95,14 @@ spec:
             {{- end }}
 {{/*          startupProbe:*/}}
 {{/*            httpGet:*/}}
-{{/*              path: "/{{ .Release.Namespace }}/polaris/{{ .Values.name }}/"*/}}
+{{/*              path: "/{{ .Release.Namespace }}/{{ .Values.name }}/"*/}}
 {{/*              port: 3000*/}}
 {{/*            initialDelaySeconds: 2 # webtop boots very fast*/}}
 {{/*            failureThreshold: 60  # start up totals 2 * 60 = 2 mins*/}}
 {{/*            periodSeconds: 2*/}}
 {{/*          livenessProbe:*/}}
 {{/*            httpGet:*/}}
-{{/*              path: "/{{ .Release.Namespace }}/polaris/{{ .Values.name }}/"*/}}
+{{/*              path: "/{{ .Release.Namespace }}/{{ .Values.name }}/"*/}}
 {{/*              port: 3000*/}}
 {{/*            failureThreshold: 24*/}}
 {{/*            periodSeconds: 5*/}}
@@ -129,7 +129,7 @@ spec:
             - name: PGID
               value: "{{ .Values.guid }}"
             - name: SUBFOLDER
-              value: "/{{ .Release.Namespace }}/polaris/{{ .Values.name }}/"
+              value: "/{{ .Release.Namespace }}/{{ .Values.name }}/"
             - name: START_DOCKER
               value: "false"
             {{- range .Values.env }}

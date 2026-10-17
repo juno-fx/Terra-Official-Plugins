@@ -5,7 +5,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/auth-url: "http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/"
-    kuiper.juno-innovations.com/ingress-extras: "/{{ .Release.Namespace }}/kubevirt-console/{{ .Values.name }}/vnc.html?keep_device_awake=true&reconnect=5000&autoconnect=true&resize=scale"
+    kuiper.juno-innovations.com/ingress-extras: "/{{ .Release.Namespace }}/{{ .Values.name }}/vnc.html?keep_device_awake=true&reconnect=5000&autoconnect=true&resize=scale"
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "30"
@@ -15,7 +15,7 @@ metadata:
     nginx.ingress.kubernetes.io/affinity: "cookie"
     # Scoped to this workload's own path — same-named consoles in different
     # namespaces share a hostname, so a cookie at "/" would collide between them.
-    nginx.ingress.kubernetes.io/session-cookie-path: "/{{ .Release.Namespace }}/kubevirt-console/{{ .Values.name }}/"
+    nginx.ingress.kubernetes.io/session-cookie-path: "/{{ .Release.Namespace }}/{{ .Values.name }}/"
     nginx.ingress.kubernetes.io/session-cookie-name: "juno-console-session-{{ .Release.Namespace }}-{{ .Values.name }}"
     nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
     nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
@@ -24,7 +24,7 @@ spec:
     - host: {{ .Values.host }}
       http:
         paths:
-          - path: "/{{ .Release.Namespace }}/kubevirt-console/{{ .Values.name }}/"
+          - path: "/{{ .Release.Namespace }}/{{ .Values.name }}/"
             pathType: Prefix
             backend:
               service:

@@ -55,7 +55,7 @@ spec:
             - --port=8081
             - --address=0.0.0.0
             - --root={{ .Values.root }}
-            - --baseURL=/plugin/{{ .Values.name }}
+            - --baseURL=/{{ .Release.Namespace }}/{{ .Values.name }}
             - --log=stdout
             - --database=/data/filebrowser.db
             - --username={{ .Values.user }}

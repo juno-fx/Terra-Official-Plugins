@@ -57,13 +57,13 @@ spec:
               value: "https://{{ .Values.name }}.{{ .Values.domain }}/"
             {{- else }}
             - name: N8N_PATH
-              value: "/{{ .Release.Namespace }}/n8n/{{ .Values.name }}/"
+              value: "/{{ .Release.Namespace }}/{{ .Values.name }}/"
             - name: N8N_HOST
               value: "{{ .Values.host }}"
             - name: N8N_PROTOCOL
               value: "https"
             - name: WEBHOOK_URL
-              value: "https://{{ .Values.host }}/{{ .Release.Namespace }}/n8n/{{ .Values.name }}/"
+              value: "https://{{ .Values.host }}/{{ .Release.Namespace }}/{{ .Values.name }}/"
             {{- end }}
             {{- range .Values.env }}
             - name: {{ .name | quote }}

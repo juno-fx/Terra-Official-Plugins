@@ -5,4 +5,4 @@ auth:
   type: hubble
   port: 8080
   paths:
-  - path: /plugin/__NAME__/
+  - path: /__NAMESPACE__/__NAME__/
