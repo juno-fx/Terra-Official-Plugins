@@ -18,4 +18,4 @@ spec:
               service:
                 name: "{{ .Release.Name }}"
                 port:
-                  number: 3000
+                  number: 8080
