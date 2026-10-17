@@ -99,7 +99,7 @@ spec:
             defaultMode: 0755
         - name: nginx
           configMap:
-            name: "{{ .Values.name }}-web-ide"
+            name: "{{ .Values.name }}-nginx"
         - name: config
           persistentVolumeClaim:
             claimName: "{{ .Values.name }}-config"
