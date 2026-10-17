@@ -6,4 +6,24 @@ metadata:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
 data:
   default.conf: |
-{{ tpl (.Files.Get "files/nginx/default.conf") . | indent 4 }}
+    server {
+        listen 8080;
+        server_name _;
+
+        location /{{ .Release.Namespace }}/gitea/{{ .Values.name }}/ {
+            proxy_set_header Accept-Encoding "";
+            rewrite ^/{{ .Release.Namespace }}/gitea/{{ .Values.name }}/(.*) /$1 break;
+            proxy_pass http://127.0.0.1:{{ .Values.app_port }};
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            sub_filter '<head>' '<head><base href="/{{ .Release.Namespace }}/gitea/{{ .Values.name }}/">';
+            sub_filter_types text/html;
+            sub_filter_once on;
+        }
+    }

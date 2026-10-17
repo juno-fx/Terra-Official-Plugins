@@ -1,0 +1,11 @@
+resource_id: boinc
+name: BOINC
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/boinc/assets/logo.png
+description: Distributed computing client for BOINC projects
+category: Computing
+tags:
+  - cluster-level
+  - workload
+  - computing
+  - science
+fields: []

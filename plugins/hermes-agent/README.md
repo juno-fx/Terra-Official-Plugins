@@ -54,14 +54,35 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `registry` | **string** · Optional · Default: `nousresearch`<br>Container registry for the Hermes image |
 | `repo` | **string** · Optional · Default: `hermes-agent`<br>Hermes image repository |
 | `tag` | **string** · Optional · Default: `latest`<br>Hermes image tag |
-| `cluster_access` | **select** · Optional · Default: `none`<br>Kubernetes RBAC access level for the agent (`none`, `readonly-ns`, `admin-ns`) |
-| `persistence_size` | **string** · Optional · Default: `1Gi`<br>Persistent volume size for agent state storage |
-| `persistence_storage_class` | **k8sStorageClass** · Optional<br>Storage class for the persistent volume |
+| `cluster_access` | **select** · Optional<br>Kubernetes RBAC access level for the agent (unset = no cluster access, `readonly-ns`, `admin-ns`) |
+| `persistence_size` | **string** · Optional · Default: `10Gi`<br>Persistent volume size for agent state storage |
+| `persistence_storage_class` | **k8sStorageClass** · Required<br>Storage class for the persistent volume |
+| `termination_grace_period` | **int** · Optional · Default: `120`<br>Seconds Kubernetes waits for a graceful shutdown (gateway drain + DB checkpoint) before force-killing. Raise on spot/preemptible nodes |
+
+### Custom Environment Variables
+
+Genesis lets you add arbitrary environment variables to the workload at launch time. These are commonly useful for Hermes Agent's multi-provider setup:
+
+| Variable | Description |
+|----------|--------------|
+| `ANTHROPIC_API_KEY` | Anthropic Console API key, used when the agent is configured to use Claude models. |
+| `OPENAI_API_KEY` | API key for OpenAI or any OpenAI-compatible endpoint (also used for local Ollama setups). |
+| `OPENROUTER_API_KEY` | OpenRouter API key for flexible access to many hosted models. |
+| `HERMES_MODEL` | Overrides the default model used by the agent. |
+
+---
+
+## Resilience
+
+Hermes Agent is built to survive unclean node loss (AWS spot-instance reclaims, preemptible nodes, OOM kills):
+
+- **Graceful shutdown** — on pod termination, a preStop hook (backed by a signal trap in the init script) drains the gateway, finishes any in-flight turn, and forces a final WAL checkpoint so the SQLite state database is never left mid-write. Tune the window with the `termination_grace_period` launch field.
+- **Startup self-heal** — before the gateway opens the state database, an integrity check runs. If the database is corrupt (e.g. after a hard node loss), the recoverable rows are salvaged into a fresh database automatically. Only if the salvage *fails* is the corrupt original kept (as `state.db.corrupt.<timestamp>`) for manual repair — the 2 newest such backups are retained, older ones pruned so repeated corruption cannot fill the data volume.
 
 ---
 
 ## Notes
 
-- The `cluster_access` field controls whether Hermes can interact with Kubernetes resources — use `readonly-ns` for safe exploration, `admin-ns` only when the agent needs to manage workloads
-- LLM provider API keys must be configured at the application level within the Hermes WebUI after launch — they are not set via these fields
+- The `cluster_access` field controls whether Hermes can interact with Kubernetes resources — leave unset for no cluster access, use `readonly-ns` for safe exploration, `admin-ns` only when the agent needs to manage workloads
+- LLM provider API keys are not set via the install-time fields above — configure them either as custom environment variables at workload launch (see table above) or at the application level within the Hermes WebUI after launch
 - Hermes supports OpenAI-compatible APIs, making it compatible with any provider that follows the OpenAI API specification

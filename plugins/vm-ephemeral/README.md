@@ -65,7 +65,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `virtio_drivers` | **boolean** · Optional · Default: `false`<br>Mount VirtIO drivers ISO to the VM (useful for Windows guest driver installation) |
 | `prefered_disk_bus` | **select** · Required · Default: `virtio`<br>Preferred disk bus type (`virtio`) |
 | `storage_class` | **k8sStorageClass** · Required<br>Storage class for the VM's boot disk |
-| `ports` | **list** · Optional<br>Ports to expose from the VM (name, type: `ClusterIP` or `NodePort`) |
+| `ports` | **list** · Optional<br>Ports to expose from the VM — one Service per entry. Sub-fields: `name` (lowercase letters, digits and `-`, max 15 characters), `type` (`ClusterIP`, `NodePort` or `LoadBalancer`), `vm_port` (port inside the VM), `service_port` (port exposed on the Service), `protocol`. `LoadBalancer` requires MetalLB or a cloud load balancer, and each `LoadBalancer` entry takes one IP from its pool |
 
 ---
 

@@ -1,0 +1,4 @@
+apiVersion: v1
+description: runtime-python workload template
+name: runtime-python
+version: 0.0.0

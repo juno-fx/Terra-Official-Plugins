@@ -11,4 +11,5 @@ tags:
   - virtual-machine
   - kubevirt
   - cluster-level
+  - workload
 fields: []

@@ -1,5 +1,53 @@
-# Put any valid Kubernetes objects here.
-# This can be Deployments, StatefulSets, Jobs, CronJobs, ConfigMaps, RBAC, etc.
-# There are no structural requirements — organize however makes sense for the plugin.
+# Your plugin's Kubernetes objects go here — any valid manifests (Deployment,
+# StatefulSet, Job, CronJob, ConfigMap, RBAC...). No structural requirements;
+# organize however makes sense for the plugin.
 #
-# See docs/plugin-types.md for examples and guidance.
+# Below is a minimal web-UI Deployment + Service. Adapt it: change the image,
+# ports, and probes; drop or add objects as the workload needs. See
+# plugins/ollama/ (storage-backed web service) and plugins/deadline10/
+# (Job-based installer) for fuller examples.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Release.Name }}"
+  labels:
+    terra.juno-innovations.com/app: "{{ .Release.Name }}"
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      terra.juno-innovations.com/app: "{{ .Release.Name }}"
+  template:
+    metadata:
+      labels:
+        terra.juno-innovations.com/app: "{{ .Release.Name }}"
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: PLUGIN
+          image: your-image:tag   # TODO: the workload's image
+          ports:
+            - name: http
+              containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Release.Name }}"
+spec:
+  ports:
+    - port: 3000
+      targetPort: 3000
+      name: http
+  selector:
+    terra.juno-innovations.com/app: "{{ .Release.Name }}"
+
+# Web UI? Add an Ingress authenticated via Genesis (namespaced/cluster-level
+# plugins authenticate through Genesis, not Hubble):
+#   nginx.ingress.kubernetes.io/auth-url: "http://genesis.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-service/{{ .Release.Name }}/"
+#   nginx.ingress.kubernetes.io/auth-signin: /unauthorized/
+# (see AGENTS.md — Ingress Authentication (nginx)).
+#
+# Storage? Define an install-time `shared-volume`/`exclusive-volume` field in
+# terra.yaml, then mount the PVC from `.Values.install_volume` (see plugins/ollama/).

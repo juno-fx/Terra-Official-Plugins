@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: {{ .Release.Name }}-kubevirt
-  namespace: argocd
+  namespace: {{ .Release.Namespace }}
   finalizers:
     - resources-finalizer.argocd.argoproj.io
     - post-delete-finalizer.argocd.argoproj.io

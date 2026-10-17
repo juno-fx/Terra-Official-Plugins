@@ -1,0 +1,7 @@
+# This plugin installs a workload template ConfigMap only. Every setting is
+# chosen at workload launch time from the schema in templates/metadata.yaml,
+# so there are no install-time values.
+#
+# The empty mapping below is deliberate and must stay: a comments-only file
+# parses to null rather than an empty map, which breaks bundle installs.
+{}

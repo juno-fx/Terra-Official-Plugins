@@ -1,0 +1,35 @@
+{{- if .Values.install_crds }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-slinky-crds
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    # Wave 0 - the Slinky CRDs must exist before the operator or any Slurm CR.
+    argocd.argoproj.io/sync-wave: "0"
+  # No resources-finalizer here, unlike the other two Applications - that finalizer
+  # cascade-deletes on Application delete, and deleting a CRD takes every Slurm
+  # cluster in the cluster with it. Do not add it back for consistency.
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: slinky
+  sources:
+    - repoURL: ghcr.io/slinkyproject/charts
+      chart: slurm-operator-crds
+      targetRevision: {{ .Values.chart_version }}
+      helm:
+        releaseName: slurm-operator-crds
+  syncPolicy:
+    automated:
+      # CRDs are cluster-scoped and shared. Never prune them out from under a
+      # running Slurm cluster.
+      prune: false
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - ServerSideApply=true
+      - CreateNamespace=true
+{{- end }}

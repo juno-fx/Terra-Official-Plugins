@@ -1,0 +1,15 @@
+{{- if eq .Values.network_mode "nodeport" }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Values.name }}-nodeport"
+spec:
+  type: NodePort
+  selector:
+    juno-innovations.com/workstation: "{{ .Values.name }}"
+  ports:
+    - port: {{ .Values.port }}
+      targetPort: {{ .Values.port }}
+      protocol: TCP
+      name: viewer
+{{- end }}

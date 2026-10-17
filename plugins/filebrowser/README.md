@@ -11,7 +11,7 @@
 
 ## Overview
 
-File Browser is a lightweight, web-based file manager that runs entirely in a browser — no desktop environment required. It provides a clean interface for drag-and-drop upload, directory browsing, file editing, and file download. The File Browser workload can optionally mount project storage volumes and persist uploaded data across restarts.
+File Browser is a lightweight, web-based file manager that runs entirely in a browser — no desktop environment required. It provides a clean interface for drag-and-drop upload, directory browsing, file editing, and file download. The File Browser workload can optionally mount project storage volumes.
 
 ---
 
@@ -23,7 +23,6 @@ File Browser is a lightweight, web-based file manager that runs entirely in a br
 
 ## Prerequisites
 
-- A Kubernetes storage class available in the cluster (required when persistent storage is enabled)
 - An nginx ingress controller in the cluster
 
 ---
@@ -51,16 +50,12 @@ These fields are configured when authoring the workload template in **Genesis** 
 
 | Field | Details |
 |-------|---------|
-| `workspace` | **string** · Optional<br>Optional target workspace name. If set, the URL becomes `/filebrowser/<workspace>` instead of the workload name. |
 | `registry` | **string** · Required · Default: `docker.io`<br>Container registry to pull the File Browser image from |
 | `repo` | **string** · Required · Default: `filebrowser/filebrowser`<br>File Browser image repository |
 | `tag` | **string** · Required · Default: `latest`<br>File Browser image tag |
 | `ingressNamespace` | **string** · Optional · Default: `ingress-nginx`<br>Ingress controller namespace (used for the network policy) |
 | `cpu` | **string** · Required · Default: `512m`<br>CPU request for the File Browser container |
 | `memory` | **string** · Required · Default: `256Mi`<br>Memory request for the File Browser container |
-| `dataPersistent` | **boolean** · Optional · Default: `false`<br>Enable persistent storage for uploaded files and database. When enabled, creates a PVC. When disabled, data is ephemeral (emptyDir). |
-| `storageClass` | **string** · Optional<br>Storage class for the data PVC. Leave empty for cluster default. |
-| `storageSize` | **string** · Optional · Default: `10Gi`<br>Persistent volume size when `dataPersistent` is enabled |
 | `root` | **string** · Optional · Default: `/data`<br>Root filesystem path visible in File Browser. Set to `/` to browse the entire container filesystem, or `/data` to restrict to the data volume only. |
 
 ---
@@ -71,6 +66,5 @@ These fields are configured when authoring the workload template in **Genesis** 
 - Authentication is handled by the Juno platform's Hubble ingress — no separate login is required within the application
 - The container runs as a non-root user with a read-only root filesystem for security
 - The `root` field controls the scope of the filesystem visible in File Browser — restrict to `/data` for a scoped view, or set to `/` for full container filesystem access
-- Uploaded files and the File Browser database are ephemeral unless `dataPersistent` is enabled
+- Uploaded files and the File Browser database are stored on an ephemeral `emptyDir` and are lost on pod restart
 - Project storage mounts are available at workload launch time through the standard Genesis volume mounting interface — they will appear under `/data` or the path specified by `root`
-- The File Browser database (`filebrowser.db`) stores user settings and is lost on restart when ephemeral storage is used

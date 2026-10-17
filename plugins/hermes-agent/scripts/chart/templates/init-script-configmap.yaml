@@ -13,15 +13,21 @@ data:
 
     log() { echo "[init] $*"; }
 
-    # Phase 1 — install sudo + tmux (small, fast). Needed immediately for
-    # privilege-drop via sudo.  Build tools (gcc/g++/make) come later in
-    # Phase 3 so the gateway can start without waiting for compilation.
-    if ! command -v sudo > /dev/null 2>&1; then
-      log "Installing sudo and tmux..."
+    # Phase 1 — ensure runtime deps (small, fast). sudo is needed immediately
+    # for the privilege-drop that starts the gateway; tmux backs wetty; sqlite3
+    # backs the state.db integrity self-heal in db-heal.sh. Build tools
+    # (gcc/g++/make) come later in Phase 3 so the gateway starts without waiting
+    # for compilation.
+    MISSING=""
+    command -v sudo    > /dev/null 2>&1 || MISSING="$MISSING sudo"
+    command -v tmux    > /dev/null 2>&1 || MISSING="$MISSING tmux"
+    command -v sqlite3 > /dev/null 2>&1 || MISSING="$MISSING sqlite3"
+    if [ -n "$MISSING" ]; then
+      log "Installing runtime deps:$MISSING"
       apt-get update -qq
-      apt-get install -y sudo tmux 2>&1
+      apt-get install -y $MISSING 2>&1
     else
-      log "sudo already installed, skipping..."
+      log "runtime deps present, skipping..."
     fi
 
     # --- User/group remap (only when PUID != 0) ---
@@ -42,17 +48,35 @@ data:
         echo "hermes:$USER_PASS" | chpasswd
       fi
 
-      # Fix ownership of the PVC data volume
-      chown hermes:hermes /opt/data
-      for sub in cron sessions logs hooks memories skills skins plans workspace home profiles; do
-        [ -d "/opt/data/$sub" ] && chown -R hermes:hermes "/opt/data/$sub"
-      done
+      # Ownership remap, gated by a marker on the PVC itself (survives pod
+      # restarts). The full-tree walk over /opt/hermes forces an overlayfs
+      # copy-up of the whole 2.2G image layer — measured > 15 min, blowing
+      # the startup-probe deadline and restart-looping the pod — so it must
+      # not run on every boot. Only a missing/stale marker (first launch, or
+      # this workload instance was reassigned a different user) pays the full
+      # cost. PVCs arrive with a foreign uid (e.g. 1000 after an
+      # image-seeded skeleton or clone), so the /opt/data walk is required —
+      # but only once per PUID/PGID.
+      PERMS_MARKER="/opt/data/.hermes-perms"
+      if [ "$(cat "$PERMS_MARKER" 2>/dev/null || true)" != "${PUID}:${PGID}" ]; then
+        log "Permissions marker missing or stale — running one-time remap"
 
-      # Fix ownership and permissions for the entire hermes tree and data dir.
-      # Image ships with UID 10000; after usermod all files show old UID.
-      # Synchronous — pod won't flag Ready until permissions are complete.
-      chown -R hermes:hermes /opt/hermes /opt/data 2>/dev/null || true
-      chmod -R o+rX /opt/hermes /opt/data 2>/dev/null || true
+        # /opt/hermes is read-only for hermes at runtime: installs (tool
+        # store, wetty) run as root in this script and writable state lives
+        # under /opt/data. The image ships the tree root-owned and
+        # world-readable, so no full chown is needed — just adopt stray
+        # uid-10000 files if a future image reintroduces them.
+        find /opt/hermes -uid 10000 -exec chown hermes:hermes {} + 2>/dev/null || true
+
+        # PVC: hermes must own all writable state.
+        chown -R hermes:hermes /opt/data 2>/dev/null || true
+
+        printf '%s:%s\n' "$PUID" "$PGID" > "$PERMS_MARKER"
+        chown hermes:hermes "$PERMS_MARKER" 2>/dev/null || true
+        log "Permissions remap complete"
+      else
+        log "Permissions marker matches ${PUID}:${PGID} — skipping remap"
+      fi
     else
       log "PUID=0, running as root (legacy mode)"
     fi
@@ -77,11 +101,16 @@ data:
     _SU=""
     [ "${PUID:-0}" != "0" ] && _SU="sudo -E -u hermes"
 
+    # Graceful shutdown on termination (e.g. spot-instance reclaim / pod
+    # eviction). Delegates to shutdown.sh, which drains the gateway and
+    # checkpoints state.db so it is never left mid-write. This backstops the
+    # container preStop hook — whichever fires first performs the clean stop.
     cleanup() {
-      log "Shutting down..."
-      kill "${GATEWAY_PID:-}" "${DASHBOARD_PID:-}" "${WETTY_PID:-}" 2>/dev/null || true
+      log "Received termination signal — shutting down gracefully..."
+      /opt/init/shutdown.sh || true
+      kill "${DASHBOARD_PID:-}" "${WETTY_PID:-}" 2>/dev/null || true
       wait
-      exit
+      exit 0
     }
     trap cleanup TERM INT
 
@@ -92,6 +121,11 @@ data:
         "$@"
       fi
     }
+
+    # Phase 1.5 — verify state.db integrity and auto-recover if corrupt, BEFORE
+    # the gateway opens it. Defends against unclean shutdowns (spot reclaim,
+    # OOM-kill) that can corrupt the SQLite state DB.
+    /opt/init/db-heal.sh || true
 
     # Phase 2 — start gateway + dashboard (fast, no build tools needed)
     log "Starting gateway..."
@@ -107,13 +141,26 @@ data:
     # start wetty.  Gateway + dashboard are already running so the agent
     # is usable while wetty compiles.
     _start_wetty() {
+      # Node comes from the image's managed tool store (e.g.
+      # /opt/hermes/tools/node-26.7.0-linux-x64), not /usr/local — so the npm
+      # global prefix is version-dependent and must be resolved at runtime.
+      # npm drops the `wetty` shim in <prefix>/bin, which is NOT on the
+      # default PATH, so put it there before the `command -v wetty` check
+      # (otherwise every boot reinstalls and `wetty` is unresolvable).
+      WETTY_PREFIX="$(npm prefix -g)"
+      export PATH="${WETTY_PREFIX}/bin:${PATH}"
+
       if ! command -v wetty > /dev/null 2>&1; then
         log "Installing build tools (gcc, g++, make)..."
         apt-get update -qq
         apt-get install -y gcc g++ make 2>&1
         log "Installing wetty..."
-        npm install -g wetty 2>&1
-        chmod +x /usr/local/lib/node_modules/wetty/build/main.js
+        # npm 12 (shipped in this image) blocks dependency lifecycle scripts by
+        # default. node-pty has no linux-x64 prebuild, so its install script
+        # must compile build/Release/pty.node or wetty dies at startup with
+        # "Failed to load native module: pty.node". The flag is accepted and
+        # ignored by npm 11, so it is safe on either major.
+        npm install -g --allow-scripts=node-pty,@parcel/watcher wetty@3.3.5 2>&1
       else
         log "wetty already installed, skipping..."
       fi
@@ -121,10 +168,130 @@ data:
       log "Starting wetty..."
       WETTY_CMD="bash -c 'export LANG=C.UTF-8 LC_ALL=C.UTF-8 COLORTERM=truecolor && . /opt/hermes/.venv/bin/activate && exec tmux new-session -A -s hermes bash'"
       [ -n "$_SU" ] && WETTY_CMD="$_SU ${WETTY_CMD}"
-      wetty -b /plugin/__NAME__ --allow-iframe -p 7681 \
+      wetty -b /__NAMESPACE__/hermes/__NAME__ --allow-iframe -p 7681 \
         -c "${WETTY_CMD}" \
         2>&1 | sed 's/^/[wetty] /' &
     }
     _start_wetty &
 
     wait
+
+  db-heal.sh: |
+    #!/bin/bash
+    # Verify the hermes state.db on startup and auto-salvage it if corrupt.
+    #
+    # A hard, unclean shutdown (spot-instance reclaim, OOM-kill, node loss) can
+    # tear a WAL checkpoint mid-write and corrupt the SQLite state DB, after
+    # which every agent turn fails to persist ("session storage could not be
+    # written"). This script runs BEFORE the gateway opens the DB: it checks
+    # integrity and, if the DB is malformed, salvages the recoverable rows with
+    # sqlite3's .recover into a fresh DB, drops the (rebuildable) FTS index so
+    # hermes recreates it cleanly on open, and swaps it in. On success the
+    # corrupt copy is deleted; only a FAILED salvage keeps it (as
+    # state.db.corrupt.<timestamp>) so the DB can be repaired manually — the
+    # 2 newest such backups are retained, older ones pruned.
+    #
+    # Runs as the hermes user: when invoked as root with a PUID remap active,
+    # it re-execs itself via sudo so every file it creates is hermes-owned
+    # from the start — no chown fix-up needed. Under PUID=0 (legacy mode) it
+    # stays root, matching the rest of the container.
+    set -u
+
+    HERMES_HOME="${HERMES_HOME:-/opt/data}"
+    DB="${HERMES_HOME}/state.db"
+    PUID="${PUID:-1000}"
+
+    log() { echo "[db-heal] $*"; }
+
+    # start.sh installs sudo in Phase 1, before this runs, so the demotion is
+    # guaranteed whenever a PUID remap is active.
+    if [ "$(id -u)" = "0" ] && [ "$PUID" != "0" ] && command -v sudo > /dev/null 2>&1; then
+      exec sudo -E -u hermes "$0" "$@"
+    fi
+
+    [ -f "$DB" ] || { log "no state.db yet — nothing to check"; exit 0; }
+
+    if ! command -v sqlite3 > /dev/null 2>&1; then
+      log "sqlite3 not available — skipping integrity check"
+      exit 0
+    fi
+
+    if sqlite3 "$DB" 'PRAGMA quick_check;' 2>/dev/null | head -1 | grep -qx 'ok'; then
+      log "state.db integrity OK"
+      exit 0
+    fi
+
+    log "state.db FAILED integrity check — attempting offline salvage via .recover"
+    TS="$(date +%Y%m%d_%H%M%S)"
+    BK="${DB}.corrupt.${TS}"
+    cp -a "$DB" "$BK" 2>/dev/null || true
+    [ -f "${DB}-wal" ] && cp -a "${DB}-wal" "${BK}-wal" 2>/dev/null || true
+    [ -f "${DB}-shm" ] && cp -a "${DB}-shm" "${BK}-shm" 2>/dev/null || true
+
+    # Retention: keep only the 2 newest corrupt backups (leftovers from failed
+    # salvages) so repeated corruption can't fill the data volume. Sort by the
+    # timestamp embedded in the filename — cp -a preserves mtimes, so mtime
+    # order is unreliable here.
+    ls -1 "${DB}".corrupt.* 2>/dev/null | grep -vE -- '-(wal|shm)$' | sort -r | tail -n +3 | \
+      while read -r OLD; do
+        log "pruning old corrupt backup: ${OLD}"
+        rm -f "$OLD" "${OLD}-wal" "${OLD}-shm"
+      done
+
+    REC="${DB}.recovered.${TS}"
+    rm -f "$REC"
+    sqlite3 "$BK" '.recover' 2>/dev/null | sqlite3 "$REC" 2>/dev/null
+
+    if [ -f "$REC" ] && sqlite3 "$REC" 'PRAGMA integrity_check;' 2>/dev/null | head -1 | grep -qx 'ok'; then
+      # Drop the (rebuildable) FTS objects + .recover's orphan table so hermes
+      # recreates a clean full-text index from the canonical messages table.
+      DROPS="$(sqlite3 "$REC" "SELECT 'DROP '||CASE WHEN type='trigger' THEN 'TRIGGER' ELSE 'TABLE' END||' IF EXISTS \"'||replace(name,'\"','\"\"')||'\";' FROM sqlite_master WHERE name LIKE 'messages_fts%';" 2>/dev/null)"
+      sqlite3 "$REC" "DROP TABLE IF EXISTS lost_and_found; ${DROPS} VACUUM;" 2>/dev/null || true
+      mv -f "$REC" "$DB"
+      rm -f "${DB}-wal" "${DB}-shm"
+      rm -f "$BK" "${BK}-wal" "${BK}-shm"
+      log "state.db salvaged — corrupt copy deleted"
+    else
+      rm -f "$REC" 2>/dev/null || true
+      log "WARNING: automatic salvage FAILED — original left in place; manual repair required (backup at ${BK})"
+    fi
+
+  shutdown.sh: |
+    #!/bin/bash
+    # Graceful shutdown for the hermes-agent container.
+    #
+    # Invoked by the container's preStop hook (and, as a backstop, by start.sh's
+    # TERM/INT trap). Drains the gateway — which finishes any in-flight turn,
+    # checkpoints and closes state.db — then forces a final WAL checkpoint so
+    # the on-disk database is fully consistent before the container exits. This
+    # is what prevents a spot-instance reclaim from tearing a write and
+    # corrupting the DB.
+    #
+    # Runs as the hermes user — the same user the gateway runs as: when
+    # invoked as root with a PUID remap active, it re-execs itself via sudo,
+    # so it never leaves root-owned WAL/SHM files behind. Under PUID=0
+    # (legacy mode) it stays root, matching the rest of the container.
+    set -u
+
+    HERMES_HOME="${HERMES_HOME:-/opt/data}"
+    DB="${HERMES_HOME}/state.db"
+    HERMES_BIN="/opt/hermes/.venv/bin/hermes"
+    PUID="${PUID:-1000}"
+
+    log() { echo "[shutdown] $*"; }
+
+    # If the preStop hook fires before start.sh Phase 1 has installed sudo,
+    # fall through as root — the gateway isn't running yet and the checkpoint
+    # below changes no file ownership, so that path is safe.
+    if [ "$(id -u)" = "0" ] && [ "$PUID" != "0" ] && command -v sudo > /dev/null 2>&1; then
+      exec sudo -E -u hermes "$0" "$@"
+    fi
+
+    log "stopping gateway (drains in-flight turns, checkpoints and closes state.db)"
+    "$HERMES_BIN" gateway stop 2>/dev/null || true
+
+    if command -v sqlite3 > /dev/null 2>&1 && [ -f "$DB" ]; then
+      log "forcing final WAL checkpoint (TRUNCATE)"
+      sqlite3 "$DB" 'PRAGMA wal_checkpoint(TRUNCATE);' 2>/dev/null || true
+    fi
+    log "graceful shutdown complete"

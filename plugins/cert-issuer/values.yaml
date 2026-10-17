@@ -1,0 +1,10 @@
+issuer_name: letsencrypt-prod
+email:
+acme_server: https://acme-v02.api.letsencrypt.org/directory
+solver: http01
+ingress_class: nginx
+dns_provider: cloudflare
+secret_namespace: cert-manager
+secret_name: ""
+secret_key: ""
+aws_hosted_zone_id: ""

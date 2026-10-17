@@ -1,0 +1,50 @@
+# vLLM workload template values
+
+# Kuiper-injected standard values — do not remove
+name: vllm
+user:
+group:
+cpu: "1"
+memory: "1Gi"
+cpuLimit: null
+memoryLimit: null
+gpu: false
+idx: 0
+guid: 0
+puid: 0
+host:
+pullSecret:
+session:
+volumeMounts: []
+volumes: []
+env:
+  - name: JUNO
+    value: "true"
+selector:
+plugins: []
+_kuiper:
+
+# vLLM configuration
+registry: "docker.io"
+repo: "vllm/vllm-openai"
+tag: "latest"
+
+# Model to serve
+model: ""
+
+# vLLM serving arguments
+max_model_len: "262144"
+max_num_batched_tokens: "16384"
+max_num_seqs: "64"
+gpu_memory_utilization: "0.50"
+kv_cache_dtype: "fp8"
+language_model_only: true
+enable_prefix_caching: true
+enable_auto_tool_choice: true
+speculative_config: ""
+tool_call_parser: ""
+reasoning_parser: ""
+
+# GPU settings
+gpu_count: 1
+gpu_memory_fraction: "0.9"

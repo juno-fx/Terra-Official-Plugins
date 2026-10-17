@@ -56,6 +56,17 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `tag` | **string** · Required · Default: `latest`<br>Image tag |
 | `publicAccess` | **boolean** · Required · Default: `false`<br>Disable authentication and allow unauthenticated access |
 
+### Custom Environment Variables
+
+Genesis lets you add arbitrary environment variables to the workload at launch time. These are commonly useful for a LinuxServer.io Webtop image:
+
+| Variable | Description |
+|----------|--------------|
+| `CUSTOM_USER` | Username for HTTP basic auth in front of the desktop. |
+| `PASSWORD` | Password for HTTP basic auth, used together with `CUSTOM_USER`. |
+| `DOCKER_MODS` | LinuxServer.io mod(s) to install at container start, e.g. additional apps or tools. |
+| `TZ` | Timezone for the desktop session, e.g. `America/New_York`. |
+
 ---
 
 ## Notes

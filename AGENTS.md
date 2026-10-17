@@ -3,6 +3,14 @@
 This file provides authoritative guidance for AI agents and automated tools working in this repository.
 Read this before making any changes to plugins or tooling.
 
+**Agent reading order** — navigate by priority, not sequence: (1) Critical Rules → (2) Plugin
+Authoring — Probe First → (3) **"Adding a New Plugin — Checklist"** — creation tasks start there,
+it sequences probe → scaffold → files → check → package → verify → (4) Concept Routing — consult
+only the concept file a probe or task hits. The reference tables below (Kuiper Annotations, Field
+Types, terra.yaml properties, values keys, Make Targets) are consult-on-demand only — do **not**
+pre-read them. AGENTS.md tables are authoritative; `concepts/` and `docs/` mirror them. A
+small-context model needs only this preamble + Critical Rules + the checklist + one routed concept.
+
 ---
 
 ## Repository Purpose
@@ -20,6 +28,13 @@ Plugins are Helm charts that Terra installs into Kubernetes clusters via ArgoCD 
 | **Kuiper** | Workload launcher — renders embedded Helm charts at workload launch time |
 
 All plugins live in `plugins/<plugin-name>/`. Do not create plugins outside this directory.
+
+**Logo and icon placement** — logo/icon files live at the plugin root in `assets/`
+(`plugins/<plugin-name>/assets/logo.png`), as a sibling of `scripts/`. Never put images inside
+`scripts/`: the entire `scripts/` directory is gzip-compressed, base64-encoded, and shipped inside
+the packaged scripts ConfigMap, so images there consume the 1MiB ConfigMap budget for no benefit.
+`terra.yaml`'s `icon` field and any README badges reference the root asset path
+(`https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/<plugin-name>/assets/logo.png`).
 
 ---
 
@@ -45,7 +60,7 @@ ConfigMaps, RBAC, etc.) organized however makes sense for the plugin.
 ### 2. Cluster-Level Plugin
 
 Identical to a namespaced plugin mechanically — a standard Helm chart of any contents. The only
-difference is that Terra installs it into the `argocd` namespace instead of the user's project
+difference is that Terra installs it into the Genesis namespace (`argocd` by default) instead of the user's project
 namespace. The plugin is expected to create and manage its own namespaces if needed.
 
 **Identifying marker:**
@@ -53,7 +68,12 @@ namespace. The plugin is expected to create and manage its own namespaces if nee
 
 **Example:** `plugins/nvidia-gpu-operator/`, `plugins/longhorn/`, `plugins/cert-manager/`
 
-**Install target:** `argocd` namespace
+**Install target:** Genesis namespace (`argocd` by default)
+
+**Never hardcode `argocd` as a namespace** — Genesis can be deployed into a custom namespace. Anything
+that must live alongside Genesis/ArgoCD (ArgoCD `Application` CRs, Ingresses for `argocd-server`,
+`namespaceSelector`s that target Genesis) uses `{{ .Release.Namespace }}`. `argocd.argoproj.io/*`
+annotations and finalizers are API-group names, not namespaces — leave those alone.
 
 ---
 
@@ -73,17 +93,26 @@ this embedded chart at workload launch time using the field values defined in `t
 
 **Example:** `plugins/helios/`, `plugins/web-ide/`, `plugins/jupyter-notebook/`
 
-**Install target:** `argocd` namespace
+**Install target:** Genesis namespace (`argocd` by default)
+
+**The `workload` tag** — every workload template's `terra.yaml` tags array must include `workload`
+alongside `cluster-level`. The Terra app store uses this tag to drive its workloads filter, so a
+workload template without it will not appear when users filter the store by workloads.
+
+**Only workload template plugins may carry this tag.** Do not add it to a namespaced or cluster-level
+plugin — those install a running service directly and are not launchable workloads, so tagging one
+puts it in a store filter it does not belong in. If a plugin has no `templates/metadata.yaml` carrying
+the `kuiper.juno-innovations.com/chart` label, it does not get the `workload` tag.
 
 **Directory structure:**
 
 ```
 plugins/my-template/
 ├── Chart.yaml
-├── terra.yaml                          # tags: [cluster-level], fields: []
+├── terra.yaml                          # tags: [cluster-level, workload], fields: []
 ├── values.yaml
 ├── templates/
-│   ├── metadata.yaml                   # THE CONTRACT — discovery label + fields schema
+│   ├── metadata.yaml                   # THE CONTRACT — discovery label + fields schema + env_hints: [...]
 │   ├── packaged-scripts.yaml           # GENERATED — never edit
 │   └── packaged-scripts-cleanup.yaml   # GENERATED — never edit
 └── scripts/
@@ -92,10 +121,47 @@ plugins/my-template/
         ├── Chart.yaml
         ├── values.yaml                 # Must contain all fields from metadata.yaml
         └── templates/
-            ├── workstation.yaml        # StatefulSet — the running workload
+            ├── workload.yaml           # StatefulSet — the running workload
             ├── service.yaml
             └── ingress.yaml
 ```
+
+**`env_hints` in `templates/metadata.yaml`** — for workload templates whose
+`scripts/chart/templates/workload.yaml` ranges over `.Values.env` (i.e. the chart actually wires up Genesis's
+built-in custom env var field — see the `env` field type in Field Types Reference below), `templates/metadata.yaml`'s
+`data:` block may carry an `env_hints:` key (a sibling of `fields:`, using the same string-block-scalar
+convention since ConfigMap `data` values must be strings) documenting the upstream image's most commonly used
+custom env vars:
+
+```yaml
+data:
+  fields: |
+    - name: ...
+  env_hints: |
+    - name: EXAMPLE_VAR
+      description: What this variable does and when to set it.
+```
+
+This lives in `metadata.yaml` rather than `terra.yaml` because it needs to travel through the same ConfigMap
+Genesis already reads (label `kuiper.juno-innovations.com/chart`) to reach the workload-launch UI — `terra.yaml`
+is install-time only (Rule 5) and Genesis never reads it. See `concepts/env.md` for the
+full env-var conventions (platform-set vars, `.Values.env` wiring, README mirroring).
+
+Rules:
+- **List only the handful of variables end users would actually set** — not every variable the upstream image
+  supports. This is a curated "commonly useful" list, not exhaustive reference documentation.
+- **Never list a variable already set by the platform** at runtime (e.g. `JUNO_WORKSTATION`,
+  `JUNO_PROJECT`, `JUNO_ENVIRONMENT`, `USER`, `HOME`, `UID`/`PUID`, `GID`/`PGID`, `PREFIX`/`SUBFOLDER`) — see
+  `concepts/env.md`'s platform-set table. A suggested var that collides with a platform-set one is misleading.
+- If the upstream image has no well-known custom env vars, set `env_hints: |` followed by an indented
+  `[]` rather than omitting the key (see `plugins/proxmox/templates/metadata.yaml`).
+- Mirror the same list in the plugin's `README.md`, under a `### Custom Environment Variables` subsection inside
+  `## Configuration` (table of `Variable` / `Description`, one row per entry) — see any workload template plugin
+  under `plugins/` for the established format.
+- Do not add a "don't override" callout to the README — the goal is a short, useful suggestion list, not a
+  cautionary reference.
+- `template/workload/templates/metadata.yaml` and `template/workload/README.md` carry `TODO` placeholders for
+  this — fill them in (or delete down to `env_hints: |` + `[]`) when scaffolding a new workload template.
 
 ---
 
@@ -165,6 +231,58 @@ in `templates/metadata.yaml`, which are shown at **workload launch time**.
 
 ---
 
+## Concept Guides — Agent Routing
+
+When a feature is requested, read the matching concept file before touching a chart. Each file
+is a self-contained how-to: the Helm values involved, the template pattern, conventions,
+gotchas, and real-plugin examples.
+
+**Creating a plugin?** Skip ahead to "Adding a New Plugin — Checklist" — it sequences
+probe → scaffold → per-type files → best-practices check → package → verify. The table below
+routes individual features to concepts.
+
+| Feature request | Read | Covers |
+|-----------------|------|--------|
+| New plugin or new feature — what does it need? | `concepts/probing.md` | the ASK/SUGGEST probe checklist, feature→concept mapping |
+| Plugin quality, best practices, review bar | `concepts/best-practices.md` | **policy, not how-to** — the MUST/SHOULD/Consider quality bar, baseline hygiene, per-feature bars, type minimums, PR review checklist |
+| Node placement, affinity, tolerations, node selectors, `.Values.selector` | `concepts/affinity.md` | nodeAffinity/nodeSelector, podAffinity/podAntiAffinity — avoid others / pack together, taints/tolerations, Kuiper's anti-blacklist injection |
+| Resources, CPU/memory limits, priority classes, replicas, hostname | `concepts/scheduling.md` | `cpu`/`memory`/`cpuLimit`/`memoryLimit` wiring, `k8sPriority`, workload shape |
+| Storage, PVCs, volumes, mounts, storage classes, shared volumes, DataVolumes | `concepts/storage.md` | install-time vs launch-time storage, `volumeMounts`/`volumes`, `k8sStorageClass`/`dataVolume`, Kuiper-managed mount annotations |
+| GPU, CUDA, inference, `runtimeClassName` | `concepts/gpu.md` | `gpu` field, nvidia runtime, driver prerequisite, GPU-node targeting |
+| Image, registry, pull secrets, command/args, probes, sidecars | `concepts/runtime.md` | image wiring, `pullSecret`, startup/liveness probes, nginx sidecar pattern |
+| Ingress, routes, auth, endpoint visibility, paths | `concepts/ingress.md` | namespace-prefixed paths, Hubble/Genesis auth, `ingress-hide`/`ingress-extras`, PREFIX matching |
+| Env vars, env_hints, custom environment | `concepts/env.md` | `.Values.env` range, `env_hints`, platform-set pass-through vars (wire only what the image consumes) |
+| Kuiper annotations, labels, actions, connection, adopt, EC2 exposure | `concepts/labels-annotations.md` | plugin-author vs Kuiper-managed annotations, `plugin` label, Crossplane/EC2 keys |
+| Virtual machines, KubeVirt, DataVolumes, VM console | `concepts/vm.md` | VirtualMachine shape, VirtualMachinePreference, DataVolumeTemplates, firmware/TPM, GPU device passthrough, kubevirt-console sidecar |
+| Cloud instances, Crossplane, EC2, adopt | `concepts/crossplane.md` | CR-based workloads, providerConfig, expose/aws-remote-connection/use-private-dns, ExternalName Service + adopt |
+| Connection brokers, external backends, no-pod workloads | `concepts/connection-brokers.md` | selector-less NodePort + EndpointSlice, port mapping, IPv4-only constraint |
+| Service exposure, NodePort, LoadBalancer, non-HTTP workloads | `concepts/service-exposure.md` | Service types (ClusterIP/NodePort/LoadBalancer), nodePort strategies (auto/fixed/adjacent range), no-ingress workload shape |
+
+Files are additive how-tos — the critical **rules** above and the reference tables below remain
+authoritative. Where a concept file and a table disagree, the table wins.
+
+---
+
+## Plugin Authoring — Probe First
+
+**Before writing chart code for a new plugin or any new feature, probe what the workload
+actually needs.** The template is a deliberately generic baseline — no env vars, no probes, no
+mounts, no GPU, no sidecars. Features are added per workload, not pre-baked.
+
+1. **ASK** — walk the probe checklist (`concepts/probing.md`): purpose/type, interface
+   (web/API/desktop/headless), GPU, persistence, ingress protection (protected vs public),
+   runtime quirks, env needs, image source, node targeting.
+2. **SUGGEST** — the author may not know what their workload needs. Propose candidates from
+   characteristics: Chromium/Electron → `/dev/shm` mount, ML/LLM/render → GPU, web app → auth,
+   stateful data → storage, subpath web UI → sidecar. **Never add silently** — confirm each
+   with the author.
+3. **WIRE from concepts** — each confirmed need maps to its concept file; every field added to
+   `templates/metadata.yaml` needs the matching key in `scripts/chart/values.yaml` (Rule 3).
+4. **Add only what was confirmed** — the template baseline stays intact; features arrive as
+   small, concept-backed additions.
+
+---
+
 ## File Ownership Map
 
 | File/Directory | Authored | Generated | Notes |
@@ -177,8 +295,6 @@ in `templates/metadata.yaml`, which are shown at **workload launch time**.
 | `plugins/*/templates/packaged-scripts-cleanup.yaml` | | ✓ | Generated by `make package` |
 | `plugins/*/scripts/` | ✓ | | Source scripts — edit these |
 | `plugins/*/scripts/chart/` | ✓ | | Workload template Helm chart (workload plugins only) |
-| `plugins/*/scripts/chart/files/nginx/` | ✓ | | Nginx sidecar config — edit these |
-| `plugins/*/scripts/chart/templates/nginx-configmap.yaml` | ✓ | | Thin wrapper loading `files/nginx/` via `tpl` |
 
 ---
 
@@ -188,7 +304,7 @@ in `templates/metadata.yaml`, which are shown at **workload launch time**.
 scripts/                                    ← edit these files
     └── entrypoint.sh
     └── chart/                              ← workload template embedded Helm chart
-        └── templates/workstation.yaml
+        └── templates/workload.yaml
             make package <plugin>
                 ↓ tar --owner=0 ... -czf scripts.tar scripts/
                 ↓ base64 -w 0 scripts.tar
@@ -196,7 +312,7 @@ scripts/                                    ← edit these files
 templates/packaged-scripts.yaml             ← generated, committed to git
 templates/packaged-scripts-cleanup.yaml     ← generated, committed to git
                 ↓ ArgoCD syncs
-ConfigMap in argocd namespace               ← Genesis reads packaged_scripts.base64
+ConfigMap in Genesis namespace              ← Genesis reads packaged_scripts.base64
                 ↓ Genesis catalog API
 Kuiper receives base64 chart string
                 ↓ b64decode → tar extract → helm template
@@ -211,10 +327,13 @@ Workload manifests applied to cluster
    - `<release>-terra-metadata` ConfigMap — carries the `kuiper.juno-innovations.com/chart` label and `fields:` schema
    - `<release>-scripts-configmap` ConfigMap — carries `packaged_scripts.base64` (the base64 gzip tarball of `scripts/`)
 
-2. **Genesis catalog:** Genesis lists all ConfigMaps in the `argocd` namespace with label `kuiper.juno-innovations.com/chart`.
+2. **Genesis catalog:** Genesis lists all ConfigMaps in the Genesis namespace with label `kuiper.juno-innovations.com/chart`.
    For each, it reads:
    - `data.fields` → the schema presented in the workload creation UI
    - `data.chart` → name of the scripts ConfigMap
+   - `data.env_hints`, if present → suggested custom env vars for the auto-injected `env` field (this
+     key exists in the ConfigMap for Genesis to consume; whether Genesis's UI currently reads and displays it is
+     outside this repo's control — see the `env_hints` subsection above)
    - Then fetches that scripts ConfigMap and reads `packaged_scripts.base64`
 
 3. **Workload launch (Kuiper):** User creates a workload in Genesis. Kuiper receives the base64 chart string,
@@ -258,9 +377,14 @@ data:
       description: "Attach a GPU"
       type: boolean
       required: true
+  # Optional: suggestions surfaced next to the auto-injected `env` field at workload-launch time.
+  # See the `env_hints` subsection above.
+  env_hints: |
+    - name: EXAMPLE_VAR
+      description: "What this variable does and when to set it"
 ```
 
-**The `juno-innovations.com/workload` annotation must also appear in `scripts/chart/templates/workstation.yaml`**
+**The `juno-innovations.com/workload` annotation must also appear in `scripts/chart/templates/workload.yaml`**
 on the StatefulSet metadata — this is how Hubble categorizes the running workload in its UI.
 
 **Valid `juno-innovations.com/workload` values:**
@@ -279,9 +403,11 @@ on the StatefulSet metadata — this is how Hubble categorizes the running workl
 
 Kuiper always injects these keys when rendering the embedded chart. They must be present in
 `scripts/chart/values.yaml` or Helm rendering will fail. Do not remove them from the scaffold.
+`selector` is the one exception — a chart-declared convention key Kuiper does **not** inject
+(see `concepts/affinity.md`); it stays because a dozen charts range it into `nodeAffinity`.
 
 ```yaml
-# Kuiper-injected standard values — do not remove
+# Kuiper-injected standard values — do not remove (selector: declared, not injected)
 name: my-template
 user:
 group:
@@ -297,9 +423,7 @@ pullSecret:
 session:
 volumeMounts: []
 volumes: []
-env:
-  - name: JUNO
-    value: "true"
+env: []        # populated at launch from the auto-injected `env` field
 selector:
 plugins: []
 _kuiper:
@@ -309,27 +433,23 @@ User-facing fields from `metadata.yaml` are added below these standard keys.
 
 ---
 
-## `scripts/chart/templates/workstation.yaml` — Required Conventions
+## `scripts/chart/templates/workload.yaml` — Required Conventions
 
 The StatefulSet that Kuiper deploys must follow these conventions:
 
-- **Node affinity** — target nodes with label `juno-innovations.com/workstation: "true"`
-- **Toleration** — tolerate taint `juno-innovations.com/workstation: NoSchedule`
+- **Ownership label** — use `kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"` for the StatefulSet
+  selector, pod template labels, and Service selector. Kuiper injects the same label into top-level resource
+  metadata at launch (value = workload name), so it matches without extra labels. The pod template must declare
+  the label itself — Kuiper's injection does not reach `spec.template.metadata.labels`.
 - **`juno-innovations.com/workload` annotation** — must match `metadata.yaml` value
-- **Plugin mounts** — range over `.Values.plugins` to mount Helios plugin scripts
-- **Nginx sidecar** — add a container named `nginx` on port 8080, using `{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}` as the image
-- **Nginx ConfigMap** — mount `{{ .Release.Name }}-nginx` ConfigMap at `/etc/nginx/conf.d/default.conf` (server-block) or `/etc/nginx/nginx.conf` (full wrapper via `events {} http {}`)
-- **Standard env vars** — set `JUNO_WORKSTATION`, `JUNO_PROJECT`, `USER`, `HOME`, `PREFIX`
+- **Conditional: plugin mounts** — when the workload consumes Helios plugin scripts, range over `.Values.plugins`
+  (mounted at `/etc/helios/init.d/<name>/<file>`); see `plugins/helios/scripts/chart/templates/workstation.yaml`.
+- **Conditional: env vars** — pass-through only: wire `JUNO_WORKSTATION`, `JUNO_WORKSPACE` (formerly
+  `JUNO_PROJECT`, still set for backwards compatibility), `USER`, `HOME`, `PREFIX` **only when the
+  upstream image is built to consume them** (check image docs before wiring; the template ships none by
+  default — see "Plugin Authoring — Probe First"). Full table: `concepts/env.md`.
 
-The nginx config lives in an external file at `files/nginx/default.conf` and is loaded via:
-
-```yaml
-data:
-  default.conf: |
-{{ tpl (.Files.Get "files/nginx/default.conf") . | indent 4 }}
-```
-
-See `plugins/filebrowser/scripts/chart/templates/workstation.yaml` for a minimal reference, or `plugins/gitea/scripts/chart/templates/workstation.yaml` for the full pattern with dedicated `nginx_registry`/`nginx_repo`/`nginx_tag` fields.
+See `plugins/helios/scripts/chart/templates/workstation.yaml` for the full reference implementation.
 
 ---
 
@@ -342,7 +462,7 @@ See `plugins/filebrowser/scripts/chart/templates/workstation.yaml` for a minimal
 | `icon` | yes | Icon URL or identifier shown in the Terra app store |
 | `description` | yes | Short description shown in the Terra app store |
 | `category` | yes | Category grouping in the Terra app store |
-| `tags` | yes | List of tags. Include `cluster-level` for cluster-level plugins |
+| `tags` | yes | List of tags. Include `cluster-level` for cluster-level plugins. Include `workload` **only** for workload template plugins — it drives the Terra app store's workloads filter |
 | `fields` | yes | List of install-time field definitions (can be empty `[]`) |
 | `editable` | no | `true` \| `false` — allows users to edit field values after install. Default: `false` |
 | `compatibility` | no | Pip-style platform version constraint string. Terra blocks install if not met. Example: `genesis-deployment>=3.0.2,orion-deployment>=3.1.0` |
@@ -357,70 +477,76 @@ manages the workload. All keys use the `kuiper.juno-innovations.com/` prefix unl
 **These annotations only apply to workload template plugins.** Namespaced and cluster-level plugins
 are synced directly by ArgoCD and never pass through Kuiper — annotations have no effect there.
 
-### Nginx Sidecar Authentication
+For the plugin-author view with per-annotation usage examples (and the one `kuiper-instance`
+exception on pod templates), see `concepts/labels-annotations.md`.
 
-Authentication is handled by an **nginx sidecar container** inside the workload pod, not by ingress
-annotations. The sidecar uses nginx's `auth_request` module to validate every request against the
-platform auth service before proxying to the app container.
+### Ingress Path Convention
 
+Workload ingress paths start with the release namespace; a plugin may add its own segment
+after it:
+
+```yaml
+- path: "/{{ .Release.Namespace }}/{{ .Values.name }}/"   # no segment (template default)
+- path: "/{{ .Release.Namespace }}/<segment>/{{ .Values.name }}/"   # optional plugin segment
 ```
-Request → Ingress (plain route, no auth annotations) → Service → Pod
-                                                              └─ nginx sidecar (port 8080)
-                                                                   ├─ auth_request → Hubble/Genesis
-                                                                   └─ proxy_pass → 127.0.0.1:APP_PORT
-                                                              └─ app container
-```
 
-**Workload templates** — authenticate via Hubble. Sidecar nginx config at `files/nginx/default.conf`:
+The template starts with **no segment**. Many catalog workload charts add one — the heritage
+segment is `polaris` (web-ide, proxmox, helios, boinc, jupyter-notebook, lsio-webtop,
+runtime-python/go/js/cpp); other charts choose their own (gitea → `/gitea/`, k9s → `/k9s/`).
+End-to-end routing, auth-annotation variants, endpoint visibility, and the no-rewrite gotcha:
+`concepts/ingress.md`.
 
-```nginx
-location /plugin/{{ .Values.name }}/ {
-    auth_request /auth;
-    proxy_pass http://127.0.0.1:APP_PORT;
-}
+The rule nginx actually enforces is that **host + path must be unique cluster-wide** — object names are
+namespaced, routing rules are not. So two environments sharing a hostname that both render
+`/<namespace>/<name>/` (or `/polaris/<name>/`) collide, and the second to launch is rejected by the
+ingress admission webhook.
 
-location = /auth {
-    internal;
-    proxy_pass http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/;
-    proxy_pass_request_body off;
-    proxy_set_header Content-Length "";
-    proxy_set_header X-Original-URI $request_uri;
-    proxy_set_header Upgrade "";
-    proxy_set_header Connection "";
-}
+An environment given its own hostname (`<env>.example.com`) satisfies uniqueness through the host alone
+and does not strictly need the namespace segment. Include it anyway: this catalog is installed into many
+deployments, and a plugin author cannot know whether a given environment gets its own DNS or shares one.
+The namespaced segment is harmless where it is redundant and required where it is not.
+
+Nothing rewrites the path before it reaches the pod — no chart sets `rewrite-target` — so the container
+receives the full URL and **every in-container reference must match the ingress path exactly**:
+
+| Where | Example |
+|-------|---------|
+| `PREFIX` env | `value: "/{{ .Release.Namespace }}/{{ .Values.name }}/"` |
+| nginx sidecar | `location /{{ .Release.Namespace }}/{{ .Values.name }}/ { … }` |
+| App base-url flags | `--baseURL`, `--ServerApp.base_url`, `ROOT_URL` |
+| Gateway API | `HTTPRoute` `URLRewrite` value |
+
+If the chart renders a segment (`/ns/<segment>/<name>/`), every reference carries it too.
+
+Changing the ingress alone routes the request to the pod, which then 404s because it is still serving at
+the old path — it fails *after* appearing to work.
+
+`ingress-hide` matches by **exact string** against the rendered path, so hide values must be the full
+namespaced path, not a bare sub-path. `ingress-extras` matches by prefix and appends the remainder.
+
+### Ingress Authentication (nginx)
+
+Standard nginx ingress annotations required for platform-integrated authentication. Not Kuiper-specific.
+
+**Workload templates** — authenticate via Hubble:
+```yaml
+nginx.ingress.kubernetes.io/auth-url: "http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/"
+nginx.ingress.kubernetes.io/use-regex: "true"
 ```
 
 **Namespaced / cluster-level plugins** — authenticate via Genesis:
-
-```nginx
-location = /auth {
-    internal;
-    proxy_pass http://genesis.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-service/{{ .Release.Name }}/;
-    proxy_pass_request_body off;
-    proxy_set_header Content-Length "";
-    proxy_set_header X-Original-URI $request_uri;
-    proxy_set_header Upgrade "";
-    proxy_set_header Connection "";
-}
-```
-
-**Conditional auth** — wrap `auth_request` in a Helm conditional for plugins that support public access:
-
 ```yaml
-{{- if not .Values.publicAccess }}
-auth_request /auth;
-{{- end }}
+nginx.ingress.kubernetes.io/auth-url: "http://genesis.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-service/{{ .Release.Name }}/"
+nginx.ingress.kubernetes.io/auth-signin: /unauthorized/
 ```
 
-The nginx config is loaded from an external file into a ConfigMap via `tpl`:
-
-```yaml
-data:
-  default.conf: |
-{{ tpl (.Files.Get "files/nginx/default.conf") . | indent 4 }}
-```
-
-The ingress itself carries no nginx annotations — only a conditional `ingressClassName`:
+**Custom domain routes cannot use either gate.** The platform session cookie is scoped to the
+platform host and the browser never sends it to another domain, so an `auth-url` subrequest on a
+custom domain rejects every caller, authenticated or not. Any route a plugin publishes on its own
+hostname is therefore outside the platform gate by construction. Plugins must make that exposure
+explicit rather than silent: only honour a domain from a state that already declares itself
+unauthenticated (the runtime templates require `network_mode: ingress-noauth`), or rely on the
+application's own login (n8n), or put basic auth or a CIDR allow list in front (domain-route).
 
 ### Plugin-Author Annotations
 
@@ -433,6 +559,7 @@ These are set by plugin authors in their Helm chart templates.
 | `kuiper.juno-innovations.com/actions` | any resource | comma-separated action names | Whitelist of callable actions on a resource (e.g. `restart,stop,scale`). Only listed actions are callable via the Kuiper API. |
 | `kuiper.juno-innovations.com/connection` | any resource | `key=value,key=value` | Connection details surfaced as endpoint metadata in the Hubble UI (e.g. `username=admin,port=5900`). |
 | `kuiper.juno-innovations.com/adopt-<name>` | any resource | Kubernetes Kind (e.g. `Service`) | Adopts a deterministically-named resource created **outside** the chart into the workload. The suffix `<name>` is the resource name; value is its Kind. Kuiper patches the ownership label onto it so it is tracked and cleaned up with the workload. Canonical use: adopting the ExternalName Service Kuiper creates post-launch for an EC2 instance. |
+| `kuiper.juno-innovations.com/plugin` (label) | ConfigMap | `"true"` | Marks a ConfigMap as plugin scripts (e.g. a Helios init script). Kuiper discovers labeled ConfigMaps and makes them available to workloads via the `plugins:` value that workstation charts range over (mounted at `/etc/helios/init.d/<name>/<file>`). See `plugins/helios-auto-shutdown/templates/wave-1/plugin.yaml` for a canonical example. |
 
 #### Ingress
 
@@ -528,13 +655,14 @@ All types above plus:
 | `make verify` failing in CI | CI fails with stale package list | `make package` each listed plugin |
 | `fields:` name doesn't match `values.yaml` key | Workload launch fails with Helm error | Align field `name:` with values.yaml key |
 | Missing `kuiper.juno-innovations.com/chart` label | Plugin not visible in Genesis catalog | Add label to `templates/metadata.yaml` |
-| Missing `juno-innovations.com/workload` annotation | Workload not categorized in Hubble | Add annotation to both `metadata.yaml` and `workstation.yaml` |
+| Missing `juno-innovations.com/workload` annotation | Workload not categorized in Hubble | Add annotation to both `metadata.yaml` and `workload.yaml` |
 | Scripts directory exceeds 1MiB | ArgoCD sync fails silently | `make check-size`, trim `scripts/` |
 | Hand-editing `packaged-scripts.yaml` | Overwritten next `make package` | Edit `scripts/` instead, then repackage |
-| Auth still in ingress annotations instead of sidecar | Sidecar config missing; no auth enforced | Move `auth_request` to nginx configmap, remove annotations from ingress |
-| Inline nginx config in YAML string instead of `files/` | Harder to edit, no syntax highlighting | Move to `files/nginx/default.conf`, load via `{{ tpl (.Files.Get ...) . }}` |
-| `ingressClassName` hardcoded instead of conditional | Users can't switch ingress class | Use `{{- if .Values.ingressClassName }}` conditional |
-| Service name doesn't use `{{ .Release.Name }}` | Possible naming collisions | Standardize to `{{ .Release.Name }}` with port name `http` |
+| `env_hints` entry duplicates a platform-set var | Misleading docs — the suggested var is silently shadowed by the platform-set one | Check `concepts/env.md`'s platform-set var table before adding to `metadata.yaml` |
+| `env_hints` in `metadata.yaml` and `README.md` fall out of sync | Docs disagree with what Genesis actually suggests | Keep both lists identical; update together |
+| Ingress path omits `{{ .Release.Namespace }}` | Passes in a single-environment cluster; once a second environment shares the hostname, launches fail with an admission-webhook 400 (`host … and path … is already defined in ingress <ns>/<name>`) part-way through, leaving a partial workload to clean up | Prefix the path with `/{{ .Release.Namespace }}/` (see Ingress Path Convention) |
+| Ingress path changed without updating the in-container path | nginx routes to the pod correctly, then the app 404s or serves a page whose assets all 404 — fails *after* looking like it worked | Update `PREFIX`, nginx `location`/`rewrite`/`sub_filter`, `--baseURL`/`ROOT_URL`/`base_url` and `HTTPRoute` rewrites in the same pass |
+| Required podAffinity/podAntiAffinity in a small cluster | Pods unschedulable — stranded at launch | Use `preferred` unless correctness requires `required` |
 
 ---
 
@@ -551,34 +679,32 @@ All types above plus:
   are the base templates used by `make package`. Do not modify them unless changing the bootstrap script behavior
   for all plugins.
 
-- Conditional `publicAccess` support (allowing unauthenticated access via `{{- if not .Values.publicAccess }}`) is
-  implemented in only 3 plugins: `helios`, `lsio-webtop`, and `wetty`. This is an intentional per-plugin feature —
-  not all plugins need public access. Adding it to a new plugin requires: (1) the `publicAccess` field in
-  `metadata.yaml`, (2) the conditional wrapper in `files/nginx/default.conf`, and (3) no secrets or user data
-  behind the unauthenticated endpoint.
-
 ---
 
 ## Adding a New Plugin — Checklist
 
-1. `make new-plugin` — follow interactive prompts
+1. **Probe the workload first** — ASK/SUGGEST what it needs (`concepts/probing.md`), confirm the feature set with the author, then `make new-plugin` with the confirmed needs in hand
 2. Edit `terra.yaml` — set `name`, `description`, `category`, `icon`, `fields`
 3. Edit `Chart.yaml` — bump version if needed
 4. **Namespaced:** add your Kubernetes objects to `templates/resources.yaml` (any valid K8s manifests)
 5. **Cluster-level:** add your Kubernetes objects to `templates/resources.yaml` (ArgoCD `Application` delegating to upstream chart is a common pattern)
 6. **Workload template:**
+   - Edit `terra.yaml` — add `workload` to `tags` so the plugin appears in the app store's workloads filter
    - Edit `templates/metadata.yaml` — set `description`, tune `fields:`
    - Edit `scripts/chart/values.yaml` — ensure all field names are present as keys
-   - Edit `scripts/chart/templates/workstation.yaml` — set correct image, ports, probes; set `juno-innovations.com/workload` annotation to match `metadata.yaml`; add nginx sidecar container (image `nginx_registry/repo/tag`, port 8080) with ConfigMap volume
-   - Edit `scripts/chart/templates/service.yaml` — use `{{ .Release.Name }}` as name, port name `http`, target `8080`
-   - Create `scripts/chart/files/nginx/default.conf` — nginx config with `auth_request` + `proxy_pass` to app port
-   - Create `scripts/chart/templates/nginx-configmap.yaml` — load external config via `{{ tpl (.Files.Get "files/nginx/default.conf") . | indent 4 }}`
-   - Edit `scripts/chart/templates/ingress.yaml` — no nginx annotations, conditional `ingressClassName`, path `/plugin/{{ .Values.name }}/`
-7. `make package <plugin-name>` — **required** for any plugin with a `scripts/` directory
-8. `make check-size <plugin-name>` — verify under 1MiB
-9. `make verify` — confirm nothing is stale
-10. `make test <plugin-name>` or `make test-plugin <plugin-name>` — deploy and test
-11. Commit both `scripts/` changes AND the updated `templates/packaged-scripts*.yaml` files
+   - Edit `scripts/chart/templates/workload.yaml` — set correct image, ports, probes; set `juno-innovations.com/workload` annotation to match `metadata.yaml`
+   - Edit `scripts/chart/templates/service.yaml` — set correct `port`/`targetPort`
+   - Edit `scripts/chart/templates/ingress.yaml` — add Hubble auth annotations (`nginx.ingress.kubernetes.io/auth-url` pointing to Hubble, `use-regex: "true"`) and set the path to
+     `/{{ .Release.Namespace }}/{{ .Values.name }}/` or `/{{ .Release.Namespace }}/<segment>/{{ .Values.name }}/` (see Ingress Path Convention)
+   - Make every in-container reference to that path match it exactly — `PREFIX`, nginx sidecar `location`/`rewrite`/`sub_filter`, `--baseURL`/`ROOT_URL`/`base_url`, `HTTPRoute` rewrites. The ingress does not rewrite the path away
+   - If `workload.yaml` ranges over `.Values.env`, edit `templates/metadata.yaml`'s `env_hints:` key (or set it to `|` + `[]`)
+     and mirror it in `README.md` under `### Custom Environment Variables` — see the `env_hints` guidance above
+7. **Run the best-practices check** — required before packaging/verifying: baseline + per-feature quality + your type's minimums (`concepts/best-practices.md` review checklist). The check is **advisory** — it states issues and makes recommendations, blocks nothing, and the author makes the final decision
+8. `make package <plugin-name>` — **required** for any plugin with a `scripts/` directory
+9. `make check-size <plugin-name>` — verify under 1MiB
+10. `make verify` — confirm nothing is stale
+11. `make test <plugin-name>` or `make test-plugin <plugin-name>` — deploy and test
+12. Commit both `scripts/` changes AND the updated `templates/packaged-scripts*.yaml` files
 
 ---
 
@@ -588,7 +714,7 @@ Human-readable docs live in `docs/`. Key pages for workload template authors:
 
 | File | Contents |
 |------|----------|
-| `docs/workload-templates.md` | Overview — what workload templates are, full data flow diagram, directory structure, `metadata.yaml` anatomy, `values.yaml` matching, `workstation.yaml` conventions, packaging, authoring checklist, common mistakes |
+| `docs/workload-templates.md` | Overview — what workload templates are, full data flow diagram, directory structure, `metadata.yaml` anatomy, `values.yaml` matching, `workload.yaml` conventions, packaging, authoring checklist, common mistakes |
 | `docs/workload-configuration.md` | Configuration reference — field types (links to `plugin-fields.md`), ingress authentication patterns, full Kuiper annotations reference with per-annotation examples, quick-reference table |
 | `docs/workload-guides.md` | Annotated examples — `simple-app` (StatefulSet + Service + Ingress with all plugin-author annotations) and `ec2-workstation` (Crossplane EC2 + `adopt` pattern) |
 | `docs/plugin-fields.md` | Full field type reference for both `terra.yaml` (install-time) and `metadata.yaml` (workload launch-time) fields |

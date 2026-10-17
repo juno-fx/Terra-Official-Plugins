@@ -22,7 +22,10 @@ spec:
         juno-innovations.com/user: "{{ .Values.user }}"
         juno-innovations.com/workstation: "{{ .Values.name }}"
     spec:
-      {{- if ne .Values.cluster_access "none" }}
+      # Give the container time to drain the gateway and checkpoint state.db
+      # before SIGKILL — critical on spot/preemptible nodes. See preStop below.
+      terminationGracePeriodSeconds: {{ .Values.termination_grace_period | default 120 }}
+      {{- if .Values.cluster_access }}
       serviceAccountName: "{{ .Values.name }}"
       automountServiceAccountToken: true
       {{- else }}
@@ -30,6 +33,12 @@ spec:
       {{- end }}
       securityContext:
         fsGroup: {{ .Values.guid }}
+        # Default fsGroupChangePolicy=Always makes kubelet recursively chgrp
+        # the whole PVC on every pod start — another full volume walk per
+        # boot. OnRootMismatch stats the volume root instead: after the
+        # marker-gated remap the root group already matches guid, so steady-
+        # state starts skip the walk.
+        fsGroupChangePolicy: OnRootMismatch
       initContainers:
         - name: write-config
           image: busybox
@@ -37,6 +46,12 @@ spec:
           env:
             - name: NAME
               value: {{ .Values.name | quote }}
+            - name: NAMESPACE
+              value: {{ .Release.Namespace | quote }}
+            - name: PUID
+              value: {{ .Values.puid | quote }}
+            - name: PGID
+              value: {{ .Values.guid | quote }}
           volumeMounts:
             - name: hermes-data
               mountPath: /opt/data
@@ -54,6 +69,11 @@ spec:
           image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
           imagePullPolicy: IfNotPresent
           command: ["/opt/init/start.sh"]
+          lifecycle:
+            preStop:
+              exec:
+                # Graceful drain + WAL checkpoint before the container is killed.
+                command: ["/opt/init/shutdown.sh"]
           ports:
             - name: api
               containerPort: 8642

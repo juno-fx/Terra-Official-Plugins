@@ -12,9 +12,18 @@ data:
     : "${PUID:=1000}"
     : "${PGID:=1000}"
     : "${NAME:=hermes-agent}"
+    : "${NAMESPACE:?NAMESPACE must be set}"
 
-    echo "Fixing ownership for PUID=${PUID}:${PGID}"
-    chown -R "${PUID}:${PGID}" /opt/data
+    # One-time PVC ownership fix, gated by the marker start.sh writes after
+    # the full remap. Skipping steady-state boots avoids re-walking the whole
+    # volume before the main container even starts.
+    PERMS_MARKER="/opt/data/.hermes-perms"
+    if [ "$(cat "$PERMS_MARKER" 2>/dev/null || true)" != "${PUID}:${PGID}" ]; then
+      echo "Fixing ownership for PUID=${PUID}:${PGID}"
+      chown -R "${PUID}:${PGID}" /opt/data
+    else
+      echo "Ownership marker matches ${PUID}:${PGID} — skipping chown"
+    fi
 
     mkdir -p /opt/data/dashboard-themes
 
@@ -24,6 +33,18 @@ data:
     fi
 
     # --- Substitute init script template ---
-    sed "s/__NAME__/${NAME}/g" \
+    sed -e "s/__NAME__/${NAME}/g" -e "s/__NAMESPACE__/${NAMESPACE}/g" \
       /opt/templates/init/start.sh > /opt/init/start.sh
     chmod 755 /opt/init/start.sh
+
+    # --- Install helper scripts (graceful shutdown + DB self-heal) ---
+    for _s in db-heal.sh shutdown.sh; do
+      sed -e "s/__NAME__/${NAME}/g" -e "s/__NAMESPACE__/${NAMESPACE}/g" \
+        "/opt/templates/init/${_s}" > "/opt/init/${_s}"
+      chmod 755 "/opt/init/${_s}"
+    done
+
+    # --- Substitute nginx template ---
+    sed -e "s/__NAME__/${NAME}/g" -e "s/__NAMESPACE__/${NAMESPACE}/g" \
+      /opt/templates/nginx/nginx.conf > /opt/proxy/nginx.conf
+    chmod 644 /opt/proxy/nginx.conf

@@ -1,0 +1,6 @@
+host:
+prefix: /domains
+registry: ghcr.io
+repo: umer-jahangier/domain-manager
+tag: "0.1.0"
+namespace: domain-manager

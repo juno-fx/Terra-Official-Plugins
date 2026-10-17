@@ -22,8 +22,10 @@ fi
 # Install tmux for session persistence (Alpine uses apk)
 apk add --no-cache tmux bash
 
-# Base path for wetty (matches ingress nginx rewrite rule)
-WETTY_BASE="/wetty/$WORKSTATION_NAME"
+# Base path for wetty. The nginx sidecar forwards the full path without rewriting,
+# so this must match the ingress path exactly, namespace segment included.
+: "${NAMESPACE:?NAMESPACE must be set}"
+WETTY_BASE="/$NAMESPACE/wetty/$WORKSTATION_NAME"
 SESSION_NAME="juno-wetty-${WORKSTATION_NAME}"
 
 # Start wetty as a WebSocket-to-terminal bridge.

@@ -58,11 +58,24 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `timezone` | **string** · Required · Default: `America/New_York`<br>Timezone for the OpenCode instance |
 | `storage_class` | **k8sStorageClass** · Required<br>Storage class for the OpenCode data persistent volume |
 | `storage_size` | **string** · Required · Default: `10Gi`<br>Size of the persistent volume for project and config data |
+| `ingressNamespace` | **string** · Required · Default: `ingress-nginx`<br>Namespace of the ingress controller (used for the network policy) |
+| `cluster_access` | **select** · Optional<br>Kubernetes RBAC access level for the workstation (unset = no cluster access, `readonly-ns`, `admin-ns`) |
+
+### Custom Environment Variables
+
+Genesis lets you add arbitrary environment variables to the workload at launch time. These are commonly useful for opencode:
+
+| Variable | Description |
+|----------|--------------|
+| `ANTHROPIC_API_KEY` | Anthropic API key, auto-detected by opencode for Claude models. |
+| `OPENAI_API_KEY` | OpenAI (or OpenAI-compatible) API key, auto-detected by opencode. |
+| `OPENROUTER_API_KEY` | OpenRouter API key for access to multiple hosted models. |
+| `OPENCODE_MODEL` | Default model for opencode to use, referenced via `{env:OPENCODE_MODEL}` in config. |
 
 ---
 
 ## Notes
 
-- LLM provider API keys must be configured within the OpenCode application after launch — they are not set at workload creation time
+- LLM provider API keys are not set via the install-time fields above — configure them either as custom environment variables at workload launch (see table above) or within the OpenCode application after launch
 - The nginx sidecar provides browser-accessible proxying for the OpenCode terminal interface
 - Project files and OpenCode configuration are persisted to the storage volume across workload restarts

@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-scripts-configmap
+data:
+  bootstrap.sh: |
+    #!/bin/bash
+    echo "Unpacking scripts..."
+    # decode base64 encoded scripts mount at /terra/scripts.base64
+    base64 -d /terra/scripts.base64 > /terra/scripts.tar.gz
+    
+    # extract scripts to /terra/scripts
+    tar -xzvf /terra/scripts.tar.gz -C /terra/
+    
+    # make scripts executable
+    chmod +x -v /terra/scripts/*.sh
+    
+    # start entrypoint.sh
+    cd /terra/scripts
+    pwd
+    ./entrypoint.sh
+  packaged_scripts.base64: "H4sIAAAAAAAAA+1Y227jNhDNs75i6vQhQSsl8iUp/NhFUWy7TQIkuy9FsUtLY5s1RRIk5Y2xWKAf0S/sl3RISb4l3nQLJ0G7OgEimRSHQ57RmaFsZrh29uTgEXFKOB8MwpWwfV277/fSLt2naTc9O4DBYzrVoLSOGYADo5T71HMP9f9HYWv+sykz7pGi4PP57/bS85b/p8Am/y/8/2TBCrHPOTyzZ/3+Tv67aX+L/363nx7A6T6d2IUvnH+m+Rs0lis5hHka5VgFRPh9aegC3xs1QwPvlZkJxXJwWGjBHMLRhcrxShkHTgHeOjSSCbGAgkk2wRy4HBtmnSkzVxo8jiQrcAjKG41HwWg0b6Y+TejvuffiS8Tm+99wu9964PP1n66DVv+fArv41/Re2z1lggf0v9sdpFv8n/UGp63+PwUO4VIiLJX8Gs2cZwjfkIq7bMrlBH6QuVZcumvhOzSlApTOLEjewU0R3oVIeQeCW5dEh2RBYOaUiQVaC5Q/dGm0sqT8yLIp2HoCo0oKM585vJG72YMsjVg2Q5nDnDPgzu7y6Ij4m6DzHVwffwsXlzfeLAOtcu9QszYLzCCw0qmYWcsnklLUaAE/lyOaGr0zRz0fg3Gve352DobJCR4n0YcPMfAxJG+YKNEmYbXw8SO1V4/c7dlKqTMu82GzsVGBjuXMsWEEUCVEMvR1Y8O3kInY24qpo2mIrMbMD3ELTUOaJVFDmNX3ABwGg1BQRFd7FbZ2iz5PcnjsaEYLj7VRt37PtfV74TuOg6145dzSBwigEU5lSlR9za+1fpqh6qupfhvmXPZXbF3tfCqOYyJt02vB5cyG1dgQXSG0mkiqQ6iJlpdXnvQbapktmU24Oqkfj8NqBBuh2N6pJvbDE3jLaJ6Ft/Xyat6nQKbYHCsDUr1PNijOuc0UFTKLZPZdmGnJ+cYi/i3zUDlbc7x7Tf/QHMtzQ7t3E+LIryxaRtAuzj/N+G6+sV5+bbyeGeuV+KbOustc06BO4J+aPZXhLYvr2+cWyv8pNvP/vKJizwfAB/J/enrW3a7/Bqft+e9JEKTSIlTMhxSplS59EVinR+5TPnOrA6BgpfSSyUkixkYVQTzHHEVuSS1zHHMZTn+wqiYb7QuRlfgpF+vqGwYH9bEr4SVb1eQxl7+T6JNNokrmzOSNt3/98SfkiiTZgcGCRPi+M2ZJujSMJlRw6GGU6XIInbRDalwos/D3P/KOb37FC05CJksh6s71Fp7f0iE1mpQ891ddX6fKuiH9EuIaM4N0T/oW0kI0V6Is8BdVegGEX3+rG6p7lPN1xf3p9cVlEMWwLnKKDs3YiWxdStEMopxwWY19Owu7MvQb9JrWFo9Z5oufioGakft3PuKajHfuSr6uiol1rb95cRVa1lV9CP1+77kjtsU+0eh/qOlDuk7sdM9zPPT9r59u63/vnFJCq/9PgMOvTkZcnoyYnYaymdt7vvRRIwUG1WGkwVRujxBIVKuDWSXRSTN2FUZ+kBdmvMWs9OKdc+NL90VQbR76NRWENCLU1ZrqdzbxQpapQjPHR1xwt2iKeUoKJRMr30Ka4f47JZ0O5ugdhM1aJokwmyroBL8eXkHnuZlo0aJFixYtWrRo0aJFi8fF326uH9wAKAAA"

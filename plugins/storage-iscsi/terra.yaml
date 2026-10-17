@@ -5,7 +5,7 @@ description: |
     Mount an iSCSI target as a Persistent Volume in your Kubernetes cluster using the iSCSI volume type.
     This plugin allows for operators to connect to existing iSCSI targets and make them available to Pods running in the 
     cluster.
-category: storage
+category: Storage
 tags:
   - storage
   - iscsi

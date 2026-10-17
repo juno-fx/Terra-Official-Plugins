@@ -47,6 +47,10 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+            - name: JUNO_WORKSPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
             - name: JUNO_ENVIRONMENT
               valueFrom:
                 fieldRef:
@@ -61,6 +65,8 @@ spec:
               value: "{{ .Values.guid }}"
             - name: WORKSTATION_NAME
               value: "{{ .Values.name }}"
+            - name: NAMESPACE
+              value: "{{ .Release.Namespace }}"
             {{- if .Values.packages }}
             - name: PACKAGES
               value: "{{ .Values.packages }}"

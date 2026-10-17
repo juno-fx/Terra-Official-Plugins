@@ -5,9 +5,15 @@ description: Automated certificate management - supporting a wide range of issue
 category: Infrastructure
 tags:
   - cluster-level
+editable: true
 fields:
   - name: chart_version
     description: Version of the cert-manager chart to install.
     required: true
     default: v1.19.1
     type: string
+  - name: enable_gateway_api
+    description: Reconcile Gateway resources as well as Ingresses. Required on clusters routing through the Gateway API, where TLS is configured on the Gateway listener rather than on the route.
+    required: true
+    default: false
+    type: boolean

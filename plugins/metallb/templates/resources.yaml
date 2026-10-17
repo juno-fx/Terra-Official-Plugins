@@ -1,0 +1,61 @@
+---
+# The metallb.io CRDs (IPAddressPool, L2Advertisement, BGPPeer, BGPAdvertisement) are installed by
+# the nested MetalLB Application (templates/installer.yaml), which syncs as its own separate,
+# asynchronous ArgoCD Application. sync-wave alone cannot guarantee these CRDs exist yet by the time
+# this wave runs, since ArgoCD only gates on wave-0 health if the destination cluster has a custom
+# health check registered for the `Application` kind — not guaranteed on every cluster. So each
+# resource below also sets `SkipDryRunOnMissingResource=true`: this skips the dry-run validation
+# that otherwise hard-fails when the CRD isn't registered yet, and relies on selfHeal + automated
+# sync to retry the resource once the CRD actually exists.
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: {{ .Release.Name }}-pool
+  namespace: metallb-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  addresses:
+    {{- range splitList "," .Values.address_pool }}
+    - {{ trim . | quote }}
+    {{- end }}
+---
+{{- if eq .Values.mode "layer2" }}
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: {{ .Release.Name }}-l2
+  namespace: metallb-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  ipAddressPools:
+    - {{ .Release.Name }}-pool
+{{- else if eq .Values.mode "bgp" }}
+apiVersion: metallb.io/v1beta1
+kind: BGPPeer
+metadata:
+  name: {{ .Release.Name }}-peer
+  namespace: metallb-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  myASN: {{ .Values.bgp_my_asn }}
+  peerASN: {{ .Values.bgp_peer_asn }}
+  peerAddress: {{ .Values.bgp_peer_address | quote }}
+---
+apiVersion: metallb.io/v1beta1
+kind: BGPAdvertisement
+metadata:
+  name: {{ .Release.Name }}-bgp-adv
+  namespace: metallb-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  ipAddressPools:
+    - {{ .Release.Name }}-pool
+{{- end }}

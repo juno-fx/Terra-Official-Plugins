@@ -2,18 +2,20 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ .Values.name }}-wetty
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    {{- if not .Values.publicAccess }}
+    nginx.ingress.kubernetes.io/auth-url: "http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/"
+    {{- end }}
 spec:
-  {{- if .Values.ingressClassName }}
-  ingressClassName: {{ .Values.ingressClassName }}
-  {{- end }}
   rules:
     - host: {{ .Values.host }}
       http:
         paths:
-          - path: "/plugin/{{ .Values.name }}"
+          - path: "/{{ .Release.Namespace }}/wetty/{{ .Values.name }}"
             pathType: Prefix
             backend:
               service:
-                name: {{ .Release.Name }}
+                name: {{ .Values.name }}-wetty
                 port:
-                  number: 8080
+                  number: 3001

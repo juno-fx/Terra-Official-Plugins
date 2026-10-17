@@ -1,0 +1,147 @@
+resource_id: slinky
+name: Slinky
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/slinky/assets/logo.png
+description: |
+  Run a real Slurm cluster on Kubernetes. SchedMD's Slurm operator deploys slurmctld, slurmd
+  compute nodes, login nodes and slurmrestd as pods, so HPC batch jobs (sbatch/srun) and
+  container workloads share the same hardware. https://slurm.schedmd.com/slinky.html
+category: Compute
+tags:
+  - slurm
+  - hpc
+  - scheduler
+  - batch
+  - operator
+  - cluster-level
+editable: true
+fields:
+  - name: chart_version
+    description: Version of the Slinky charts to install. All three charts (CRDs, operator, Slurm cluster) are installed at this version.
+    required: true
+    type: select
+    default: 1.2.1
+    options:
+      - 1.2.1
+      - 1.2.0
+      - 1.1.2
+  - name: install_crds
+    description: |
+      Install the Slinky Custom Resource Definitions (Controller, NodeSet, LoginSet, Accounting,
+      RestApi, Token). Leave true for the first install in a cluster. Set false on any additional
+      install so it does not fight the first one over shared, cluster-scoped CRDs.
+    required: false
+    type: boolean
+    default: true
+  - name: install_operator
+    description: |
+      Install the slurm-operator controller and webhook into the "slinky" namespace. The operator is a
+      cluster singleton - leave true for the first install, and set false when installing this plugin
+      again purely to add a second Slurm cluster.
+    required: false
+    type: boolean
+    default: true
+  - name: cluster_namespace
+    description: Namespace the Slurm cluster is deployed into. Use a distinct value per Slurm cluster.
+    required: true
+    type: string
+    default: slurm
+  - name: worker_replicas
+    description: Number of Slurm compute nodes (slurmd pods) to run. Can be scaled to zero.
+    required: false
+    type: int
+    default: 2
+  - name: worker_cpu
+    description: CPU request and limit per compute node, in Kubernetes quantity format (e.g. "2", "500m"). This is what Slurm sees as the node's CPU count.
+    required: false
+    type: string
+    default: "2"
+  - name: worker_memory
+    description: Memory request and limit per compute node, in Kubernetes quantity format (e.g. "4Gi"). This is what Slurm sees as the node's RealMemory.
+    required: false
+    type: string
+    default: 4Gi
+  - name: worker_gpus
+    description: |
+      NVIDIA GPUs to attach to each compute node. Set to 0 for a CPU-only cluster. Any value above 0
+      requires the NVIDIA GPU Operator plugin, and configures Slurm GRES (gpu) automatically.
+    required: false
+    type: int
+    default: 0
+  - name: storage_class
+    description: StorageClass for the controller's slurmctld state-save volume. Leave empty to use the cluster default StorageClass.
+    required: false
+    type: string
+  - name: login_service_type
+    description: |
+      Service type used to expose the login node's SSH port. ClusterIP is enough when users reach
+      Slurm through the Slurm Terminal workload - the login node only needs to be reachable from inside
+      the cluster. Use LoadBalancer (needs MetalLB or similar) or NodePort only if you also want to
+      SSH in from outside the cluster.
+    required: true
+    type: select
+    default: ClusterIP
+    options:
+      - ClusterIP
+      - LoadBalancer
+      - NodePort
+  - name: login_ssh_public_key
+    description: |
+      An SSH public key granted root access to the login node, e.g. the contents of your ~/.ssh/id_ed25519.pub.
+      Only usable for direct "ssh -i" from outside the cluster - the Slurm Terminal workload authenticates with a
+      password, so this does not grant access through the browser terminal. Set sssd_secret for that.
+    required: false
+    type: string
+  - name: accounting_enabled
+    description: |
+      Deploy slurmdbd for job accounting (sacct, fairshare, QoS). A MariaDB database is deployed
+      alongside it automatically - no external database or extra plugin is required.
+    required: false
+    type: boolean
+    default: false
+  - name: accounting_db_secret
+    description: |
+      Name of a Secret in cluster_namespace holding the accounting database password under the key
+      "password". Required when accounting is enabled - create it before installing:
+
+        kubectl create secret generic slurm-accounting-db -n slurm --from-literal=password='<choose one>'
+
+      Passed by reference so the password never appears in an ArgoCD Application spec. Choose the value
+      once: changing it later will not update the credential already stored inside the database.
+    required: false
+    type: string
+  - name: sssd_secret
+    description: |
+      Name of a Secret in cluster_namespace holding an sssd.conf under the key "sssd.conf", used by the
+      login node to resolve and authenticate users against your directory. See this plugin's README for
+      the file's structure and a worked LDAP example.
+
+      REQUIRED - create this Secret before installing (see the README). Without it the login node knows
+      only local accounts and no one can log in.
+    required: true
+    type: string
+  - name: ldap_ca_secret
+    description: |
+      Optional. Name of a Secret in cluster_namespace holding the CA certificate that signed your LDAP
+      server's TLS certificate, under the key "ca.crt". Mounted into the login node at
+      /etc/ssl/ldap-ca/ca.crt, so your sssd.conf can set:
+
+        ldap_uri = ldaps://your-directory:636
+        ldap_tls_reqcert = demand
+        ldap_tls_cacert = /etc/ssl/ldap-ca/ca.crt
+
+      Only needed for a private or self-signed CA. Leave empty if your directory's certificate is signed
+      by a publicly trusted CA - the login image already trusts those.
+    required: false
+    type: string
+  - name: home_pvc
+    description: |
+      Optional. Name of a ReadWriteMany PersistentVolumeClaim in cluster_namespace, mounted at /home on
+      the login node and on every compute node.
+
+      Slurm needs one shared filesystem visible at the same path everywhere: without it "cd ~" fails on
+      the login node, and a batch job writes its output on whichever compute node ran it, where you
+      cannot read it. Interactive srun still works either way.
+
+      The PVC must be RWX (many nodes mount it at once) and must already exist.
+    required: false
+    type: string

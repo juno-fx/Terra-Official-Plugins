@@ -3,19 +3,31 @@ kind: Ingress
 metadata:
   name: {{ .Values.name }}-ingress
   annotations:
-    kuiper.juno-innovations.com/ingress-extras: "/kubevirt-console/{{ .Values.name }}/vnc.html?keep_device_awake=true&reconnect=5000&autoconnect=true&resize=scale"
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/auth-url: "http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/"
+    kuiper.juno-innovations.com/ingress-extras: "/{{ .Release.Namespace }}/kubevirt-console/{{ .Values.name }}/vnc.html?keep_device_awake=true&reconnect=5000&autoconnect=true&resize=scale"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-next-upstream-timeout: "30"
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    # Scoped to this workload's own path — same-named consoles in different
+    # namespaces share a hostname, so a cookie at "/" would collide between them.
+    nginx.ingress.kubernetes.io/session-cookie-path: "/{{ .Release.Namespace }}/kubevirt-console/{{ .Values.name }}/"
+    nginx.ingress.kubernetes.io/session-cookie-name: "juno-console-session-{{ .Release.Namespace }}-{{ .Values.name }}"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
 spec:
-  {{- if .Values.ingressClassName }}
-  ingressClassName: {{ .Values.ingressClassName }}
-  {{- end }}
   rules:
     - host: {{ .Values.host }}
       http:
         paths:
-          - path: "/kubevirt-console/{{ .Values.name }}/"
+          - path: "/{{ .Release.Namespace }}/kubevirt-console/{{ .Values.name }}/"
             pathType: Prefix
             backend:
               service:
-                name: {{ .Release.Name }}
+                name: {{ .Values.name }}-console
                 port:
-                  number: 8082
+                  number: 8080

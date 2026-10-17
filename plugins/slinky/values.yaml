@@ -1,0 +1,35 @@
+# Chart version applied to slurm-operator-crds, slurm-operator and slurm.
+chart_version: 1.2.1
+
+# Operator installation - both are cluster singletons.
+install_crds: true
+install_operator: true
+
+# Slurm cluster - always deployed. Namespace is per-cluster (see multi-cluster in the README).
+cluster_namespace: slurm
+
+# Compute nodes (NodeSet)
+worker_replicas: 2
+worker_cpu: "2"
+worker_memory: 4Gi
+worker_gpus: 0
+
+# Controller state-save persistence
+storage_class: ""
+
+# Login node (LoginSet) - always deployed; it is how users reach Slurm.
+login_service_type: ClusterIP
+login_ssh_public_key: ""
+
+# Accounting (slurmdbd + bundled MariaDB)
+accounting_enabled: false
+accounting_db_secret: ""
+
+# Login node user identity - name of a Secret holding sssd.conf (see README). Required.
+sssd_secret: ""
+
+# Optional CA bundle for an LDAP server with a private/self-signed certificate.
+ldap_ca_secret: ""
+
+# Optional RWX PVC mounted at /home on the login node and all compute nodes.
+home_pvc: ""

@@ -10,8 +10,8 @@ additional information about your plugin that can be accessed by other plugins o
 
 To use this feature, you can define the `metadata` field in your `plugins/<plugin name>/templates/metadata.yaml` file:
 
-```yaml linenums="1" title="plugins/nuke/templates/metadata.yaml"
---8<-- "plugins/nuke/templates/metadata.yaml"
+```yaml linenums="1" title="plugins/deadline10/templates/metadata.yaml"
+--8<-- "plugins/deadline10/templates/metadata.yaml"
 ```
 
 Terra will find the Release Name with postfix `-terra-metadata` and load the data from the `ConfigMap` into the plugin's 

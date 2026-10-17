@@ -9,7 +9,7 @@ how the data flows from plugin through the platform to a running workload, and h
 
 A workload template is a plugin that defines a **reusable workload schema** for the Juno platform.
 
-- **At install time:** Terra installs it as an ArgoCD Application into the `argocd` namespace. No running
+- **At install time:** Terra installs it as an ArgoCD Application into the Genesis namespace (`argocd` by default). No running
   workload is created. What gets created is a pair of ConfigMaps.
 - **At launch time:** A user opens Genesis, picks a workload type, fills in parameters, and submits.
   Kuiper reads the stored schema, renders the embedded Helm chart with the user's values, and applies
@@ -75,14 +75,10 @@ scripts/
 └── chart/
     ├── Chart.yaml
     ├── values.yaml            # All field names from metadata.yaml must exist here
-    ├── files/
-    │   └── nginx/
-    │       └── default.conf   # Nginx sidecar config (loaded via tpl)
     └── templates/
-        ├── workstation.yaml   # Primary workload resource (StatefulSet by convention; Crossplane plugins use xr.yaml)
-        ├── service.yaml       # ClusterIP Service, name: {{ .Release.Name }}, port name: http
-        ├── ingress.yaml       # Ingress — no nginx annotations, conditional ingressClassName
-        └── nginx-configmap.yaml  # Thin wrapper loading files/nginx/ via tpl
+        ├── workload.yaml        # Primary workload resource (StatefulSet by convention; Crossplane plugins use xr.yaml)
+        ├── service.yaml       # ClusterIP Service
+        └── ingress.yaml       # nginx Ingress with Hubble auth
 ```
 
 ---
@@ -163,7 +159,7 @@ These are examples — not an exhaustive list. Custom values are valid.
     The `juno-innovations.com/workload` annotation must appear in both:
 
     1. `templates/metadata.yaml` — Genesis uses it to categorize the template in the catalog
-    2. `scripts/chart/templates/workstation.yaml` on the StatefulSet — Hubble uses it to display
+    2. `scripts/chart/templates/workload.yaml` on the StatefulSet — Hubble uses it to display
        the running workload type
 
 ---
@@ -191,18 +187,18 @@ pullSecret:
 session:
 volumeMounts: []
 volumes: []
-env:
-  - name: JUNO
-    value: "true"
+env: []
 selector:
 plugins: []
 _kuiper:
 
 # User-facing fields from metadata.yaml — must all be present
+icon: ""
 registry: docker.io
 repo: my-image
 tag: latest
-gpu: false
+port: 3000
+publicAccess: false
 ```
 
 ### Kuiper-Injected Standard Values Reference
@@ -230,34 +226,38 @@ gpu: false
     **not** configure its ingress at the root path — doing so will clash with platform services and
     break routing for the entire cluster.
 
-    Your workload must support a URL prefix (e.g. `/{{ .Values.name }}/`) or another sub-path
-    routing strategy. The `PREFIX` environment variable is the conventional way to pass the base
-    path into the container — set it from `{{ .Values.host }}` or your chosen sub-path in
-    `workstation.yaml`.
+    Use a namespaced sub-path — `/{{ .Release.Namespace }}/{{ .Values.name }}/` (or with the
+    plugin's own segment, `/{{ .Release.Namespace }}/<segment>/{{ .Values.name }}/`) — so that
+    environments sharing a hostname cannot claim the same route. The template starts with no
+    segment; many catalog charts add a heritage `polaris` one, others their own (gitea → `/gitea/`).
+    See "Ingress Path Convention" in `AGENTS.md` for the full rule and the one case where the
+    namespace segment is optional.
+
+    Your workload must then actually serve at that path. Nothing rewrites the path before it
+    reaches the pod, so the container receives the full URL. The `PREFIX` environment variable is
+    the conventional way to pass the base path in — set it in `workload.yaml` to exactly the
+    same value as the ingress path.
 
 ---
 
-## `scripts/chart/templates/workstation.yaml`
+## `scripts/chart/templates/workload.yaml`
 
-This StatefulSet is what Kuiper deploys when a user launches a workload. Key conventions:
+This StatefulSet is what Kuiper deploys when a user launches a workload. It starts as a deliberately
+generic baseline — no env vars, no probes, no mounts, no GPU, no sidecars. Probe the workload first
+(`concepts/probing.md`) and add features per workload, each wired from its concept file
+(`concepts/`). Key conventions:
 
-- **Node affinity** — must target nodes with `juno-innovations.com/workstation: "true"`
-- **Toleration** — must tolerate the `juno-innovations.com/workstation: NoSchedule` taint
+- **Ownership label** — `kuiper.juno-innovations.com/kuiper-instance` in the selector, pod template,
+  and Service selector
 - **Annotations** — `juno-innovations.com/workload` must match `metadata.yaml`
-- **Plugin mounts** — range over `.Values.plugins` to mount Helios plugin scripts
-- **Nginx sidecar** — add a container named `nginx` on port 8080, using `{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}` as the image
-- **Nginx ConfigMap** — mount `{{ .Release.Name }}-nginx` ConfigMap at `/etc/nginx/conf.d/default.conf` (server-block) or `/etc/nginx/nginx.conf` (full wrapper)
-- **Standard env vars** — `JUNO_WORKSTATION`, `JUNO_PROJECT`, `USER`, `HOME`, `PREFIX`
+- **Conditional: plugin mounts** — when the workload consumes Helios plugin scripts, range over
+  `.Values.plugins` to mount them at `/etc/helios/init.d/<name>/<file>`
+- **Conditional: env vars** — pass-through only: wire `JUNO_WORKSTATION`, `JUNO_WORKSPACE` (formerly
+  `JUNO_PROJECT`, still set for backwards compatibility), `USER`, `HOME`, `PREFIX` **only when the
+  upstream image is built to consume them** (check image docs before wiring; the template ships none
+  by default). Full table: `concepts/env.md`.
 
-The nginx config lives in an external file at `files/nginx/default.conf` and is loaded via:
-
-```yaml
-data:
-  default.conf: |
-{{ tpl (.Files.Get "files/nginx/default.conf") . | indent 4 }}
-```
-
-See `plugins/filebrowser/scripts/chart/templates/workstation.yaml` for a minimal reference, or `plugins/gitea/scripts/chart/templates/workstation.yaml` for the full pattern.
+See `plugins/helios/scripts/chart/templates/workstation.yaml` for a full feature-complete reference.
 
 ---
 
@@ -308,27 +308,40 @@ This requires `inotifywait` (available in the devbox shell).
 
 ## Creating a Workload Template
 
-1. `make new-plugin` → select type `3` (workload) → select workload category
-2. Edit `terra.yaml` — set `name`, `description`, `category`, `icon`
-3. Edit `templates/metadata.yaml`:
+1. **Probe the workload first** — ASK/SUGGEST what it needs (`concepts/probing.md`), confirm the feature set with the author
+2. `make new-plugin` → select type `3` (workload) → select workload category
+3. Edit `terra.yaml` — set `name`, `description`, `category`, `icon`
+4. Edit `templates/metadata.yaml`:
    - Set `description:`
    - Define `fields:` schema with all user-facing parameters
    - Verify `juno-innovations.com/workload` annotation matches intended category
-4. Edit `scripts/chart/values.yaml` — add every field from `metadata.yaml` as a key
-5. Edit `scripts/chart/templates/workstation.yaml`:
+5. Edit `scripts/chart/values.yaml` — add every field from `metadata.yaml` as a key
+6. Edit `scripts/chart/templates/workload.yaml`:
    - Set correct image reference using `{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}`
-   - Set correct `containerPort` and probe ports
+   - Add features confirmed by probing (env vars, probes, mounts, GPU…) — each wired from its concept file
    - Set `juno-innovations.com/workload` annotation to match `metadata.yaml`
-   - Add nginx sidecar container — image `{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}`, port 8080, ConfigMap volume
-6. Edit `scripts/chart/templates/service.yaml` — use `{{ .Release.Name }}` as name, port name `http`, target `8080`
-7. Create `scripts/chart/files/nginx/default.conf` — nginx config with `auth_request` + `proxy_pass` to app port
-8. Create `scripts/chart/templates/nginx-configmap.yaml` — load external config via `{{ tpl (.Files.Get "files/nginx/default.conf") . | indent 4 }}`
-9. Edit `scripts/chart/templates/ingress.yaml` — no nginx annotations, conditional `ingressClassName`, path `/plugin/{{ .Values.name }}/`
-10. `make package <plugin-name>`
-8. `make check-size <plugin-name>` — confirm under 1MiB
-9. `make verify` — confirm nothing is stale
-10. `make test <plugin-name>` or `make test-plugin <plugin-name>`
-11. Commit `scripts/`, `templates/metadata.yaml`, AND the generated `templates/packaged-scripts*.yaml`
+7. Edit `scripts/chart/templates/service.yaml` — set correct `port`/`targetPort`
+8. **Run the best-practices check** — required before packaging: baseline + per-feature quality + type minimums (`concepts/best-practices.md` review checklist). **Advisory** — states issues and recommendations, blocks nothing; the author makes the final decision
+9. `make package <plugin-name>`
+10. `make check-size <plugin-name>` — confirm under 1MiB
+11. `make verify` — confirm nothing is stale
+12. `make test <plugin-name>` or `make test-plugin <plugin-name>`
+13. Commit `scripts/`, `templates/metadata.yaml`, AND the generated `templates/packaged-scripts*.yaml`
+
+---
+
+## Schema Changes and Existing Templates
+
+Updating a plugin updates the schema in the catalog, not the templates already authored from it. A workload template in Genesis stays on the schema version it was created with, so fields added by a plugin update do not appear on its launch form, and a workload launched from it renders the old chart. The refresh button on the workloads table in Genesis makes sure the cache is reading the latest workload schemas.
+
+Relaunching or recreating the workload changes nothing, because the template is the thing that is pinned. What Genesis offers on the template row depends on what changed:
+
+- a chart updated with **no new fields** shows an **Upgrade** button, which moves the template straight onto the latest chart
+- a chart that **added fields** shows a **Migrate** button, which routes to the template's edit form so the new fields can be filled in before the move
+
+The [Genesis workload documentation](https://docs.juno-innovations.com/Orion-Documentation/latest/genesis/workloads/#upgrade) covers both flows in full.
+
+This matters to plugin authors as much as operators: after shipping a new field, the symptom of an unmigrated template is indistinguishable from the field not working.
 
 ---
 
@@ -339,11 +352,10 @@ This requires `inotifywait` (available in the devbox shell).
 | `fields:` name ≠ `values.yaml` key                 | Workload fails at launch; no visible error | Align names exactly                                |
 | Forgot `make package`                              | Old workload behavior after deploy         | `make package <plugin>`                            |
 | Missing `kuiper.juno.../chart` label               | Plugin absent from Genesis catalog         | Add label to `metadata.yaml`                       |
-| Missing `juno-innovations.com/workload` annotation | Not categorized in Hubble                  | Add to both `metadata.yaml` and `workstation.yaml` |
+| Missing `juno-innovations.com/workload` annotation | Not categorized in Hubble                  | Add to both `metadata.yaml` and `workload.yaml` |
 | `packaged-scripts.yaml` hand-edited                | Overwritten on next `make package`         | Edit `scripts/` instead                            |
 | Large assets in `scripts/`                         | Exceeds 1MiB ConfigMap limit               | Use `make check-size`, trim assets                 |
-| Auth in ingress annotations instead of sidecar     | No auth enforced                           | Move `auth_request` to nginx configmap             |
-| Inline nginx config in YAML instead of `files/`   | Hard to edit, no syntax highlighting       | Move to `files/nginx/default.conf`, load via tpl   |
+| New field added, template not migrated             | Field absent from launch form; old chart renders | Migrate the template in Genesis, then relaunch |
 
 ---
 

@@ -1,0 +1,116 @@
+# Runtime Go
+
+![Runtime Go](https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/runtime-go/assets/icon.svg?raw=true)
+
+**Category:** Development
+**Type:** Workload Template
+**Tags:** `runtime` · `go`
+
+---
+
+## Overview
+
+Go runtime environment for running your own applications on the Juno platform. Point it at a git repository (or code already on disk), define a build command and a run command, and it will clone, build, and serve your Go application — no custom Docker image required.
+
+These runtime plugins are intentionally generic — a fast starting point for the common case: a straightforward repo that builds with the standard tooling and starts a server listening on a port. Projects with heavier requirements (cgo system libraries or code generation steps, private git repositories, multi-service builds, or apps that can't serve under a path prefix) will need some customization: adjust the build/run commands, point the image fields at a custom image with the right toolchain baked in, or mount code through a volume. See the Notes section below for known limitations and workarounds.
+
+---
+
+## How It Works
+
+**Workload Template** — Installs the Runtime Go workload schema into Genesis. Once installed, the Runtime Go type appears in **Genesis** on the Workloads page, where it can be authored into a workload template. Users can then launch and provision Go applications on demand within a project through **Hubble**.
+
+At launch, the workload starts from the official `golang` image and runs a generated startup script that:
+
+1. Clones `git_url` (if set) and checks out `git_ref` — a branch, tag, or commit SHA. If `git_url` is empty, `source_path` is used as the work root instead (for code already available on disk, e.g. via a volume mount).
+2. Runs `build_command` (if set) in the work root.
+3. Runs `run_command` to start your application.
+
+The application must listen on `port` — startup and liveness probes are TCP checks against it.
+
+> **Note:** `scripts/entrypoint.sh` in this plugin is a stub kept for packaging compatibility — it is never executed at workload launch. The actual startup logic lives in the commands ConfigMap (`scripts/chart/templates/commands-configmap.yaml`), and the workload definition lives in `scripts/chart/`.
+
+---
+
+## Installation
+
+1. Open **Terra** and navigate to the **Plugin Marketplace**
+2. Search for **"runtime-go"**
+3. Click **Install**
+4. Click **Confirm** to deploy (no install-time fields required)
+
+Once installed, the Runtime Go schema is available in **Genesis**. From the Workloads page, author the template — users can then launch their applications on demand through **Hubble**.
+
+---
+
+## Configuration
+
+### Install-Time Fields
+
+No install-time configuration is required for this plugin.
+
+### Workload Launch Fields
+
+These fields are configured when authoring the workload template in **Genesis** and used each time a user launches the application through **Hubble**:
+
+| Field | Details |
+|-------|---------|
+| `registry` | **string** · Required · Default: `docker.io`<br>Container registry for the runtime image |
+| `repo` | **string** · Required · Default: `golang`<br>Runtime image repository |
+| `tag` | **string** · Required · Default: `1.26`<br>Runtime image tag (Go version) |
+| `git_url` | **string** · Optional<br>Git repository URL to clone (leave empty when using `source_path`) |
+| `git_ref` | **string** · Optional · Default: `main`<br>Git reference to check out — branch, tag, or commit SHA |
+| `source_path` | **string** · Optional<br>Path to existing code on disk (alternative to git clone) |
+| `build_command` | **string** · Optional · Default: `go build -o app .`<br>Build command run in the work root, e.g. `go build -o app .` |
+| `run_command` | **string** · Required · Default: `./app`<br>Command that starts your application, e.g. `./app` |
+| `port` | **int** · Required · Default: `8080`<br>Port your application listens on |
+| `network_mode` | **select** · Required · Default: `ingress-auth`<br>How to expose the application (see below) |
+| `domain` | **string** · Optional<br>Domain the application is published under, for example `apps.example.com`. The workload is served at `<name>.<domain>`. Requires `network_mode` `ingress-noauth` |
+| `tls_issuer` | **string** · Optional<br>cert-manager ClusterIssuer used to obtain the certificate for that domain |
+| `publish_dns` | **boolean** · Optional · Default: `false`<br>Annotate the route so the ExternalDNS plugin creates the DNS record |
+| `gpu` | **boolean** · Required<br>Attach a GPU to the workload |
+
+### Network Modes
+
+| Mode | Behavior |
+|------|----------|
+| `ingress-auth` | Exposes the application through the nginx ingress at `/<namespace>/polaris/<workload-name>/`, authenticated via Hubble |
+| `ingress-noauth` | Same ingress path, but **without authentication** — anyone who can reach the ingress can reach the app |
+| `clusterip` | No ingress — the application is only reachable in-cluster via its ClusterIP Service |
+| `nodeport` | Adds a NodePort Service in addition to the ClusterIP Service for direct node-level access |
+
+### Example Application
+
+A working example for every runtime lives in [`aldmbmtl/runtimes`](https://github.com/aldmbmtl/runtimes). Each language has its own
+top-level directory in that repository, so the build and run commands must point at `go/`:
+
+| Field | Value |
+|-------|-------|
+| `git_url` | `https://github.com/aldmbmtl/runtimes.git` |
+| `build_command` | `cd go && go build -o ../app .` |
+| `run_command` | `./app` |
+
+The example is a `net/http` server that reads `PREFIX` and listens on port `8080`, matching the default `port`.
+
+`build_command` and `run_command` are evaluated independently, each starting from the repository root — a
+`cd` in one does not carry over to the other.
+
+---
+
+## Serving on Your Own Domain
+
+With `network_mode` set to `ingress-noauth`, setting `domain` publishes the application at `<workload name>.<domain>`, served from the root of that host. `PREFIX` becomes `/`, so an application that reads it serves its own links correctly, and the platform path route is not rendered, since the application can no longer serve it once its base path moves.
+
+The hostname is derived from the workload name, and end users can pass a custom workload name from the Hubble frontend, which is how an address like `my-app.domain.com` is chosen alongside `my-app-dev.domain.com`. Derived does not mean collision proof: two workloads launched with the same name and the same domain, for example from different projects, would claim the same hostname, and the second route will fail. Keep names unique per domain.
+
+This needs the Certificate Manager and Certificate Issuer plugins for TLS, and either the ExternalDNS plugin with `publish_dns` enabled or a wildcard DNS record for `*.<domain>` pointing at the cluster ingress address. The Domain Manager page shows the record to add and whether it currently resolves.
+
+A domain only takes effect under `ingress-noauth`. The reasoning, which applies to every plugin that publishes a custom domain, is covered in [Custom Domains](../../docs/custom-domains.md).
+---
+
+## Notes
+
+- When exposed via ingress, the application is served under `/<namespace>/polaris/<workload-name>/`, where `<namespace>` is the environment the workload runs in. This full path is passed to the container as the `PREFIX` environment variable — your application must handle or be configured for this path prefix
+- `run_command` must start a foreground process that listens on `port`; if nothing listens, the startup probe fails and the workload restarts
+- Use `ingress-noauth` only for applications that implement their own authentication or run in trusted network environments
+- Private repositories are not supported by the built-in clone step — use `source_path` with a volume mount for private code

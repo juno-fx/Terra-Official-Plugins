@@ -90,7 +90,7 @@ spec:
             - name: GITEA__server__DOMAIN
               value: "{{ .Values.host }}"
             - name: GITEA__server__ROOT_URL
-              value: "https://{{ .Values.host }}/plugin/{{ .Values.name }}/"
+              value: "https://{{ .Values.host }}/{{ .Release.Namespace }}/gitea/{{ .Values.name }}/"
             - name: GITEA__server__SSH_DOMAIN
               value: "{{ .Values.host }}"
             - name: GITEA__server__DISABLE_SSH
@@ -127,12 +127,16 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+            - name: JUNO_WORKSPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
             - name: USER
               value: "{{ .Values.user }}"
             - name: HOME
               value: "/data"
             - name: PREFIX
-              value: "/plugin/{{ .Values.name }}/"
+              value: "/{{ .Release.Namespace }}/gitea/{{ .Values.name }}/"
             {{- range .Values.env }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}

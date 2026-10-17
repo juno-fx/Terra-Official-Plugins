@@ -1,0 +1,18 @@
+resource_id: proxmox
+name: Proxmox VE
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/proxmox/assets/logo.png
+description: |
+  Proxmox VE hypervisor node running as a workload (via dockur/proxmox).
+  Launch a full Proxmox Virtual Environment with KVM acceleration, LXC
+  support, and a pre-configured NAT bridge — accessible through the
+  Proxmox web UI. Requires nodes with KVM support (/dev/kvm).
+category: Infrastructure
+tags:
+  - cluster-level
+  - workload
+  - proxmox
+  - virtualization
+  - hypervisor
+  - vm
+  - kvm
+fields: []

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Values.name }}"
+spec:
+  selector:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+  ports:
+    - port: 8181
+      targetPort: 8181
+      protocol: TCP
+      name: gui
