@@ -40,6 +40,11 @@ data:
       options:
         - readonly-ns
         - admin-ns
+    - name: publicAccess
+      description: "Allow public access (disable authentication)"
+      type: boolean
+      required: true
+      default: false
     - name: ingressNamespace
       description: "Namespace of the ingress controller for plugin access"
       type: string

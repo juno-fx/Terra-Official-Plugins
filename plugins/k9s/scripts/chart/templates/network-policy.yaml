@@ -22,9 +22,5 @@ spec:
       ports:
         - protocol: TCP
           port: 8080
-        - protocol: TCP
-          port: {{ .Values.ttyd_port }}
-        - protocol: UDP
-          port: 53
   egress:
     - {}

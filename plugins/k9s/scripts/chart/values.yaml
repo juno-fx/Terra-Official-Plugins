@@ -4,7 +4,6 @@ ingressClassName: ""
 nginx_registry: "docker.io"
 nginx_repo: "nginx"
 nginx_tag: "alpine"
-ttyd_port: 7681
 group:
 cpu: "1"
 memory: "1Gi"

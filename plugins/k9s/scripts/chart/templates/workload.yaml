@@ -30,11 +30,11 @@ spec:
               memory: "{{ .Values.memory }}"
               cpu: "{{ .Values.cpu }}"
             limits:
-              memory: "2Gi"
-              cpu: "2"
+              memory: "{{ .Values.memoryLimit }}"
+              cpu: "{{ .Values.cpuLimit }}"
           ports:
-            - containerPort: {{ .Values.ttyd_port }}
-              name: ttyd
+            - containerPort: 3000
+              name: wetty
           env:
             {{- range .Values.env }}
             - name: {{ .name | quote }}
@@ -50,12 +50,12 @@ spec:
               value: "/data"
           startupProbe:
             tcpSocket:
-              port: {{ .Values.ttyd_port }}
+              port: 3000
             failureThreshold: 150
             periodSeconds: 2
           livenessProbe:
             tcpSocket:
-              port: {{ .Values.ttyd_port }}
+              port: 3000
             failureThreshold: 24
             periodSeconds: 5
           volumeMounts:

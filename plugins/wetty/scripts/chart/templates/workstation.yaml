@@ -17,9 +17,6 @@ spec:
         kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
 
     spec:
-      {{- if .Values.terra_role }}
-      serviceAccountName: {{ .Values.terra_role }}
-      {{- end }}
       hostname: "{{ .Values.name }}"
       containers:
         - name: nginx
