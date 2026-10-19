@@ -17,7 +17,7 @@ data:
     - name: tag
       default: "main"
     - name: icon
-      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/open-webui/scripts/assets/logo.png"
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/open-webui/assets/logo.png"
     - name: webtop_registry
       description: "Registry to pull the webtop image from"
       type: string
