@@ -4,7 +4,12 @@
 
 **Category:** Helios Plugin
 **Type:** Workstation Add-on
-**Tags:** `shutdown` · `desktop` · `customization`
+**Tags:** `shutdown` · `desktop` · `customization` · `deprecated`
+
+> [!WARNING]
+> **Deprecated.** Orion now has a built-in auto shutdown and hibernate feature that works for all workloads, not just Helios. Use that instead of installing this plugin.
+>
+> This plugin remains in the repository as a reference example of a Helios init-script plugin (a ConfigMap labelled `kuiper.juno-innovations.com/plugin: "true"`).
 
 ---
 

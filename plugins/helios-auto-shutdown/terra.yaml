@@ -1,7 +1,7 @@
 resource_id: helios-auto-shutdown
 name: Helios Auto Shutdown
 icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios/scripts/assets/helios-icon.png
-description: Triggers auto-shutdown of Helios workstations via Kuiper when running in a Juno deployment. To set the shutdown time, use the IDLE_TIME environment variable in the workstation template.
+description: "DEPRECATED — Orion now has built-in auto shutdown and hibernate for all workloads; this plugin remains only as an example. Triggers auto-shutdown of Helios workstations via Kuiper when running in a Juno deployment. To set the shutdown time, use the IDLE_TIME environment variable in the workstation template."
 category: Helios Plugin
 tags:
     - shutdown
