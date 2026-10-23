@@ -11,6 +11,7 @@ data:
         server_name _;
 
         location /{{ .Release.Namespace }}/{{ .Values.name }} {
+            auth_request /auth;
             proxy_set_header Accept-Encoding "";
             rewrite ^/{{ .Release.Namespace }}/{{ .Values.name }}(/|$)(.*) /$2 break;
             proxy_pass http://127.0.0.1:{{ .Values.ttyd_port }};
@@ -38,5 +39,13 @@ data:
             # Long timeout for web terminal sessions
             proxy_read_timeout 86400s;
             proxy_send_timeout 86400s;
+        }
+
+        location = /auth {
+            internal;
+            proxy_pass http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/;
+            proxy_pass_request_body off;
+            proxy_set_header Content-Length "";
+            proxy_set_header X-Original-URI $request_uri;
         }
     }
