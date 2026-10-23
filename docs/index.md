@@ -22,7 +22,7 @@ Apps can range from dashboards, workload templates, services, and even software 
 - **Install from a form.** Users fill in values and Orion deploys the chart. No Dockerfile, no YAML, no dependency chase.
 - **Your own charts.** Point Orion Apps at your own Git repository, pinned to a branch or release tag. Internal charts get the same install as the official catalog. Most Helm charts become Terra-compatible with minimal effort.
 - **Bundles.** Install a whole kit, like KubeVirt, at once.
-- **Helm and Argo CD underneath.** Charts are kept in sync from Git by Argo CD. Users never see either.
+- **Helm and ArgoCD underneath.** Charts are kept in sync from Git by ArgoCD. Users never see either.
 Examples from the catalog: Jupyter, vLLM, Open WebUI, Hermes Agent, Claude Code, Deadline 10, Helios, and KubeVirt. Browse the full list under [Plugins](https://docs.juno-innovations.com/Terra-Official-Plugins/plugins/AI/hermes-agent/).
 
 ## Build your own plugin
