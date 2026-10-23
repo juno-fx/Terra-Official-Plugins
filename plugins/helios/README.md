@@ -59,6 +59,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `rheaRepo` | **string** · Required · Default: `rhea`<br>Repository for the Rhea sidecar image |
 | `rheaTag` | **string** · Required · Default: `v1.2.3`<br>Rhea sidecar image tag |
 | `publicAccess` | **boolean** · Required · Default: `false`<br>Disable authentication and allow unauthenticated access to the workstation |
+| `serviceType` | **select** · Required · Default: `ClusterIP`<br>Service type (ClusterIP or LoadBalancer). Set to `LoadBalancer` to disable the ingress and create a LoadBalancer service. |
 
 ### Custom Environment Variables
 

@@ -69,6 +69,14 @@ data:
       type: boolean
       required: true
       default: false
+    - name: serviceType
+      description: "Service type (ClusterIP or LoadBalancer)"
+      type: select
+      required: true
+      default: "ClusterIP"
+      options:
+        - "ClusterIP"
+        - "LoadBalancer"
   env_hints: |
     - name: PASSWORD
       description: Password set for the users terminal session.
