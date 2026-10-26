@@ -60,6 +60,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `rheaTag` | **string** · Required · Default: `v1.2.3`<br>Rhea sidecar image tag |
 | `publicAccess` | **boolean** · Required · Default: `false`<br>Disable authentication and allow unauthenticated access to the workstation |
 | `serviceType` | **select** · Required · Default: `ClusterIP`<br>Service type (ClusterIP or LoadBalancer). Set to `LoadBalancer` to disable the ingress and create a LoadBalancer service. |
+| `coreweaveLoadBalancer` | **boolean** · Required · Default: `false`<br>When `true`, adds the annotation `service.beta.kubernetes.io/coreweave-load-balancer-type: public` to the service for CoreWeave load balancer type selection. |
 
 ### Custom Environment Variables
 

@@ -77,6 +77,11 @@ data:
       options:
         - "ClusterIP"
         - "LoadBalancer"
+    - name: coreweaveLoadBalancer
+      description: "Use CoreWeave load balancer type (adds annotation)"
+      type: boolean
+      required: true
+      default: false
   env_hints: |
     - name: PASSWORD
       description: Password set for the users terminal session.

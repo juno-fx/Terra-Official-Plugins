@@ -10,3 +10,4 @@ gpu:
 env:
 enableAPI:
 serviceType: "ClusterIP"
+coreweaveLoadBalancer: false
