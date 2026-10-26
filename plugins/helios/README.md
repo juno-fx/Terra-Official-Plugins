@@ -59,7 +59,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `rheaRepo` | **string** · Required · Default: `rhea`<br>Repository for the Rhea sidecar image |
 | `rheaTag` | **string** · Required · Default: `v1.2.3`<br>Rhea sidecar image tag |
 | `publicAccess` | **boolean** · Required · Default: `false`<br>Disable authentication and allow unauthenticated access to the workstation |
-| `serviceType` | **select** · Required · Default: `ClusterIP`<br>When `ClusterIP`: creates a single ClusterIP service on port 8080. When `LoadBalancer`: creates a ClusterIP service on port 8080 plus an additional LoadBalancer service on ports 8443/tcp (dcv-tcp) and 8443/udp (dcv-udp) for bot connectivity. |
+| `serviceType` | **select** · Required · Default: `ClusterIP`<br>When `ClusterIP`: creates a single ClusterIP service on port 8080. When `LoadBalancer`: creates a ClusterIP service on port 8080 plus an additional LoadBalancer service on port 3000/TCP (dcv) plus ports 8443/tcp (dcv-tcp) and 8443/udp (dcv-udp) for bot connectivity and Nice DCV. |
 | `coreweaveLoadBalancer` | **boolean** · Required · Default: `false`<br>When `true`, adds the annotation `service.beta.kubernetes.io/coreweave-load-balancer-type: public` to the service for CoreWeave load balancer type selection. |
 
 ### Custom Environment Variables

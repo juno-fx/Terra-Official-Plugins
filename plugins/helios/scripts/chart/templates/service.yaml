@@ -28,6 +28,10 @@ spec:
   selector:
     juno-innovations.com/workstation: "{{ .Values.name }}"
   ports:
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
+      name: dcv
     - port: 8443
       targetPort: 8443
       protocol: TCP
