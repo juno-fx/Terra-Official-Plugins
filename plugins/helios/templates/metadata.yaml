@@ -69,6 +69,11 @@ data:
       type: boolean
       required: true
       default: false
+    - name: sysResource
+      description: "Enable SYS_RESOURCE capability for the container"
+      type: boolean
+      required: true
+      default: false
     - name: serviceType
       description: "Service type (ClusterIP or LoadBalancer)"
       type: select

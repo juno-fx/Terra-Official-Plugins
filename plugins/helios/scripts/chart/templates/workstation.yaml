@@ -109,6 +109,12 @@ spec:
               memory: "{{ .Values.memoryLimit }}"
             {{- end }}
             {{- end }}
+          {{- if .Values.sysResource }}
+          securityContext:
+            capabilities:
+              add:
+              - SYS_RESOURCE
+          {{- end }}
           startupProbe:
             tcpSocket:
               port: 3000
