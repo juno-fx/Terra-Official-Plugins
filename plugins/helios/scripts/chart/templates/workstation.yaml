@@ -88,6 +88,12 @@ spec:
         - name: helios
           imagePullPolicy: IfNotPresent
           image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
+          {{- if .Values.sysResource }}
+          securityContext:
+            capabilities:
+              add:
+              - SYS_RESOURCE
+          {{- end }}
           lifecycle:
             preStop:
               exec:
@@ -109,12 +115,6 @@ spec:
               memory: "{{ .Values.memoryLimit }}"
             {{- end }}
             {{- end }}
-          {{- if .Values.sysResource }}
-          securityContext:
-            capabilities:
-              add:
-              - SYS_RESOURCE
-          {{- end }}
           startupProbe:
             tcpSocket:
               port: 3000
