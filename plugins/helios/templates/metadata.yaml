@@ -52,6 +52,7 @@ data:
   env_hints: |
     - name: PASSWORD
       description: Password set for the users terminal session.
+      expose: true
     - name: SUDO
       description: Grants the user sudo access on the container ("true" or "1").
     - name: SELKIES_FRAMERATE
