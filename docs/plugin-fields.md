@@ -223,6 +223,10 @@ Environment variable input. This field type is **automatically injected for all 
 you do not need to define it. It is shown in the Genesis workload creation form and allows users to
 set environment variables that are passed directly into the workload.
 
+Suggest commonly used variables for it with `data.env_hints` in `metadata.yaml`. Admin/Kuiper users see
+every hint in Hubble's launch **Advanced** dropdown; mark an entry `expose: true` to also offer it to all
+other users. See [`env_hints`](workload-templates.md#env_hints-suggested-environment-variables).
+
 ---
 
 ### `multi-line` *(metadata.yaml only)*
