@@ -27,6 +27,7 @@ puid: 0
 host:
 pullSecret:
 sysResource: false
+nvidiaIcd: false
 session:
 volumeMounts: []
 volumes: []

@@ -171,6 +171,10 @@ spec:
               mountPath: "/etc/helios/init.d/{{ .name }}/{{ .file }}"
             {{- end }}
             {{- end }}
+            {{- if .Values.nvidiaIcd }}
+            - name: nvidia-icd-config
+              mountPath: "/etc/glvnd/glx_vendor.d/"
+            {{- end }}
             {{- if .Values.enableAPI }}
             - name: orionpy-volume
               mountPath: /opt/juno
@@ -244,6 +248,11 @@ spec:
             name: {{ .config | quote }}
             defaultMode: 0777
         {{- end }}
+        {{- end }}
+        {{- if .Values.nvidiaIcd }}
+        - name: nvidia-icd-config
+          configMap:
+            name: {{ .Release.Name }}-nvidia-icd
         {{- end }}
         {{- if .Values.enableAPI }}
         - name: orionpy-volume

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-nvidia-icd"
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+data:
+  10_nvidia.json: |
+    {
+        "file_format_version" : "1.0.0",
+        "ICD" : {
+            "library_path" : "libGLX_nvidia.so.0"
+        }
+    }

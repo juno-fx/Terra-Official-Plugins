@@ -74,6 +74,11 @@ data:
       type: boolean
       required: true
       default: false
+    - name: nvidiaIcd
+      description: "Enable NVIDIA ICD file mount at /etc/glvnd/glx_vendor.d/"
+      type: boolean
+      required: true
+      default: false
     - name: serviceType
       description: "Service type (ClusterIP or LoadBalancer)"
       type: select
