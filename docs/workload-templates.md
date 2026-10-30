@@ -136,7 +136,58 @@ data:
       description: "Attach a GPU"
       type: boolean
       required: true
+  # Optional: suggested custom environment variables for the launch form.
+  env_hints: |
+    - name: EXAMPLE_VAR
+      description: "What this variable does and when to set it"
+      expose: true
 ```
+
+### `env_hints` — Suggested Environment Variables
+
+If your chart ranges over `.Values.env` (the auto-injected [`env` field](plugin-fields.md)), use
+`data.env_hints` to list the handful of custom environment variables users of the upstream image
+commonly set. Like `fields:`, it is a string block scalar holding a YAML list. If the image has no
+well-known custom variables, set it to an empty list:
+
+```yaml
+  env_hints: |
+    []
+```
+
+Each entry supports:
+
+| Key           | Required | Description                                                         |
+|---------------|----------|---------------------------------------------------------------------|
+| `name`        | yes      | Environment variable name                                           |
+| `description` | yes      | What the variable does and when to set it                           |
+| `expose`      | no       | `true` / `false` (default `false`) — who is offered the hint, below |
+
+Hints appear in the **Advanced** dropdown when launching the workload from Hubble:
+
+| Launching user      | Sees                             |
+|---------------------|----------------------------------|
+| Admin / Kuiper user | Every `env_hints` entry          |
+| Any other user      | Only entries with `expose: true` |
+
+Expose only variables an individual user would reasonably set for their own session. Helios, for
+example, exposes `PASSWORD` (the user's terminal session password) but leaves `SUDO` and
+`REMOTE_PROTOCOL` unexposed so only admin/Kuiper users are offered them:
+
+```yaml linenums="1" title="plugins/helios/templates/metadata.yaml (excerpt)"
+  env_hints: |
+    - name: PASSWORD
+      description: Password set for the users terminal session.
+      expose: true
+    - name: SUDO
+      description: Grants the user sudo access on the container ("true" or "1").
+```
+
+!!! warning "Don't list platform-set variables"
+    Never list a variable the platform already sets (`JUNO_*`, `USER`, `HOME`, `UID`, `GID`, `PREFIX`).
+
+Mirror the list in the plugin `README.md` under `### Custom Environment Variables`, and note exposed
+entries as available to all users at launch.
 
 ### `juno-innovations.com/workload` Annotation Values
 

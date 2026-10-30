@@ -47,6 +47,9 @@ data:
   # has no commonly used custom env vars.
   # Platform vars (JUNO_*, USER, HOME, UID, GID, PREFIX) are pass-through only — wire
   # them into workload.yaml solely when the upstream image is built to read them (concepts/env.md).
+  # Admin/Kuiper users see every hint in Hubble's launch Advanced dropdown. Add `expose: true`
+  # to an entry to also offer it to all other users — only for per-user session vars
+  # (e.g. a session password), never privilege/infrastructure vars (e.g. SUDO).
   env_hints: |
     - name: TODO_VAR_NAME
       description: TODO — what this variable does and when to set it.

@@ -140,7 +140,21 @@ data:
   env_hints: |
     - name: EXAMPLE_VAR
       description: What this variable does and when to set it.
+      expose: true   # optional — also offer this var to non-admin users launching from Hubble
 ```
+
+**`env_hints` entry keys:**
+
+| Key | Required | Description |
+|-----|----------|-------------|
+| `name` | yes | The environment variable name |
+| `description` | yes | What the variable does and when to set it |
+| `expose` | no | `true` \| `false` (default `false`). Admin/Kuiper users always see **every** `env_hints` entry in the **Advanced** dropdown when launching the workload from Hubble. `expose: true` additionally makes that hint available to **all users** at launch time, in the same dropdown. Unexposed hints stay admin/Kuiper-only |
+
+**When to set `expose: true`** — only for variables an individual end user would reasonably set for their own
+session (e.g. Helios's `PASSWORD`, the user's terminal session password). Leave privilege- or
+infrastructure-level variables unexposed (e.g. Helios's `SUDO`, `REMOTE_PROTOCOL`) so only admin/Kuiper
+users are offered them. See `plugins/helios/templates/metadata.yaml` for the reference.
 
 This lives in `metadata.yaml` rather than `terra.yaml` because it needs to travel through the same ConfigMap
 Genesis already reads (label `kuiper.juno-innovations.com/chart`) to reach the workload-launch UI — `terra.yaml`
@@ -157,7 +171,8 @@ Rules:
   `[]` rather than omitting the key (see `plugins/proxmox/templates/metadata.yaml`).
 - Mirror the same list in the plugin's `README.md`, under a `### Custom Environment Variables` subsection inside
   `## Configuration` (table of `Variable` / `Description`, one row per entry) — see any workload template plugin
-  under `plugins/` for the established format.
+  under `plugins/` for the established format. Entries with `expose: true` are noted in their README description
+  as available to all users at launch (Hubble → Advanced).
 - Do not add a "don't override" callout to the README — the goal is a short, useful suggestion list, not a
   cautionary reference.
 - `template/workload/templates/metadata.yaml` and `template/workload/README.md` carry `TODO` placeholders for
@@ -333,7 +348,8 @@ Workload manifests applied to cluster
    - `data.chart` → name of the scripts ConfigMap
    - `data.env_hints`, if present → suggested custom env vars for the auto-injected `env` field (this
      key exists in the ConfigMap for Genesis to consume; whether Genesis's UI currently reads and displays it is
-     outside this repo's control — see the `env_hints` subsection above)
+     outside this repo's control — see the `env_hints` subsection above). In Hubble's launch **Advanced**
+     dropdown, admin/Kuiper users see every hint; other users see only entries marked `expose: true`
    - Then fetches that scripts ConfigMap and reads `packaged_scripts.base64`
 
 3. **Workload launch (Kuiper):** User creates a workload in Genesis. Kuiper receives the base64 chart string,
@@ -382,6 +398,9 @@ data:
   env_hints: |
     - name: EXAMPLE_VAR
       description: "What this variable does and when to set it"
+      # Optional (default false): admin/Kuiper users always see every hint in Hubble's launch
+      # Advanced dropdown; true also shows this one to all other users.
+      expose: true
 ```
 
 **The `juno-innovations.com/workload` annotation must also appear in `scripts/chart/templates/workload.yaml`**
@@ -660,6 +679,7 @@ All types above plus:
 | Hand-editing `packaged-scripts.yaml` | Overwritten next `make package` | Edit `scripts/` instead, then repackage |
 | `env_hints` entry duplicates a platform-set var | Misleading docs — the suggested var is silently shadowed by the platform-set one | Check `concepts/env.md`'s platform-set var table before adding to `metadata.yaml` |
 | `env_hints` in `metadata.yaml` and `README.md` fall out of sync | Docs disagree with what Genesis actually suggests | Keep both lists identical; update together |
+| `expose: true` on a privilege/infrastructure var (e.g. `SUDO`) | Every non-admin user can set it from Hubble's Advanced dropdown at launch | Expose only per-user session vars; admin/Kuiper users already see every hint |
 | Ingress path omits `{{ .Release.Namespace }}` | Passes in a single-environment cluster; once a second environment shares the hostname, launches fail with an admission-webhook 400 (`host … and path … is already defined in ingress <ns>/<name>`) part-way through, leaving a partial workload to clean up | Prefix the path with `/{{ .Release.Namespace }}/` (see Ingress Path Convention) |
 | Ingress path changed without updating the in-container path | nginx routes to the pod correctly, then the app 404s or serves a page whose assets all 404 — fails *after* looking like it worked | Update `PREFIX`, nginx `location`/`rewrite`/`sub_filter`, `--baseURL`/`ROOT_URL`/`base_url` and `HTTPRoute` rewrites in the same pass |
 | Required podAffinity/podAntiAffinity in a small cluster | Pods unschedulable — stranded at launch | Use `preferred` unless correctness requires `required` |

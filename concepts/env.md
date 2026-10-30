@@ -30,7 +30,22 @@ data:
   env_hints: |
     - name: EXAMPLE_VAR
       description: "What this variable does and when to set it"
+      expose: true   # optional, default false
 ```
+
+Entry keys: `name` (required), `description` (required), `expose` (optional, default `false`).
+
+**Who sees which hints** — hints appear in the **Advanced** dropdown when launching the workload
+from Hubble:
+
+| Launching user | Sees |
+|----------------|------|
+| Admin / Kuiper user | every `env_hints` entry |
+| Any other user | only entries with `expose: true` |
+
+Expose only vars an individual user would reasonably set for their own session — Helios's
+`PASSWORD` (terminal session password) is exposed; `SUDO` and `REMOTE_PROTOCOL` are not, so only
+admin/Kuiper users are offered them. Reference: `plugins/helios/templates/metadata.yaml`.
 
 Rules:
 
@@ -80,6 +95,8 @@ reference, not the baseline (the template ships `env: []`).
   supports.
 - `env_hints` in `metadata.yaml` and the README fall out of sync easily — update both
   together.
+- `expose: true` hands the var to every non-admin user at launch — never expose a
+  privilege- or infrastructure-level var (`SUDO`, protocol switches).
 - Field names in `metadata.yaml` must match `values.yaml` keys exactly (Rule 3) — the `env`
   value list is no exception: the chart's range consumes `.Values.env` as-is.
 
@@ -87,4 +104,5 @@ reference, not the baseline (the template ships `env: []`).
 
 - `concepts/runtime.md` — image, command, probes
 - `concepts/ingress.md` — `PREFIX` path coupling
-- `docs/workload-configuration.md` — field types, env_hints
+- `docs/workload-templates.md` — `env_hints` and `expose`
+- `docs/workload-configuration.md` — field types
