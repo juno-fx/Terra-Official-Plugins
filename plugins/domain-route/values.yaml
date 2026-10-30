@@ -1,0 +1,14 @@
+hostname:
+target_kind: workload
+target_name:
+target_port: 8080
+selector_label: juno-innovations.com/workstation
+path: /
+backend_protocol: HTTP
+tls_issuer: ""
+publish_dns: false
+ingress_class: nginx
+auth: none
+basic_auth_secret: ""
+rate_limit: 0
+allow_cidrs: ""
