@@ -56,11 +56,11 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `repo` | **string** · Required · Default: `wetty`<br>Wetty image repository |
 | `tag` | **string** · Required · Default: `2.5`<br>Wetty image tag |
 | `packages` | **string** · Optional · Default: `vim`<br>Space-separated list of additional packages to install at startup |
-| `ingressClassName` | **string** · Optional · Default: `""`<br>IngressClass for the terminal's ingress (e.g. `nginx`, `traefik`). Leave empty to use the cluster's default IngressClass |
 | `nginx_registry` | **string** · Required · Default: `docker.io`<br>Container registry for the nginx proxy image |
 | `nginx_repo` | **string** · Required · Default: `nginx`<br>nginx proxy image repository |
 | `nginx_tag` | **string** · Required · Default: `1.29.3`<br>nginx proxy image tag |
 | `publicAccess` | **boolean** · Required · Default: `false`<br>Disable the Hubble login check and allow unauthenticated browser access to the terminal |
+
 ### Custom Environment Variables
 
 Wetty is a plain tmux/bash shell rather than an application with its own configuration surface — Genesis lets you add arbitrary environment variables to the workload, and these are commonly useful for anything run in the terminal session:
@@ -75,6 +75,6 @@ Wetty is a plain tmux/bash shell rather than an application with its own configu
 ## Notes
 
 - Setting `publicAccess` to `true` gives a shell to anyone who has the URL — use only in isolated or trusted network environments
-- If `ingressClassName` is left empty and the cluster has no default IngressClass, the terminal will be unreachable — set it explicitly in that case
+- The terminal's ingress uses the `nginx` IngressClass
 - The `packages` field installs system packages via `apk` (Alpine) at workload startup; include any CLI tools your terminal users need
 - Wetty is ideal for quick shell access and running scripts within a project environment

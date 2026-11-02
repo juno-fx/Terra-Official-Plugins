@@ -5,9 +5,9 @@ metadata:
   labels:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
 spec:
-  {{- if .Values.ingressClassName }}
-  ingressClassName: {{ .Values.ingressClassName }}
-  {{- end }}
+  # Kuiper >= 4.8.0 overwrites this with the launching namespace's IngressClass.
+  # nginx is the fallback for older Kuiper versions;
+  ingressClassName: nginx
   rules:
     - host: {{ .Values.host }}
       http:

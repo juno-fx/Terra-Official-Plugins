@@ -19,7 +19,6 @@ storage_size: 1Gi
 nginx_registry: docker.io
 nginx_repo: nginx
 nginx_tag: alpine
-ingressClassName: nginx
 _juno_gateway_api: false
 registry: wettyoss
 repo: wetty

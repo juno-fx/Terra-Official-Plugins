@@ -31,11 +31,6 @@ data:
       description: Additional packages to install. You can use spaces " " to install multiples.
       required: false
       default: vim
-    - name: ingressClassName
-      description: "Ingress class name. Leave empty for cluster default."
-      type: string
-      required: false
-      default: ""
     - name: nginx_registry
       description: "Registry to pull the nginx image from"
       type: string
