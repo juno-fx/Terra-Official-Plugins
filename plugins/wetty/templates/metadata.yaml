@@ -56,11 +56,6 @@ data:
       type: boolean
       required: true
       default: false
-    - name: ingressNamespace
-      description: "Namespace of the ingress controller for plugin access"
-      type: string
-      required: true
-      default: "ingress-nginx"
   # wetty is a plain tmux/bash shell, not an application with its own env vars —
   # these are generic shell-session variables useful to anything run in the terminal.
   env_hints: |

@@ -11,12 +11,11 @@ spec:
   policyTypes:
     - Ingress
     - Egress
+  # Only the nginx sidecar port is reachable. It enforces the Hubble login itself,
+  # so traffic is accepted from any ingress controller (ingress-nginx, Traefik, ...)
+  # without knowing its namespace. Wetty's own port (3000) stays blocked.
   ingress:
-    - from:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: {{ .Values.ingressNamespace }}
-      ports:
+    - ports:
         - protocol: TCP
           port: 8080
   egress:
