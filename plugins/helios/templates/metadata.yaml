@@ -100,6 +100,8 @@ data:
     - name: SELKIES_FRAMERATE
       description: Streaming framerate for the desktop session, as a range (e.g. "15-60") or fixed value (e.g. "30").
     - name: DISABLE_VGL
-      description: Disables the VirtualGL wrapper around the desktop session; apps needing it must be launched manually via vglrun.
+      description: Disables the VirtualGL wrapper around the desktop session; apps needing it must be launched manually via vglrun. The value should be set to "true"
+    - name: DISABLE_ZINK
+      description: Disables the ZINK software Vulkan renderer; apps needing it must be launched manually. The value should be set to "true" by default. Set to "false" to enable ZINK.
     - name: REMOTE_PROTOCOL
       description: if set to "dcv" Helios will run Nice DCV rather than Selkies.
