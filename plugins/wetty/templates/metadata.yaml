@@ -26,7 +26,7 @@ data:
       required: true
       default: "2.5"
     - name: icon
-      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/wetty/scripts/assets/logo.png"
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/wetty/assets/logo.png"
     - name: packages
       description: Additional packages to install. You can use spaces " " to install multiples.
       required: false
