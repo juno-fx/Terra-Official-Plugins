@@ -1,29 +1,19 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Values.name }}-ingress
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
-    nginx.ingress.kubernetes.io/auth-url: "http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/"
-    nginx.ingress.kubernetes.io/use-regex: "true"
+  name: {{ .Values.name }}-hermes
 spec:
+  # Kuiper >= 4.8.0 overwrites this with the launching namespace's IngressClass.
+  # nginx is the fallback for older deployments;
+  ingressClassName: nginx
   rules:
     - host: {{ .Values.host }}
       http:
         paths:
-          - path: "/{{ .Release.Namespace }}/hermes/{{ .Values.name }}/dashboard"
-            pathType: Prefix
-            backend:
-              service:
-                name: {{ .Values.name }}
-                port:
-                  number: 9119
           - path: "/{{ .Release.Namespace }}/hermes/{{ .Values.name }}"
             pathType: Prefix
             backend:
               service:
-                name: {{ .Values.name }}
+                name: {{ .Values.name }}-hermes
                 port:
-                  number: 9119
+                  number: 8080
