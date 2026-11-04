@@ -28,6 +28,7 @@ host:
 pullSecret:
 sysResource: false
 nvidiaIcd: false
+eglIcd: false
 session:
 volumeMounts: []
 volumes: []

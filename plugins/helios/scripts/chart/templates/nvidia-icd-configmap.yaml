@@ -12,3 +12,10 @@ data:
             "library_path" : "libGLX_nvidia.so.0"
         }
     }
+  20-nvidia.json: |
+    {
+        "file_format_version" : "1.0.0",
+        "ICD" : {
+            "library_path" : "libEGL_nvidia.so.0"
+        }
+    }

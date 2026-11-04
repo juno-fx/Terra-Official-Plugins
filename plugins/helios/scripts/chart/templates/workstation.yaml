@@ -175,6 +175,10 @@ spec:
             - name: nvidia-icd-config
               mountPath: "/etc/glvnd/glx_vendor.d/"
             {{- end }}
+            {{- if .Values.eglIcd }}
+            - name: egl-icd-config
+              mountPath: "/etc/glvnd/egl_vendor.d/"
+            {{- end }}
             {{- if .Values.enableAPI }}
             - name: orionpy-volume
               mountPath: /opt/juno
@@ -253,6 +257,11 @@ spec:
         - name: nvidia-icd-config
           configMap:
             name: {{ .Release.Name }}-nvidia-icd
+        {{- end }}
+        {{- if .Values.eglIcd }}
+        - name: egl-icd-config
+          configMap:
+            name: {{ .Release.Name }}-nvidia-egl-icd
         {{- end }}
         {{- if .Values.enableAPI }}
         - name: orionpy-volume

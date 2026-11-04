@@ -79,6 +79,11 @@ data:
       type: boolean
       required: true
       default: false
+    - name: eglIcd
+      description: "Enable NVIDIA EGL ICD file mount at /etc/glvnd/egl_vendor.d/"
+      type: boolean
+      required: true
+      default: false
     - name: serviceType
       description: "Service type (ClusterIP or LoadBalancer)"
       type: select
