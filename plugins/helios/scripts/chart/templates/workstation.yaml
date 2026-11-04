@@ -173,10 +173,8 @@ spec:
             {{- end }}
             {{- if .Values.nvidiaIcd }}
             - name: nvidia-icd-config
-              subPath: 10-nvidia.json
               mountPath: "/etc/glvnd/glx_vendor.d/"
             - name: nvidia-icd-config
-              subPath: 20-nvidia.json
               mountPath: "/etc/glvnd/egl_vendor.d/"
             {{- end }}
             {{- if .Values.enableAPI }}
