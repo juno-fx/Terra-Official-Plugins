@@ -5,7 +5,7 @@ metadata:
   labels:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
 data:
-  10_nvidia.json: |
+  10-nvidia.json: |
     {
         "file_format_version" : "1.0.0",
         "ICD" : {
