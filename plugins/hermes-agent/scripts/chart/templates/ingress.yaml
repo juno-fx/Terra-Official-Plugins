@@ -10,6 +10,15 @@ spec:
     - host: {{ .Values.host }}
       http:
         paths:
+          # Two paths so Hubble lists both endpoints (dashboard + terminal). Both go to
+          # the nginx sidecar, which routes /dashboard to the dashboard and the rest to wetty.
+          - path: "/{{ .Release.Namespace }}/hermes/{{ .Values.name }}/dashboard"
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.name }}-hermes
+                port:
+                  number: 8080
           - path: "/{{ .Release.Namespace }}/hermes/{{ .Values.name }}"
             pathType: Prefix
             backend:
