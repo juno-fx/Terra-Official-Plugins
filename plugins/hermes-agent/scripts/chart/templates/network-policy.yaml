@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Values.name }}-network-policy
+spec:
+  podSelector:
+    matchLabels:
+      kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+  # Egress is intentionally not restricted here (no Egress policyType), so it
+  # falls through to the workspace's network policies. The nginx sidecar needs
+  # DNS and Hubble for auth_request, start.sh installs build tools and wetty on
+  # boot, and the agent calls external LLM provider APIs.
+  policyTypes:
+    - Ingress
+  # Only the nginx sidecar port is reachable. It enforces the Hubble login itself,
+  # so traffic is accepted from any ingress controller (ingress-nginx, Traefik, ...)
+  # without knowing its namespace. Wetty (7681), the API (8642) and git (git_port)
+  # stay blocked.
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 8080

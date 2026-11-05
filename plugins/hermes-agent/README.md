@@ -1,6 +1,6 @@
 # Hermes Agent
 
-![Hermes Agent](https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/hermes-agent/scripts/assets/hermes-logo.png?raw=true)
+![Hermes Agent](https://github.com/juno-fx/Terra-Official-Plugins/blob/main/plugins/hermes-agent/assets/hermes-logo.png?raw=true)
 
 **Category:** AI
 **Type:** Workload Template
@@ -54,6 +54,9 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `registry` | **string** · Optional · Default: `nousresearch`<br>Container registry for the Hermes image |
 | `repo` | **string** · Optional · Default: `hermes-agent`<br>Hermes image repository |
 | `tag` | **string** · Optional · Default: `latest`<br>Hermes image tag |
+| `nginx_registry` | **string** · Required · Default: `docker.io`<br>Registry to pull the nginx sidecar image from |
+| `nginx_repo` | **string** · Required · Default: `nginx`<br>Repository to pull the nginx sidecar image from |
+| `nginx_tag` | **string** · Required · Default: `alpine`<br>Tag to pull the nginx sidecar image from |
 | `cluster_access` | **select** · Optional<br>Kubernetes RBAC access level for the agent (unset = no cluster access, `readonly-ns`, `admin-ns`) |
 | `persistence_size` | **string** · Optional · Default: `10Gi`<br>Persistent volume size for agent state storage |
 | `persistence_storage_class` | **k8sStorageClass** · Required<br>Storage class for the persistent volume |

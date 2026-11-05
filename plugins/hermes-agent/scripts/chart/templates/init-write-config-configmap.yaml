@@ -43,8 +43,3 @@ data:
         "/opt/templates/init/${_s}" > "/opt/init/${_s}"
       chmod 755 "/opt/init/${_s}"
     done
-
-    # --- Substitute nginx template ---
-    sed -e "s/__NAME__/${NAME}/g" -e "s/__NAMESPACE__/${NAMESPACE}/g" \
-      /opt/templates/nginx/nginx.conf > /opt/proxy/nginx.conf
-    chmod 644 /opt/proxy/nginx.conf
