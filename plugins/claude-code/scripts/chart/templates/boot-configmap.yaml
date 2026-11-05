@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}-boot
   labels:
-    kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
 data:
   boot.sh: |
     #!/bin/sh
@@ -51,5 +51,10 @@ data:
       CMD="gosu $USERNAME /bin/bash"
     fi
 
+    # Base path for wetty. The nginx sidecar forwards the full path without rewriting,
+    # so this must match the ingress path exactly, namespace segment included.
+    : "${NAMESPACE:?NAMESPACE must be set}"
+    WETTY_BASE="/$NAMESPACE/claude/$JUNO_WORKSTATION/"
+
     # Start wetty
-    exec wetty --port {{ .Values.ttyd_port }} --command "$CMD"
+    exec wetty --port {{ .Values.ttyd_port }} --base "$WETTY_BASE" --command "$CMD"
