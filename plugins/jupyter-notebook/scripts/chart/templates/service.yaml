@@ -6,7 +6,7 @@ spec:
   selector:
     juno-innovations.com/workstation: "{{ .Values.name }}"
   ports:
-    - port: 8888
-      targetPort: 8888
+    - port: 8080
+      targetPort: 8080
       protocol: TCP
-      name: jupyter
+      name: http
