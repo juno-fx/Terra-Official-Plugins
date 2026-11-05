@@ -26,15 +26,11 @@ data:
       required: true
       default: "2.5"
     - name: icon
-      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/wetty/scripts/assets/logo.png"
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/wetty/assets/logo.png"
     - name: packages
       description: Additional packages to install. You can use spaces " " to install multiples.
       required: false
       default: vim
-    - name: terra_role
-      description: Name of a Terra role to assign to Development Kit. This refers to the plugin level installed roles.
-      required: false
-      type: k8sServiceAccount
     - name: nginx_registry
       description: "Registry to pull the nginx image from"
       type: string
@@ -55,11 +51,6 @@ data:
       type: boolean
       required: true
       default: false
-    - name: ingressNamespace
-      description: "Namespace of the ingress controller for plugin access"
-      type: string
-      required: true
-      default: "ingress-nginx"
   # wetty is a plain tmux/bash shell, not an application with its own env vars —
   # these are generic shell-session variables useful to anything run in the terminal.
   env_hints: |
