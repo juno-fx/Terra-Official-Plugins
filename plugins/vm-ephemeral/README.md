@@ -1,6 +1,6 @@
 # Generic Ephemeral VM
 
-![Generic Ephemeral VM](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/vm-ephemeral/scripts/assets/logo.png)
+![Generic Ephemeral VM](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/vm-ephemeral/assets/logo.png)
 
 **Category:** Virtual Machine
 **Type:** Workload Template

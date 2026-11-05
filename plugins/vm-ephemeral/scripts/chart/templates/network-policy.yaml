@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Values.name }}-console-network-policy
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+spec:
+  # Console pod only. The VM's virt-launcher pod carries the kuiper-instance
+  # label too, so selecting on that would block the VM's `ports` Services.
+  podSelector:
+    matchLabels:
+      app: {{ .Values.name }}-console
+  # Egress is left to the namespace's network policies.
+  policyTypes:
+    - Ingress
+  # Only the nginx sidecar port is reachable. It enforces the Hubble login itself,
+  # so traffic is accepted from any ingress controller (ingress-nginx, Traefik, ...).
+  # The console image's own nginx (8080) and websockify (8081) stay blocked.
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 8082
