@@ -52,10 +52,9 @@ These fields are configured when authoring the workload template in **Genesis** 
 
 | Field | Details |
 |-------|---------|
-| `registry` | **string** · Required · Default: `docker.io`<br>Container registry for the nginx sidecar image |
-| `repo` | **string** · Required · Default: `nginx`<br>nginx sidecar image repository |
-| `tag` | **string** · Required · Default: `alpine`<br>nginx sidecar image tag |
-| `timezone` | **string** · Required · Default: `America/New_York`<br>Timezone for the k9s instance |
+| `nginx_registry` | **string** · Required · Default: `docker.io`<br>Registry to pull the nginx sidecar image from |
+| `nginx_repo` | **string** · Required · Default: `nginx`<br>Repository to pull the nginx sidecar image from |
+| `nginx_tag` | **string** · Required · Default: `alpine`<br>Tag to pull the nginx sidecar image from |
 | `cluster_access` | **select** · Required · Default: `readonly-ns`<br>Kubernetes RBAC access level (`readonly-ns` or `admin-ns`) |
 | `storage_class` | **k8sStorageClass** · Required<br>Storage class for the k9s data disk |
 | `storage_size` | **string** · Required · Default: `10Gi`<br>Size of the persistent volume for k9s data |
