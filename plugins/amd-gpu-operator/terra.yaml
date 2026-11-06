@@ -52,3 +52,14 @@ fields:
     required: false
     default: false
     type: boolean
+  - name: use_dra
+    description: |
+      Expose GPUs through the Dynamic Resource Allocation (DRA) driver instead of the
+      device plugin. With DRA several workloads can share one GPU by referencing the
+      same ResourceClaim; there is no memory or compute isolation between them.
+      Workloads then request GPUs with a ResourceClaim (device class gpu.amd.com)
+      and the amd.com/gpu resource is no longer advertised. Requires operator
+      v1.5.0 or newer, Kubernetes 1.32 or newer and containerd 2.0 or newer.
+    required: false
+    default: false
+    type: boolean

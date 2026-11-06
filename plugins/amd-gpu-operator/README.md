@@ -52,13 +52,55 @@ This plugin installs the upstream [ROCm/gpu-operator](https://github.com/ROCm/gp
 | `install_nfd` | **boolean** · Optional · Default: `true`<br>Install Node Feature Discovery with the operator. Set to `false` when NFD already runs in the cluster, e.g. alongside the NVIDIA GPU Operator. |
 | `detect_all_gpus` | **boolean** · Optional · Default: `true`<br>Label every node that has an AMD GPU, including integrated GPUs and cards outside AMD's supported list (e.g. Ryzen AI / Strix Halo). Set to `false` to label only supported GPUs (Instinct, Radeon Pro, selected Radeon RX). |
 | `vgpu_nodes` | **boolean** · Optional · Default: `false`<br>Target nodes labelled `amd-vgpu` instead of `amd-gpu`. Use when the nodes are virtual machines that see an AMD GPU virtual function. |
+| `use_dra` | **boolean** · Optional · Default: `false`<br>Expose GPUs through the DRA driver instead of the device plugin, so several workloads can share one GPU. Requires operator `v1.5.0`+, Kubernetes 1.32+ and containerd 2.0+. |
+
+---
+
+## Sharing a GPU Between Workloads
+
+The AMD operator has no time-slicing setting. To let several workloads use the same GPU, enable `use_dra`. The operator then runs the DRA driver instead of the device plugin: `amd.com/gpu` is no longer advertised and workloads request GPUs with a `ResourceClaim` of device class `gpu.amd.com`.
+
+Every pod that references the same `ResourceClaim` gets the same GPU. There is no memory or compute isolation between them.
+
+```yaml
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaim
+metadata:
+  name: shared-gpu
+spec:
+  devices:
+    requests:
+      - name: gpu
+        exactly:
+          deviceClassName: gpu.amd.com
+          allocationMode: ExactCount
+          count: 1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gpu-workload-1
+spec:
+  containers:
+    - name: app
+      image: docker.io/rocm/pytorch:latest
+      command: ["sleep", "infinity"]
+      resources:
+        claims:
+          - name: gpu
+  resourceClaims:
+    - name: gpu
+      resourceClaimName: shared-gpu
+```
+
+Further pods share the GPU by using the same `resourceClaimName`. The claim and the pods must be in the same namespace. Check what the driver found with `kubectl get resourceslices`.
 
 ---
 
 ## Notes
 
 - This plugin is **editable** — you can change the version and node targeting after install via Terra
-- Workloads request an AMD GPU with `resources.limits["amd.com/gpu"]`. The `gpu` toggle on the catalog's workload templates requests `nvidia.com/gpu` and does not attach an AMD GPU
+- By default workloads request an AMD GPU with `resources.limits["amd.com/gpu"]`, one workload per GPU. The `gpu` toggle on the catalog's workload templates requests `nvidia.com/gpu` and does not attach an AMD GPU
 - GPU nodes are labelled `feature.node.kubernetes.io/amd-gpu: "true"` (or `amd-vgpu` for virtual functions) automatically. With `detect_all_gpus: true` that covers any AMD GPU; with `false` only the GPUs on AMD's supported list are labelled, and other nodes need `kubectl label node <node> feature.node.kubernetes.io/amd-gpu=true`
 - GPUs outside AMD's supported list are detected and scheduled on a best-effort basis — the device plugin works with any GPU driven by `amdgpu`, but the metrics exporter is built for Instinct and may not report on them
 - If operator pods on a GPU node stay in `Init:0/1`, the node has no `amdgpu` driver loaded — install one on the node
