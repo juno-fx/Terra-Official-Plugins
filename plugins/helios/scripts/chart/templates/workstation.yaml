@@ -182,7 +182,7 @@ spec:
               name: http
           volumeMounts:
             - name: nginx-config
-              mountPath: /etc/nginx/conf.d/nginx.conf
+              mountPath: /etc/nginx/nginx.conf
               subPath: nginx.conf
         {{- if .Values.enableAPI }}
         - name: rhea
