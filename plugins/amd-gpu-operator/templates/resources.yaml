@@ -86,6 +86,10 @@ spec:
               enableDevicePlugin: false
             draDriver:
               enable: true
+              # The chart defaults to :latest, which is still v1.0.0. That build publishes
+              # an empty driverVersion when the node uses the in-kernel amdgpu driver, and
+              # the API server rejects the ResourceSlice. Fixed in v1.0.1.
+              image: docker.io/rocm/k8s-gpu-dra-driver:v1.0.1
             {{- end }}
   syncPolicy:
     automated:
