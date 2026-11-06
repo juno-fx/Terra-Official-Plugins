@@ -17,6 +17,9 @@ rheaMemoryLimit: 250Mi
 gpu: false
 enableAPI: false
 publicAccess: false
+nginx_registry: "docker.io"
+nginx_repo: "nginx"
+nginx_tag: "alpine"
 idx: 0
 guid: 0
 puid: 0
