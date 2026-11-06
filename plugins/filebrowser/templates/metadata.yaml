@@ -20,14 +20,6 @@ data:
       description: "Container image tag"
       required: true
       default: "latest"
-    - name: cpu
-      description: "CPU request"
-      required: true
-      default: "512m"
-    - name: memory
-      description: "Memory request"
-      required: true
-      default: "256Mi"
     - name: nginx_registry
       description: "Registry to pull the nginx sidecar image from"
       type: string
