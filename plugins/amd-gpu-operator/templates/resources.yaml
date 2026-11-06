@@ -1,6 +1,22 @@
 {{- /* Terra may hand booleans over as strings; normalise so "false" is never truthy. */ -}}
 {{- $installNfd := eq (toString .Values.install_nfd) "true" -}}
 {{- $vgpuNodes := eq (toString .Values.vgpu_nodes) "true" -}}
+{{- $detectAll := eq (toString .Values.detect_all_gpus) "true" -}}
+{{- /*
+  The upstream NFD rule only labels an allowlist of PCI device IDs (Instinct, Radeon Pro,
+  a few Radeon RX). This rule labels any AMD GPU: vendor 1002 with a display or
+  processing-accelerator PCI class, which covers integrated GPUs and unlisted cards.
+*/ -}}
+{{- define "amd-gpu-operator.anyGpuRule" -}}
+name: amd-gpu-any
+labels:
+  feature.node.kubernetes.io/amd-gpu: "true"
+matchFeatures:
+  - feature: pci.device
+    matchExpressions:
+      vendor: {op: In, value: ["1002"]}
+      class: {op: In, value: ["0300", "0302", "0380", "1200"]}
+{{- end -}}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -25,6 +41,13 @@ spec:
       values: |
         node-feature-discovery:
           enabled: {{ $installNfd }}
+          {{- if and $installNfd $detectAll }}
+          worker:
+            config:
+              sources:
+                custom:
+                  - {{- include "amd-gpu-operator.anyGpuRule" . | nindent 20 }}
+          {{- end }}
         # GPU nodes use the amdgpu driver already in their kernel. KMM (and its
         # cert-manager dependency) is only needed for the out-of-tree driver.
         kmm:
@@ -62,3 +85,15 @@ spec:
       # The DeviceConfig CRD is too large for client-side apply.
       - ServerSideApply=true
       - CreateNamespace=true
+{{- if and $detectAll (not $installNfd) }}
+---
+# NFD is managed outside this plugin, so the rule cannot ride along in its worker
+# config. The NodeFeatureRule CRD already exists there, so apply it as an object.
+apiVersion: nfd.k8s-sigs.io/v1alpha1
+kind: NodeFeatureRule
+metadata:
+  name: {{ .Release.Name }}-amd-gpu-any
+spec:
+  rules:
+    - {{- include "amd-gpu-operator.anyGpuRule" . | nindent 6 }}
+{{- end }}

@@ -34,6 +34,16 @@ fields:
     required: false
     default: true
     type: boolean
+  - name: detect_all_gpus
+    description: |
+      Label every node that has an AMD GPU, including integrated GPUs and cards the
+      operator does not list as supported (for example Ryzen AI / Strix Halo). Set
+      this to false to label only the GPUs on AMD's supported list (Instinct, Radeon
+      Pro and selected Radeon RX); other nodes then need the label
+      feature.node.kubernetes.io/amd-gpu=true added by hand.
+    required: false
+    default: true
+    type: boolean
   - name: vgpu_nodes
     description: |
       Target nodes labelled amd-vgpu instead of amd-gpu. Set this to true when the
