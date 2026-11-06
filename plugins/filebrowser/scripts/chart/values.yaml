@@ -2,8 +2,8 @@
 name: filebrowser
 user:
 group:
-cpu: "512m"
-memory: "256Mi"
+cpu: "1"
+memory: "1Gi"
 cpuLimit: null
 memoryLimit: null
 idx: 0
@@ -26,4 +26,6 @@ root: "/"
 registry: "docker.io"
 repo: "filebrowser/filebrowser"
 tag: "latest"
-ingressNamespace: "ingress-nginx"
+nginx_registry: "docker.io"
+nginx_repo: "nginx"
+nginx_tag: "alpine"
