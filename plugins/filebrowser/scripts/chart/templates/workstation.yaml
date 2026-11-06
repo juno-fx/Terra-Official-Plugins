@@ -16,6 +16,9 @@ spec:
     metadata:
       labels:
         juno-innovations.com/workstation: "{{ .Values.name }}"
+        # Kuiper's label injection does not reach pod templates; the NetworkPolicy
+        # selects on this label, so the pod must declare it itself.
+        kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
       annotations:
         juno-innovations.com/workload: "Application"
     spec:
@@ -45,10 +48,10 @@ spec:
               {{- end }}
             {{- end }}
           ports:
-            - containerPort: 8080
+            - containerPort: 8081
               name: filebrowser
           args:
-            - --port=8080
+            - --port=8081
             - --address=0.0.0.0
             - --root={{ .Values.root }}
             - --baseURL=/{{ .Release.Namespace }}/filebrowser/{{ .Values.name }}
@@ -72,8 +75,25 @@ spec:
             {{- if .Values.volumeMounts }}
             {{- toYaml .Values.volumeMounts | nindent 12 }}
             {{- end }}
+        - name: nginx
+          image: "{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}"
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+          ports:
+            - containerPort: 8080
+              name: http
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
 
       volumes:
+        - name: nginx-config
+          configMap:
+            name: "{{ .Values.name }}-nginx"
         - name: config
           emptyDir: {}
         - name: tmp-cache
