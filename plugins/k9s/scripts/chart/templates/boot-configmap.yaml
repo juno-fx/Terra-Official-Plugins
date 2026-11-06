@@ -46,8 +46,13 @@ data:
     # Fix ownership so the user can write to /data
     chown -R "$PUID:$PGID" /data
 
+    # Base path for wetty. The nginx sidecar forwards the full path without rewriting,
+    # so this must match the ingress path exactly, namespace segment included.
+    : "${NAMESPACE:?NAMESPACE must be set}"
+    WETTY_BASE="/$NAMESPACE/k9s/$JUNO_WORKSTATION/"
+
     # Start wetty — gosu runs a script file (not a shell builtin like 'source')
-    exec wetty --port {{ .Values.ttyd_port }} --command "bash -c \"gosu $USERNAME /opt/boot/tmux-launch.sh\""
+    exec wetty --port {{ .Values.ttyd_port }} --base "$WETTY_BASE" --command "bash -c \"gosu $USERNAME /opt/boot/tmux-launch.sh\""
   tmux-boot.sh: |
     #!/bin/sh
     # tmux-boot.sh — shared wrapper for persistent terminal sessions
