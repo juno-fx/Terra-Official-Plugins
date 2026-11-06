@@ -1,6 +1,6 @@
 # n8n
 
-![n8n](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/n8n/scripts/assets/logo.png)
+![n8n](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/n8n/assets/logo.png)
 
 **Category:** Automation
 **Type:** Workload Template
@@ -19,10 +19,13 @@ n8n is an open-source workflow automation tool with a visual node-based interfac
 
 **Workload Template** — Installs the n8n workload schema into Genesis. Once installed, the n8n type appears in **Genesis** on the Workloads page, where it can be authored into a workload template. Users can then launch and provision their own automation instance on demand within a project through **Hubble**.
 
+**Access and authentication** — Each instance runs with an nginx sidecar in the same pod. The ingress routes `/<namespace>/n8n/<workload-name>/` to the sidecar, which checks the user's Hubble login before forwarding the request to n8n. When `webhooks_public` is enabled, the sidecar also serves the webhook sub-paths without the login check and applies the webhook rate limit and CIDR allow list itself. Because all of this happens inside the pod rather than through ingress-controller annotations, it works the same with any ingress controller (ingress-nginx, Traefik, etc.).
+
 ---
 
 ## Prerequisites
 
+- An ingress controller in the cluster (ingress-nginx, Traefik, etc.)
 - Platform versions: `genesis-deployment >= 3.0.0-beta.1`, `orion-deployment >= 3.0.0-beta.1`
 - A Kubernetes storage class available in the cluster for workflow data persistence
 
@@ -54,6 +57,9 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `registry` | **string** · Required · Default: `docker.n8n.io/n8nio`<br>Container registry for the n8n image |
 | `repo` | **string** · Required · Default: `n8n`<br>n8n image repository |
 | `tag` | **string** · Required · Default: `latest`<br>n8n image tag (version) |
+| `nginx_registry` | **string** · Required · Default: `docker.io`<br>Registry to pull the nginx sidecar image from |
+| `nginx_repo` | **string** · Required · Default: `nginx`<br>Repository to pull the nginx sidecar image from |
+| `nginx_tag` | **string** · Required · Default: `latest`<br>Tag to pull the nginx sidecar image from |
 | `timezone` | **string** · Required · Default: `America/New_York`<br>Timezone for the n8n instance (affects scheduled workflow execution) |
 | `storage_class` | **k8sStorageClass** · Required<br>Storage class for the n8n workflow data persistent volume |
 | `storage_size` | **string** · Required · Default: `10Gi`<br>Size of the persistent volume for workflow and credential storage |
@@ -95,10 +101,13 @@ Point a wildcard record for `*.<domain>` at the cluster ingress address, or set 
 
 - n8n workflows, credentials, and execution history are stored in the persistent volume — data persists across workload restarts
 - The `timezone` setting affects when scheduled workflows (cron-based) trigger — set it to match your team's primary timezone
-- With `webhooks_public` disabled (the default) every path is behind the Juno session gate, so calls from third-party services are rejected at the ingress before n8n receives them, so enable it for any workflow driven by an inbound webhook
+- With `webhooks_public` disabled (the default) every path is behind the Juno session gate, so calls from third-party services are rejected by the nginx sidecar before n8n receives them, so enable it for any workflow driven by an inbound webhook
 - n8n is served under `/<namespace>/n8n/<workload-name>/`, where `<namespace>` is the environment the workload runs in — this full path is passed to the container as `N8N_PATH`, so the webhook URLs n8n displays in the editor already include it
 - Enabling `webhooks_public` exposes only the `webhook/`, `webhook-test/`, and `webhook-waiting/` sub-paths — the full public URL to hand to a third-party service is `https://<host>/<namespace>/n8n/<workload-name>/webhook/<path>`; the editor, REST API, and credential store stay authenticated
 - With `domain` set the whole instance lives on its own hostname, so the editor, the REST API and the webhooks are all served there and n8n's own login is what protects them
 - Authenticate exposed webhooks in the webhook node itself (header auth, basic auth, or a signature check) and narrow the source with `webhook_allow_cidrs` where the calling platform publishes its IP ranges
+- The webhook rate limit and CIDR allow list are enforced by the sidecar per caller IP, which it reads from `X-Forwarded-For` when the request arrives from an in-cluster (private or CGNAT range) proxy. If your ingress controller reaches pods from outside those ranges, every caller appears as the controller's address — the rate limit is then shared and a CIDR allow list blocks all webhook calls
+- The workload's network policy only accepts inbound traffic on the nginx sidecar port (8080); n8n's own port (5678) is not reachable from elsewhere in the cluster. It sets no egress rules, so outbound access is controlled entirely by your namespace/cluster
+- The ingress uses the `nginx` IngressClass by default; Kuiper 4.8.0 and later replaces it with the launching namespace's IngressClass
 - n8n has a fair-code license; for commercial use, review [n8n's licensing terms](https://github.com/n8n-io/n8n/blob/master/LICENSE.md)
 - Each workload instance is an isolated n8n environment with its own credential store
