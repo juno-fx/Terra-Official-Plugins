@@ -1,0 +1,64 @@
+{{- /* Terra may hand booleans over as strings; normalise so "false" is never truthy. */ -}}
+{{- $installNfd := eq (toString .Values.install_nfd) "true" -}}
+{{- $vgpuNodes := eq (toString .Values.vgpu_nodes) "true" -}}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-amd-gpu-operator
+  namespace: {{ .Release.Namespace }}
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    - post-delete-finalizer.argocd.argoproj.io
+    - post-delete-finalizer.argocd.argoproj.io/cleanup
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    # Upstream-standard namespace — AMD's docs and troubleshooting commands assume it.
+    namespace: kube-amd-gpu
+  source:
+    repoURL: {{ .Values.helm_repo }}
+    chart: gpu-operator-charts
+    targetRevision: {{ .Values.version }}
+    helm:
+      releaseName: amd-gpu-operator
+      values: |
+        node-feature-discovery:
+          enabled: {{ $installNfd }}
+        # GPU nodes use the amdgpu driver already in their kernel. KMM (and its
+        # cert-manager dependency) is only needed for the out-of-tree driver.
+        kmm:
+          enabled: false
+          watch: false
+        # Auto node remediation ships an Argo Workflows controller and multi-MB CRDs
+        # that collide with any existing Argo Workflows install.
+        remediation:
+          enabled: false
+          installCRDs: false
+        # ArgoCD applies the chart's CRDs on every sync, so the pre-upgrade CRD
+        # patch Job is redundant.
+        upgradeCRD: false
+        crds:
+          defaultCR:
+            install: true
+        deviceConfig:
+          spec:
+            selector:
+              {{- if $vgpuNodes }}
+              # null drops the chart's default amd-gpu key instead of merging with it.
+              feature.node.kubernetes.io/amd-gpu: null
+              feature.node.kubernetes.io/amd-vgpu: "true"
+              {{- else }}
+              feature.node.kubernetes.io/amd-gpu: "true"
+              {{- end }}
+            driver:
+              enable: false
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      # The DeviceConfig CRD is too large for client-side apply.
+      - ServerSideApply=true
+      - CreateNamespace=true

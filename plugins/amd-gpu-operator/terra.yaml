@@ -1,0 +1,44 @@
+resource_id: amd-gpu-operator
+name: AMD GPU Operator
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/amd-gpu-operator/assets/logo.png
+description: |
+  Enable GPU acceleration for compute workloads on AMD Instinct and Radeon GPUs. https://instinct.docs.amd.com/projects/gpu-operator
+category: Hardware
+tags:
+  - gpu
+  - amd
+  - operator
+  - cluster-level
+editable: true
+fields:
+  - name: version
+    description: Version of the AMD GPU Operator to install.
+    required: true
+    default: v1.5.1
+    type: select
+    options:
+      - v1.5.1
+      - v1.5.0
+      - v1.4.1
+  - name: helm_repo
+    description: Helm repository URL for the AMD GPU Operator chart.
+    required: true
+    default: "https://rocm.github.io/gpu-operator"
+    type: string
+  - name: install_nfd
+    description: |
+      Install Node Feature Discovery (NFD) alongside the operator. NFD labels the
+      nodes that carry an AMD GPU, which is how the operator finds them. Set this
+      to false when NFD is already running in the cluster, for example when the
+      NVIDIA GPU Operator is installed, so the two do not fight over the same CRDs.
+    required: false
+    default: true
+    type: boolean
+  - name: vgpu_nodes
+    description: |
+      Target nodes labelled amd-vgpu instead of amd-gpu. Set this to true when the
+      cluster nodes are virtual machines that see an AMD GPU virtual function
+      rather than the physical device.
+    required: false
+    default: false
+    type: boolean

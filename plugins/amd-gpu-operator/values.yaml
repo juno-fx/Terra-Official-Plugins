@@ -1,0 +1,4 @@
+version: "v1.5.1"
+helm_repo: "https://rocm.github.io/gpu-operator"
+install_nfd: true
+vgpu_nodes: false
