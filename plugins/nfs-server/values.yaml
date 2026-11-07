@@ -1,0 +1,3 @@
+size: "10Gi"
+storageClass: ""
+port: 32049
