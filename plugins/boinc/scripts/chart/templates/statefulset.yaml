@@ -105,9 +105,10 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
             # Image defaults CUSTOM_PORT to 8080, which the nginx sidecar owns.
-            # Move BOINC's HTTP port aside; the sidecar proxies to HTTPS 8181.
+            # Move BOINC's HTTP port to the base image default (3000); 8082 is
+            # taken by Selkies' websocket server. The sidecar proxies to HTTPS 8181.
             - name: CUSTOM_PORT
-              value: "8082"
+              value: "3000"
             - name: SUBFOLDER
               value: "/{{ .Release.Namespace }}/boinc/{{ .Values.name }}/"
             {{- range .Values.env }}
