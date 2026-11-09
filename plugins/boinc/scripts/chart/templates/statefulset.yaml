@@ -104,8 +104,12 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+            # Image defaults CUSTOM_PORT to 8080, which the nginx sidecar owns.
+            # Move BOINC's HTTP port aside; the sidecar proxies to HTTPS 8181.
+            - name: CUSTOM_PORT
+              value: "8082"
             - name: SUBFOLDER
-              value: "/{{ .Release.Namespace }}/polaris/{{ .Values.name }}/"
+              value: "/{{ .Release.Namespace }}/boinc/{{ .Values.name }}/"
             {{- range .Values.env }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}
@@ -128,7 +132,26 @@ spec:
               mountPath: "/etc/cont-init.d/{{ .name }}/{{ .file }}"
             {{- end }}
             {{- end }}
+
+        - name: nginx
+          image: "{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}"
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+          ports:
+            - containerPort: 8080
+              name: http
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+
       volumes:
+        - name: nginx-config
+          configMap:
+            name: "{{ .Values.name }}-nginx"
         - name: shm
           emptyDir:
             medium: Memory

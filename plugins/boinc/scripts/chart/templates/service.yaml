@@ -6,7 +6,7 @@ spec:
   selector:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
   ports:
-    - port: 8181
-      targetPort: 8181
+    - port: 8080
+      targetPort: 8080
       protocol: TCP
-      name: gui
+      name: http

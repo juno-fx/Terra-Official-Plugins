@@ -62,6 +62,9 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `storage_class` | **k8sStorageClass** · Required<br>Storage class for the BOINC config PVC mounted at `/config`                       |
 | `storage_size`  | **string** · Optional · Default: `10Gi`<br>Size of the BOINC config persistent volume                               |
 | `arch`          | **select** · Required · Default: `amd64`<br>Target CPU architecture — `amd64`, `arm64`, or `either` (no constraint) |
+| `nginx_registry` | **string** · Required · Default: `docker.io`<br>Registry for the nginx sidecar image that enforces the Hubble login |
+| `nginx_repo`    | **string** · Required · Default: `nginx`<br>nginx sidecar image repository                                         |
+| `nginx_tag`     | **string** · Required · Default: `alpine`<br>nginx sidecar image tag                                               |
 
 ### Resource Configuration
 
