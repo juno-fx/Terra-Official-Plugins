@@ -12,26 +12,21 @@ data:
   fields: |
     - name: icon
       default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/k9s/assets/logo.png"
-    - name: registry
+    - name: nginx_registry
       description: "Registry to pull the nginx sidecar image from"
       type: string
       required: true
       default: "docker.io"
-    - name: repo
+    - name: nginx_repo
       description: "Repository to pull the nginx sidecar image from"
       type: string
       required: true
       default: "nginx"
-    - name: tag
+    - name: nginx_tag
       description: "Tag to pull the nginx sidecar image from"
       type: string
       required: true
       default: "alpine"
-    - name: timezone
-      description: "Timezone to use for the k9s instance"
-      type: string
-      required: true
-      default: "America/New_York"
     - name: cluster_access
       description: "Kubernetes RBAC access level for the service account"
       type: select
@@ -40,11 +35,6 @@ data:
       options:
         - readonly-ns
         - admin-ns
-    - name: ingressNamespace
-      description: "Namespace of the ingress controller for plugin access"
-      type: string
-      required: true
-      default: "ingress-nginx"
   env_hints: |
     - name: EDITOR
       description: Text editor invoked by the k9s "e" (edit resource) command.
