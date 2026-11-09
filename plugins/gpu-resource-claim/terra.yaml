@@ -1,0 +1,47 @@
+resource_id: gpu-resource-claim
+name: GPU Resource Claim
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/gpu-resource-claim/assets/logo.png
+description: |
+  Create a Kubernetes ResourceClaim for a GPU in this workspace. Workloads that reference
+  the claim by name all land on the same GPU, so one GPU can be shared between several
+  workloads. The install name becomes the claim name. Install multiple times for
+  multiple claims — each install is independent. Requires a GPU operator running its
+  DRA driver (e.g. amd-gpu-operator with use_dra enabled).
+category: Hardware
+tags:
+  - gpu
+  - dra
+  - amd
+  - nvidia
+fields:
+  - name: vendor
+    description: |
+      GPU vendor the claim is for. Picks the DRA device class: amd uses gpu.amd.com,
+      nvidia uses gpu.nvidia.com. The matching GPU operator must be running its DRA
+      driver, otherwise the claim never allocates and pods stay Pending.
+    required: true
+    default: amd
+    type: select
+    options:
+      - amd
+      - nvidia
+  - name: gpu_count
+    description: |
+      Number of GPUs allocated to this claim. Pods referencing the claim see all of them.
+    required: true
+    default: 1
+    type: int
+  - name: min_memory
+    description: |
+      Only allocate GPUs with at least this much memory, e.g. 8Gi. Use it to skip
+      integrated GPUs on nodes that also carry a discrete card. Leave empty for any GPU.
+    required: false
+    type: string
+  - name: cel_selector
+    description: |
+      Optional extra CEL expression evaluated per device, for example
+      device.attributes["gpu.amd.com"].deviceID == "0x747e" to pin one GPU model.
+      Combined with min_memory when both are set. See kubectl get resourceslices -o yaml
+      for the attribute names your driver publishes.
+    required: false
+    type: string

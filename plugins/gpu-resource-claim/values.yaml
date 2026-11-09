@@ -1,0 +1,4 @@
+vendor: "amd"
+gpu_count: 1
+min_memory: ""
+cel_selector: ""

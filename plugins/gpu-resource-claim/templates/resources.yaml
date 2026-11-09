@@ -1,0 +1,37 @@
+{{- /*
+  One ResourceClaim per install, named after the install, in the workspace namespace.
+  Every pod in the workspace that references this claim by name is placed on the same
+  GPU(s) — that is how several workloads share one GPU under DRA. Install the plugin
+  again under another name for a second, independent claim.
+*/ -}}
+{{- $classes := dict "amd" "gpu.amd.com" "nvidia" "gpu.nvidia.com" -}}
+{{- $vendor := toString .Values.vendor -}}
+{{- $deviceClass := index $classes $vendor -}}
+{{- if not $deviceClass }}
+{{- fail (printf "vendor must be amd or nvidia, got %q" $vendor) }}
+{{- end }}
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaim
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  devices:
+    requests:
+      - name: gpu
+        exactly:
+          deviceClassName: {{ $deviceClass }}
+          allocationMode: ExactCount
+          count: {{ .Values.gpu_count }}
+          {{- if or .Values.min_memory .Values.cel_selector }}
+          # Selectors are ANDed: a device must satisfy every expression.
+          selectors:
+            {{- with .Values.min_memory }}
+            - cel:
+                expression: {{ printf "device.capacity[%q].memory.compareTo(quantity(%q)) >= 0" $deviceClass . | quote }}
+            {{- end }}
+            {{- with .Values.cel_selector }}
+            - cel:
+                expression: {{ . | quote }}
+            {{- end }}
+          {{- end }}
