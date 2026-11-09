@@ -79,5 +79,5 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 - To persist notebooks, add a volume mount for `/home/` when creating the workload in Genesis
 - `gpu: nvidia` requires the **NVIDIA GPU Operator** plugin on the cluster
 - `gpu: amd` requires the **AMD GPU Operator** plugin with `use_dra` enabled and a **GPU Resource Claim** installed in the workspace; pass its name as `gpu_claim`. Several notebooks on one claim share the GPU with no isolation between them
-- With `amd`, a start-up hook adds the notebook user to the groups owning the injected `/dev/kfd` and `/dev/dri/*` device nodes. This relies on the Jupyter docker-stacks `start.sh` hook directory, so use a docker-stacks based image. ROCm user-space libraries are not part of the default images
+- With `amd`, a start-up hook makes the injected `/dev/kfd` and `/dev/dri/*` device nodes usable by the notebook user (root-owned nodes are opened to `0666` inside the container; host-group-owned nodes get the user added to that group). This relies on the Jupyter docker-stacks `start.sh` hook directory, so use a docker-stacks based image. ROCm user-space libraries are not part of the default images
 - Notebooks run with the project user's UID/GID — ensure mounted volumes have appropriate permissions
