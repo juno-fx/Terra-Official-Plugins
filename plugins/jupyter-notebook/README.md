@@ -58,7 +58,8 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `nginx_registry` | **string** · Required · Default: `docker.io`<br>Registry to pull the nginx sidecar image from |
 | `nginx_repo` | **string** · Required · Default: `nginx`<br>Repository to pull the nginx sidecar image from |
 | `nginx_tag` | **string** · Required · Default: `alpine`<br>Tag to pull the nginx sidecar image from |
-| `gpu` | **boolean** · Required<br>Enable GPU access for the notebook server |
+| `gpu` | **multi** · Optional · Options: `nvidia`, `amd`<br>GPU vendors the notebook may use. Empty = CPU only. Pick one: `nvidia` requests `nvidia.com/gpu` through the NVIDIA GPU Operator; `amd` attaches a DRA ResourceClaim. Selecting both fails at launch until NVIDIA runs through DRA. |
+| `gpu_claim` | **string** · Required when `gpu` includes `amd`<br>Name of a GPU ResourceClaim in the workspace, i.e. a **GPU Resource Claim** plugin install. Every notebook referencing the same claim shares that GPU. |
 
 ### Custom Environment Variables
 
@@ -76,5 +77,7 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 
 - Use images from the [Jupyter Docker Stacks](https://quay.io/organization/jupyter) such as `datascience-notebook`, `scipy-notebook`, or `tensorflow-notebook` for a pre-configured environment
 - To persist notebooks, add a volume mount for `/home/` when creating the workload in Genesis
-- GPU support requires the **NVIDIA GPU Operator** plugin to be installed on the cluster
+- `gpu: nvidia` requires the **NVIDIA GPU Operator** plugin on the cluster
+- `gpu: amd` requires the **AMD GPU Operator** plugin with `use_dra` enabled and a **GPU Resource Claim** installed in the workspace; pass its name as `gpu_claim`. Several notebooks on one claim share the GPU with no isolation between them
+- With `amd`, a start-up hook adds the notebook user to the groups owning the injected `/dev/kfd` and `/dev/dri/*` device nodes. This relies on the Jupyter docker-stacks `start.sh` hook directory, so use a docker-stacks based image. ROCm user-space libraries are not part of the default images
 - Notebooks run with the project user's UID/GID — ensure mounted volumes have appropriate permissions

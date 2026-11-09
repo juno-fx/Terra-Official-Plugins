@@ -1,3 +1,22 @@
+{{- /*
+  gpu is a multi-select list (nvidia, amd). Older saved workloads carry the previous
+  boolean; map true -> [nvidia] so they keep working.
+*/ -}}
+{{- $gpu := .Values.gpu -}}
+{{- if kindIs "slice" $gpu -}}
+{{- else if has (toString $gpu) (list "true" "false" "" "<nil>") -}}
+{{- $gpu = ternary (list "nvidia") (list) (eq (toString $gpu) "true") -}}
+{{- else -}}
+{{- $gpu = splitList "," (toString $gpu) -}}
+{{- end -}}
+{{- $nvidia := has "nvidia" $gpu -}}
+{{- $amd := has "amd" $gpu -}}
+{{- if and $nvidia $amd -}}
+{{- fail "gpu: select either nvidia or amd, not both. A pod cannot require both an NVIDIA device plugin GPU and an AMD DRA claim; selecting both is supported once NVIDIA runs through DRA." -}}
+{{- end -}}
+{{- if and $amd (not .Values.gpu_claim) -}}
+{{- fail "gpu_claim is required when gpu includes amd: name of a GPU Resource Claim installed in this workspace" -}}
+{{- end -}}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -60,8 +79,15 @@ spec:
           operator: "Exists"
           effect: "NoSchedule"
 
-      {{- if .Values.gpu }}
+      {{- if $nvidia }}
       runtimeClassName: nvidia
+      {{- end }}
+
+      {{- if $amd }}
+      # DRA: the claim pins which GPU this pod gets; pods sharing a claim share the GPU.
+      resourceClaims:
+        - name: gpu
+          resourceClaimName: {{ .Values.gpu_claim | quote }}
       {{- end }}
 
       {{- if .Values.pullSecret }}
@@ -78,9 +104,9 @@ spec:
               memory: "{{ .Values.memory }}"
               cpu: "{{ .Values.cpu }}"
             # gotmpl's or is a function taking 2 args - this is "X or Y or Z" translated to python
-            {{- if or (or .Values.gpu .Values.memoryLimit) .Values.cpuLimit }}
+            {{- if or (or $nvidia .Values.memoryLimit) .Values.cpuLimit }}
             limits:
-            {{- if .Values.gpu }}
+            {{- if $nvidia }}
               nvidia.com/gpu: "1"
             {{- end }}
             {{- if .Values.cpuLimit }}
@@ -89,6 +115,10 @@ spec:
             {{- if .Values.memoryLimit }}
               memory: "{{ .Values.memoryLimit }}"
             {{- end }}
+            {{- end }}
+            {{- if $amd }}
+            claims:
+              - name: gpu
             {{- end }}
           startupProbe:
             tcpSocket:
@@ -122,6 +152,14 @@ spec:
               value: {{ .value | quote }}
             {{- end }}
           volumeMounts:
+            {{- if $amd }}
+            # Runs as root in start.sh before the switch to NB_USER; adds the user to the
+            # groups owning the injected GPU device nodes.
+            - name: gpu-hook
+              mountPath: /usr/local/bin/before-notebook.d/10-gpu-device-groups.sh
+              subPath: 10-gpu-device-groups.sh
+              readOnly: true
+            {{- end }}
             {{- if .Values.volumeMounts }}
             {{- toYaml .Values.volumeMounts | nindent 12 }}
             {{- end }}
@@ -151,6 +189,12 @@ spec:
         - name: nginx-config
           configMap:
             name: "{{ .Values.name }}-nginx"
+        {{- if $amd }}
+        - name: gpu-hook
+          configMap:
+            name: "{{ .Values.name }}-gpu-hook"
+            defaultMode: 0755
+        {{- end }}
         {{- if .Values.volumes }}
         {{- toYaml .Values.volumes | nindent 8 }}
         {{- end }}

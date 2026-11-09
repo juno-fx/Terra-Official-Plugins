@@ -16,9 +16,16 @@ data:
       required: true
       default: "quay.io/jupyter"
     - name: gpu
-      description: "Use a GPU"
-      type: boolean
-      required: true
+      description: "GPU vendors this notebook may use. Leave empty for CPU only. Select one vendor; selecting both is not supported until NVIDIA runs through DRA."
+      type: multi
+      required: false
+      options:
+        - nvidia
+        - amd
+    - name: gpu_claim
+      description: "Name of the GPU ResourceClaim in this workspace (a GPU Resource Claim plugin install). Required when amd is selected; notebooks referencing the same claim share that GPU."
+      type: string
+      required: false
     - name: repo
       description: "Repository to pull the image from"
       type: string

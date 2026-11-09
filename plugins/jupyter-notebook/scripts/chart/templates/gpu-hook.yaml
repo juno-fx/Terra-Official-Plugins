@@ -1,0 +1,26 @@
+{{- $gpu := .Values.gpu -}}
+{{- if kindIs "slice" $gpu -}}
+{{- else if has (toString $gpu) (list "true" "false" "" "<nil>") -}}
+{{- $gpu = ternary (list "nvidia") (list) (eq (toString $gpu) "true") -}}
+{{- else -}}
+{{- $gpu = splitList "," (toString $gpu) -}}
+{{- end -}}
+{{- if has "amd" $gpu }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Values.name }}-gpu-hook"
+data:
+  # Sourced by the Jupyter docker-stacks start.sh (before-notebook.d) as root, before it
+  # switches to NB_USER. GPU device nodes injected via CDI keep their host group ownership
+  # (video / render), so the notebook user is added to those groups to be able to open them.
+  10-gpu-device-groups.sh: |
+    #!/bin/bash
+    for dev in /dev/kfd /dev/dri/card* /dev/dri/renderD*; do
+      [ -e "$dev" ] || continue
+      gid=$(stat -c %g "$dev")
+      [ "$gid" = "0" ] && continue
+      getent group "$gid" >/dev/null 2>&1 || groupadd -g "$gid" "gpu-$gid"
+      usermod -aG "$gid" "${NB_USER}" && echo "gpu-hook: added ${NB_USER} to gid $gid for $dev"
+    done
+{{- end }}
