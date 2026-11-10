@@ -8,7 +8,7 @@ metadata:
     kuiper.juno-innovations.com/aws-private-subnet: "{{ .Values.aws_private_subnet | default false }}"
     {{- if and .Values.aws_private_subnet .Values.load_balancer }}
     kuiper.juno-innovations.com/aws-load-balancer: "true"
-    service.beta.kubernetes.io/aws-load-balancer-type: external
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
     service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: instance
     service.beta.kubernetes.io/aws-load-balancer-scheme: {{ .Values.load_balancer }}
     {{- end }}
