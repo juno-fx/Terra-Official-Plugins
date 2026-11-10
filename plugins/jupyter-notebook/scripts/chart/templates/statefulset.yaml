@@ -84,6 +84,12 @@ spec:
             limits:
             {{- if $nvidia }}
               nvidia.com/gpu: "1"
+              {{- if gt (int .Values.gpu_memory) 0 }}
+              nvidia.com/gpumem: "{{ .Values.gpu_memory }}"
+              {{- end }}
+              {{- if gt (int .Values.gpu_cores) 0 }}
+              nvidia.com/gpucores: "{{ .Values.gpu_cores }}"
+              {{- end }}
             {{- end }}
             {{- if $amd }}
               amd.com/gpu: "1"

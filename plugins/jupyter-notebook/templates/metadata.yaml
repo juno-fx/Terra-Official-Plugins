@@ -28,6 +28,16 @@ data:
       options:
         - nvidia
         - amd
+    - name: gpu_memory
+      description: "GPU memory in MiB to reserve for the notebook (nvidia only). 0 takes the whole GPU. A value makes the notebook a GPU slice that can share the card with others; requires the HAMi GPU Sharing plugin."
+      type: int
+      required: false
+      default: 0
+    - name: gpu_cores
+      description: "Share of the GPU's compute for the notebook, 0-100 (nvidia only, HAMi). 0 sets no compute limit."
+      type: int
+      required: false
+      default: 0
     - name: repo
       description: "Repository to pull the image from"
       type: string

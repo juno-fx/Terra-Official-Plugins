@@ -60,6 +60,8 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `nginx_tag` | **string** · Required · Default: `alpine`<br>Tag to pull the nginx sidecar image from |
 | `gpu` | **boolean** · Required · Default: `false`<br>Attach a GPU to the notebook. |
 | `gpu_vendor` | **select** · Optional · Default: `nvidia` · Options: `nvidia`, `amd`<br>Which vendor's GPU to request when `gpu` is on: `nvidia` renders `nvidia.com/gpu` (NVIDIA GPU Operator), `amd` renders `amd.com/gpu` (AMD GPU Operator). Ignored when `gpu` is off. |
+| `gpu_memory` | **int** · Optional · Default: `0`<br>GPU memory in MiB to reserve (`nvidia.com/gpumem`). `0` takes the whole GPU. A value makes the notebook a slice that shares the card; needs the HAMi GPU Sharing plugin. |
+| `gpu_cores` | **int** · Optional · Default: `0`<br>Share of the GPU's compute, 0–100 (`nvidia.com/gpucores`). `0` sets no compute limit. HAMi only. |
 
 ### Custom Environment Variables
 
@@ -78,6 +80,7 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 - Use images from the [Jupyter Docker Stacks](https://quay.io/organization/jupyter) such as `datascience-notebook`, `scipy-notebook`, or `tensorflow-notebook` for a pre-configured environment
 - To persist notebooks, add a volume mount for `/home/` when creating the workload in Genesis
 - `gpu` on with `gpu_vendor: nvidia` requires the **NVIDIA GPU Operator** plugin on the cluster
+- `gpu_memory` and `gpu_cores` only render for `gpu_vendor: nvidia` and need the **HAMi GPU Sharing** plugin. Without HAMi, leave both at `0`: the NVIDIA device plugin does not know those resource names and the pod would never schedule
 - `gpu` on with `gpu_vendor: amd` requires the **AMD GPU Operator** plugin on the cluster. A pod can request one vendor only; on a mixed cluster the admin presets `gpu_vendor` per template
 - With `gpu_vendor: amd`, a start-up hook gives the notebook user access to the GPU device nodes. Requires a Jupyter docker-stacks based image
 - Notebooks run with the project user's UID/GID — ensure mounted volumes have appropriate permissions
