@@ -12,8 +12,8 @@ metadata:
   name: "{{ .Values.name }}-gpu-hook"
 data:
   # Sourced by the Jupyter docker-stacks start.sh (before-notebook.d) as root, before it
-  # switches to NB_USER. GPU device nodes injected via CDI arrive root:root 0660 (containerd
-  # default) or with a host group (video / render). Both are unreadable by NB_USER, so
+  # switches to NB_USER. The GPU device nodes the AMD device plugin injects arrive either
+  # root:root 0660 or with a host group (video / render). Both are unreadable by NB_USER, so
   # root-group nodes are opened up (the container's /dev is a private tmpfs, so this does
   # not touch the host) and host-group nodes get NB_USER added to that group.
   10-gpu-device-groups.sh: |

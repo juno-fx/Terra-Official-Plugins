@@ -58,8 +58,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `nginx_registry` | **string** · Required · Default: `docker.io`<br>Registry to pull the nginx sidecar image from |
 | `nginx_repo` | **string** · Required · Default: `nginx`<br>Repository to pull the nginx sidecar image from |
 | `nginx_tag` | **string** · Required · Default: `alpine`<br>Tag to pull the nginx sidecar image from |
-| `gpu` | **multi** · Optional · Options: `nvidia`, `amd`<br>GPU vendors the notebook may use. Empty = CPU only. Pick one: `nvidia` requests `nvidia.com/gpu` through the NVIDIA GPU Operator; `amd` attaches a DRA ResourceClaim. Selecting both fails at launch until NVIDIA runs through DRA. |
-| `gpu_claim` | **string** · Required when `gpu` includes `amd`<br>Name of a GPU ResourceClaim in the workspace, i.e. a **GPU Resource Claim** plugin install. Every notebook referencing the same claim shares that GPU. |
+| `gpu` | **multi** · Optional · Options: `nvidia`, `amd`<br>GPU vendor to attach one GPU from. Empty = CPU only. Pick one: `nvidia` requests `nvidia.com/gpu` through the NVIDIA GPU Operator; `amd` requests `amd.com/gpu` through the AMD GPU Operator. Selecting both fails at launch. |
 
 ### Custom Environment Variables
 
@@ -78,6 +77,6 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 - Use images from the [Jupyter Docker Stacks](https://quay.io/organization/jupyter) such as `datascience-notebook`, `scipy-notebook`, or `tensorflow-notebook` for a pre-configured environment
 - To persist notebooks, add a volume mount for `/home/` when creating the workload in Genesis
 - `gpu: nvidia` requires the **NVIDIA GPU Operator** plugin on the cluster
-- `gpu: amd` requires the **AMD GPU Operator** plugin with `use_dra` enabled and a **GPU Resource Claim** installed in the workspace; pass its name as `gpu_claim`. Several notebooks on one claim share the GPU with no isolation between them
-- With `amd`, a start-up hook makes the injected `/dev/kfd` and `/dev/dri/*` device nodes usable by the notebook user (root-owned nodes are opened to `0666` inside the container; host-group-owned nodes get the user added to that group). This relies on the Jupyter docker-stacks `start.sh` hook directory, so use a docker-stacks based image. ROCm user-space libraries are not part of the default images
+- `gpu: amd` requires the **AMD GPU Operator** plugin on the cluster. The notebook holds the whole GPU while it runs
+- With `amd`, a start-up hook makes the injected `/dev/kfd` and `/dev/dri/*` device nodes usable by the notebook user (root-owned nodes are opened to `0666` inside the container; host-group-owned nodes get the user added to that group). This relies on the Jupyter docker-stacks `start.sh` hook directory, so use a docker-stacks based image. ROCm user-space libraries are not part of the default images; e.g. `pip install torch --index-url https://download.pytorch.org/whl/rocm6.4`
 - Notebooks run with the project user's UID/GID — ensure mounted volumes have appropriate permissions

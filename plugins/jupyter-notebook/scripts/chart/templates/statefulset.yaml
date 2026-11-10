@@ -12,10 +12,7 @@
 {{- $nvidia := has "nvidia" $gpu -}}
 {{- $amd := has "amd" $gpu -}}
 {{- if and $nvidia $amd -}}
-{{- fail "gpu: select either nvidia or amd, not both. A pod cannot require both an NVIDIA device plugin GPU and an AMD DRA claim; selecting both is supported once NVIDIA runs through DRA." -}}
-{{- end -}}
-{{- if and $amd (not .Values.gpu_claim) -}}
-{{- fail "gpu_claim is required when gpu includes amd: name of a GPU Resource Claim installed in this workspace" -}}
+{{- fail "gpu: select either nvidia or amd, not both. Requesting nvidia.com/gpu and amd.com/gpu together only schedules on a node that has both." -}}
 {{- end -}}
 apiVersion: apps/v1
 kind: StatefulSet
@@ -83,13 +80,6 @@ spec:
       runtimeClassName: nvidia
       {{- end }}
 
-      {{- if $amd }}
-      # DRA: the claim pins which GPU this pod gets; pods sharing a claim share the GPU.
-      resourceClaims:
-        - name: gpu
-          resourceClaimName: {{ .Values.gpu_claim | quote }}
-      {{- end }}
-
       {{- if .Values.pullSecret }}
       imagePullSecrets:
         - name: "{{ .Values.pullSecret }}"
@@ -104,10 +94,13 @@ spec:
               memory: "{{ .Values.memory }}"
               cpu: "{{ .Values.cpu }}"
             # gotmpl's or is a function taking 2 args - this is "X or Y or Z" translated to python
-            {{- if or (or $nvidia .Values.memoryLimit) .Values.cpuLimit }}
+            {{- if or (or $nvidia $amd) (or .Values.memoryLimit .Values.cpuLimit) }}
             limits:
             {{- if $nvidia }}
               nvidia.com/gpu: "1"
+            {{- end }}
+            {{- if $amd }}
+              amd.com/gpu: "1"
             {{- end }}
             {{- if .Values.cpuLimit }}
               cpu: "{{ .Values.cpuLimit }}"
@@ -115,10 +108,6 @@ spec:
             {{- if .Values.memoryLimit }}
               memory: "{{ .Values.memoryLimit }}"
             {{- end }}
-            {{- end }}
-            {{- if $amd }}
-            claims:
-              - name: gpu
             {{- end }}
           startupProbe:
             tcpSocket:

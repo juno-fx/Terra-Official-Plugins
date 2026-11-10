@@ -1,3 +1,0 @@
-apiVersion: v1
-name: gpu-resource-claim
-version: 0.0.1

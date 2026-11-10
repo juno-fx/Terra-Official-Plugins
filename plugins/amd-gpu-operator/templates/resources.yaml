@@ -2,10 +2,6 @@
 {{- $installNfd := eq (toString .Values.install_nfd) "true" -}}
 {{- $vgpuNodes := eq (toString .Values.vgpu_nodes) "true" -}}
 {{- $detectAll := eq (toString .Values.detect_all_gpus) "true" -}}
-{{- $useDra := eq (toString .Values.use_dra) "true" -}}
-{{- if and $useDra (hasPrefix "v1.4" (toString .Values.version)) }}
-{{- fail "use_dra requires AMD GPU Operator v1.5.0 or newer" }}
-{{- end }}
 {{- /*
   The upstream NFD rule only labels an allowlist of PCI device IDs (Instinct, Radeon Pro,
   a few Radeon RX). This rule labels any AMD GPU: vendor 1002 with a display or
@@ -80,17 +76,6 @@ spec:
               {{- end }}
             driver:
               enable: false
-            {{- if $useDra }}
-            # The device plugin and the DRA driver are mutually exclusive.
-            devicePlugin:
-              enableDevicePlugin: false
-            draDriver:
-              enable: true
-              # The chart defaults to :latest, which is still v1.0.0. That build publishes
-              # an empty driverVersion when the node uses the in-kernel amdgpu driver, and
-              # the API server rejects the ResourceSlice. Fixed in v1.0.1.
-              image: docker.io/rocm/k8s-gpu-dra-driver:v1.0.1
-            {{- end }}
   syncPolicy:
     automated:
       prune: true
