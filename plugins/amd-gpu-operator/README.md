@@ -65,14 +65,14 @@ resources:
     amd.com/gpu: "1"
 ```
 
-In the catalog, the **Jupyter Notebook** workload template's `gpu` field accepts `amd` and renders this limit.
+In the catalog, the **Jupyter Notebook** workload template renders this limit when `gpu` is on and `gpu_vendor` is `amd`.
 
 ---
 
 ## Notes
 
 - This plugin is **editable** — you can change the version and node targeting after install via Terra
-- Workload templates whose `gpu` field is a plain NVIDIA toggle request `nvidia.com/gpu` and do not attach an AMD GPU; only templates offering an `amd` option (Jupyter Notebook) render `amd.com/gpu`
+- Workload templates whose `gpu` field is a plain NVIDIA toggle request `nvidia.com/gpu` and do not attach an AMD GPU; only templates with a `gpu_vendor` field (Jupyter Notebook) render `amd.com/gpu`
 - GPU nodes are labelled `feature.node.kubernetes.io/amd-gpu: "true"` (or `amd-vgpu` for virtual functions) automatically. With `detect_all_gpus: true` that covers any AMD GPU; with `false` only the GPUs on AMD's supported list are labelled, and other nodes need `kubectl label node <node> feature.node.kubernetes.io/amd-gpu=true`
 - GPUs outside AMD's supported list are detected and scheduled on a best-effort basis — the device plugin works with any GPU driven by `amdgpu`, but the metrics exporter is built for Instinct and may not report on them
 - If operator pods on a GPU node stay in `Init:0/1`, the node has no `amdgpu` driver loaded — install one on the node

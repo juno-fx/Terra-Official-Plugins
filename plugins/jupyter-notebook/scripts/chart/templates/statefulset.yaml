@@ -1,19 +1,6 @@
-{{- /*
-  gpu is a multi-select list (nvidia, amd). Older saved workloads carry the previous
-  boolean; map true -> [nvidia] so they keep working.
-*/ -}}
-{{- $gpu := .Values.gpu -}}
-{{- if kindIs "slice" $gpu -}}
-{{- else if has (toString $gpu) (list "true" "false" "" "<nil>") -}}
-{{- $gpu = ternary (list "nvidia") (list) (eq (toString $gpu) "true") -}}
-{{- else -}}
-{{- $gpu = splitList "," (toString $gpu) -}}
-{{- end -}}
-{{- $nvidia := has "nvidia" $gpu -}}
-{{- $amd := has "amd" $gpu -}}
-{{- if and $nvidia $amd -}}
-{{- fail "gpu: select either nvidia or amd, not both. Requesting nvidia.com/gpu and amd.com/gpu together only schedules on a node that has both." -}}
-{{- end -}}
+{{- $gpuVendor := include "jupyter-notebook.gpuVendor" . -}}
+{{- $nvidia := eq $gpuVendor "nvidia" -}}
+{{- $amd := eq $gpuVendor "amd" -}}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:

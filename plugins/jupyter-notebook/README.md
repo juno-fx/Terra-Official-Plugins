@@ -58,7 +58,8 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `nginx_registry` | **string** · Required · Default: `docker.io`<br>Registry to pull the nginx sidecar image from |
 | `nginx_repo` | **string** · Required · Default: `nginx`<br>Repository to pull the nginx sidecar image from |
 | `nginx_tag` | **string** · Required · Default: `alpine`<br>Tag to pull the nginx sidecar image from |
-| `gpu` | **multi** · Optional · Options: `nvidia`, `amd`<br>GPU vendor to attach one GPU from. Empty = CPU only. Pick one: `nvidia` requests `nvidia.com/gpu` through the NVIDIA GPU Operator; `amd` requests `amd.com/gpu` through the AMD GPU Operator. Selecting both fails at launch. |
+| `gpu` | **boolean** · Required · Default: `false`<br>Attach one GPU to the notebook. The notebook holds the whole GPU while it runs. |
+| `gpu_vendor` | **select** · Optional · Default: `nvidia` · Options: `nvidia`, `amd`<br>Which vendor's GPU to request when `gpu` is on: `nvidia` renders `nvidia.com/gpu` (NVIDIA GPU Operator), `amd` renders `amd.com/gpu` (AMD GPU Operator). Ignored when `gpu` is off. |
 
 ### Custom Environment Variables
 
@@ -66,7 +67,7 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 
 | Variable | Description |
 |----------|--------------|
-| `GRANT_SUDO` | Grants the notebook user passwordless sudo, useful for installing OS packages with apt from within the notebook's terminal. |
+| `GRANT_SUDO` | Set to `yes` (or `1`; `true` is ignored) to grant the notebook user passwordless sudo, useful for installing OS packages with apt from within the notebook's terminal. |
 | `RESTARTABLE` | Runs Jupyter in a restart loop so quitting or a kernel restart doesn't kill the container. |
 | `DOCKER_STACKS_JUPYTER_CMD` | Launches a different frontend (`notebook`, `nbclassic`, `retro`) instead of the default JupyterLab. |
 
@@ -76,7 +77,7 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 
 - Use images from the [Jupyter Docker Stacks](https://quay.io/organization/jupyter) such as `datascience-notebook`, `scipy-notebook`, or `tensorflow-notebook` for a pre-configured environment
 - To persist notebooks, add a volume mount for `/home/` when creating the workload in Genesis
-- `gpu: nvidia` requires the **NVIDIA GPU Operator** plugin on the cluster
-- `gpu: amd` requires the **AMD GPU Operator** plugin on the cluster. The notebook holds the whole GPU while it runs
-- With `amd`, a start-up hook makes the injected `/dev/kfd` and `/dev/dri/*` device nodes usable by the notebook user (root-owned nodes are opened to `0666` inside the container; host-group-owned nodes get the user added to that group). This relies on the Jupyter docker-stacks `start.sh` hook directory, so use a docker-stacks based image. ROCm user-space libraries are not part of the default images; e.g. `pip install torch --index-url https://download.pytorch.org/whl/rocm6.4`
+- `gpu` on with `gpu_vendor: nvidia` requires the **NVIDIA GPU Operator** plugin on the cluster
+- `gpu` on with `gpu_vendor: amd` requires the **AMD GPU Operator** plugin on the cluster. A pod can request one vendor only; on a mixed cluster the admin presets `gpu_vendor` per template (or users pick at launch)
+- With `gpu_vendor: amd`, a start-up hook makes the injected `/dev/kfd` and `/dev/dri/*` device nodes usable by the notebook user (root-owned nodes are opened to `0666` inside the container; host-group-owned nodes get the user added to that group). This relies on the Jupyter docker-stacks `start.sh` hook directory, so use a docker-stacks based image. ROCm user-space libraries are not part of the default images. Install a PyTorch ROCm wheel whose ROCm generation matches the node (e.g. `pip install torch --index-url https://download.pytorch.org/whl/rocm7.2`); a plain `pip install torch` gives the CUDA build, and a mismatched ROCm generation can segfault on first kernel launch (seen with a `rocm7.0` wheel on a Strix Halo node running a 7.2 kernel)
 - Notebooks run with the project user's UID/GID — ensure mounted volumes have appropriate permissions
