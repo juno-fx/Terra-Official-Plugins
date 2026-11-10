@@ -1,6 +1,5 @@
-{{- $gpuVendor := include "jupyter-notebook.gpuVendor" . -}}
-{{- $nvidia := eq $gpuVendor "nvidia" -}}
-{{- $amd := eq $gpuVendor "amd" -}}
+{{- $amd := and .Values.gpu (eq .Values.gpu_vendor "amd") -}}
+{{- $nvidia := and .Values.gpu (not $amd) -}}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:

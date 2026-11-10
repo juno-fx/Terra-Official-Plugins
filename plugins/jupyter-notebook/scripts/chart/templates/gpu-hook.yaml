@@ -1,4 +1,4 @@
-{{- if eq (include "jupyter-notebook.gpuVendor" .) "amd" }}
+{{- if and .Values.gpu (eq .Values.gpu_vendor "amd") }}
 apiVersion: v1
 kind: ConfigMap
 metadata:

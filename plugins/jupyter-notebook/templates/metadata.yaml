@@ -16,7 +16,7 @@ data:
       required: true
       default: "quay.io/jupyter"
     - name: gpu
-      description: "Attach one GPU to the notebook. The notebook holds the whole GPU while it runs."
+      description: "Attach a GPU to the notebook."
       type: boolean
       required: true
       default: false
