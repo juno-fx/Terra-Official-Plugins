@@ -14,7 +14,9 @@ metadata:
     {{- end }}
     juno-innovations.com/workload: "Virtual Machine"
     kuiper.juno-innovations.com/aws-remote-connection: "true"
-    kuiper.juno-innovations.com/expose: "22"
+    {{- if .Values.ports }}
+    kuiper.juno-innovations.com/expose: "{{ range $i, $p := .Values.ports }}{{ if $i }},{{ end }}{{ $p.service_port }}:{{ $p.instance_port }}{{ end }}"
+    {{- end }}
 spec:
   parameters:
     name: "{{.Release.Namespace}}-{{.Values.name}}"

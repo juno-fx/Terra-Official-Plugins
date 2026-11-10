@@ -63,6 +63,21 @@ data:
       options:
         - internet-facing
         - internal
+    - name: ports
+      description: "Ports to expose from the instance (e.g. 22 for SSH, 3389 for RDP, 8443 for NICE DCV). The instance's security groups must allow them. Fixed at launch"
+      required: false
+      type: list
+      fields:
+        - name: instance_port
+          description: Port the application listens on inside the instance
+          required: true
+          type: int
+          default: 22
+        - name: service_port
+          description: Port clients connect to. Only differs from instance_port with aws_private_subnet, where it is the port on the cluster Service or load balancer
+          required: true
+          type: int
+          default: 22
     - name: region
       description: AWS Region
       required: true

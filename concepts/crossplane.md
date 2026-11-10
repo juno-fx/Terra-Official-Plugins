@@ -37,15 +37,20 @@ spec:
 
 EC2 fields, all user-supplied at launch: `ami_image_id`, `instance_type` (default `t3.micro`),
 `region`, `subnet_id`, `security_group_ids` (list), `block_device_mappings` (list: mount path +
-size GB), `delete_on_termination` (boolean, default `true`), `provider_config_ref` (default
+size GB), `delete_on_termination` (boolean, default `true`), `ports` (list: `instance_port` +
+`service_port`, default `22` → `22`), `provider_config_ref` (default
 `aws-provider-argocd-provider-config`).
+
+The chart joins `ports` into the `expose` annotation as `service_port:instance_port` pairs
+(`"3389:3389,2222:22"`), and omits the annotation when the list is empty.
 
 ## Surfacing the instance — Kuiper's EC2 flow
 
 Kuiper watches the EC2 resource at launch and, once AWS DNS is available:
 
 - builds an **ExternalName Service** from the `kuiper.juno-innovations.com/expose` annotation
-  (comma-separated ports, e.g. `22,3389`) — service name is **deterministic**:
+  (comma-separated `port` or `port:targetPort` entries, e.g. `22,3389`) — service name is
+  **deterministic**:
   `<name>-ec2-svc`
 - computes and writes the `connection` annotation when `kuiper.juno-innovations.com/
   aws-remote-connection: "true"` is set (`use-private-dns` toggles private vs public DNS)
