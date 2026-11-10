@@ -1,14 +1,18 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Release.Name }}
+  name: "{{ .Values.name }}"
   labels:
-    kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
 spec:
   selector:
-    kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
   ports:
     - port: 8080
       targetPort: 8080
       protocol: TCP
-      name: proxy
+      name: http
+    - port: {{ .Values.app_port }}
+      targetPort: {{ .Values.app_port }}
+      protocol: TCP
+      name: git

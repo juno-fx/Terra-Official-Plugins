@@ -77,5 +77,7 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 
 - Each launched Gitea workload gets its own isolated Git server and persistent storage volume
 - The nginx sidecar handles web traffic proxying and is required for the Gitea web UI to function within the Juno ingress setup
+- Other workloads in the same project (e.g. Helios, Wetty) can clone and push directly over the Gitea service using Gitea credentials: `git clone http://<workload-name>:3000/<owner>/<repo>.git`. Clone URLs shown in the Gitea UI use the external address instead
+- Workloads in other namespaces are blocked by default. To allow one, an admin opens ingress from that namespace into the Gitea workspace in **Genesis → Networking → [Network Security](https://docs.juno-innovations.com/Orion-Documentation/latest/genesis/networking/#network-security)**: select the Gitea workspace, click **CREATE RULE**, set the rule to **Ingress**, and set the rule type to **Namespace** with the client namespace. Clients then use the full service name: `git clone http://<workload-name>.<gitea-namespace>.svc.cluster.local:3000/<owner>/<repo>.git`. The client workspace only needs a matching **Egress** rule if its egress is already restricted. Network Security rules apply to the whole workspace, so the client namespace can reach every workload in the Gitea workspace, not only Gitea
 - Gitea is free and open-source software (MIT license) — no license key is needed
 - Repository data persists across workload restarts as long as the persistent volume is retained
