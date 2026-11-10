@@ -64,6 +64,19 @@ fields:
     required: false
     type: string
     default: "1"
+  - name: device_list_strategy
+    description: |
+      How the HAMi device plugin hands GPUs to the container runtime. cdi-annotations and
+      cdi-cri use the Container Device Interface and are required when the GPU Operator runs
+      the nvidia runtime in CDI mode (its default since v25.3). envvar is the legacy
+      NVIDIA_VISIBLE_DEVICES method for runtimes without CDI.
+    required: false
+    type: select
+    default: cdi-annotations
+    options:
+      - cdi-annotations
+      - cdi-cri
+      - envvar
   - name: default_gpu_memory
     description: |
       GPU memory in MiB handed to a workload that requests a GPU without naming an amount

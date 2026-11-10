@@ -34,6 +34,10 @@ spec:
           # Wait for the GPU Operator's container toolkit before starting.
           gpuOperatorToolkitReady:
             enabled: true
+          # The GPU Operator (v25.3+) runs the nvidia runtime in CDI mode, where the
+          # legacy NVIDIA_VISIBLE_DEVICES env resolves against a management CDI spec
+          # that has no per-GPU entries. A CDI strategy injects HAMi's own spec instead.
+          deviceListStrategy: {{ .Values.device_list_strategy }}
           # The chart defaults to a NodePort for the metrics service.
           service:
             type: ClusterIP

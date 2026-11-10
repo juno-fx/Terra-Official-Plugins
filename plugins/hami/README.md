@@ -90,6 +90,7 @@ The plugin is editable: fields can be changed after install and Argo CD rolls th
 | `device_split_count` | **int** · Optional · Default: `10`<br>Maximum number of workloads sharing one physical GPU |
 | `device_memory_scaling` | **string** · Optional · Default: `1`<br>GPU memory overcommit ratio. `1` advertises the real memory; `2` lets workloads claim twice the physical memory in total |
 | `device_core_scaling` | **string** · Optional · Default: `1`<br>GPU compute overcommit ratio. `1` advertises 100% of the cores per GPU |
+| `device_list_strategy` | **select** · Optional · Default: `cdi-annotations`<br>How GPUs are handed to the container runtime: `cdi-annotations`, `cdi-cri` (both CDI, needed with the GPU Operator's CDI-mode runtime) or `envvar` (legacy) |
 | `default_gpu_memory` | **int** · Optional · Default: `0`<br>GPU memory in MiB given to a workload that requests `nvidia.com/gpu` without `nvidia.com/gpumem`. `0` gives such workloads the whole GPU. Set to, for example, `8192` to make every plain GPU request a slice |
 | `preconfigured_gpu_memory` | **int** · Optional · Default: `0`<br>Total GPU memory in MiB to assume per GPU when the driver cannot report it (DGX Spark / GB10). `0` uses the driver's value |
 | `host` | **string** · Required<br>DNS name of the Genesis host; the dashboard Ingress and iFrame use it |
@@ -170,8 +171,15 @@ Prometheus query.
   happens only when every consumer uses its full share at once.
 - **DGX Spark / GB10** share system memory with the GPU and `nvidia-smi` reports no total.
   Without `preconfigured_gpu_memory` HAMi registers the node with zero GPU memory and no slice
-  can be placed there. A 128 GB Spark takes about `98304`. Compute quotas (`gpucores`) on this
-  platform are not yet confirmed to throttle; memory limits work.
+  can be placed there. A 128 GB Spark takes about `98304`. On top of that, HAMi 2.11.0 validates
+  percentage-sized allocations against the NVML memory value, which is 0 on GB10, so a plain
+  `nvidia.com/gpu: 1` request fails at Allocate with "allocated N MB … but requests 0 MB". Set
+  `default_gpu_memory` (or have workloads request `nvidia.com/gpumem`) so the request carries an
+  absolute size. Compute quotas (`gpucores`) on this platform are not yet confirmed to throttle;
+  memory limits work.
+- **CDI.** Leave `device_list_strategy` on a CDI value with the GPU Operator plugin. With `envvar`
+  the nvidia runtime in CDI mode fails container start with
+  `unresolvable CDI devices management.nvidia.com/gpu=GPU-…`.
 - **Scheduler image.** The chart derives the kube-scheduler image tag from the cluster's
   Kubernetes version; nothing to set.
 - **Namespaces to leave alone.** Label a namespace `hami.io/webhook: ignore` to keep HAMi's
