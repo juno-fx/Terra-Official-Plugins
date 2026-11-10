@@ -4,7 +4,7 @@ icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/head
 description: |
     Mount an NFS share as a Persistent Volume in your Kubernetes cluster using the NFS volume type.
     This plugin allows for operators to connect to existing NFS shares and make them available to Pods running in the cluster.
-category: storage
+category: Storage
 tags:
   - storage
   - nfs

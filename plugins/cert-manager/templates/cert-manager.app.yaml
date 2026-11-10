@@ -3,7 +3,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: {{ .Release.Name }}-cert-manager
-  namespace: argocd
+  namespace: {{ .Release.Namespace }}
   finalizers:
     - resources-finalizer.argocd.argoproj.io
     - post-delete-finalizer.argocd.argoproj.io
@@ -22,6 +22,8 @@ spec:
         values: |
           crds:
             enabled: true
+          config:
+            enableGatewayAPI: {{ .Values.enable_gateway_api }}
   syncPolicy:
     automated:
       prune: false

@@ -1,0 +1,157 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-slurm
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    # Wave 2 - the Slurm cluster is made of Slinky CRs, so it needs both the CRDs
+    # and a running operator before it can reconcile.
+    argocd.argoproj.io/sync-wave: "2"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    - post-delete-finalizer.argocd.argoproj.io
+    - post-delete-finalizer.argocd.argoproj.io/cleanup
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {{ .Values.cluster_namespace }}
+  sources:
+    - repoURL: ghcr.io/slinkyproject/charts
+      chart: slurm
+      targetRevision: {{ .Values.chart_version }}
+      helm:
+        releaseName: {{ .Release.Name }}-slurm
+        values: |
+          # Pin resource names so they do not inherit the Terra release name.
+          # The login Service is then always "slurm-login-slinky" in this
+          # namespace, which is what lets the Slurm Terminal workload find it
+          # without anyone having to look the name up.
+          fullnameOverride: slurm
+          {{- if gt (int .Values.worker_gpus) 0 }}
+          configFiles:
+            gres.conf: |
+              AutoDetect=nvidia
+          {{- end }}
+          controller:
+            persistence:
+              enabled: true
+              {{- if .Values.storage_class }}
+              storageClassName: {{ .Values.storage_class | quote }}
+              {{- end }}
+              resources:
+                requests:
+                  # slurmctld's state-save data is small; 4Gi is ample for any cluster size.
+                  storage: "4Gi"
+            {{- if gt (int .Values.worker_gpus) 0 }}
+            extraConfMap:
+              GresTypes:
+                - gpu
+            {{- end }}
+          accounting:
+            enabled: {{ .Values.accounting_enabled }}
+            {{- if .Values.accounting_enabled }}
+            storageConfig:
+              passwordKeyRef:
+                name: {{ .Values.accounting_db_secret | quote }}
+                key: password
+            {{- end }}
+          nodesets:
+            slinky:
+              enabled: true
+              replicas: {{ .Values.worker_replicas }}
+              slurmd:
+                resources:
+                  requests:
+                    cpu: {{ .Values.worker_cpu | quote }}
+                    memory: {{ .Values.worker_memory | quote }}
+                  limits:
+                    cpu: {{ .Values.worker_cpu | quote }}
+                    memory: {{ .Values.worker_memory | quote }}
+                    {{- if gt (int .Values.worker_gpus) 0 }}
+                    nvidia.com/gpu: {{ .Values.worker_gpus }}
+                    {{- end }}
+                {{- if .Values.home_pvc }}
+                # Shared home directories. Compute nodes must see the same files at
+                # the same paths as the login node, or a job cannot read its inputs
+                # or write output the user can retrieve.
+                volumeMounts:
+                  - name: home
+                    mountPath: /home
+                {{- end }}
+              {{- if gt (int .Values.worker_gpus) 0 }}
+              extraConfMap:
+                Gres:
+                  - "gpu:{{ .Values.worker_gpus }}"
+              {{- end }}
+              {{- if .Values.home_pvc }}
+              podSpec:
+                volumes:
+                  - name: home
+                    persistentVolumeClaim:
+                      claimName: {{ .Values.home_pvc | quote }}
+              {{- end }}
+          partitions:
+            all:
+              enabled: true
+              nodesets:
+                - ALL
+          {{- if .Values.sssd_secret }}
+          # User identity for the login node. Supplied as a Secret reference rather than
+          # generated from fields, so the directory credentials never appear in this
+          # Application's spec, and the administrator controls the TLS settings.
+          sssd:
+            secretRef:
+              name: {{ .Values.sssd_secret | quote }}
+              key: sssd.conf
+          {{- end }}
+          # The login node is always deployed - it is the submit host the Slurm
+          # Login workload connects to, and without it the cluster is only
+          # reachable via kubectl exec or slurmrestd.
+          loginsets:
+            slinky:
+              enabled: true
+              {{- if or .Values.ldap_ca_secret .Values.home_pvc }}
+              login:
+                volumeMounts:
+                  {{- if .Values.home_pvc }}
+                  # Same shared home the compute nodes mount, at the same path.
+                  - name: home
+                    mountPath: /home
+                  {{- end }}
+                  {{- if .Values.ldap_ca_secret }}
+                  # Trust a private/self-signed LDAP CA, so sssd.conf can use
+                  # ldaps:// with ldap_tls_reqcert = demand instead of disabling
+                  # certificate verification.
+                  - name: ldap-ca
+                    mountPath: /etc/ssl/ldap-ca
+                    readOnly: true
+                  {{- end }}
+              podSpec:
+                volumes:
+                  {{- if .Values.home_pvc }}
+                  - name: home
+                    persistentVolumeClaim:
+                      claimName: {{ .Values.home_pvc | quote }}
+                  {{- end }}
+                  {{- if .Values.ldap_ca_secret }}
+                  - name: ldap-ca
+                    secret:
+                      secretName: {{ .Values.ldap_ca_secret | quote }}
+                  {{- end }}
+              {{- end }}
+              {{- if .Values.login_ssh_public_key }}
+              rootSshAuthorizedKeys: {{ .Values.login_ssh_public_key | quote }}
+              {{- end }}
+              service:
+                spec:
+                  type: {{ .Values.login_service_type }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - ServerSideApply=true
+      - CreateNamespace=true

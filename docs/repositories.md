@@ -13,6 +13,13 @@ the latest features and improvements.
 | Name                   | Maintainer       | Repo URL                                          |
 |------------------------|------------------|---------------------------------------------------|
 | Official Terra Plugins | Juno Innovations | https://github.com/juno-fx/Terra-Official-Plugins |
+| Terra Games            | Juno Innovations | https://github.com/juno-fx/Terra-Games            |
+
+### Terra Games
+
+[Terra Games](https://github.com/juno-fx/Terra-Games) is a self-hosted plugin library for game servers, and for anything
+else the community would like to add. It follows the same structure as this repository, so it can be added to Terra as a
+Source the same way, and contributions follow the same workflow described in [Contributing](contributing.md).
 
 ## Community Repositories
 

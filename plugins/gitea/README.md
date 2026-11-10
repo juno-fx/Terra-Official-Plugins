@@ -59,11 +59,25 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `storage_class` | **k8sStorageClass** · Required<br>Kubernetes storage class for Gitea repository data |
 | `storage_size` | **string** · Required · Default: `5Gi`<br>Size of the persistent volume for repository storage |
 
+### Custom Environment Variables
+
+Genesis lets you add arbitrary environment variables to the workload at launch time. Gitea reads any `GITEA__<section>__<key>` variable as a config override — these are commonly useful ones not already set by the platform:
+
+| Variable | Description |
+|----------|--------------|
+| `GITEA__mailer__ENABLED` | Enables outbound email (set to `true`) for notifications and password resets. |
+| `GITEA__mailer__SMTP_ADDR` | SMTP server hostname for outbound mail. |
+| `GITEA__mailer__USER` | SMTP username. |
+| `GITEA__mailer__PASSWD` | SMTP password. |
+| `GITEA__actions__ENABLED` | Enables Gitea Actions (built-in CI/CD). |
+
 ---
 
 ## Notes
 
 - Each launched Gitea workload gets its own isolated Git server and persistent storage volume
 - The nginx sidecar handles web traffic proxying and is required for the Gitea web UI to function within the Juno ingress setup
+- Other workloads in the same project (e.g. Helios, Wetty) can clone and push directly over the Gitea service using Gitea credentials: `git clone http://<workload-name>:3000/<owner>/<repo>.git`. Clone URLs shown in the Gitea UI use the external address instead
+- Workloads in other namespaces are blocked by default. To allow one, an admin opens ingress from that namespace into the Gitea workspace in **Genesis → Networking → [Network Security](https://docs.juno-innovations.com/Orion-Documentation/latest/genesis/networking/#network-security)**: select the Gitea workspace, click **CREATE RULE**, set the rule to **Ingress**, and set the rule type to **Namespace** with the client namespace. Clients then use the full service name: `git clone http://<workload-name>.<gitea-namespace>.svc.cluster.local:3000/<owner>/<repo>.git`. The client workspace only needs a matching **Egress** rule if its egress is already restricted. Network Security rules apply to the whole workspace, so the client namespace can reach every workload in the Gitea workspace, not only Gitea
 - Gitea is free and open-source software (MIT license) — no license key is needed
 - Repository data persists across workload restarts as long as the persistent volume is retained

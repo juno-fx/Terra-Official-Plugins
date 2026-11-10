@@ -2,4 +2,4 @@ branch:
 plugin:
 remote:
 name:
-environment: default
+environment: argocd

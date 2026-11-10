@@ -3,3 +3,4 @@ role: ""
 volume_size: 100Gi
 volume_type: gp3
 ami_alias: al2023@latest
+subnet_id: ""

@@ -1,0 +1,4 @@
+apiVersion: v1
+description: Orion Broker workload template (NodePort to externally managed infrastructure)
+name: orion-broker
+version: 0.0.0

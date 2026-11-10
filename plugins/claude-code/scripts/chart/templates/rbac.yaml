@@ -1,4 +1,4 @@
-{{- if ne .Values.cluster_access "none" }}
+{{- if .Values.cluster_access }}
 ---
 apiVersion: v1
 kind: ServiceAccount

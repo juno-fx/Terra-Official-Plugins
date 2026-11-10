@@ -20,11 +20,13 @@ spec:
 
   selector:
     matchLabels:
-      juno-innovations.com/workstation: "{{ .Values.name }}"
+      kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
 
   template:
     metadata:
       labels:
+        # Kuiper's label injection doesn't reach pod templates; the StatefulSet selector and NetworkPolicy select on this.
+        kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
         juno-innovations.com/app: polaris
         juno-innovations.com/user: "{{ .Values.user }}"
         juno-innovations.com/workstation: "{{ .Values.name }}"
@@ -93,19 +95,6 @@ spec:
               memory: "{{ .Values.memoryLimit }}"
             {{- end }}
             {{- end }}
-{{/*          startupProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              path: "/polaris/{{ .Values.name }}/"*/}}
-{{/*              port: 3000*/}}
-{{/*            initialDelaySeconds: 2 # webtop boots very fast*/}}
-{{/*            failureThreshold: 60  # start up totals 2 * 60 = 2 mins*/}}
-{{/*            periodSeconds: 2*/}}
-{{/*          livenessProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              path: "/polaris/{{ .Values.name }}/"*/}}
-{{/*              port: 3000*/}}
-{{/*            failureThreshold: 24*/}}
-{{/*            periodSeconds: 5*/}}
           ports:
             - containerPort: 3001
               name: viewer
@@ -113,6 +102,10 @@ spec:
             - name: JUNO_WORKSTATION
               value: "{{ .Values.name }}"
             - name: JUNO_PROJECT
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: JUNO_WORKSPACE
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
@@ -125,7 +118,7 @@ spec:
             - name: PGID
               value: "{{ .Values.guid }}"
             - name: SUBFOLDER
-              value: "/polaris/{{ .Values.name }}/"
+              value: "/{{ .Release.Namespace }}/webtop/{{ .Values.name }}/"
             - name: START_DOCKER
               value: "false"
             {{- range .Values.env }}
@@ -145,7 +138,24 @@ spec:
               mountPath: "/etc/helios/init.d/{{ .name }}/{{ .file }}"
             {{- end }}
             {{- end }}
+        - name: nginx
+          image: "{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}"
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+          ports:
+            - containerPort: 8080
+              name: http
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
       volumes:
+        - name: nginx-config
+          configMap:
+            name: "{{ .Values.name }}-nginx"
         - name: dshm
           emptyDir:
             medium: Memory

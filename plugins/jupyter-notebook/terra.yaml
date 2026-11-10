@@ -1,6 +1,6 @@
 resource_id: jupyter-notebook
 name: jupyter-notebook
-icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/jupyter-notebook/scripts/assets/logo.png
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/jupyter-notebook/assets/logo.png
 description: >
   JupyterLab is the latest web-based interactive development environment for notebooks, code, and data. Its flexible interface allows users to configure and arrange workflows in data science, scientific computing, computational journalism, and machine learning. A modular design invites extensions to expand and enrich functionality. When creating your workload template, use an image compliant with Jupyter's docker-stacks, eg. https://quay.io/repository/jupyter/datascience-notebook.
 

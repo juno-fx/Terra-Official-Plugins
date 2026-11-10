@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: "{{ .Values.name }}"
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+spec:
+  # Kuiper >= 4.8.0 overwrites this with the launching namespace's IngressClass.
+  # nginx is the fallback for older deployments
+  ingressClassName: nginx
+  rules:
+    - host: {{ .Values.host }}
+      http:
+        paths:
+          - path: "/{{ .Release.Namespace }}/boinc/{{ .Values.name }}/"
+            pathType: Prefix
+            backend:
+              service:
+                name: "{{ .Values.name }}"
+                port:
+                  number: 8080

@@ -1,1 +1,2 @@
 chart_version: v1.19.1
+enable_gateway_api: false

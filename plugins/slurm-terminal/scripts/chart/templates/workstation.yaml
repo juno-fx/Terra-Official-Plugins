@@ -1,0 +1,166 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{ .Values.name }}"
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+  annotations:
+    juno-innovations.com/workload: "Terminal"
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+
+  template:
+    metadata:
+      labels:
+        kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+      annotations:
+        juno-innovations.com/workload: "Terminal"
+
+    spec:
+      # This pod is a thin SSH client - it needs no Kubernetes API access at all.
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      hostname: "{{ .Values.name }}"
+
+      # workstation nodes will require juno-innovations.com/workstation: "true"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: juno-innovations.com/workstation
+                    operator: In
+                    values:
+                      - "true"
+                  {{- if .Values.selector }}
+                  {{- range .Values.selector }}
+                  - key: {{ .key | quote }}
+                    operator: In
+                    values:
+                      - {{ .value | quote }}
+                  {{- end }}
+                  {{- end }}
+
+      # allow for this pod to work on nodes reserved for workstations
+      tolerations:
+        - key: "juno-innovations.com/workstation"
+          operator: "Exists"
+          effect: "NoSchedule"
+      {{- if .Values.pullSecret }}
+      imagePullSecrets:
+        - name: "{{ .Values.pullSecret }}"
+      {{- end }}
+      containers:
+        - name: nginx
+          image: "{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+              # The official nginx image starts as root, chowns its cache dirs and
+              # then drops to the nginx user. Without these three it cannot start.
+              add: ["CHOWN", "SETUID", "SETGID"]
+          ports:
+            - containerPort: 3001
+              name: nginx
+          volumeMounts:
+            - name: nginx
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+        - name: terminal
+          image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          command:
+            - /bin/sh
+          args:
+            - /system.sh
+          ports:
+            - containerPort: 3000
+              name: viewer
+          resources:
+            requests:
+              cpu: "{{ .Values.cpu }}"
+              memory: "{{ .Values.memory }}"
+            {{- if or .Values.cpuLimit .Values.memoryLimit }}
+            limits:
+              {{- if .Values.cpuLimit }}
+              cpu: "{{ .Values.cpuLimit }}"
+              {{- end }}
+              {{- if .Values.memoryLimit }}
+              memory: "{{ .Values.memoryLimit }}"
+              {{- end }}
+            {{- end }}
+          env:
+            - name: JUNO_WORKSTATION
+              value: "{{ .Values.name }}"
+            - name: JUNO_WORKSPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            # Retained for backwards compatibility with older platform components.
+            - name: JUNO_PROJECT
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: USER
+              value: "{{ .Values.user }}"
+            - name: HOME
+              value: "/home/{{ .Values.user }}"
+            - name: PREFIX
+              value: "/slurm/{{ .Values.name }}"
+            - name: WORKSTATION_NAME
+              value: "{{ .Values.name }}"
+            # Where the Slurm login node lives. The terminal SSHes here; no Slurm
+            # binaries or credentials exist in this pod.
+            - name: SLURM_NAMESPACE
+              value: "{{ .Values.slurmNamespace }}"
+            # Fixed by the Slinky plugin, which pins fullnameOverride=slurm so the
+            # login node's name never depends on the Terra release name.
+            - name: SLURM_LOGIN_SERVICE
+              value: "slurm-login-slinky"
+            - name: SLURM_LOGIN_PORT
+              value: "22"
+            {{- range .Values.env }}
+            - name: {{ .name | quote }}
+              value: {{ .value | quote }}
+            {{- end }}
+          volumeMounts:
+            - name: tooling
+              mountPath: /system.sh
+              subPath: system.sh
+              readOnly: true
+            {{- range .Values.plugins }}
+            - name: "{{ . }}"
+              mountPath: "/opt/juno/plugins/{{ . }}"
+            {{- end }}
+            {{- if .Values.volumeMounts }}
+            {{- toYaml .Values.volumeMounts | nindent 12 }}
+            {{- end }}
+      volumes:
+        - name: tooling
+          configMap:
+            name: "{{ .Values.name }}-tooling"
+            defaultMode: 0555
+        - name: nginx
+          configMap:
+            name: "{{ .Values.name }}-nginx"
+        {{- range .Values.plugins }}
+        - name: "{{ . }}"
+          configMap:
+            name: "{{ . }}"
+            defaultMode: 0555
+        {{- end }}
+        {{- if .Values.volumes }}
+        {{- toYaml .Values.volumes | nindent 8 }}
+        {{- end }}

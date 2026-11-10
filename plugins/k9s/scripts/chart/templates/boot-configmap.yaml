@@ -28,7 +28,11 @@ data:
     fi
 
     # Install wetty (like Hermes Agent's built-in wetty)
-    npm install -g wetty
+    # --allow-scripts: npm 12 (which node:lts floats to) blocks dependency
+    # lifecycle scripts by default, and node-pty has no linux-x64 prebuild —
+    # without it wetty dies with "Failed to load native module: pty.node".
+    # npm 11 accepts and ignores the flag, so it is safe on either major.
+    npm install -g --allow-scripts=node-pty,@parcel/watcher wetty@3.3.5
 
     # Download k9s binary from GitHub releases
     curl -fsSL -o /tmp/k9s.tar.gz https://github.com/derailed/k9s/releases/latest/download/k9s_Linux_amd64.tar.gz
@@ -42,8 +46,13 @@ data:
     # Fix ownership so the user can write to /data
     chown -R "$PUID:$PGID" /data
 
+    # Base path for wetty. The nginx sidecar forwards the full path without rewriting,
+    # so this must match the ingress path exactly, namespace segment included.
+    : "${NAMESPACE:?NAMESPACE must be set}"
+    WETTY_BASE="/$NAMESPACE/k9s/$JUNO_WORKSTATION/"
+
     # Start wetty — gosu runs a script file (not a shell builtin like 'source')
-    exec wetty --port {{ .Values.ttyd_port }} --command "bash -c \"gosu $USERNAME /opt/boot/tmux-launch.sh\""
+    exec wetty --port {{ .Values.ttyd_port }} --base "$WETTY_BASE" --command "bash -c \"gosu $USERNAME /opt/boot/tmux-launch.sh\""
   tmux-boot.sh: |
     #!/bin/sh
     # tmux-boot.sh — shared wrapper for persistent terminal sessions

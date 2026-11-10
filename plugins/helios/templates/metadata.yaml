@@ -9,7 +9,7 @@ data:
   description: "Helios deployment with desktop streaming"
   fields: |
     - name: icon
-      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios/scripts/assets/helios-icon.png"
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios/assets/logo.png"
     - name: gpu
       description: "Use a GPU"
       type: boolean
@@ -44,8 +44,35 @@ data:
       type: string
       required: true
       default: "v1.2.3"
+    - name: nginx_registry
+      description: "Registry to pull the nginx sidecar image from"
+      type: string
+      required: true
+      default: "docker.io"
+    - name: nginx_repo
+      description: "Repository to pull the nginx sidecar image from"
+      type: string
+      required: true
+      default: "nginx"
+    - name: nginx_tag
+      description: "Tag to pull the nginx sidecar image from"
+      type: string
+      required: true
+      default: "alpine"
     - name: publicAccess
       description: "Allow public access (disable authentication)"
       type: boolean
       required: true
       default: false
+  env_hints: |
+    - name: PASSWORD
+      description: Password set for the users terminal session.
+      expose: true
+    - name: SUDO
+      description: Grants the user sudo access on the container ("true" or "1").
+    - name: SELKIES_FRAMERATE
+      description: Streaming framerate for the desktop session, as a range (e.g. "15-60") or fixed value (e.g. "30").
+    - name: DISABLE_VGL
+      description: Disables the VirtualGL wrapper around the desktop session; apps needing it must be launched manually via vglrun.
+    - name: REMOTE_PROTOCOL
+      description: if set to "dcv" Helios will run Nice DCV rather than Selkies.

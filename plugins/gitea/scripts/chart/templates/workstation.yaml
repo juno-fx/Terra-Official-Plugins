@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ .Release.Name }}
+  name: "{{ .Values.name }}"
   labels:
-    kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
   annotations:
     juno-innovations.com/workload: "Application"
 spec:
@@ -11,11 +11,11 @@ spec:
   podManagementPolicy: Parallel
   selector:
     matchLabels:
-      kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+      kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
   template:
     metadata:
       labels:
-        kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+        kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
       annotations:
         cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
     spec:
@@ -90,7 +90,7 @@ spec:
             - name: GITEA__server__DOMAIN
               value: "{{ .Values.host }}"
             - name: GITEA__server__ROOT_URL
-              value: "https://{{ .Values.host }}/gitea/{{ .Values.name }}/"
+              value: "https://{{ .Values.host }}/{{ .Release.Namespace }}/gitea/{{ .Values.name }}/"
             - name: GITEA__server__SSH_DOMAIN
               value: "{{ .Values.host }}"
             - name: GITEA__server__DISABLE_SSH
@@ -117,8 +117,6 @@ spec:
               value: "true"
             - name: GITEA__repository__ENABLE_PUSH_CREATE_ORG
               value: "true"
-            - name: GITEA__repository__DEFAULT_PUSH_CREATE_PRIVATE
-              value: "false"
             - name: GITEA__service__ALLOW_ONLY_EXTERNAL_REGISTRATION
               value: "false"
             - name: JUNO_WORKSTATION
@@ -127,12 +125,16 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+            - name: JUNO_WORKSPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
             - name: USER
               value: "{{ .Values.user }}"
             - name: HOME
               value: "/data"
             - name: PREFIX
-              value: "/gitea/{{ .Values.name }}/"
+              value: "/{{ .Release.Namespace }}/gitea/{{ .Values.name }}/"
             {{- range .Values.env }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}
@@ -169,18 +171,18 @@ spec:
               name: proxy
           volumeMounts:
             - name: nginx-config
-              mountPath: /etc/nginx/conf.d/default.conf
-              subPath: default.conf
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
       volumes:
         - name: nginx-config
           configMap:
-            name: {{ .Release.Name }}-nginx
+            name: "{{ .Values.name }}-nginx"
         - name: boot
           configMap:
-            name: {{ .Release.Name }}-boot
+            name: "{{ .Values.name }}-boot"
         - name: gitea-data
           persistentVolumeClaim:
-            claimName: "{{ .Release.Name }}"
+            claimName: "{{ .Values.name }}"
         {{- if .Values.volumes }}
         {{- toYaml .Values.volumes | nindent 8 }}
         {{- end }}

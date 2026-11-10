@@ -1,6 +1,6 @@
 # Helios
 
-![Helios](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios/scripts/assets/helios-icon.png)
+![Helios](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios/assets/logo.png)
 
 **Category:** Workstations
 **Type:** Workload Template
@@ -18,6 +18,8 @@ Helios is the flagship containerized workstation from Juno Innovations. It provi
 ## How It Works
 
 **Workload Template** — Installs the Helios workstation schema into Genesis. Once installed, the Helios type appears in **Genesis** on the Workloads page, where it can be authored into a workload template. Users can then launch and provision their own personal desktop on demand within a project through **Hubble**.
+
+**Access and authentication** — Each workstation runs with an nginx sidecar in the same pod. The ingress routes `/<namespace>/helios/<workload-name>/` to the sidecar, which checks the user's Hubble login before forwarding the request to Helios. Because authentication happens inside the pod rather than through ingress-controller annotations, it works the same with any ingress controller (ingress-nginx, Traefik, etc.).
 
 ---
 
@@ -58,7 +60,22 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `enableAPI` | **boolean** · Required · Default: `false`<br>Enable system-to-system communication via the Helios API |
 | `rheaRepo` | **string** · Required · Default: `rhea`<br>Repository for the Rhea sidecar image |
 | `rheaTag` | **string** · Required · Default: `v1.2.3`<br>Rhea sidecar image tag |
+| `nginx_registry` | **string** · Required · Default: `docker.io`<br>Registry to pull the nginx sidecar image from |
+| `nginx_repo` | **string** · Required · Default: `nginx`<br>Repository to pull the nginx sidecar image from |
+| `nginx_tag` | **string** · Required · Default: `alpine`<br>Tag to pull the nginx sidecar image from |
 | `publicAccess` | **boolean** · Required · Default: `false`<br>Disable authentication and allow unauthenticated access to the workstation |
+
+### Custom Environment Variables
+
+Genesis lets you add arbitrary environment variables to the workload at launch time. These are commonly useful for a Helios workstation:
+
+| Variable | Description                                                                                                        |
+|----------|--------------------------------------------------------------------------------------------------------------------|
+| `PASSWORD` | Password set for the users terminal session. Available to all users at launch (Hubble → Advanced).                |
+| `SUDO` | Grants the user sudo access on the container.                                                                      |
+| `SELKIES_FRAMERATE` | Streaming framerate for the desktop session, as a range (e.g. `15-60`) or fixed value (e.g. `30`).                 |
+| `DISABLE_VGL` | Disables the VirtualGL wrapper around the desktop session; apps needing it must be launched manually via `vglrun`. |
+| `REMOTE_PROTOCOL` | if set to "dcv" Helios will run Nice DCV rather than Selkies.                                                      |
 
 ---
 
@@ -66,6 +83,9 @@ These fields are configured when authoring the workload template in **Genesis** 
 
 - This plugin is included in the **Orion Essentials** bundle — you can install Helios, the Prometheus Stack, and the ArgoCD Dashboard together in one step from Terra
 - Setting `publicAccess` to `true` removes authentication from the workstation endpoint — use only in trusted network environments
+- Workstations are served at `/<namespace>/helios/<workload-name>/`
+- The workload's network policy only accepts inbound traffic on the nginx sidecar port (8080); Helios' own port is not reachable from elsewhere in the cluster. It sets no egress rules, so outbound access is controlled entirely by your namespace/cluster
+- The workstation's ingress uses the `nginx` IngressClass by default; Kuiper 4.8.0 and later replaces it with the launching namespace's IngressClass
 - The `tag` field controls the OS and desktop flavour of the workstation; consult the Juno documentation for available image tags
 - Helios workstations are scheduled on nodes labelled `juno-innovations.com/workstation: "true"` — ensure your cluster has workstation nodes configured
 - Helios plugin add-ons (auto-shutdown, RAM monitoring) must be installed separately and will automatically attach to Helios workloads

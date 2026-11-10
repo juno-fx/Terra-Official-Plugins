@@ -24,6 +24,7 @@ Claude Code is Anthropic's AI coding agent, delivered as a browser-accessible we
 
 - A Kubernetes storage class available in the cluster
 - API credentials for Claude (`ANTHROPIC_API_KEY` or equivalent) — set via the workload's environment variables at launch
+- Unrestricted outbound network access in the workload's namespace (see Notes) — required for `apt`/`npm`/`pip` installs and the Claude API
 
 ---
 
@@ -56,13 +57,25 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `timezone` | **string** · Required · Default: `America/New_York`<br>Timezone for the Claude Code instance |
 | `storage_class` | **k8sStorageClass** · Optional<br>Storage class for the persistent `/data` disk |
 | `storage_size` | **string** · Required · Default: `10Gi`<br>Storage size for the persistent `/data` disk |
-| `publicAccess` | **boolean** · Required · Default: `false`<br>Allow public access (disable Hubble authentication) |
+| `cluster_access` | **select** · Optional<br>Kubernetes RBAC access level for the workstation (unset = no cluster access, `readonly-ns`, `admin-ns`) |
+
+### Custom Environment Variables
+
+Genesis lets you add arbitrary environment variables to the workload at launch time. These are commonly useful for the `claude` CLI (`@anthropic-ai/claude-code`):
+
+| Variable | Description |
+|----------|--------------|
+| `ANTHROPIC_API_KEY` | Anthropic Console API key used by the `claude` CLI to authenticate. |
+| `ANTHROPIC_MODEL` | Overrides the default Claude model used by the CLI. |
+| `ANTHROPIC_BASE_URL` | Overrides the API base URL, e.g. to point at a proxy or compatible endpoint. |
 
 ---
 
 ## Notes
 
-- Claude API credentials are not set at workload creation time — configure them as environment variables (e.g. `ANTHROPIC_API_KEY`) on the workload, using the environment variable field auto-injected by Genesis for every workload template
+- Claude API credentials are not set via the install-time fields above — configure them as custom environment variables at workload launch (see table above), e.g. `ANTHROPIC_API_KEY`
 - The nginx sidecar provides browser-accessible proxying for the wetty terminal interface
 - Project files and Claude Code configuration are persisted to the `/data` volume across workload restarts
-- Setting `publicAccess` to `true` removes authentication from the workstation endpoint — use only in trusted network environments
+- The workstation endpoint always authenticates through Hubble — there is no option to disable authentication
+- The `cluster_access` field controls whether the workstation can interact with Kubernetes resources within the workspace it lives in — leave unset for no cluster access, use `readonly-ns` for safe exploration, `admin-ns` only when the workstation needs to manage workloads
+- The workload's network policy restricts inbound traffic only (ingress). It sets no egress rules, so outbound access is controlled entirely by your namespace/cluster — if it default-denies egress, add your own allow rule for this workload (DNS + internet, or your internal mirrors/proxy if airgapped)

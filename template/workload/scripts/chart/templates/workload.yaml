@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{ .Values.name }}"
+  annotations:
+    # Workload type shown in the Hubble UI — must match the annotation in templates/metadata.yaml.
+    juno-innovations.com/workload: "WORKLOAD_TYPE"
+    # Optional Kuiper annotations. Uncomment to enable — see AGENTS.md for the full reference.
+    #
+    # Whitelist actions users can trigger on this workload via the Kuiper API.
+    # Available actions depend on the resource kind (e.g. restart, stop).
+    # kuiper.juno-innovations.com/actions: "restart,stop"
+    #
+    # Surface extra connection details in the Hubble UI endpoint list.
+    # kuiper.juno-innovations.com/connection: "username={{ .Values.user }},port={{ .Values.port }}"
+  labels:
+    # Kuiper injects this ownership label at launch; declaring it keeps the
+    # selector and pod template (below) consistent with that injected value.
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+
+  template:
+    metadata:
+      labels:
+        # Kuiper only injects the ownership label into top-level resource
+        # metadata, so the pod template must declare it here for the
+        # StatefulSet selector above to match pods.
+        kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+
+    spec:
+      automountServiceAccountToken: false
+
+      # Generic baseline — probe before extending (AGENTS.md → "Plugin Authoring — Probe First").
+      # Each feature maps to a concepts/*.md file: env vars (env.md), probes (runtime.md),
+      # storage (storage.md), GPU (gpu.md), node placement (affinity.md), ingress (ingress.md).
+
+      containers:
+        - name: PLUGIN
+          imagePullPolicy: IfNotPresent
+          image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
+          ports:
+            - containerPort: {{ .Values.port }}
+          resources:
+            requests:
+              memory: "{{ .Values.memory }}"
+              cpu: "{{ .Values.cpu }}"
+          env:
+            {{- range .Values.env }}
+            - name: {{ .name | quote }}
+              value: {{ .value | quote }}
+            {{- end }}

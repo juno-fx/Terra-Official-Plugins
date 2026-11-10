@@ -2,7 +2,7 @@
 
 set -e
 
-ARGOCD_NAMESPACE=argocd
+ARGOCD_NAMESPACE="${ARGOCD_NAMESPACE:-$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)}"
 
 remove_configmap_key() {
     local cm_name="$1"

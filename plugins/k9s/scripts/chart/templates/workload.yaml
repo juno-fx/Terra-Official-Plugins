@@ -29,9 +29,15 @@ spec:
             requests:
               memory: "{{ .Values.memory }}"
               cpu: "{{ .Values.cpu }}"
+            {{- if or .Values.cpuLimit .Values.memoryLimit }}
             limits:
-              memory: "2Gi"
-              cpu: "2"
+              {{- if .Values.cpuLimit }}
+              cpu: "{{ .Values.cpuLimit }}"
+              {{- end }}
+              {{- if .Values.memoryLimit }}
+              memory: "{{ .Values.memoryLimit }}"
+              {{- end }}
+            {{- end }}
           ports:
             - containerPort: {{ .Values.ttyd_port }}
               name: ttyd
@@ -48,6 +54,12 @@ spec:
               value: "{{ .Values.user }}"
             - name: HOME
               value: "/data"
+            - name: JUNO_WORKSTATION
+              value: "{{ .Values.name }}"
+            # Used by boot.sh to build wetty's base path. nginx forwards the full
+            # path without rewriting, so it must match the ingress path exactly.
+            - name: NAMESPACE
+              value: "{{ .Release.Namespace }}"
           startupProbe:
             tcpSocket:
               port: {{ .Values.ttyd_port }}
@@ -73,7 +85,7 @@ spec:
             {{- end }}
         - name: nginx
           imagePullPolicy: IfNotPresent
-          image: {{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}
+          image: "{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}"
           resources:
             requests:
               memory: "64Mi"
@@ -86,8 +98,8 @@ spec:
               name: proxy
           volumeMounts:
             - name: nginx-config
-              mountPath: /etc/nginx/conf.d/default.conf
-              subPath: default.conf
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
       nodeSelector:
         beta.kubernetes.io/arch: amd64
       tolerations:
@@ -98,7 +110,7 @@ spec:
       volumes:
         - name: nginx-config
           configMap:
-            name: "{{ .Release.Name }}-nginx"
+            name: "{{ .Values.name }}-nginx"
         - name: boot
           configMap:
             name: "{{ .Release.Name }}-boot"

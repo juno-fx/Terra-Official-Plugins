@@ -1,6 +1,6 @@
 # File Browser
 
-![File Browser](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/filebrowser/scripts/assets/icon.png)
+![File Browser](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/filebrowser/assets/logo.png)
 
 **Category:** Workstations
 **Type:** Workload Template
@@ -11,7 +11,7 @@
 
 ## Overview
 
-File Browser is a lightweight, web-based file manager that runs entirely in a browser — no desktop environment required. It provides a clean interface for drag-and-drop upload, directory browsing, file editing, and file download. The File Browser workload can optionally mount project storage volumes and persist uploaded data across restarts.
+File Browser is a lightweight, web-based file manager that runs entirely in a browser — no desktop environment required. It provides a clean interface for drag-and-drop upload, directory browsing, file editing, and file download. The File Browser workload can optionally mount project storage volumes.
 
 ---
 
@@ -19,12 +19,13 @@ File Browser is a lightweight, web-based file manager that runs entirely in a br
 
 **Workload Template** — Installs the File Browser workload schema into Genesis. Once installed, the File Browser type appears in **Genesis** on the Workloads page, where it can be authored into a workload template. Users can then launch and provision their own file manager on demand within a project through **Hubble**.
 
+**Access and authentication** — Each instance runs with an nginx sidecar in the same pod. The ingress routes `/<namespace>/filebrowser/<workload-name>/` to the sidecar, which checks the user's Hubble login before forwarding the request to File Browser. Because authentication happens inside the pod rather than through ingress-controller annotations, it works the same with any ingress controller (ingress-nginx, Traefik, etc.).
+
 ---
 
 ## Prerequisites
 
-- A Kubernetes storage class available in the cluster (required when persistent storage is enabled)
-- An nginx ingress controller in the cluster
+- An ingress controller in the cluster (ingress-nginx, Traefik, etc.)
 
 ---
 
@@ -51,26 +52,25 @@ These fields are configured when authoring the workload template in **Genesis** 
 
 | Field | Details |
 |-------|---------|
-| `workspace` | **string** · Optional<br>Optional target workspace name. If set, the URL becomes `/filebrowser/<workspace>` instead of the workload name. |
 | `registry` | **string** · Required · Default: `docker.io`<br>Container registry to pull the File Browser image from |
 | `repo` | **string** · Required · Default: `filebrowser/filebrowser`<br>File Browser image repository |
 | `tag` | **string** · Required · Default: `latest`<br>File Browser image tag |
-| `ingressNamespace` | **string** · Optional · Default: `ingress-nginx`<br>Ingress controller namespace (used for the network policy) |
 | `cpu` | **string** · Required · Default: `512m`<br>CPU request for the File Browser container |
 | `memory` | **string** · Required · Default: `256Mi`<br>Memory request for the File Browser container |
-| `dataPersistent` | **boolean** · Optional · Default: `false`<br>Enable persistent storage for uploaded files and database. When enabled, creates a PVC. When disabled, data is ephemeral (emptyDir). |
-| `storageClass` | **string** · Optional<br>Storage class for the data PVC. Leave empty for cluster default. |
-| `storageSize` | **string** · Optional · Default: `10Gi`<br>Persistent volume size when `dataPersistent` is enabled |
-| `root` | **string** · Optional · Default: `/data`<br>Root filesystem path visible in File Browser. Set to `/` to browse the entire container filesystem, or `/data` to restrict to the data volume only. |
+| `nginx_registry` | **string** · Required · Default: `docker.io`<br>Registry to pull the nginx sidecar image from |
+| `nginx_repo` | **string** · Required · Default: `nginx`<br>Repository to pull the nginx sidecar image from |
+| `nginx_tag` | **string** · Required · Default: `alpine`<br>Tag to pull the nginx sidecar image from |
+| `root` | **string** · Optional · Default: `/`<br>Root filesystem path visible in File Browser. Leave as `/` to browse the entire container filesystem, or set it to a mount path to restrict the view to that volume. |
 
 ---
 
 ## Notes
 
 - File Browser is free and open-source software (Apache 2.0 license) — no license key is needed
-- Authentication is handled by the Juno platform's Hubble ingress — no separate login is required within the application
-- The container runs as a non-root user with a read-only root filesystem for security
-- The `root` field controls the scope of the filesystem visible in File Browser — restrict to `/data` for a scoped view, or set to `/` for full container filesystem access
-- Uploaded files and the File Browser database are ephemeral unless `dataPersistent` is enabled
-- Project storage mounts are available at workload launch time through the standard Genesis volume mounting interface — they will appear under `/data` or the path specified by `root`
-- The File Browser database (`filebrowser.db`) stores user settings and is lost on restart when ephemeral storage is used
+- Authentication is handled by the nginx sidecar, which checks the user's Hubble login — no separate login is required within the application
+- The File Browser container runs as a non-root user with all Linux capabilities dropped
+- The `root` field controls the scope of the filesystem visible in File Browser — set it to a mount path for a scoped view, or leave it as `/` for full container filesystem access
+- File Browser has no storage of its own: its database lives in `/tmp` and is lost on pod restart, and anything uploaded outside a mounted volume is lost too
+- Project storage mounts are available at workload launch time through the standard Genesis volume mounting interface — they appear at their mount paths, and are visible in File Browser when they sit under `root`
+- The workload's network policy only accepts inbound traffic on the nginx sidecar port (8080); File Browser's own port is not reachable from elsewhere in the cluster. It sets no egress rules, so outbound access is controlled entirely by your namespace/cluster
+- The ingress uses the `nginx` IngressClass by default; Kuiper 4.8.0 and later replaces it with the launching namespace's IngressClass

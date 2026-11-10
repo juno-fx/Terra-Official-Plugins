@@ -56,3 +56,12 @@ data:
       description: "Storage class for the VSCode config persistent volume."
       type: k8sStorageClass
       required: false
+  env_hints: |
+    - name: PASSWORD
+      description: Web UI login password. If neither PASSWORD nor HASHED_PASSWORD is set, the UI has no authentication.
+    - name: SUDO_PASSWORD
+      description: Enables sudo access in the integrated terminal, protected by this password.
+    - name: DEFAULT_WORKSPACE
+      description: Directory code-server opens by default when a session starts.
+    - name: TZ
+      description: Container timezone, e.g. "America/New_York".

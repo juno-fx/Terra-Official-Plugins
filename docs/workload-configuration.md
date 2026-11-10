@@ -4,6 +4,9 @@ This page covers all configuration options available when authoring a workload t
 field types for the Genesis workload form, Kuiper annotations for lifecycle and UI control,
 and ingress authentication patterns.
 
+> Tables on this page mirror `AGENTS.md` (authoritative quick reference) and
+> `concepts/labels-annotations.md` — keep all three in sync.
+
 ---
 
 ## Field Types
@@ -34,7 +37,7 @@ annotations:
 
 !!! note
     Workload templates must always be tagged `cluster-level` in `terra.yaml` — they are installed
-    into the `argocd` namespace by Terra.
+    into the Genesis namespace (`argocd` by default) by Terra.
 
 ```yaml
 annotations:
@@ -134,27 +137,85 @@ that Kuiper creates after resolving EC2 DNS post-launch.
 
 ```yaml
 annotations:
-  kuiper.juno-innovations.com/ingress-hide: "/healthz,/admin,/metrics"
+  kuiper.juno-innovations.com/ingress-hide: "/{{ .Release.Namespace }}/myapp/{{ .Values.name }}/healthz,/{{ .Release.Namespace }}/myapp/{{ .Values.name }}/admin"
 ```
 
 **Applies to:** Ingress  
-**Value format:** comma-separated URL paths
+**Value format:** comma-separated URL paths — each must be the **full** rendered path
 
 Hides the listed URL paths from the endpoint list shown in the Hubble UI. Use this to suppress
 internal paths like health checks or admin endpoints.
+
+Matching is an exact string comparison against the path in the Ingress rule, so a bare sub-path
+like `/healthz` will not match a rule at `/<namespace>/myapp/<name>/healthz` — it silently hides
+nothing. Always write the complete path.
 
 ---
 
 ```yaml
 annotations:
-  kuiper.juno-innovations.com/ingress-extras: "/app/index.html,/app/login"
+  kuiper.juno-innovations.com/ingress-extras: "/{{ .Release.Namespace }}/myapp/{{ .Values.name }}/index.html"
 ```
 
 **Applies to:** Ingress  
-**Value format:** comma-separated sub-paths
+**Value format:** comma-separated paths — each must **start with** an existing ingress path
 
 Appends extra sub-paths to existing ingress endpoints in the Hubble UI without creating new
-Ingress rules. Each extra path is matched to the closest existing ingress path.
+Ingress rules. Each extra path is matched to the longest existing ingress path it starts with,
+and the remainder is appended to that endpoint.
+
+Because matching is by prefix, an extra must begin with the full rendered ingress path. A bare
+sub-path like `/index.html` starts with no existing rule and is dropped without warning.
+
+---
+
+#### Interconnects
+
+!!! note "Requires Orion Projects v4.8.1 or later"
+    Interconnects require Kuiper v4.7.1, which ships with Orion Projects v4.8.1 (Genesis v6.1.0). Earlier
+    versions ignore these annotations and do not return an `interconnects` list.
+
+```yaml
+annotations:
+  kuiper.juno-innovations.com/interconnect-mcp: "http://{{ .Release.Name }}:8080/mcp-server/http"
+```
+
+**Applies to:** Service  
+**Value format:** connection endpoint string
+
+Advertises a named connection point on the workload for other systems to consume, for example an
+MCP server endpoint an AI agent can connect to. The annotation key suffix `<name>` becomes the
+interconnect name, and the value is its endpoint. A Service can declare any number of interconnects.
+Annotations with a blank value are ignored.
+
+---
+
+```yaml
+annotations:
+  kuiper.juno-innovations.com/interconnect-description-mcp: "Connect to this workload's MCP server"
+```
+
+**Applies to:** Service  
+**Value format:** any string
+
+Optional human readable description for the interconnect with the matching `<name>`. A description
+is only used when an `interconnect-<name>` annotation with the same name exists on the Service.
+
+Kuiper returns interconnects from its `/all` endpoint in two places: on each Service resource that
+declares them, and collected into a top level `interconnects` list on the workload covering every
+Service in that workload. The two annotations above produce:
+
+```json
+"interconnects": [
+  {
+    "name": "mcp",
+    "endpoint": "http://my-release:8080/mcp-server/http",
+    "description": "Connect to this workload's MCP server"
+  }
+]
+```
+
+Like all Kuiper annotations, interconnect values are returned in plain text. Do not put secrets in them.
 
 ---
 

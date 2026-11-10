@@ -1,17 +1,21 @@
 name: hermes-agent
 user:
 session:
-cluster_access: none
+cluster_access:
 registry: nousresearch
 repo: hermes-agent
 tag: latest
+nginx_registry: "docker.io"
+nginx_repo: "nginx"
+nginx_tag: "alpine"
 host: ""
 cpu: 500m
 memory: 1Gi
 cpuLimit: 2000m
 memoryLimit: 4Gi
-persistence_size: 1Gi
+persistence_size: 10Gi
 persistence_storage_class: local-path
+termination_grace_period: 120
 git_port: 9418
 puid: 1000
 guid: 1000

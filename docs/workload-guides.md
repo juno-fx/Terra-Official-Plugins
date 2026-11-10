@@ -10,7 +10,7 @@ annotations in context with inline comments explaining the purpose of each.
 A standard web application workload. Demonstrates actions, connection details, and ingress
 endpoint control.
 
-```yaml title="scripts/chart/templates/workstation.yaml"
+```yaml title="scripts/chart/templates/workload.yaml"
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -19,7 +19,7 @@ metadata:
     # Declare the workload category for Hubble — shown on the running workload in the Hubble UI.
     # This value can be any string. It must match the value in templates/metadata.yaml:
     #   - metadata.yaml copy → read by Genesis to categorize the template in the catalog
-    #   - workstation.yaml copy → read by Hubble to label the active running workload
+    #   - workload.yaml copy → read by Hubble to label the active running workload
     juno-innovations.com/workload: "Application"
     # Whitelist which actions users can trigger on this StatefulSet via the Kuiper API.
     kuiper.juno-innovations.com/actions: "restart"
@@ -65,22 +65,26 @@ metadata:
     nginx.ingress.kubernetes.io/auth-url: "http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/"
     nginx.ingress.kubernetes.io/use-regex: "true"
     # Hide internal paths from the Hubble endpoint list.
-    kuiper.juno-innovations.com/ingress-hide: "/socket.io"
+    # Matched by exact string against the rendered path — must be the full path, not a bare sub-path.
+    kuiper.juno-innovations.com/ingress-hide: "/{{ .Release.Namespace }}/simple-app/{{ .Values.name }}/socket.io"
     # Surface additional deep-link paths as clickable endpoints in Hubble.
-    kuiper.juno-innovations.com/ingress-extras: "/app/index.html"
+    # Matched by prefix against an existing path; the remainder is appended.
+    kuiper.juno-innovations.com/ingress-extras: "/{{ .Release.Namespace }}/simple-app/{{ .Values.name }}/app/index.html"
 spec:
   rules:
     - host: {{ .Values.host }}
       http:
+        # Paths start with the namespace so environments sharing a hostname cannot collide.
+        # See "Ingress Path Convention" in AGENTS.md.
         paths:
-          - path: /
+          - path: "/{{ .Release.Namespace }}/simple-app/{{ .Values.name }}/"
             pathType: Prefix
             backend:
               service:
                 name: {{ .Values.name }}
                 port:
                   number: 8080
-          - path: /socket.io
+          - path: "/{{ .Release.Namespace }}/simple-app/{{ .Values.name }}/socket.io"
             pathType: Prefix
             backend:
               service:
@@ -88,6 +92,13 @@ spec:
                 port:
                   number: 8088
 ```
+
+!!! warning "The container must know its own path"
+
+    Nothing rewrites the path before it reaches the pod — no chart sets `rewrite-target`, so the app
+    receives `/<namespace>/simple-app/<name>/…` in full. Whatever tells the app its base path
+    (`PREFIX`, `--baseURL`, `ROOT_URL`, an nginx sidecar `location`) has to carry the same value, or
+    the request routes correctly and then 404s inside the pod.
 
 ---
 

@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-terra-metadata"
+  labels:
+    kuiper.juno-innovations.com/chart: "{{ .Release.Name }}-scripts-configmap"
+  annotations:
+    juno-innovations.com/workload: "Terminal"
+data:
+  chart: "{{ .Release.Name }}-scripts-configmap"
+  description: "Browser terminal onto a Slinky Slurm cluster"
+  fields: |
+    - name: icon
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/slurm-terminal/scripts/assets/logo.png"
+    - name: slurmNamespace
+      description: "Namespace the Slurm cluster runs in. Only change this if you run more than one Slurm cluster; the login node's name is fixed, so the namespace is all that distinguishes them."
+      type: string
+      required: true
+      default: "slurm"
+    - name: registry
+      description: "Registry to pull the wetty image from"
+      type: string
+      required: true
+      default: "wettyoss"
+    - name: repo
+      description: "Repository to pull the wetty image from"
+      type: string
+      required: true
+      default: "wetty"
+    - name: tag
+      description: "Tag to pull the wetty image from"
+      type: string
+      required: true
+      default: "2.5"
+    - name: nginx_registry
+      description: "Registry to pull the nginx image from"
+      type: string
+      required: true
+      default: "docker.io"
+    - name: nginx_repo
+      description: "Repository to pull the nginx image from"
+      type: string
+      required: true
+      default: "nginx"
+    - name: nginx_tag
+      description: "Tag to pull the nginx image from"
+      type: string
+      required: true
+      default: "1.29.3"
+    - name: ingressNamespace
+      description: "Namespace of the ingress controller for plugin access"
+      type: string
+      required: true
+      default: "ingress-nginx"
+  # This pod is a thin SSH client — the shell, and therefore the environment a
+  # user actually works in, lives on the Slurm login node at the other end of the
+  # connection. There are no useful client-side variables to suggest; anything
+  # affecting the session belongs in the login node's profile instead.
+  env_hints: |
+    []

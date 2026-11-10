@@ -1,4 +1,3 @@
-{{- if not (eq .Values._juno_gateway_api true) }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -11,11 +10,10 @@ spec:
     - host: {{ .Values.host }}
       http:
         paths:
-          - path: "/polaris/{{ .Values.name }}/"
+          - path: "/{{ .Release.Namespace }}/polaris/{{ .Values.name }}/"
             pathType: Prefix
             backend:
               service:
                 name: {{ .Values.name }}-web-ide
                 port:
                   number: 3000
-{{- end }}

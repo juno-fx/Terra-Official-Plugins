@@ -62,6 +62,19 @@ Full documentation: [Juno Metrics Gatherer](https://juno-fx.github.io/Orion-Docu
 
 ---
 
+## Custom Dashboards
+
+Grafana includes a selection of official Kubernetes and Juno dashboards out of the box, giving you better visibility into your cluster. Beyond these defaults, you can also build and deploy your own custom dashboards.
+
+There are two ways to do this:
+
+- Via the Grafana web interface — build your dashboard directly in Grafana and save it to Grafana's internal SQLite database. If you choose this approach, we recommend backing the database with persistent storage, as you risk losing your dashboards between pod restarts.
+- Via a ConfigMap — deploy your dashboard definition to your cluster as a ConfigMap and label it grafana_dashboard: "1". Grafana will automatically detect and load it.
+
+We recommend the ConfigMap approach, as it's simpler to manage and more robust for production use.
+
+---
+
 ## Notes
 
 - This plugin is included in the **Orion Essentials** bundle — you can install the Prometheus Stack, Helios, and the ArgoCD Dashboard together in one step from Terra

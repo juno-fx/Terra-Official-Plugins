@@ -14,11 +14,11 @@ data:
         listen 3000;
         listen [::]:3000;
 
-        location = /polaris/{{ .Values.name }} {
-          return 302 /polaris/{{ .Values.name }}/;
+        location = /{{ .Release.Namespace }}/polaris/{{ .Values.name }} {
+          return 302 /{{ .Release.Namespace }}/polaris/{{ .Values.name }}/;
         }
 
-        location /polaris/{{ .Values.name }}/ {
+        location /{{ .Release.Namespace }}/polaris/{{ .Values.name }}/ {
           # Proxmox serves TLS on 8006 with a self-signed cert.
           proxy_pass https://localhost:8006/;
           proxy_ssl_verify off;
@@ -36,28 +36,28 @@ data:
           proxy_read_timeout 3600s;
           proxy_send_timeout 3600s;
           # PVEAuthCookie is issued with path=/ — rescope it to the base URL.
-          proxy_cookie_path / /polaris/{{ .Values.name }}/;
+          proxy_cookie_path / /{{ .Release.Namespace }}/polaris/{{ .Values.name }}/;
 
           # The Proxmox UI hardcodes absolute paths in HTML and in JS-built
           # URLs (ExtJS) — rewrite them onto the base URL.
           sub_filter_once off;
           sub_filter_types text/html application/javascript application/json text/css;
-          sub_filter '"/pve2/' '"/polaris/{{ .Values.name }}/pve2/';
-          sub_filter "'/pve2/" "'/polaris/{{ .Values.name }}/pve2/";
-          sub_filter '"/api2/' '"/polaris/{{ .Values.name }}/api2/';
-          sub_filter "'/api2/" "'/polaris/{{ .Values.name }}/api2/";
-          sub_filter '`/api2/' '`/polaris/{{ .Values.name }}/api2/';
-          sub_filter '^\/api2' '^\/polaris\/{{ .Values.name }}\/api2';
+          sub_filter '"/pve2/' '"/{{ .Release.Namespace }}/polaris/{{ .Values.name }}/pve2/';
+          sub_filter "'/pve2/" "'/{{ .Release.Namespace }}/polaris/{{ .Values.name }}/pve2/";
+          sub_filter '"/api2/' '"/{{ .Release.Namespace }}/polaris/{{ .Values.name }}/api2/';
+          sub_filter "'/api2/" "'/{{ .Release.Namespace }}/polaris/{{ .Values.name }}/api2/";
+          sub_filter '`/api2/' '`/{{ .Release.Namespace }}/polaris/{{ .Values.name }}/api2/';
+          sub_filter '^\/api2' '^\/{{ .Release.Namespace }}\/polaris\/{{ .Values.name }}\/api2';
           sub_filter 'me.UI.forceSetting("path"' 'me.UI.forceSetting("host", ""); me.UI.forceSetting("port", ""); me.UI.forceSetting("path"';
           sub_filter "'/?' + Ext.Object.toQueryString(queryDict)" "window.location.pathname + '/?' + Ext.Object.toQueryString(queryDict)";
-          sub_filter '"/novnc/' '"/polaris/{{ .Values.name }}/novnc/';
-          sub_filter "'/novnc/" "'/polaris/{{ .Values.name }}/novnc/";
-          sub_filter '"/xtermjs/' '"/polaris/{{ .Values.name }}/xtermjs/';
-          sub_filter "'/xtermjs/" "'/polaris/{{ .Values.name }}/xtermjs/";
-          sub_filter '"/pwt/' '"/polaris/{{ .Values.name }}/pwt/';
-          sub_filter "'/pwt/" "'/polaris/{{ .Values.name }}/pwt/";
-          sub_filter 'src="/' 'src="/polaris/{{ .Values.name }}/';
-          sub_filter 'href="/' 'href="/polaris/{{ .Values.name }}/';
+          sub_filter '"/novnc/' '"/{{ .Release.Namespace }}/polaris/{{ .Values.name }}/novnc/';
+          sub_filter "'/novnc/" "'/{{ .Release.Namespace }}/polaris/{{ .Values.name }}/novnc/";
+          sub_filter '"/xtermjs/' '"/{{ .Release.Namespace }}/polaris/{{ .Values.name }}/xtermjs/';
+          sub_filter "'/xtermjs/" "'/{{ .Release.Namespace }}/polaris/{{ .Values.name }}/xtermjs/";
+          sub_filter '"/pwt/' '"/{{ .Release.Namespace }}/polaris/{{ .Values.name }}/pwt/';
+          sub_filter "'/pwt/" "'/{{ .Release.Namespace }}/polaris/{{ .Values.name }}/pwt/";
+          sub_filter 'src="/' 'src="/{{ .Release.Namespace }}/polaris/{{ .Values.name }}/';
+          sub_filter 'href="/' 'href="/{{ .Release.Namespace }}/polaris/{{ .Values.name }}/';
         }
       }
     }

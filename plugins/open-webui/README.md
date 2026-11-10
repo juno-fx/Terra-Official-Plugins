@@ -1,6 +1,6 @@
 # Open WebUI
 
-![Open WebUI](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/open-webui/scripts/assets/logo.png)
+![Open WebUI](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/open-webui/assets/logo.png)
 
 **Category:** AI
 **Type:** Workload Template
@@ -58,6 +58,9 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `webtop_registry` | **string** · Required · Default: `lscr.io/linuxserver`<br>Registry for the Webtop browser sidecar image |
 | `webtop_repo` | **string** · Required · Default: `chromium`<br>Webtop browser sidecar image repository |
 | `webtop_tag` | **string** · Required · Default: `latest`<br>Webtop browser sidecar image tag |
+| `nginx_registry` | **string** · Required · Default: `docker.io`<br>Registry for the nginx sidecar image that enforces the Hubble login |
+| `nginx_repo` | **string** · Required · Default: `nginx`<br>nginx sidecar image repository |
+| `nginx_tag` | **string** · Required · Default: `alpine`<br>nginx sidecar image tag |
 | `storage_class` | **k8sStorageClass** · Required<br>Storage class for the Open WebUI data persistent volume |
 | `storage_size` | **string** · Required · Default: `10Gi`<br>Size of the persistent volume for chat history and model config |
 

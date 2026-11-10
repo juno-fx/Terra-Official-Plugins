@@ -2,7 +2,7 @@
 
 set -e
 
-ARGOCD_NAMESPACE=argocd
+ARGOCD_NAMESPACE="${ARGOCD_NAMESPACE:-$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)}"
 
 # Check if PREFIX is set and not empty
 if [[ -z "${PREFIX:-}" ]]; then

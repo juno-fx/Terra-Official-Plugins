@@ -25,9 +25,13 @@ out of the box.
 | config_size | `1Gi` | `/var/lib/pve-cluster` — PVE configuration |
 | persistence_storage_class | cluster default | StorageClass for both volumes |
 
+### Custom Environment Variables
+
+Genesis lets you add arbitrary environment variables to the workload at launch time, but `dockurr/proxmox` only documents `PASSWORD` upstream — and that's already covered by the `password` field above. There are no additional custom environment variables to set for this image.
+
 ## Access
 
-- Web UI: exposed through the project ingress at `/polaris/<name>/` (Hubble-authenticated),
+- Web UI: exposed through the project ingress at `/<namespace>/polaris/<name>/` (Hubble-authenticated),
   backend HTTPS on port 8006. Login as `root` with the password field value.
 - Connection metadata (`username=root,port=8006`) is surfaced in Hubble via the
   `kuiper.juno-innovations.com/connection` annotation.
@@ -38,6 +42,6 @@ out of the box.
 - 120s termination grace period matches upstream's `stop_grace_period` so PVE can
   flush state cleanly on shutdown.
 - The Proxmox web UI uses absolute asset paths; if the UI misbehaves under the
-  `/polaris/<name>/` sub-path, access it via the service directly
+  `/<namespace>/polaris/<name>/` sub-path, access it via the service directly
   (`kubectl port-forward svc/<name>-proxmox 8006:8006`) while a path-rewrite
   proxy is evaluated.

@@ -2,18 +2,18 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ .Values.name }}-ingress
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/auth-url: "http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/"
 spec:
+  # Kuiper >= 4.8.0 overwrites this with the launching namespace's IngressClass.
+  # nginx is the fallback for older deployments;
+  ingressClassName: nginx
   rules:
     - host: {{ .Values.host }}
       http:
         paths:
-          - path: "/polaris/{{ .Values.name }}/"
+          - path: "/{{ .Release.Namespace }}/jupyter/{{ .Values.name }}"
             pathType: Prefix
             backend:
               service:
                 name: {{ .Values.name }}-jupyter-notebook
                 port:
-                  number: 8888
+                  number: 8080

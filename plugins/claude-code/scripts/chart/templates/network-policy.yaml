@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Values.name }}-network-policy
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+spec:
+  podSelector:
+    matchLabels:
+      kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+  # Egress is intentionally not restricted here (no Egress policyType), so it
+  # falls through to the workspace's network policies. The nginx sidecar needs
+  # DNS and Hubble for auth_request, the boot script runs apt-get/npm on every
+  # start, and this is an interactive terminal where users install packages.
+  policyTypes:
+    - Ingress
+  # Only the nginx sidecar port is reachable. It enforces the Hubble login itself,
+  # so traffic is accepted from any ingress controller (ingress-nginx, Traefik, ...)
+  # without knowing its namespace. Wetty's own port (ttyd_port) stays blocked.
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 8080

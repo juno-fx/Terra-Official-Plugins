@@ -1,8 +1,8 @@
 name: opencode
 user:
-registry: docker.io
-repo: nginx
-tag: alpine
+nginx_registry: "docker.io"
+nginx_repo: "nginx"
+nginx_tag: "alpine"
 ttyd_port: 7681
 group:
 cpu: "1"
@@ -26,4 +26,6 @@ _kuiper:
 timezone: "America/New_York"
 storage_class:
 storage_size: "1Gi"
-ingressNamespace: ingress-nginx
+
+# Kubernetes RBAC access level for this agent: readonly-ns | admin-ns
+cluster_access:

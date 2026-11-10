@@ -21,8 +21,12 @@ spec:
         juno-innovations.com/app: "hermes-agent"
         juno-innovations.com/user: "{{ .Values.user }}"
         juno-innovations.com/workstation: "{{ .Values.name }}"
+        kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
     spec:
-      {{- if ne .Values.cluster_access "none" }}
+      # Give the container time to drain the gateway and checkpoint state.db
+      # before SIGKILL — critical on spot/preemptible nodes. See preStop below.
+      terminationGracePeriodSeconds: {{ .Values.termination_grace_period | default 120 }}
+      {{- if .Values.cluster_access }}
       serviceAccountName: "{{ .Values.name }}"
       automountServiceAccountToken: true
       {{- else }}
@@ -30,6 +34,12 @@ spec:
       {{- end }}
       securityContext:
         fsGroup: {{ .Values.guid }}
+        # Default fsGroupChangePolicy=Always makes kubelet recursively chgrp
+        # the whole PVC on every pod start — another full volume walk per
+        # boot. OnRootMismatch stats the volume root instead: after the
+        # marker-gated remap the root group already matches guid, so steady-
+        # state starts skip the walk.
+        fsGroupChangePolicy: OnRootMismatch
       initContainers:
         - name: write-config
           image: busybox
@@ -37,13 +47,15 @@ spec:
           env:
             - name: NAME
               value: {{ .Values.name | quote }}
+            - name: NAMESPACE
+              value: {{ .Release.Namespace | quote }}
+            - name: PUID
+              value: {{ .Values.puid | quote }}
+            - name: PGID
+              value: {{ .Values.guid | quote }}
           volumeMounts:
             - name: hermes-data
               mountPath: /opt/data
-            - name: nginx-out
-              mountPath: /opt/proxy
-            - name: nginx-template
-              mountPath: /opt/templates/nginx
             - name: init-script
               mountPath: /opt/templates/init
             - name: init-out
@@ -58,6 +70,11 @@ spec:
           image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
           imagePullPolicy: IfNotPresent
           command: ["/opt/init/start.sh"]
+          lifecycle:
+            preStop:
+              exec:
+                # Graceful drain + WAL checkpoint before the container is killed.
+                command: ["/opt/init/shutdown.sh"]
           ports:
             - name: api
               containerPort: 8642
@@ -119,35 +136,33 @@ spec:
               mountPath: /opt/init
 
         - name: nginx
-          image: nginx:alpine
+          image: "{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}"
           imagePullPolicy: IfNotPresent
-          command: ["nginx", "-g", "daemon off;", "-c", "/opt/proxy/nginx.conf"]
           ports:
             - name: http
-              containerPort: 9119
+              containerPort: 8080
               protocol: TCP
           resources:
             requests:
               memory: "64Mi"
               cpu: "50m"
           volumeMounts:
-            - name: nginx-out
-              mountPath: /opt/proxy
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
 
       volumes:
         {{- if .Values.volumes }}
         {{- toYaml .Values.volumes | nindent 8 }}
         {{- end }}
+        - name: nginx-config
+          configMap:
+            name: "{{ .Values.name }}-nginx"
         - name: hermes-data
           persistentVolumeClaim:
             claimName: "{{ .Values.name }}-data"
-        - name: nginx-out
-          emptyDir: {}
         - name: init-out
           emptyDir: {}
-        - name: nginx-template
-          configMap:
-            name: "{{ .Release.Name }}-nginx-template"
         - name: init-script
           configMap:
             name: "{{ .Release.Name }}-init-script"

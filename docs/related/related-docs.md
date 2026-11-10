@@ -45,6 +45,7 @@ Welcome to the Juno Innovations documentation ecosystem. Our documentation is or
 
 !!! info "External Resources"
     - **GitHub Organization:** [github.com/juno-fx](https://github.com/juno-fx/)
+    - **Terra Games:** [github.com/juno-fx/Terra-Games](https://github.com/juno-fx/Terra-Games) — self-hosted plugin library for game servers and community contributions
     - **Docker Hub:** [hub.docker.com/u/junoinnovations](https://hub.docker.com/u/junoinnovations)
     - **LinkedIn:** [Juno Innovations Company Page](https://www.linkedin.com/company/juno-innovations/about/)
     - **Discord:** [Discord Community](https://discord.gg/PtM6NzazqH)

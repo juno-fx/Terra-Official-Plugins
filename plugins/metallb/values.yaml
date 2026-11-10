@@ -1,0 +1,6 @@
+chart_version: "0.14.9"
+mode: layer2
+address_pool: ""
+bgp_my_asn: 64512
+bgp_peer_asn: 64512
+bgp_peer_address: ""

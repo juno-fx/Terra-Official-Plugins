@@ -3,7 +3,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: {{ .Release.Name }}-velero
-  namespace: argocd
+  namespace: {{ .Release.Namespace }}
 spec:
   project: default
   destination:

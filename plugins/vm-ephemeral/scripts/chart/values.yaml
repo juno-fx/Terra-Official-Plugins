@@ -34,6 +34,9 @@ cloud_init: |-
   password: fedora
   chpasswd: { expire: False }
 use_cloud_init: false
+nginx_registry: "docker.io"
+nginx_repo: "nginx"
+nginx_tag: "alpine"
 gpu_device_name: ""
 virtio_drivers: false
 

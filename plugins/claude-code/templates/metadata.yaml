@@ -41,17 +41,17 @@ data:
       type: string
       required: true
       default: "10Gi"
-    - name: publicAccess
-      description: "Allow public access (disable authentication)"
-      type: boolean
-      required: true
-      default: false
     - name: cluster_access
-      description: "Kubernetes RBAC access level for this agent."
+      description: "Kubernetes RBAC access level for this agent. This is for the workspace it lives in."
       type: select
       required: false
-      default: none
       options:
-        - none
         - readonly-ns
         - admin-ns
+  env_hints: |
+    - name: ANTHROPIC_API_KEY
+      description: Anthropic Console API key used by the claude CLI to authenticate.
+    - name: ANTHROPIC_MODEL
+      description: Overrides the default Claude model used by the CLI.
+    - name: ANTHROPIC_BASE_URL
+      description: Overrides the API base URL, e.g. to point at a proxy or compatible endpoint.

@@ -1,10 +1,15 @@
 # Helios Auto Shutdown
 
-![Helios Auto Shutdown](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios/scripts/assets/helios-icon.png)
+![Helios Auto Shutdown](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios-auto-shutdown/assets/logo.png)
 
 **Category:** Helios Plugin
 **Type:** Workstation Add-on
-**Tags:** `shutdown` · `desktop` · `customization`
+**Tags:** `shutdown` · `desktop` · `customization` · `deprecated`
+
+> [!WARNING]
+> **Deprecated.** Orion now has a built-in auto shutdown and hibernate feature that works for all workloads, not just Helios. Use that instead of installing this plugin.
+>
+> This plugin remains in the repository as a reference example of a Helios init-script plugin (a ConfigMap labelled `kuiper.juno-innovations.com/plugin: "true"`).
 
 ---
 

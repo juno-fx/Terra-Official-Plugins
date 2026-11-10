@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.name }}-slurm-terminal
+spec:
+  selector:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+  ports:
+    - port: 3001
+      targetPort: 3001
+      protocol: TCP
+      name: nginx

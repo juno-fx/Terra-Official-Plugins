@@ -10,8 +10,9 @@ spec:
   selector:
     kuiper.juno-innovations.com/vm-instance: {{ $.Values.name }}
   ports:
-    - protocol: {{ .protocol }}
-      port: {{ .vm_port }}
-      targetPort: {{ .service_port }}
+    - name: {{ .name }}
+      protocol: {{ .protocol }}
+      port: {{ .service_port }}
+      targetPort: {{ .vm_port }}
 ---
 {{ end }}

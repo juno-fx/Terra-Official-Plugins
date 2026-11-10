@@ -7,8 +7,6 @@ metadata:
     juno-innovations.com/workload: "Application"
   labels:
     juno-innovations.com/workstation: "{{ .Values.name }}"
-
-
 spec:
   replicas: 1
   selector:
@@ -18,6 +16,9 @@ spec:
     metadata:
       labels:
         juno-innovations.com/workstation: "{{ .Values.name }}"
+        # Kuiper's label injection does not reach pod templates; the NetworkPolicy
+        # selects on this label, so the pod must declare it itself.
+        kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
       annotations:
         juno-innovations.com/workload: "Application"
     spec:
@@ -25,12 +26,10 @@ spec:
       securityContext:
         fsGroup: {{ .Values.guid }}
       hostname: "{{ .Values.name }}"
-
       {{- if .Values.pullSecret }}
       imagePullSecrets:
         - name: "{{ .Values.pullSecret }}"
       {{- end }}
-
       containers:
         - name: filebrowser
           image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
@@ -49,52 +48,56 @@ spec:
               {{- end }}
             {{- end }}
           ports:
-            - containerPort: 8080
+            - containerPort: 8081
               name: filebrowser
           args:
-            - --port=8080
+            - --port=8081
             - --address=0.0.0.0
             - --root={{ .Values.root }}
-            - --baseURL=/filebrowser/{{ .Values.name }}
+            - --baseURL=/{{ .Release.Namespace }}/filebrowser/{{ .Values.name }}
             - --log=stdout
-            - --database=/data/filebrowser.db
+            - --database=/tmp/filebrowser.db
             - --username={{ .Values.user }}
             - --noauth
             - --cacheDir=/tmp/cache
-          env:
-            - name: JUNO
-              value: "true"
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
               drop:
                 - ALL
-            readOnlyRootFilesystem: true
             runAsNonRoot: true
             runAsUser: {{ .Values.puid }}
           volumeMounts:
             - name: config
               mountPath: /config
-            - name: filebrowser-data
-              mountPath: /data
             - name: tmp-cache
               mountPath: /tmp/cache
             {{- if .Values.volumeMounts }}
             {{- toYaml .Values.volumeMounts | nindent 12 }}
             {{- end }}
+        - name: nginx
+          image: "{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}"
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+          ports:
+            - containerPort: 8080
+              name: http
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
 
       volumes:
+        - name: nginx-config
+          configMap:
+            name: "{{ .Values.name }}-nginx"
         - name: config
           emptyDir: {}
         - name: tmp-cache
           emptyDir: {}
-        - name: filebrowser-data
-          {{- if .Values.dataPersistent }}
-          persistentVolumeClaim:
-            claimName: "{{ .Values.name }}-data"
-          {{- else }}
-          emptyDir: {}
-          {{- end }}
         {{- if .Values.volumes }}
         {{- toYaml .Values.volumes | nindent 8 }}
         {{- end }}

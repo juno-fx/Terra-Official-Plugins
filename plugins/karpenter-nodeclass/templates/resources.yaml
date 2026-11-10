@@ -6,8 +6,7 @@ spec:
   amiFamily: AL2023
   role: {{ .Values.role | quote }}
   subnetSelectorTerms:
-    - tags:
-        karpenter.sh/discovery: {{ .Values.cluster_name | quote }}
+    - id: {{ .Values.subnet_id | quote }}
   securityGroupSelectorTerms:
     - tags:
         karpenter.sh/discovery: {{ .Values.cluster_name | quote }}
