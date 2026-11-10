@@ -29,4 +29,4 @@ nginx_registry: "docker.io"
 nginx_repo: "nginx"
 nginx_tag: "latest"
 persistence_size: 1Gi
-persistence_storage_class: local-path
+persistence_storage_class:
