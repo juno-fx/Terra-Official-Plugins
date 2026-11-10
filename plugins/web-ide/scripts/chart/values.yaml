@@ -28,6 +28,5 @@ terra_role:
 nginx_registry: "docker.io"
 nginx_repo: "nginx"
 nginx_tag: "latest"
-proxy_namespace: ingress-nginx
 persistence_size: 1Gi
 persistence_storage_class: local-path
