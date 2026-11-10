@@ -3,6 +3,10 @@ kind: Application
 metadata:
   name: {{ .Release.Name }}-nvidia-gpu-operator
   namespace: {{ .Release.Namespace }}
+  finalizers:
+    # Without this Argo CD deletes the Application object only and orphans the
+    # operator, its operands and the ClusterPolicy.
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   destination:
@@ -47,6 +51,8 @@ spec:
                   version: v1
                   flags:
                     migStrategy: none
+                  {{- if gt (int .Values.slice_count) 1 }}
+                  # A slice_count of 1 means no time-slicing; the config parser rejects replicas < 2.
                   sharing:
                     timeSlicing:
                       renameByDefault: false
@@ -54,6 +60,7 @@ spec:
                       resources:
                         - name: nvidia.com/gpu
                           replicas: {{ .Values.slice_count }}
+                  {{- end }}
           nfd:
             enabled: true
           dcgm:

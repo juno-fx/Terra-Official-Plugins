@@ -43,11 +43,9 @@ fields:
     type: boolean
   - name: slice_count
     description: |
-      Number of time-slices to create for each GPU. This is required for time-slicing 
-      configuration and determines how many slices each GPU will be divided into. The 
-      default is 4, which means that each GPU will be divided into 4 time-slices. You 
-      can adjust this number based on your workload requirements and the capabilities 
-      of your GPUs.
+      Number of time-slices to create for each GPU. 4 means each GPU shows up as 4
+      schedulable nvidia.com/gpu resources. 1 turns time-slicing off (whole GPUs). Use 1
+      with the HAMi GPU Sharing plugin, which does its own slicing.
     required: true
     default: 4
     type: int
