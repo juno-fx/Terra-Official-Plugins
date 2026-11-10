@@ -68,13 +68,8 @@ data:
       required: false
       type: list
       fields:
-        - name: instance_port
+        - name: port
           description: Port the application listens on inside the instance
-          required: true
-          type: int
-          default: 22
-        - name: service_port
-          description: Port clients connect to. Only differs from instance_port with aws_private_subnet, where it is the port on the cluster Service or load balancer
           required: true
           type: int
           default: 22

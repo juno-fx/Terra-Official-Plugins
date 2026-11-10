@@ -36,5 +36,4 @@ delete_on_termination: true
 aws_private_subnet: false
 load_balancer:
 ports:
-  - instance_port: 22
-    service_port: 22
+  - port: 22

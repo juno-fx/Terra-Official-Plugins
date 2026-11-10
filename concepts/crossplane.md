@@ -37,12 +37,12 @@ spec:
 
 EC2 fields, all user-supplied at launch: `ami_image_id`, `instance_type` (default `t3.micro`),
 `region`, `subnet_id`, `security_group_ids` (list), `block_device_mappings` (list: mount path +
-size GB), `delete_on_termination` (boolean, default `true`), `ports` (list: `instance_port` +
-`service_port`, default `22` → `22`), `provider_config_ref` (default
+size GB), `delete_on_termination` (boolean, default `true`), `ports` (list of `port`, default
+`22`), `provider_config_ref` (default
 `aws-provider-argocd-provider-config`).
 
-The chart joins `ports` into the `expose` annotation as `service_port:instance_port` pairs
-(`"3389:3389,2222:22"`), and omits the annotation when the list is empty.
+The chart joins `ports` into the `expose` annotation (`"22,3389"`), and omits the annotation when
+the list is empty.
 
 ## Surfacing the instance — Kuiper's EC2 flow
 
