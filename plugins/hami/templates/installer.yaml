@@ -2,7 +2,61 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: {{ .Release.Name }}-hami
-  namespace: argocd
+  namespace: {{ .Release.Namespace }}
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    # Upstream default; HAMi's docs, the WebUI chart and the AMD plugin all assume it.
+    namespace: kube-system
+  source:
+    repoURL: {{ .Values.helm_repo }}
+    chart: hami
+    targetRevision: {{ .Values.version | quote }}
+    helm:
+      releaseName: hami
+      values: |
+        scheduler:
+          # kubeScheduler.image.tag is left empty on purpose: the chart derives it from
+          # the cluster's Kubernetes version.
+          defaultSchedulerPolicy:
+            nodeSchedulerPolicy: {{ .Values.scheduler_node_policy }}
+            gpuSchedulerPolicy: {{ .Values.scheduler_gpu_policy }}
+        devicePlugin:
+          # Run on exactly the nodes where the NVIDIA GPU Operator would run its own
+          # device plugin. Skips nodes in vm-passthrough mode. null drops the chart's
+          # default gpu=on key so no manual node labelling is needed.
+          nvidiaNodeSelector:
+            gpu: null
+            nvidia.com/gpu.deploy.device-plugin: "true"
+          # Wait for the GPU Operator's container toolkit before starting.
+          gpuOperatorToolkitReady:
+            enabled: true
+          # The chart defaults to a NodePort for the metrics service.
+          service:
+            type: ClusterIP
+        devices:
+          nvidia:
+            # RuntimeClass created by the GPU Operator's container toolkit.
+            runtimeClassName: nvidia
+            deviceSplitCount: {{ .Values.device_split_count }}
+            deviceMemoryScaling: {{ .Values.device_memory_scaling }}
+            deviceCoreScaling: {{ .Values.device_core_scaling }}
+            defaultMemory: {{ .Values.default_gpu_memory }}
+            preConfiguredDeviceMemory: {{ .Values.preconfigured_gpu_memory }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-hami-webui
+  namespace: {{ .Release.Namespace }}
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
@@ -10,90 +64,57 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system
-  sources:
-    - repoURL: {{ .Values.helm_repo }}
-      chart: hami
-      targetRevision: {{ .Values.version }}
-      helm:
-        releaseName: {{ .Release.Name }}-hami
-        values: |
-          # ============================================
-          # RESOURCE NAMING
-          # All HAMi GPU resources use hami.io/ prefix
-          # to avoid conflicts with GPU Operator's
-          # nvidia.com/ resources.
-          # ============================================
-          resourceName: "hami.io/gpu"
-          resourceMem: "hami.io/gpu-memory"
-          resourceMemPercentage: "hami.io/gpu-memory-percentage"
-          resourceCores: "hami.io/gpu-cores"
-          resourcePriority: "hami.io/priority"
-
-          # ============================================
-          # SCHEDULER — safe coexistence mode
-          # ============================================
-          scheduler:
-            forceOverwriteDefaultScheduler: false
-            kubeScheduler:
-              image:
-                registry: "registry.k8s.io"
-                repository: "kube-scheduler"
-                tag: "v1.36.2"
-            defaultSchedulerPolicy:
-              nodeSchedulerPolicy: {{ .Values.scheduler_node_policy }}
-              gpuSchedulerPolicy: {{ .Values.scheduler_gpu_policy }}
-
-          # ============================================
-          # DEVICE PLUGIN — NVIDIA (always on)
-          # ============================================
-          devicePlugin:
-            deviceSplitCount: {{ .Values.device_split_count }}
-            deviceMemoryScaling: {{ .Values.device_memory_scaling }}
-            deviceCoreScaling: {{ .Values.device_core_scaling }}
-            preConfiguredDeviceMemory: {{ if .Values.dgx_spark_cluster }}131072{{ else }}0{{ end }}
-            runtimeClassName: "nvidia"
-            nvidiaNodeSelector:
-              hami.com/gpu: "true"
-              gpu: null
-
-          # ============================================
-          # VENDOR DEVICES
-          # ============================================
-          devices:
-            nvidia:
-              enabled: true
-              gpuCorePolicy: default
-              libCudaLogLevel: 1
-            ascend:
-              enabled: false
-            cambricon:
-              enabled: false
-            hygon:
-              enabled: false
-            iluvatar:
-              enabled: false
-            mthreads:
-              enabled: false
-            metax:
-              enabled: false
-            enflame:
-              enabled: false
-            kunlun:
-              enabled: false
-            awsneuron:
-              enabled: false
-            biren:
-              enabled: false
-
-          # ============================================
-          # OPTIONAL FEATURES
-          # ============================================
-          prometheus:
-            enabled: {{ .Values.enable_monitoring }}
-          dra:
-            enabled: false
+  source:
+    repoURL: {{ .Values.webui_git_repo }}
+    path: charts/hami-webui
+    targetRevision: {{ .Values.webui_git_revision | quote }}
+    helm:
+      releaseName: hami-webui
+      values: |
+        # The dashboard reads everything from Prometheus; it never talks to HAMi directly.
+        externalPrometheus:
+          enabled: true
+          address: {{ .Values.prometheus_url | quote }}
+        kube-prometheus-stack:
+          enabled: false
+        # The GPU Operator already runs a DCGM exporter on the GPU nodes.
+        dcgm-exporter:
+          enabled: false
+        hamiServiceMonitor:
+          enabled: true
+          svcNamespace: kube-system
+          {{- with .Values.prometheus_release_label }}
+          additionalLabels:
+            release: {{ . | quote }}
+          {{- end }}
+        serviceMonitor:
+          enabled: true
+          {{- with .Values.prometheus_release_label }}
+          additionalLabels:
+            release: {{ . | quote }}
+          {{- end }}
+        # Same node set as the HAMi device plugin above.
+        vendorNodeSelectors:
+          NVIDIA: nvidia.com/gpu.deploy.device-plugin=true
+        frontend:
+          # Serve the SPA, its assets and API under the Ingress prefix.
+          basePath: {{ .Values.prefix | quote }}
+          # Genesis embeds the dashboard in an iFrame on the same host.
+          frameAncestors: ["'self'"]
+        # The dashboard has no login of its own, so the Ingress sits behind Genesis auth.
+        ingress:
+          enabled: true
+          className: nginx
+          annotations:
+            nginx.ingress.kubernetes.io/auth-url: "http://genesis.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-service/{{ .Release.Name }}/"
+            nginx.ingress.kubernetes.io/auth-signin: /unauthorized/
+          hosts:
+            - host: {{ .Values.host | quote }}
+              paths:
+                - path: {{ .Values.prefix | quote }}
+                  pathType: Prefix
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
-      allowEmpty: true
+      allowEmpty: false

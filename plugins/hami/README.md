@@ -4,31 +4,64 @@
 
 **Category:** Hardware
 **Type:** Cluster Service
-**Tags:** `gpu` · `hami` · `gpu-sharing`
+**Tags:** `gpu` · `hami` · `gpu-sharing` · `dashboard`
+**Editable:** Yes
 
 ---
 
 ## Overview
 
-HAMi (Heterogeneous AI Computing Virtualization Middleware) slices physical GPUs into fractional vGPUs with hard memory and compute core isolation — multiple workloads can share a single GPU with deterministic guarantees, without modifying application code. It installs alongside the NVIDIA GPU Operator: GPU Operator manages drivers and the container runtime; HAMi manages GPU sharing and scheduling on top.
+HAMi (Heterogeneous AI Computing Virtualization Middleware) lets several workloads share one
+physical GPU. Each workload gets a slice with a GPU memory limit and an optional compute quota,
+enforced inside the container, with no changes to application code.
+
+HAMi sits on top of the NVIDIA GPU Operator. The operator keeps providing drivers, the container
+toolkit, the `nvidia` RuntimeClass, Node Feature Discovery and the DCGM exporter. HAMi replaces
+only the device plugin and adds its own scheduler extender.
+
+The plugin installs two Argo CD Applications into `kube-system`:
+
+| Application | Chart | Role |
+|-------------|-------|------|
+| `<release>-hami` | [`hami`](https://project-hami.github.io/HAMi/) | scheduler, webhook, device plugin |
+| `<release>-hami-webui` | [`hami-webui`](https://github.com/Project-HAMi/HAMi-WebUI) 2.0.0 (from git) | GPU dashboard, embedded in Genesis |
+
+The dashboard is a Genesis **dashboard plugin**: it appears in the Genesis sidebar for admin
+users and is served from the Genesis host under `prefix`, behind the Genesis authentication gate.
 
 ---
 
 ## How It Works
 
-**Cluster Service** — Installed once per cluster by an administrator. Once active, GPU nodes are configured for fractional GPU allocation and any workload in the cluster can request shared GPU resources — no per-project setup needed.
+**Cluster Service** — installed once per cluster by an administrator.
+
+- The HAMi device plugin runs on every node the GPU Operator labels
+  `nvidia.com/gpu.deploy.device-plugin=true`. Nodes in VM pass-through mode are skipped. No
+  manual node labelling is needed.
+- The device plugin advertises `nvidia.com/gpu` as before, multiplied by `device_split_count`,
+  plus `nvidia.com/gpumem` and `nvidia.com/gpucores` so workloads can ask for a slice.
+- A mutating webhook rewrites every pod that requests `nvidia.com/gpu` to use the HAMi
+  scheduler. Workload templates do not need `schedulerName` set.
+- A pod that asks for `nvidia.com/gpu: 1` and nothing else still gets the whole GPU unless
+  `default_gpu_memory` is set. Sharing starts when workloads request `nvidia.com/gpumem` or
+  `nvidia.com/gpucores`, or when `default_gpu_memory` makes every plain request a slice.
 
 ---
 
 ## Prerequisites
 
-- **GPU Operator installed** — HAMi replaces the GPU Operator's device plugin and scheduler; GPU Operator still manages drivers, nvidia-container-toolkit, NFD, and DCGM
-- **GPU nodes labeled `hami.com/gpu: "true"`** — Apply manually to each GPU node that should participate in GPU sharing:
-  ```
-  kubectl label node <node> hami.com/gpu=true
-  ```
-  Nodes without this label are skipped by the HAMi device plugin. Use this to exclude passthrough-only nodes.
-- Kubernetes 1.18+ (upstream HAMi requirement)
+- **NVIDIA GPU Operator plugin installed** and healthy. HAMi needs the driver, the container
+  toolkit and the `nvidia` RuntimeClass it provides.
+- **The GPU Operator's own device plugin must be off.** Two device plugins registering
+  `nvidia.com/gpu` on the same node fight over the resource. In the `nvidia-gpu-operator`
+  plugin set `device_plugin` to `false` (the plugin is editable) and wait for the operator's
+  device-plugin DaemonSet to disappear before installing HAMi. Its `slice_count` has no effect
+  while the device plugin is off.
+- **Prometheus with the Prometheus Operator CRDs** (the `kube-prometheus-stack` plugin). The
+  dashboard creates ServiceMonitors and reads every panel from Prometheus.
+- **Genesis reachable over HTTPS** on `host`; the dashboard is embedded in Genesis as an iFrame.
+- **A GPU node with a working `nvidia-smi`.** Unified-memory systems such as NVIDIA DGX Spark
+  (GB10) report `memory.total` as `N/A`; set `preconfigured_gpu_memory` for those (see Notes).
 
 ---
 
@@ -40,6 +73,8 @@ HAMi (Heterogeneous AI Computing Virtualization Middleware) slices physical GPUs
 4. Fill in the configuration fields below
 5. Click **Confirm** to deploy
 
+The plugin is editable: fields can be changed after install and Argo CD rolls the change out.
+
 ---
 
 ## Configuration
@@ -48,74 +83,101 @@ HAMi (Heterogeneous AI Computing Virtualization Middleware) slices physical GPUs
 
 | Field | Details |
 |-------|---------|
-| `version` | **select** · Required · Default: `v2.9.0`<br>Upstream HAMi release tag |
-| `helm_repo` | **string** · Optional · Default: `https://project-hami.github.io/HAMi/`<br>Helm repository URL |
-| `scheduler_node_policy` | **select** · Optional · Default: `binpack`<br>Node-level scheduling — binpack packs on fewer nodes; spread distributes across nodes |
-| `scheduler_gpu_policy` | **select** · Optional · Default: `spread`<br>GPU-level scheduling — binpack packs on fewer GPUs; spread distributes |
-| `device_split_count` | **int** · Optional · Default: `10`<br>Max concurrent workloads per physical GPU |
-| `device_memory_scaling` | **string** · Optional · Default: `1`<br>GPU memory overcommit ratio. `1` = 1:1 no overcommit. `>1` allows virtual memory beyond physical capacity |
-| `device_core_scaling` | **string** · Optional · Default: `1`<br>GPU compute core overcommit ratio. `1` = 1:1 no overcommit |
-| `enable_monitoring` | **boolean** · Optional · Default: `false`<br>Enable Prometheus metrics endpoint (scheduler port 9393, device plugin port 9394) |
+| `version` | **select** · Required · Default: `2.11.0`<br>HAMi chart version |
+| `helm_repo` | **string** · Required · Default: `https://project-hami.github.io/HAMi/`<br>Helm repository for the HAMi chart |
+| `scheduler_node_policy` | **select** · Optional · Default: `binpack`<br>Placement across nodes. `binpack` fills one node before using the next; `spread` distributes |
+| `scheduler_gpu_policy` | **select** · Optional · Default: `spread`<br>Placement across the GPUs of one node. `spread` uses every GPU before doubling up; `binpack` fills one GPU first |
+| `device_split_count` | **int** · Optional · Default: `10`<br>Maximum number of workloads sharing one physical GPU |
+| `device_memory_scaling` | **string** · Optional · Default: `1`<br>GPU memory overcommit ratio. `1` advertises the real memory; `2` lets workloads claim twice the physical memory in total |
+| `device_core_scaling` | **string** · Optional · Default: `1`<br>GPU compute overcommit ratio. `1` advertises 100% of the cores per GPU |
+| `default_gpu_memory` | **int** · Optional · Default: `0`<br>GPU memory in MiB given to a workload that requests `nvidia.com/gpu` without `nvidia.com/gpumem`. `0` gives such workloads the whole GPU. Set to, for example, `8192` to make every plain GPU request a slice |
+| `preconfigured_gpu_memory` | **int** · Optional · Default: `0`<br>Total GPU memory in MiB to assume per GPU when the driver cannot report it (DGX Spark / GB10). `0` uses the driver's value |
+| `host` | **string** · Required<br>DNS name of the Genesis host; the dashboard Ingress and iFrame use it |
+| `prefix` | **string** · Optional · Default: `/hami`<br>URL path the dashboard is served under on the Genesis host |
+| `prometheus_url` | **string** · Optional · Default: `http://prometheus-kube-prometheus-prometheus.prometheus.svc.cluster.local:9090`<br>In-cluster Prometheus URL the dashboard reads from. The default matches the `kube-prometheus-stack` plugin |
+| `prometheus_release_label` | **string** · Optional · Default: `prometheus`<br>Value of the `release` label Prometheus requires on ServiceMonitors. The default matches the `kube-prometheus-stack` plugin. Empty adds no label |
+| `webui_git_repo` | **string** · Required · Default: `https://github.com/Project-HAMi/HAMi-WebUI.git`<br>Git repository holding the HAMi-WebUI chart at `charts/hami-webui` |
+| `webui_git_revision` | **string** · Required · Default: pinned commit on `main`<br>Git revision of the HAMi-WebUI chart. Pinned until upstream publishes chart 2.0.0 to its Helm repository |
 
 ---
 
-## Resource Naming
+## Requesting a GPU
 
-HAMi uses `hami.io/` resource names to avoid conflicts with GPU Operator's `nvidia.com/` resources. This gives you two independent GPU paths:
+HAMi keeps the standard resource name, so existing workloads keep working. Slices are requested
+with two extra resources:
 
-| Resource | Source | Meaning |
-|----------|--------|---------|
-| `nvidia.com/gpu` | GPU Operator | Whole GPU — standard allocation, no sharing |
-| `hami.io/gpu` | HAMi | Fractional GPU — sliced with memory/core isolation |
-| `hami.io/gpu-memory` | HAMi | Requested GPU memory (MiB) |
-| `hami.io/gpu-cores` | HAMi | Requested GPU compute percentage (0–100) |
-| `hami.io/gpu-memory-percentage` | HAMi | Request GPU memory as a % of total GPU memory |
-
-### Workload Examples
+| Resource | Meaning |
+|----------|---------|
+| `nvidia.com/gpu` | Number of GPUs (or GPU slices) for the container |
+| `nvidia.com/gpumem` | GPU memory for the container, in MiB |
+| `nvidia.com/gpumem-percentage` | GPU memory as a percentage of the card, instead of `gpumem` |
+| `nvidia.com/gpucores` | Share of the GPU's compute, 0–100 |
 
 ```yaml
-# Whole GPU via GPU Operator (no sharing)
-apiVersion: v1
-kind: Pod
-metadata:
-  name: full-gpu-pod
-spec:
-  containers:
-    - name: app
-      image: your-image
-      resources:
-        limits:
-          nvidia.com/gpu: 1
+# Whole GPU — unchanged from the GPU Operator (unless default_gpu_memory is set)
+resources:
+  limits:
+    nvidia.com/gpu: 1
 ```
 
 ```yaml
-# Shared GPU via HAMi (fractional allocation)
-apiVersion: v1
-kind: Pod
-metadata:
-  name: shared-gpu-pod
-spec:
-  schedulerName: hami-scheduler  # required for HAMi scheduling
-  containers:
-    - name: app
-      image: your-image
-      resources:
-        limits:
-          hami.io/gpu: 1
-          hami.io/gpu-memory: 3000          # 3 GB of GPU memory
-          # hami.io/gpu-cores: 50            # 50% of GPU compute cores (optional)
-          # hami.io/gpu-memory-percentage: 25  # or request by percentage
+# One slice: 4 GiB of GPU memory and up to 30% of compute
+resources:
+  limits:
+    nvidia.com/gpu: 1
+    nvidia.com/gpumem: 4096
+    nvidia.com/gpucores: 30
 ```
 
-> **Note:** Workloads using `hami.io/` resources must set `schedulerName: hami-scheduler` in their pod spec. The GPU Operator path (`nvidia.com/gpu`) continues to work unchanged.
+Workload templates in this catalog (for example `jupyter-notebook` with `gpu` on and
+`gpu_vendor: nvidia`) request `nvidia.com/gpu: "1"`. With HAMi installed that is a whole GPU
+until either `default_gpu_memory` is set or the template grows memory and core fields.
+
+---
+
+## Dashboard
+
+HAMi-WebUI is a read-only dashboard: cards per node and per GPU, allocation versus physical
+capacity, running tasks and utilisation history. It never talks to HAMi directly; every panel is a
+Prometheus query.
+
+- Reached from the Genesis sidebar (admin users) or at `https://<host><prefix>/`. The Ingress
+  carries the Genesis `auth-url` gate; the dashboard has no login of its own.
+- Served under `prefix` through the chart's `frontend.basePath`, with `frameAncestors` set to
+  `'self'` so only the Genesis host may embed it. This is why the plugin needs chart 2.0.0: the
+  1.x dashboard can only live at `/`.
+- Two ServiceMonitors (HAMi device-plugin metrics in `kube-system`, and the dashboard's own
+  exporter) carry `release: <prometheus_release_label>` so Prometheus picks them up. The chart's
+  bundled Prometheus and DCGM exporter stay off because the cluster already has both.
+- **Utilisation panels need DCGM metrics in Prometheus.** Allocation data comes from HAMi's own
+  exporter and works out of the box. Per-GPU utilisation and memory-used graphs come from the GPU
+  Operator's DCGM exporter; turn on `dcgm_servicemonitor` in the `nvidia-gpu-operator` plugin
+  (same `prometheus_release_label`). Without it those panels stay empty.
+- The chart is sourced from git because upstream has not published 2.0.0 to its Helm repository.
+  Argo CD builds the chart's dependencies at sync time, so the repo-server needs outbound access to
+  `prometheus-community.github.io` and `nvidia.github.io` as well as GitHub. The image is pulled by
+  digest, pinned by the chart.
 
 ---
 
 ## Notes
 
-- HAMi works alongside the GPU Operator — install GPU Operator first, then HAMi. GPU Operator handles drivers, the container runtime, NFD, and monitoring; HAMi provides GPU sharing and isolation
-- The `hami.io/` prefix avoids resource name conflicts between the two device plugins
-- `device_split_count` caps how many pods can share one GPU. Higher values = more sharing, but more fragmentation risk
-- Memory or core overcommit (`>1`) allocates more virtual GPU capacity than physically available. Hard isolation is enforced at the device level; resource contention occurs only if all consumers request their full share simultaneously
-- Prometheus metrics at ports 9393 (scheduler) and 9394 (device plugin) require a Prometheus scrape target to collect
-- Additional GPU vendor support (Ascend, Cambricon, Hygon, Iluvatar, Moore Threads, MetaX, Enflame, Kunlunxin, AWS Neuron, Biren) is available but not exposed in the Terra UI. To enable, add vendor flags via Helm values override (e.g. `devices.ascend.enabled: true`). See the [HAMi upstream documentation](https://project-hami.io/docs) for per-vendor requirements
+- **Install order matters.** GPU Operator first, with its device plugin disabled; then HAMi.
+  Installing HAMi while the operator's device plugin still runs leaves two plugins registering
+  `nvidia.com/gpu` on each node.
+- **Overcommit** (`device_memory_scaling` or `device_core_scaling` above `1`) advertises more
+  capacity than the hardware has. Memory limits are still enforced per container; contention
+  happens only when every consumer uses its full share at once.
+- **DGX Spark / GB10** share system memory with the GPU and `nvidia-smi` reports no total.
+  Without `preconfigured_gpu_memory` HAMi registers the node with zero GPU memory and no slice
+  can be placed there. A 128 GB Spark takes about `98304`. Compute quotas (`gpucores`) on this
+  platform are not yet confirmed to throttle; memory limits work.
+- **Scheduler image.** The chart derives the kube-scheduler image tag from the cluster's
+  Kubernetes version; nothing to set.
+- **Namespaces to leave alone.** Label a namespace `hami.io/webhook: ignore` to keep HAMi's
+  webhook away from its pods.
+- **AMD GPUs** are not handled by this plugin yet. HAMi's AMD device plugin is a separate,
+  git-only chart; wiring it in is planned as a follow-up once the NVIDIA path is proven.
+- **Uninstall** removes both Applications. Running GPU workloads keep their slices until they
+  restart; new launches fall back to whatever device plugin is registered, so re-enable the GPU
+  Operator's device plugin after removing HAMi.

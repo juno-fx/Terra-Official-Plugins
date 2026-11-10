@@ -2,78 +2,122 @@ resource_id: hami
 name: HAMi GPU Sharing
 icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/hami/assets/hami-graph-color.svg
 description: |
-  Heterogeneous AI Computing Virtualization Middleware. Slices physical GPUs
-  into fractional vGPUs with hard memory and core isolation. Supports 10+
-  accelerator vendors. Installs alongside GPU Operator — HAMi provides GPU
-  sharing, GPU Operator provides drivers.
+  Share one physical GPU between several workloads. HAMi slices GPUs into fractions with
+  memory limits and compute quotas, on top of the GPU Operator which keeps providing
+  drivers and the container runtime. Includes the HAMi-WebUI GPU dashboard, embedded in
+  Genesis. https://project-hami.io
 category: Hardware
 tags:
   - gpu
   - hami
-  - cluster-level
   - gpu-sharing
-  - heterogeneous
+  - dashboard
+  - cluster-level
+editable: true
 fields:
   - name: version
-    description: HAMi upstream release tag.
+    description: HAMi chart version to install.
     required: true
     type: select
-    default: v2.9.0
+    default: "2.11.0"
     options:
-      - v2.9.0
-      - v2.8.0
-      - v2.7.0
-
+      - "2.11.0"
   - name: helm_repo
-    description: Helm chart repository URL.
-    required: false
+    description: Helm repository URL for the HAMi chart.
+    required: true
     type: string
     default: "https://project-hami.github.io/HAMi/"
-
   - name: scheduler_node_policy
-    description: Node scheduling — binpack packs on fewer nodes; spread distributes.
+    description: |
+      How GPU workloads are placed across nodes. binpack fills one node before using the
+      next; spread distributes workloads across nodes.
     required: false
     type: select
     default: binpack
-    options: [binpack, spread]
-
+    options:
+      - binpack
+      - spread
   - name: scheduler_gpu_policy
-    description: GPU scheduling within nodes — binpack or spread.
+    description: |
+      How GPU workloads are placed across the GPUs of one node. spread uses every GPU
+      before doubling up; binpack fills one GPU first.
     required: false
     type: select
     default: spread
-    options: [binpack, spread]
-
+    options:
+      - binpack
+      - spread
   - name: device_split_count
-    description: Max concurrent workloads per physical GPU.
+    description: Maximum number of workloads that may share one physical GPU.
     required: false
     type: int
     default: 10
-
   - name: device_memory_scaling
-    description: GPU memory overcommit ratio (1 = no overcommit).
-    required: false
-    type: string
-    default: "1"
-
-  - name: device_core_scaling
-    description: GPU core overcommit ratio (1 = no overcommit).
-    required: false
-    type: string
-    default: "1"
-
-  - name: enable_monitoring
-    description: Enable Prometheus metrics endpoint at port 9393.
-    required: false
-    type: boolean
-    default: false
-
-  - name: dgx_spark_cluster
     description: |
-      Enable if your cluster has NVIDIA DGX Spark (GB10) nodes with
-      unified memory architecture. Pre-configures total GPU memory
-      to 128GB since NVML auto-detection does not report memory on
-      these systems. Set to false for standard GPUs (A100, H100, etc.).
+      GPU memory overcommit ratio. 1 advertises the real memory; 2 lets workloads claim
+      twice the physical memory in total (uses host memory as spill-over).
     required: false
-    type: boolean
-    default: false
+    type: string
+    default: "1"
+  - name: device_core_scaling
+    description: GPU compute overcommit ratio. 1 advertises 100% of the cores per GPU.
+    required: false
+    type: string
+    default: "1"
+  - name: default_gpu_memory
+    description: |
+      GPU memory in MiB handed to a workload that requests a GPU without naming an amount
+      (nvidia.com/gpu without nvidia.com/gpumem). 0 gives such workloads the whole GPU,
+      which means no sharing until workloads ask for a slice. Set this to make every
+      plain GPU request a slice, for example 8192.
+    required: false
+    type: int
+    default: 0
+  - name: preconfigured_gpu_memory
+    description: |
+      Total GPU memory in MiB to assume per GPU when the driver cannot report it. Needed
+      for unified-memory systems such as NVIDIA DGX Spark (GB10), where nvidia-smi shows
+      memory.total as N/A and HAMi otherwise leaves the node unregistered. 0 uses the
+      value reported by the driver. A 128 GB DGX Spark takes about 98304.
+    required: false
+    type: int
+    default: 0
+  - name: host
+    description: The DNS name of your Genesis host, for the GPU dashboard.
+    required: true
+    type: string
+  - name: prefix
+    description: |
+      URL path the GPU dashboard is served under on the Genesis host, for example /hami.
+      Rarely needs changing.
+    required: false
+    type: string
+    default: "/hami"
+  - name: prometheus_url
+    description: |
+      In-cluster URL of the Prometheus the dashboard reads from. The default matches
+      the Prometheus plugin (kube-prometheus-stack in the prometheus namespace).
+    required: false
+    type: string
+    default: "http://prometheus-kube-prometheus-prometheus.prometheus.svc.cluster.local:9090"
+  - name: prometheus_release_label
+    description: |
+      Value of the release label Prometheus requires on ServiceMonitors before it scrapes
+      them. The default matches the Prometheus plugin (Helm release prometheus). Leave
+      empty if your Prometheus picks up every ServiceMonitor.
+    required: false
+    type: string
+    default: "prometheus"
+  - name: webui_git_repo
+    description: |
+      Git repository holding the HAMi-WebUI Helm chart (charts/hami-webui). The 2.0.0
+      chart, which adds the sub-path serving needed for embedding in Genesis, is not
+      published to the upstream Helm repository yet, so the chart is taken from git.
+    required: true
+    type: string
+    default: "https://github.com/Project-HAMi/HAMi-WebUI.git"
+  - name: webui_git_revision
+    description: Git commit, tag or branch of the HAMi-WebUI chart to install.
+    required: true
+    type: string
+    default: "cb896331e0e39447d6033338fb23433aa01ae536"
