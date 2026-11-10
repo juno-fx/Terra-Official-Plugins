@@ -33,3 +33,5 @@ provider_config_ref:
 region: ""
 instance_type: t3.micro
 delete_on_termination: true
+aws_private_subnet: false
+load_balancer:

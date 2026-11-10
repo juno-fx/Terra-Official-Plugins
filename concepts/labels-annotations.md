@@ -36,6 +36,8 @@ Full detail + examples: `concepts/ingress.md`.
 | `kuiper.juno-innovations.com/expose` | Crossplane EC2 Instance | comma-separated ports | Kuiper auto-creates an ExternalName Service exposing these ports once EC2 DNS is available. |
 | `kuiper.juno-innovations.com/aws-remote-connection` | Crossplane EC2 Instance | `"true"` | Kuiper computes and writes the `connection` annotation once EC2 DNS is available. |
 | `kuiper.juno-innovations.com/use-private-dns` | Crossplane EC2 Instance | `"true"` | Use `privateDnsName` instead of `publicDnsName` for the ExternalName Service and connection annotation. |
+| `kuiper.juno-innovations.com/aws-private-subnet` | Crossplane EC2 Instance | `"true"` | Broker instead of alias: once the instance is Ready with a private IP, Kuiper creates a selector-less `ClusterIP` Service (TCP only) plus an EndpointSlice pointing at `privateIpAddress`, and writes the `connection` annotation from the Service's in-cluster DNS name and ports. Overrides `use-private-dns`. Requires the cluster to route to the VPC. |
+| `kuiper.juno-innovations.com/aws-load-balancer` | Crossplane EC2 Instance | `"true"` | With `aws-private-subnet`, make the broker Service `type: LoadBalancer` and copy every `service.beta.kubernetes.io/*` annotation on the Instance onto it (this is how the LB provider is picked). The `connection` annotation waits for the LB address and uses it. |
 
 ## Kuiper-managed — do not set
 
