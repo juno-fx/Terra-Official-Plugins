@@ -19,6 +19,13 @@ spec:
       helm:
         releaseName: {{ .Release.Name }}-nvidia-gpu-operator
         values: |
+          # The release name above is long. The NFD subchart truncates its fullname to 63
+          # characters and then appends "-prune" for its post-delete hook Job, pushing the
+          # Job's label past the 63-character limit. The API server rejects the Job, Argo
+          # retries forever and the uninstall never finishes. A short fixed NFD name keeps
+          # every derived name under the limit.
+          node-feature-discovery:
+            fullnameOverride: {{ .Release.Name }}-nfd
           toolkit:
             enabled: true
             {{ if .Values.k3s }}

@@ -60,6 +60,7 @@ The NVIDIA GPU Operator automates the management of NVIDIA GPU resources in a Ku
 
 ## Notes
 
+- NFD resources are named `<release>-nfd-*` (`fullnameOverride`). The default naming overflowed Kubernetes' 63-character label limit on the NFD post-delete prune Job, which left uninstalls stuck in Argo CD with `DeletionError`. Existing installs from before this change rename their NFD Deployments/DaemonSet on the next sync (brief NFD restart, no GPU workload impact)
 - This plugin is **editable** — you can update slice count, version, and flags after install via Terra
 - `install_crds` should be `true` on the **first installation only**. If you are reinstalling or running multiple GPU Operator instances, set it to `false` to avoid CRD conflicts
 - `slice_count` controls GPU time-slicing — a value of `4` means each physical GPU appears as 4 schedulable GPU resources. Higher values allow more concurrent workloads per GPU at the cost of per-workload performance
