@@ -8,10 +8,7 @@ cpu: "1"
 memory: "1Gi"
 cpuLimit: null
 memoryLimit: null
-gpu: false
-gpu_vendor: ""
-gpu_memory: 0
-gpu_cores: 0
+gpu: "off"
 idx: 0
 guid: 0
 puid: 0

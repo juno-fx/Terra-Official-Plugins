@@ -1,4 +1,4 @@
-{{- if and .Values.gpu (eq .Values.gpu_vendor "amd") }}
+{{- if eq (toString .Values.gpu) "amd" }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
