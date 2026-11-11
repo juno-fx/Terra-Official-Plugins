@@ -159,6 +159,26 @@ Prometheus query.
   `prometheus-community.github.io` and `nvidia.github.io` as well as GitHub. The image is pulled by
   digest, pinned by the chart.
 
+## Grafana dashboard
+
+The plugin ships a Grafana dashboard, **HAMi GPU Sharing**, as a ConfigMap labelled
+`grafana_dashboard: "1"`. The `kube-prometheus-stack` plugin's Grafana sidecar watches every
+namespace for that label, so the dashboard appears under `https://<host>/grafana` with no extra
+steps. It covers what HAMi-WebUI does not:
+
+- Cluster: GPUs under HAMi, slices allocated vs capacity, memory and compute reserved, pending GPU
+  workloads (from kube-state-metrics).
+- NVIDIA GPUs: per-GPU core utilisation, memory allocated vs capacity, DCGM utilisation, power and
+  temperature.
+- AMD GPUs: GFX activity, VRAM, power and temperature from the AMD GPU Operator's metrics
+  exporter. Needs `metrics_servicemonitor` on the `amd-gpu-operator` plugin. Node-level only until
+  HAMi manages AMD GPUs.
+- Workloads: one row per HAMi slice with workspace, workstation, memory and cores allocated and
+  used; per-workload memory and core utilisation over time.
+
+Source: `dashboards/hami-gpu.json`. The `hami_*` series come from HAMi-WebUI's exporter, so the
+dashboard needs the WebUI Application running (always on in this plugin).
+
 ---
 
 ## Notes
