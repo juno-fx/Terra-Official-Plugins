@@ -66,7 +66,7 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 
 | Variable | Description |
 |----------|--------------|
-| `HAMI_GPU_MEMORY` | GPU memory in MiB the notebook may use (HAMi GPU Sharing plugin). Rendered as the pod's `nvidia.com/gpumem` or `amd.com/gpumem` limit, not passed into the container. Unset together with `HAMI_GPU_CORES` gives the notebook the whole GPU. |
+| `HAMI_GPU_MEMORY` | GPU memory in GiB the notebook may use (HAMi GPU Sharing plugin), fractions allowed (`0.5` = 512 MiB). Rendered as the pod's `nvidia.com/gpumem` or `amd.com/gpumem` limit in MiB, not passed into the container. Unset together with `HAMI_GPU_CORES` gives the notebook the whole GPU. |
 | `HAMI_GPU_CORES` | Share of the GPU's compute the notebook may use, 1–100 (HAMi). Rendered as the pod's `nvidia.com/gpucores` or `amd.com/gpucores` limit, not passed into the container. Unset reserves no compute on `nvidia` and all of it on `amd`. |
 | `GRANT_SUDO` | Set to `yes` (or `1`; `true` is ignored) to grant the notebook user passwordless sudo, useful for installing OS packages with apt from within the notebook's terminal. |
 | `RESTARTABLE` | Runs Jupyter in a restart loop so quitting or a kernel restart doesn't kill the container. |

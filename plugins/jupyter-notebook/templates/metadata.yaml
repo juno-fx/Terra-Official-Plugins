@@ -53,7 +53,7 @@ data:
       default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/jupyter-notebook/assets/logo.png"
   env_hints: |
     - name: HAMI_GPU_MEMORY
-      description: GPU memory in MiB the notebook may use (HAMi GPU Sharing plugin). Rendered as the pod's nvidia.com/gpumem or amd.com/gpumem limit, not passed into the container. Unset together with HAMI_GPU_CORES gives the notebook the whole GPU.
+      description: GPU memory in GiB the notebook may use (HAMi GPU Sharing plugin), fractions allowed (0.5 = 512 MiB). Rendered as the pod's nvidia.com/gpumem or amd.com/gpumem limit in MiB, not passed into the container. Unset together with HAMI_GPU_CORES gives the notebook the whole GPU.
     - name: HAMI_GPU_CORES
       description: Share of the GPU's compute the notebook may use, 1-100 (HAMi). Rendered as the pod's nvidia.com/gpucores or amd.com/gpucores limit, not passed into the container. Unset reserves no compute on nvidia and all of it on amd.
     - name: GRANT_SUDO

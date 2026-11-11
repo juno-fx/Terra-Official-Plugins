@@ -5,7 +5,8 @@
 {{- $gpuMem := 0 -}}
 {{- $gpuCores := 0 -}}
 {{- range .Values.env }}
-  {{- if eq .name "HAMI_GPU_MEMORY" }}{{ $gpuMem = int .value }}{{ end }}
+  {{- /* GiB in, MiB out: HAMi gpumem is MiB. float64 keeps fractions ("0.5" -> 512). */ -}}
+  {{- if eq .name "HAMI_GPU_MEMORY" }}{{ $gpuMem = int (mulf (float64 .value) 1024) }}{{ end }}
   {{- if eq .name "HAMI_GPU_CORES" }}{{ $gpuCores = int .value }}{{ end }}
 {{- end }}
 apiVersion: apps/v1
