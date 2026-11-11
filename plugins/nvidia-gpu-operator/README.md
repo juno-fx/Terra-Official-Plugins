@@ -17,7 +17,7 @@ The NVIDIA GPU Operator automates the management of NVIDIA GPU resources in a Ku
 
 ## How It Works
 
-**Cluster Service** — Installed once per cluster by an administrator. Once active, GPU nodes are automatically configured and GPU resources become schedulable for any workload in the cluster — no per-project setup needed.
+**Cluster Service** — Installed once per cluster by an administrator. Once active, GPU nodes are automatically configured and GPU resources become schedulable for any workload in the cluster — no per-workspace setup needed.
 
 ---
 
@@ -50,7 +50,10 @@ The NVIDIA GPU Operator automates the management of NVIDIA GPU resources in a Ku
 | `install_crds` | **boolean** · Optional · Default: `false`<br>Install the GPU Operator CRDs. Set to `true` on first install; `false` for subsequent installs to avoid CRD conflicts. |
 | `open_kernel_modules` | **boolean** · Optional · Default: `false`<br>Use open kernel modules for the NVIDIA driver (required for open-source kernel module installations) |
 | `k3s` | **boolean** · Optional · Default: `true`<br>Configure for k3s clusters (sets containerd socket path to `/run/k3s/containerd/containerd.sock`) |
-| `slice_count` | **int** · Required · Default: `4`<br>Number of time-slices per GPU. Each GPU is divided into this many virtual GPU slices. |
+| `slice_count` | **int** · Required · Default: `4`<br>Number of time-slices per GPU. Each GPU is divided into this many virtual GPU slices. `1` turns time-slicing off. Use `1` with HAMi. |
+| `device_plugin` | **boolean** · Optional · Default: `true`<br>Run the operator's own device plugin. Turn off before installing the HAMi GPU Sharing plugin, which brings its own. Drivers, container toolkit, NFD and DCGM keep running. |
+| `dcgm_servicemonitor` | **boolean** · Optional · Default: `false`<br>Create a Prometheus ServiceMonitor for the DCGM exporter. Needs the Prometheus Operator CRDs (`kube-prometheus-stack` plugin). Required for HAMi-WebUI utilisation panels. |
+| `prometheus_release_label` | **string** · Optional · Default: `prometheus`<br>`release` label put on the DCGM ServiceMonitor so Prometheus selects it. Matches the `kube-prometheus-stack` plugin. Empty adds no label. |
 | `helm_repo` | **string** · Required · Default: `https://helm.ngc.nvidia.com/nvidia`<br>Helm repository URL for the GPU Operator chart |
 
 ---
@@ -61,3 +64,5 @@ The NVIDIA GPU Operator automates the management of NVIDIA GPU resources in a Ku
 - `install_crds` should be `true` on the **first installation only**. If you are reinstalling or running multiple GPU Operator instances, set it to `false` to avoid CRD conflicts
 - `slice_count` controls GPU time-slicing — a value of `4` means each physical GPU appears as 4 schedulable GPU resources. Higher values allow more concurrent workloads per GPU at the cost of per-workload performance
 - After installation, GPU nodes will be labelled `nvidia.com/gpu.present: "true"` and workloads can request GPUs with `resources.limits["nvidia.com/gpu"]`
+- **With the HAMi GPU Sharing plugin:** set `device_plugin` to `false` first, then install HAMi. HAMi registers `nvidia.com/gpu` itself and handles slicing; two device plugins on one node fight over the resource. Set `slice_count` to `1` as well: GPU feature discovery still reads the time-slicing config, and HAMi does the slicing. Turn `device_plugin` back on after removing HAMi
+- `dcgm_servicemonitor` puts DCGM GPU metrics into Prometheus. HAMi-WebUI's utilisation and memory-used panels read these; without it only allocation data shows
