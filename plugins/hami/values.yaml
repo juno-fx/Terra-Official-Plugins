@@ -14,3 +14,6 @@ prometheus_url: "http://prometheus-kube-prometheus-prometheus.prometheus.svc.clu
 prometheus_release_label: "prometheus"
 webui_git_repo: "https://github.com/Project-HAMi/HAMi-WebUI.git"
 webui_git_revision: "cb896331e0e39447d6033338fb23433aa01ae536"
+enable_amd: false
+amd_plugin_git_repo: "https://github.com/Project-HAMi/amd-device-plugin.git"
+amd_plugin_git_revision: "amd-gpu-helm-0.0.4"

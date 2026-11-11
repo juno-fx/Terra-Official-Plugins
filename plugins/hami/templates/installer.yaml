@@ -1,3 +1,4 @@
+{{- $amd := eq (toString .Values.enable_amd) "true" -}}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -50,11 +51,12 @@ spec:
             deviceCoreScaling: {{ .Values.device_core_scaling }}
             defaultMemory: {{ .Values.default_gpu_memory }}
             preConfiguredDeviceMemory: {{ .Values.preconfigured_gpu_memory }}
+          {{- if not $amd }}
           # The chart enables AMD handling by default: any pod requesting amd.com/gpu is
-          # moved onto hami-scheduler, which has no AMD device plugin registered here and
-          # leaves the pod unschedulable ("node unregistered"). Blank names make the
-          # webhook ignore AMD requests, so they stay on the default scheduler and the AMD
-          # GPU Operator's own device plugin. Revisit when HAMi's AMD device plugin is wired in.
+          # moved onto hami-scheduler, which without the AMD device plugin has no AMD device
+          # registered and leaves the pod unschedulable ("node unregistered"). Blank names
+          # make the webhook ignore AMD requests, so they stay on the default scheduler and
+          # the AMD GPU Operator's own device plugin.
           # resourceMemoryPercentageName must stay set: the chart copies it into the
           # kube-scheduler extender's managedResources, where an empty name is rejected and
           # crash-loops the scheduler. Nothing requests it, so it never matches a pod.
@@ -63,6 +65,7 @@ spec:
             resourceMemoryName: ""
             resourceCoreName: ""
             customresources: []
+          {{- end }}
   syncPolicy:
     automated:
       prune: true
@@ -135,3 +138,45 @@ spec:
       prune: true
       selfHeal: true
       allowEmpty: false
+{{- if $amd }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-hami-amd
+  namespace: {{ .Release.Namespace }}
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  source:
+    repoURL: {{ .Values.amd_plugin_git_repo }}
+    path: helm/amd-gpu
+    targetRevision: {{ .Values.amd_plugin_git_revision | quote }}
+    helm:
+      releaseName: hami-amd
+      values: |
+        dp:
+          # Same sharing limits as the NVIDIA side. 0 would let the plugin pick per GPU.
+          splitCount: {{ .Values.device_split_count }}
+          deviceMemoryScaling: {{ .Values.device_memory_scaling }}
+        # Only nodes the AMD GPU Operator has recognised. Its NFD rule sets this label;
+        # the chart's default selector needs a PCI-class NFD label this cluster lacks.
+        node_selector_enabled: true
+        node_selector:
+          feature.node.kubernetes.io/amd-gpu: "true"
+        tolerations:
+          - key: CriticalAddonsOnly
+            operator: Exists
+          - key: amd.com/gpu
+            operator: Exists
+            effect: NoSchedule
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+{{- end }}

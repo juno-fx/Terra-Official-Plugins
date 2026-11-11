@@ -134,3 +134,23 @@ fields:
     required: true
     type: string
     default: "cb896331e0e39447d6033338fb23433aa01ae536"
+  - name: enable_amd
+    description: |
+      Also share AMD GPUs. Installs HAMi's AMD device plugin on nodes the AMD GPU Operator
+      has labelled (feature.node.kubernetes.io/amd-gpu=true) and lets the HAMi scheduler
+      handle amd.com/gpu, amd.com/gpumem and amd.com/gpucores. The AMD GPU Operator plugin
+      must run with device_plugin set to false first; kubelet serves amd.com/gpu from one
+      plugin only. Off leaves AMD pods to the AMD GPU Operator (whole GPU each).
+    required: false
+    type: boolean
+    default: false
+  - name: amd_plugin_git_repo
+    description: Git repository holding HAMi's AMD device plugin Helm chart (helm/amd-gpu). Used when enable_amd is on.
+    required: false
+    type: string
+    default: "https://github.com/Project-HAMi/amd-device-plugin.git"
+  - name: amd_plugin_git_revision
+    description: Git tag, commit or branch of the AMD device plugin chart. The chart and its image must come from the same release.
+    required: false
+    type: string
+    default: "amd-gpu-helm-0.0.4"

@@ -62,6 +62,11 @@ users and is served from the Genesis host under `prefix`, behind the Genesis aut
 - **Genesis reachable over HTTPS** on `host`; the dashboard is embedded in Genesis as an iFrame.
 - **A GPU node with a working `nvidia-smi`.** Unified-memory systems such as NVIDIA DGX Spark
   (GB10) report `memory.total` as `N/A`; set `preconfigured_gpu_memory` for those (see Notes).
+- **For AMD GPUs (`enable_amd`):** the **AMD GPU Operator** plugin installed with
+  `device_plugin` set to `false` (its labeller and metrics exporter keep running; the HAMi AMD
+  plugin even reads the exporter's health socket). Wait for the operator's device-plugin
+  DaemonSet to disappear before turning `enable_amd` on. Nodes need `/dev/kfd`, `/dev/dri`
+  and the operator's `feature.node.kubernetes.io/amd-gpu=true` label.
 
 ---
 
@@ -99,6 +104,9 @@ The plugin is editable: fields can be changed after install and Argo CD rolls th
 | `prometheus_release_label` | **string** · Optional · Default: `prometheus`<br>Value of the `release` label Prometheus requires on ServiceMonitors. The default matches the `kube-prometheus-stack` plugin. Empty adds no label |
 | `webui_git_repo` | **string** · Required · Default: `https://github.com/Project-HAMi/HAMi-WebUI.git`<br>Git repository holding the HAMi-WebUI chart at `charts/hami-webui` |
 | `webui_git_revision` | **string** · Required · Default: pinned commit on `main`<br>Git revision of the HAMi-WebUI chart. Pinned until upstream publishes chart 2.0.0 to its Helm repository |
+| `enable_amd` | **boolean** · Optional · Default: `false`<br>Also share AMD GPUs: installs HAMi's AMD device plugin on nodes labelled `feature.node.kubernetes.io/amd-gpu=true` and lets the scheduler handle `amd.com/gpu`, `amd.com/gpumem`, `amd.com/gpucores`. Needs the AMD GPU Operator with `device_plugin` off. Off leaves AMD pods to the operator, whole GPU each |
+| `amd_plugin_git_repo` | **string** · Optional · Default: `https://github.com/Project-HAMi/amd-device-plugin.git`<br>Git repository of the HAMi AMD device plugin chart (`helm/amd-gpu`) |
+| `amd_plugin_git_revision` | **string** · Optional · Default: `amd-gpu-helm-0.0.4`<br>Tag of that chart. Chart and image must come from the same release |
 
 ---
 
@@ -204,12 +212,21 @@ dashboard needs the WebUI Application running (always on in this plugin).
   Kubernetes version; nothing to set.
 - **Namespaces to leave alone.** Label a namespace `hami.io/webhook: ignore` to keep HAMi's
   webhook away from its pods.
-- **AMD GPUs** are not handled by this plugin yet. HAMi's AMD device plugin is a separate,
-  git-only chart; wiring it in is planned as a follow-up once the NVIDIA path is proven. Until
-  then the plugin blanks HAMi's AMD resource names, so pods requesting `amd.com/gpu` are left
-  alone by the HAMi webhook and scheduled by the default scheduler against the AMD GPU
-  Operator's device plugin. Without this, HAMi 2.11 claims every `amd.com/gpu` pod and leaves
-  it pending with `node unregistered`.
+- **AMD GPUs** share through HAMi's separate [AMD device plugin](https://github.com/Project-HAMi/amd-device-plugin)
+  when `enable_amd` is on (a third Application, `<release>-hami-amd`, git-sourced at the tagged
+  chart). Pods request `amd.com/gpu` plus `amd.com/gpumem` (MiB) and `amd.com/gpucores` (%).
+  Differences from NVIDIA: a pod that sets only `gpumem` still books 100% of the compute units,
+  so set `gpucores` on every pod that should share; compute slices are whole WGPs (CU pairs) on
+  RDNA; the memory cap is an `LD_AUDIT` hook (glibc 2.34+) plus a kernel dmem cgroup cap where
+  the kernel has that controller. There is no AMD view in the HAMi-WebUI dashboard yet.
+  With `enable_amd` off the plugin blanks HAMi's AMD resource names so the webhook leaves
+  `amd.com/gpu` pods to the default scheduler and the AMD GPU Operator's own device plugin;
+  without that, HAMi 2.11 claims every such pod and leaves it pending with `node unregistered`.
+- **AMD APUs (Ryzen AI, Strix Halo).** The plugin registers the VRAM carve-out reported by the
+  driver (512 MiB on a Radeon 8060S), not the shared system memory ROCm actually allocates
+  from. `amd.com/gpumem` above that fails scheduling, and omitting it books the whole 512 MiB,
+  so one pod per GPU. Compute slicing (`gpucores`) is unaffected. Treat APU sharing as
+  compute-only until the plugin reads GTT for APUs.
 - **Uninstall** removes both Applications. Running GPU workloads keep their slices until they
   restart; new launches fall back to whatever device plugin is registered, so re-enable the GPU
   Operator's device plugin after removing HAMi.

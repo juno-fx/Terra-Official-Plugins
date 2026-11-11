@@ -43,37 +43,14 @@ fields:
     type: boolean
   - name: slice_count
     description: |
-      Number of time-slices to create for each GPU. 4 means each GPU shows up as 4
-      schedulable nvidia.com/gpu resources. 1 turns time-slicing off (whole GPUs). Use 1
-      with the HAMi GPU Sharing plugin, which does its own slicing.
+      Number of time-slices to create for each GPU. This is required for time-slicing 
+      configuration and determines how many slices each GPU will be divided into. The 
+      default is 4, which means that each GPU will be divided into 4 time-slices. You 
+      can adjust this number based on your workload requirements and the capabilities 
+      of your GPUs.
     required: true
     default: 4
     type: int
-  - name: device_plugin
-    description: |
-      Run the GPU Operator's own device plugin, which advertises nvidia.com/gpu and applies
-      the slice_count time-slicing. Turn this off before installing the HAMi GPU Sharing
-      plugin: HAMi brings its own device plugin, and two device plugins on one node fight
-      over nvidia.com/gpu. Drivers, the container toolkit, NFD and DCGM keep running either way.
-    required: false
-    default: true
-    type: boolean
-  - name: dcgm_servicemonitor
-    description: |
-      Create a Prometheus ServiceMonitor for the DCGM exporter so GPU utilisation and memory
-      metrics land in Prometheus. Needs the Prometheus Operator CRDs (kube-prometheus-stack
-      plugin). Required for the HAMi-WebUI utilisation panels.
-    required: false
-    default: false
-    type: boolean
-  - name: prometheus_release_label
-    description: |
-      Value of the release label Prometheus requires on ServiceMonitors before it scrapes
-      them. The default matches the Prometheus plugin (Helm release prometheus). Leave empty
-      if your Prometheus picks up every ServiceMonitor. Only used with dcgm_servicemonitor.
-    required: false
-    default: "prometheus"
-    type: string
   - name: version
     description: Version of the GPU Operator to install.
     required: true
