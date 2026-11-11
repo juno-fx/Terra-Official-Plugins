@@ -55,11 +55,14 @@ spec:
           # leaves the pod unschedulable ("node unregistered"). Blank names make the
           # webhook ignore AMD requests, so they stay on the default scheduler and the AMD
           # GPU Operator's own device plugin. Revisit when HAMi's AMD device plugin is wired in.
+          # resourceMemoryPercentageName must stay set: the chart copies it into the
+          # kube-scheduler extender's managedResources, where an empty name is rejected and
+          # crash-loops the scheduler. Nothing requests it, so it never matches a pod.
           amd:
             resourceCountName: ""
             resourceMemoryName: ""
-            resourceMemoryPercentageName: ""
             resourceCoreName: ""
+            customresources: []
   syncPolicy:
     automated:
       prune: true
