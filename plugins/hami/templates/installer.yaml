@@ -163,11 +163,14 @@ spec:
           # Same sharing limits as the NVIDIA side. 0 would let the plugin pick per GPU.
           splitCount: {{ .Values.device_split_count }}
           deviceMemoryScaling: {{ .Values.device_memory_scaling }}
-        # Only nodes the AMD GPU Operator has recognised. Its NFD rule sets this label;
-        # the chart's default selector needs a PCI-class NFD label this cluster lacks.
+        # Only nodes the AMD GPU Operator has recognised. Its NFD rule sets this label.
+        # Helm merges this map with the chart's default selector, so the default
+        # pci-0300_1002 key is removed explicitly: APUs are PCI class 0380 (display,
+        # not VGA) and never get that NFD label, which left the DaemonSet at 0 pods.
         node_selector_enabled: true
         node_selector:
           feature.node.kubernetes.io/amd-gpu: "true"
+          feature.node.kubernetes.io/pci-0300_1002.present: null
         tolerations:
           - key: CriticalAddonsOnly
             operator: Exists
