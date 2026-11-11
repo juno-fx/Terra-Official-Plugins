@@ -31,3 +31,8 @@ storage_size: "10Gi"
 project_url: ""
 account_key: ""
 arch: "amd64"
+
+# nginx sidecar — enforces the Hubble login
+nginx_registry: "docker.io"
+nginx_repo: "nginx"
+nginx_tag: "alpine"

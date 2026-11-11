@@ -12,7 +12,7 @@ data:
   fields: |
     - name: icon
       description: icon
-      default: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/web-ide/scripts/assets/logo.png
+      default: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/web-ide/assets/logo.png
     - name: registry
       description: Registry to pull the image from
       type: string
@@ -55,7 +55,7 @@ data:
     - name: persistence_storage_class
       description: "Storage class for the VSCode config persistent volume."
       type: k8sStorageClass
-      required: false
+      required: true
   env_hints: |
     - name: PASSWORD
       description: Web UI login password. If neither PASSWORD nor HASHED_PASSWORD is set, the UI has no authentication.

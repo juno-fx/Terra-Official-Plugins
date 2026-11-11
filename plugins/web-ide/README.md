@@ -1,6 +1,6 @@
 # Web IDE
 
-![Web IDE](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/web-ide/scripts/assets/logo.png)
+![Web IDE](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/web-ide/assets/logo.png)
 
 **Category:** Development
 **Type:** Workload Template
@@ -52,6 +52,8 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `nginx_registry` | **string** · Required · Default: `docker.io`<br>Container registry for the nginx proxy image |
 | `nginx_repo` | **string** · Required · Default: `nginx`<br>nginx proxy image repository |
 | `nginx_tag` | **string** · Required · Default: `latest`<br>nginx proxy image tag |
+| `persistence_size` | **string** · Optional · Default: `1Gi`<br>Persistent volume size for the VS Code config directory (e.g. `1Gi`, `500Mi`) |
+| `persistence_storage_class` | **k8sStorageClass** · Required<br>Storage class for the VS Code config persistent volume |
 
 ### Custom Environment Variables
 

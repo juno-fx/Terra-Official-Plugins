@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: "{{ .Release.Name }}"
+  name: "{{ .Values.name }}"
   annotations:
     juno-innovations.com/workload: "Application"
 spec:
   replicas: 1
   selector:
     matchLabels:
-      kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+      kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
   template:
     metadata:
       labels:
-        kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+        kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
     spec:
       automountServiceAccountToken: false
       containers:
@@ -42,7 +42,7 @@ spec:
             - name: PGID
               value: "{{ .Values.guid }}"
             - name: SUBFOLDER
-              value: "/{{ .Release.Namespace }}/webtop/{{ .Values.name }}/"
+              value: "/{{ .Release.Namespace }}/webui/{{ .Values.name }}/"
             - name: START_DOCKER
               value: "false"
             - name: CHROME_CLI
@@ -70,10 +70,28 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
+        - name: nginx
+          image: "{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}"
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+          ports:
+            # 8080 is taken by open-webui (shared pod network).
+            - containerPort: 8081
+              name: http
+          volumeMounts:
+            - name: nginx
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
       volumes:
+        - name: nginx
+          configMap:
+            name: "{{ .Values.name }}-nginx"
         - name: dshm
           emptyDir:
             medium: Memory
         - name: data
           persistentVolumeClaim:
-            claimName: "{{ .Release.Name }}"
+            claimName: "{{ .Values.name }}"

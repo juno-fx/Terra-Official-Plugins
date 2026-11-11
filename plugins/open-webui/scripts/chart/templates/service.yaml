@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: "{{ .Release.Name }}"
+  name: "{{ .Values.name }}"
 spec:
   selector:
-    kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
   ports:
-    - port: 3001
-      targetPort: 3001
+    - port: 8081
+      targetPort: 8081
       protocol: TCP
-      name: webtop
+      name: http
