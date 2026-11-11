@@ -82,6 +82,6 @@ In the catalog, the **Jupyter Notebook** workload template renders this limit wh
 - With `install_nfd: false` an NFD install must already exist in the cluster; the operator still adds its own rule for detecting AMD GPUs. With `install_nfd: true` next to another NFD install, both manage the same NFD CRDs, and uninstalling this plugin removes them
 - The operator's `default` DeviceConfig is owned by this plugin. Manual edits to it are reverted on the next sync — change the fields above instead
 - GPU metrics are exported in-cluster on port `5000` by the device metrics exporter; `metrics_servicemonitor` makes Prometheus scrape them
-- **With the HAMi GPU Sharing plugin:** set `device_plugin` to `false` first, then enable AMD in HAMi. HAMi registers `amd.com/gpu` itself and handles slicing; two device plugins on one node fight over the resource. Turn `device_plugin` back on after removing HAMi
+- **With the HAMi GPU Sharing plugin:** set `device_plugin` to `false` first, then turn on `enable_amd` in HAMi. HAMi registers `amd.com/gpu` itself and handles slicing; two device plugins on one node fight over the resource. Turn `device_plugin` back on after removing HAMi
 - Auto node remediation is disabled: it installs an Argo Workflows controller and CRDs that conflict with an existing Argo Workflows install
 - The device plugin, node labeller and metrics exporter images use the upstream chart's `latest` tags
