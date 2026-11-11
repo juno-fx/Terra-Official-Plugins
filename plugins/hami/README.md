@@ -205,7 +205,11 @@ dashboard needs the WebUI Application running (always on in this plugin).
 - **Namespaces to leave alone.** Label a namespace `hami.io/webhook: ignore` to keep HAMi's
   webhook away from its pods.
 - **AMD GPUs** are not handled by this plugin yet. HAMi's AMD device plugin is a separate,
-  git-only chart; wiring it in is planned as a follow-up once the NVIDIA path is proven.
+  git-only chart; wiring it in is planned as a follow-up once the NVIDIA path is proven. Until
+  then the plugin blanks HAMi's AMD resource names, so pods requesting `amd.com/gpu` are left
+  alone by the HAMi webhook and scheduled by the default scheduler against the AMD GPU
+  Operator's device plugin. Without this, HAMi 2.11 claims every `amd.com/gpu` pod and leaves
+  it pending with `node unregistered`.
 - **Uninstall** removes both Applications. Running GPU workloads keep their slices until they
   restart; new launches fall back to whatever device plugin is registered, so re-enable the GPU
   Operator's device plugin after removing HAMi.

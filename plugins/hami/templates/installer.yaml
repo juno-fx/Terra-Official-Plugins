@@ -50,6 +50,16 @@ spec:
             deviceCoreScaling: {{ .Values.device_core_scaling }}
             defaultMemory: {{ .Values.default_gpu_memory }}
             preConfiguredDeviceMemory: {{ .Values.preconfigured_gpu_memory }}
+          # The chart enables AMD handling by default: any pod requesting amd.com/gpu is
+          # moved onto hami-scheduler, which has no AMD device plugin registered here and
+          # leaves the pod unschedulable ("node unregistered"). Blank names make the
+          # webhook ignore AMD requests, so they stay on the default scheduler and the AMD
+          # GPU Operator's own device plugin. Revisit when HAMi's AMD device plugin is wired in.
+          amd:
+            resourceCountName: ""
+            resourceMemoryName: ""
+            resourceMemoryPercentageName: ""
+            resourceCoreName: ""
   syncPolicy:
     automated:
       prune: true
