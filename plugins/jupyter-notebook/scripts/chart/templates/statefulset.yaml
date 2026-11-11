@@ -101,6 +101,12 @@ spec:
             {{- end }}
             {{- if $amd }}
               amd.com/gpu: "1"
+              {{- if gt $gpuMem 0 }}
+              amd.com/gpumem: "{{ $gpuMem }}"
+              {{- end }}
+              {{- if gt $gpuCores 0 }}
+              amd.com/gpucores: "{{ $gpuCores }}"
+              {{- end }}
             {{- end }}
             {{- if .Values.cpuLimit }}
               cpu: "{{ .Values.cpuLimit }}"

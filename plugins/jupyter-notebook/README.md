@@ -66,8 +66,8 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 
 | Variable | Description |
 |----------|--------------|
-| `HAMI_GPU_MEMORY` | GPU memory in MiB the notebook may use (`nvidia` only, HAMi GPU Sharing plugin). Rendered as the pod's `nvidia.com/gpumem` limit, not passed into the container. Unset together with `HAMI_GPU_CORES` gives the notebook the whole GPU. |
-| `HAMI_GPU_CORES` | Share of the GPU's compute the notebook may use, 1–100 (`nvidia` only, HAMi). Rendered as the pod's `nvidia.com/gpucores` limit, not passed into the container. Unset reserves no compute. |
+| `HAMI_GPU_MEMORY` | GPU memory in MiB the notebook may use (HAMi GPU Sharing plugin). Rendered as the pod's `nvidia.com/gpumem` or `amd.com/gpumem` limit, not passed into the container. Unset together with `HAMI_GPU_CORES` gives the notebook the whole GPU. |
+| `HAMI_GPU_CORES` | Share of the GPU's compute the notebook may use, 1–100 (HAMi). Rendered as the pod's `nvidia.com/gpucores` or `amd.com/gpucores` limit, not passed into the container. Unset reserves no compute on `nvidia` and all of it on `amd`. |
 | `GRANT_SUDO` | Set to `yes` (or `1`; `true` is ignored) to grant the notebook user passwordless sudo, useful for installing OS packages with apt from within the notebook's terminal. |
 | `RESTARTABLE` | Runs Jupyter in a restart loop so quitting or a kernel restart doesn't kill the container. |
 | `DOCKER_STACKS_JUPYTER_CMD` | Launches a different frontend (`notebook`, `nbclassic`, `retro`) instead of the default JupyterLab. |
@@ -81,6 +81,7 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 - `gpu: nvidia` requires the **NVIDIA GPU Operator** plugin on the cluster
 - `HAMI_GPU_MEMORY` / `HAMI_GPU_CORES` turn the notebook into a GPU slice and need the **HAMi GPU Sharing** plugin. They are read from the workload's environment variables (admin-set in Genesis when defining the workload) and rendered as pod resource limits; the container never sees them. Without HAMi, leave both unset: the NVIDIA device plugin does not know those resource names and the pod would never schedule
 - With HAMi installed and both unset, HAMi gives the notebook the whole GPU (its exclusive-card rule). Set at least `HAMI_GPU_MEMORY` to share the card
-- `gpu: amd` requires the **AMD GPU Operator** plugin on the cluster. A pod can request one vendor only; on a mixed cluster the admin presets `gpu` per workload. AMD notebooks are whole-GPU until HAMi supports AMD
+- `gpu: amd` requires the **AMD GPU Operator** plugin on the cluster. A pod can request one vendor only; on a mixed cluster the admin presets `gpu` per workload
+- AMD slicing needs the HAMi GPU Sharing plugin with `enable_amd` on and the AMD GPU Operator with `device_plugin` off. On AMD, a pod that sets `HAMI_GPU_MEMORY` but not `HAMI_GPU_CORES` still books all compute units, so set both to share a card. The memory limit is enforced by an `LD_AUDIT` hook (glibc 2.34+; docker-stacks images qualify) and, where the kernel has the dmem cgroup controller, by the kernel too
 - With `gpu: amd`, a start-up hook gives the notebook user access to the GPU device nodes. Requires a Jupyter docker-stacks based image
 - Notebooks run with the workspace user's UID/GID — ensure mounted volumes have appropriate permissions
