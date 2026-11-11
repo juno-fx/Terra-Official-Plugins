@@ -37,18 +37,50 @@ spec:
 
 EC2 fields, all user-supplied at launch: `ami_image_id`, `instance_type` (default `t3.micro`),
 `region`, `subnet_id`, `security_group_ids` (list), `block_device_mappings` (list: mount path +
-size GB), `delete_on_termination` (boolean, default `true`), `provider_config_ref` (default
+size GB), `delete_on_termination` (boolean, default `true`), `ports` (list of `port`, default
+`22`), `provider_config_ref` (default
 `aws-provider-argocd-provider-config`).
+
+The chart joins `ports` into the `expose` annotation (`"22,3389"`), and omits the annotation when
+the list is empty.
 
 ## Surfacing the instance — Kuiper's EC2 flow
 
 Kuiper watches the EC2 resource at launch and, once AWS DNS is available:
 
 - builds an **ExternalName Service** from the `kuiper.juno-innovations.com/expose` annotation
-  (comma-separated ports, e.g. `22,3389`) — service name is **deterministic**:
+  (comma-separated `port` or `port:targetPort` entries, e.g. `22,3389`) — service name is
+  **deterministic**:
   `<name>-ec2-svc`
 - computes and writes the `connection` annotation when `kuiper.juno-innovations.com/
   aws-remote-connection: "true"` is set (`use-private-dns` toggles private vs public DNS)
+
+### Private subnets — `aws-private-subnet`
+
+An ExternalName Service is only a DNS alias, so it can't reach an instance with no public address.
+Set `kuiper.juno-innovations.com/aws-private-subnet: "true"` (the `aws_private_subnet` launch field)
+and Kuiper brokers the connection: a selector-less Service (TCP only, named after the instance)
+plus an EndpointSlice pointing at the instance's private IP. The EndpointSlice is owned by the
+Service, so it is garbage collected with it.
+
+The optional `load_balancer` launch field picks how far that Service reaches:
+
+| `load_balancer` | Service | `connection` server | Use when |
+|-----------------|---------|---------------------|----------|
+| unset (None) | `ClusterIP` | `<name>.<namespace>.svc` | Only in-cluster clients need the instance |
+| `internet-facing` | `LoadBalancer`, public NLB | LB hostname, once assigned | Users connect over the internet |
+| `internal` | `LoadBalancer`, internal NLB | LB hostname, once assigned | Users are on a VPN, Direct Connect or peered network |
+
+Picking a value sets `kuiper.juno-innovations.com/aws-load-balancer: "true"` plus the AWS Load
+Balancer Controller annotations (`aws-load-balancer-type: external`, `nlb-target-type: instance`),
+with the field's value written straight into `aws-load-balancer-scheme`. Kuiper copies every
+`service.beta.kubernetes.io/*` annotation from the Instance onto the Service.
+
+- The field is optional, so Terra sends None when nothing is picked. The template gates on a plain
+  `if .Values.load_balancer`, so don't add a sentinel option like "off".
+- The cluster nodes must be able to route to the VPC (same VPC, peering, TGW or VPN), or the
+  Service comes up but every connection fails.
+- The NLB options need the AWS Load Balancer Controller installed in the cluster.
 
 Canonical annotation reference: `concepts/labels-annotations.md` (Crossplane/EC2 table). Annotated
 full example: `docs/workload-guides.md` — the `ec2-workstation` guide (`expose`, `aws-remote-connection`,

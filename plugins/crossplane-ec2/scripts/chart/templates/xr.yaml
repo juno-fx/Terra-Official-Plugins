@@ -5,8 +5,17 @@ metadata:
   namespace: {{.Release.Namespace}}
   annotations:
     kuiper.juno-innovations.com/use-private-dns: "false"
+    kuiper.juno-innovations.com/aws-private-subnet: "{{ .Values.aws_private_subnet | default false }}"
+    {{- if and .Values.aws_private_subnet .Values.load_balancer }}
+    kuiper.juno-innovations.com/aws-load-balancer: "true"
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+    service.beta.kubernetes.io/aws-load-balancer-scheme: {{ .Values.load_balancer }}
+    {{- end }}
     juno-innovations.com/workload: "Virtual Machine"
     kuiper.juno-innovations.com/aws-remote-connection: "true"
+    {{- if .Values.ports }}
+    kuiper.juno-innovations.com/expose: "{{ range $i, $p := .Values.ports }}{{ if $i }},{{ end }}{{ $p.port }}{{ end }}"
+    {{- end }}
 spec:
   parameters:
     name: "{{.Release.Namespace}}-{{.Values.name}}"
