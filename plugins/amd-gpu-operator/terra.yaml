@@ -52,3 +52,28 @@ fields:
     required: false
     default: false
     type: boolean
+  - name: device_plugin
+    description: |
+      Run the operator's own device plugin, which advertises amd.com/gpu. Turn this off
+      before installing the HAMi GPU Sharing plugin with AMD support: HAMi brings its own
+      AMD device plugin, and two device plugins on one node fight over amd.com/gpu. Node
+      labelling and the metrics exporter keep running either way.
+    required: false
+    default: true
+    type: boolean
+  - name: metrics_servicemonitor
+    description: |
+      Create a Prometheus ServiceMonitor for the device metrics exporter so AMD GPU
+      utilisation and memory metrics land in Prometheus. Needs the Prometheus Operator
+      CRDs (kube-prometheus-stack plugin).
+    required: false
+    default: false
+    type: boolean
+  - name: prometheus_release_label
+    description: |
+      Value of the release label Prometheus requires on ServiceMonitors before it scrapes
+      them. The default matches the Prometheus plugin (Helm release prometheus). Leave empty
+      if your Prometheus picks up every ServiceMonitor. Only used with metrics_servicemonitor.
+    required: false
+    default: "prometheus"
+    type: string

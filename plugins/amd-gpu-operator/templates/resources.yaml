@@ -2,6 +2,8 @@
 {{- $installNfd := eq (toString .Values.install_nfd) "true" -}}
 {{- $vgpuNodes := eq (toString .Values.vgpu_nodes) "true" -}}
 {{- $detectAll := eq (toString .Values.detect_all_gpus) "true" -}}
+{{- $devicePlugin := eq (toString .Values.device_plugin) "true" -}}
+{{- $metricsSM := eq (toString .Values.metrics_servicemonitor) "true" -}}
 {{- /*
   The upstream NFD rule only labels an allowlist of PCI device IDs (Instinct, Radeon Pro,
   a few Radeon RX). This rule labels any AMD GPU: vendor 1002 with a display or
@@ -76,6 +78,19 @@ spec:
               {{- end }}
             driver:
               enable: false
+            devicePlugin:
+              # Off when the HAMi GPU Sharing plugin provides the AMD device plugin instead.
+              enableDevicePlugin: {{ $devicePlugin }}
+            {{- if $metricsSM }}
+            metricsExporter:
+              prometheus:
+                serviceMonitor:
+                  enable: true
+                  {{- with .Values.prometheus_release_label }}
+                  labels:
+                    release: {{ . | quote }}
+                  {{- end }}
+            {{- end }}
   syncPolicy:
     automated:
       prune: true

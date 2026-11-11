@@ -3,3 +3,6 @@ helm_repo: "https://rocm.github.io/gpu-operator"
 install_nfd: true
 detect_all_gpus: true
 vgpu_nodes: false
+device_plugin: true
+metrics_servicemonitor: false
+prometheus_release_label: "prometheus"
