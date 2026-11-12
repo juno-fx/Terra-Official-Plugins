@@ -95,6 +95,7 @@ The plugin is editable: fields can be changed after install and Argo CD rolls th
 | `device_split_count` | **int** · Optional · Default: `10`<br>Maximum number of workloads sharing one physical GPU |
 | `device_memory_scaling` | **string** · Optional · Default: `1`<br>GPU memory overcommit ratio. `1` advertises the real memory; `2` lets workloads claim twice the physical memory in total |
 | `device_core_scaling` | **string** · Optional · Default: `1`<br>GPU compute overcommit ratio. `1` advertises 100% of the cores per GPU |
+| `gpu_core_policy` | **select** · Optional · Default: `default`<br>When the `nvidia.com/gpucores` limit is enforced. `default`: only while another HAMi workload is active on the same GPU, so a lone workload runs at full speed. `force`: always. `disable`: never (gpucores only drives scheduling). Applies to workloads launched after a change. AMD compute slices are hardware masks and ignore this |
 | `device_list_strategy` | **select** · Optional · Default: `cdi-annotations`<br>How GPUs are handed to the container runtime: `cdi-annotations`, `cdi-cri` (both CDI, needed with the GPU Operator's CDI-mode runtime) or `envvar` (legacy) |
 | `default_gpu_memory` | **int** · Optional · Default: `0`<br>GPU memory in MiB given to a workload that requests `nvidia.com/gpu` without `nvidia.com/gpumem`. `0` gives such workloads the whole GPU. Set to, for example, `8192` to make every plain GPU request a slice |
 | `preconfigured_gpu_memory` | **int** · Optional · Default: `0`<br>Total GPU memory in MiB to assume per GPU when the driver cannot report it (DGX Spark / GB10). `0` uses the driver's value |
@@ -203,8 +204,16 @@ dashboard needs the WebUI Application running (always on in this plugin).
   percentage-sized allocations against the NVML memory value, which is 0 on GB10, so a plain
   `nvidia.com/gpu: 1` request fails at Allocate with "allocated N MB … but requests 0 MB". Set
   `default_gpu_memory` (or have workloads request `nvidia.com/gpumem`) so the request carries an
-  absolute size. Compute quotas (`gpucores`) on this platform are not yet confirmed to throttle;
-  memory limits work.
+  absolute size. Memory limits and compute quotas (`gpucores`) both work on GB10.
+- **Core policy.** `gpucores` is a throttle in HAMi-core, not a hardware partition. With
+  `gpu_core_policy: default` a workload alone on a GPU is never throttled; when a second HAMi
+  workload becomes active on the same GPU, HAMi's monitor switches enforcement on within about
+  10 s, each workload stalls for a few seconds while the token bucket refills, then settles at
+  its share. When the other workload stops, the survivor climbs back to full speed. `force`
+  pins every workload to its share from the first kernel, which is the setting to use when
+  tenants should see the same throughput whether or not the GPU is shared. The policy is
+  injected at admission (`GPU_CORE_UTILIZATION_POLICY`), so after changing it restart the
+  workloads that should pick it up.
 - **CDI.** Leave `device_list_strategy` on a CDI value with the GPU Operator plugin. With `envvar`
   the nvidia runtime in CDI mode fails container start with
   `unresolvable CDI devices management.nvidia.com/gpu=GPU-…`.

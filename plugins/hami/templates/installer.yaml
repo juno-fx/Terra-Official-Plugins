@@ -49,6 +49,9 @@ spec:
             deviceSplitCount: {{ .Values.device_split_count }}
             deviceMemoryScaling: {{ .Values.device_memory_scaling }}
             deviceCoreScaling: {{ .Values.device_core_scaling }}
+            # When the gpucores limit is enforced. Read by the webhook at admission, so it
+            # reaches pods created after a change; running pods keep their policy.
+            gpuCorePolicy: {{ .Values.gpu_core_policy }}
             defaultMemory: {{ .Values.default_gpu_memory }}
             preConfiguredDeviceMemory: {{ .Values.preconfigured_gpu_memory }}
           {{- if not $amd }}

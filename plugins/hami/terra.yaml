@@ -64,6 +64,22 @@ fields:
     required: false
     type: string
     default: "1"
+  - name: gpu_core_policy
+    description: |
+      When HAMi enforces a workload's nvidia.com/gpucores limit. default enforces it only
+      while another HAMi workload is active on the same GPU, so a workload alone on a GPU
+      runs at full speed. force always enforces it, for predictable throughput at the cost
+      of idle capacity. disable never enforces it; gpucores then only drives scheduling.
+      Set at workload launch, so a change applies to workloads started after it, not to
+      running ones. Limits of 0 and 100 are never enforced. AMD compute slices are
+      hardware masks and always apply regardless of this setting.
+    required: false
+    type: select
+    default: default
+    options:
+      - default
+      - force
+      - disable
   - name: device_list_strategy
     description: |
       How the HAMi device plugin hands GPUs to the container runtime. cdi-annotations and
