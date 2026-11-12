@@ -3,6 +3,9 @@ user:
 registry: docker.io
 repo: gcc
 tag: "16"
+nginx_registry: "docker.io"
+nginx_repo: "nginx"
+nginx_tag: "1.29.3"
 group:
 cpu: "1"
 memory: "1Gi"

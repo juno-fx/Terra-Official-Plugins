@@ -69,12 +69,15 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `tls_issuer` | **string** · Optional<br>cert-manager ClusterIssuer used to obtain the certificate for that domain |
 | `publish_dns` | **boolean** · Optional · Default: `false`<br>Annotate the route so the ExternalDNS plugin creates the DNS record |
 | `gpu` | **boolean** · Required<br>Attach a GPU to the workload |
+| `nginx_registry` | **string** · Required · Default: `docker.io`<br>Registry for the nginx sidecar image that enforces the Hubble login under `ingress-auth` |
+| `nginx_repo` | **string** · Required · Default: `nginx`<br>nginx sidecar image repository |
+| `nginx_tag` | **string** · Required · Default: `1.29.3`<br>nginx sidecar image tag |
 
 ### Network Modes
 
 | Mode | Behavior |
 |------|----------|
-| `ingress-auth` | Exposes the application through the nginx ingress at `/<namespace>/polaris/<workload-name>/`, authenticated via Hubble |
+| `ingress-auth` | Exposes the application through the ingress at `/<namespace>/runtime-cpp/<workload-name>/`. The ingress routes to an nginx sidecar in the same pod, which checks the user's Hubble login before forwarding the request to the application. Because authentication happens inside the pod rather than through ingress-controller annotations, it works the same with any ingress controller (ingress-nginx, Traefik, etc.) |
 | `ingress-noauth` | Same ingress path, but **without authentication** — anyone who can reach the ingress can reach the app |
 | `clusterip` | No ingress — the application is only reachable in-cluster via its ClusterIP Service |
 | `nodeport` | Adds a NodePort Service in addition to the ClusterIP Service for direct node-level access |
@@ -110,8 +113,9 @@ A domain only takes effect under `ingress-noauth`. The reasoning, which applies 
 
 ## Notes
 
-- When exposed via ingress, the application is served under `/<namespace>/polaris/<workload-name>/`, where `<namespace>` is the environment the workload runs in. This full path is passed to the container as the `PREFIX` environment variable — your application must handle or be configured for this path prefix
+- When exposed via ingress, the application is served under `/<namespace>/runtime-cpp/<workload-name>/`, where `<namespace>` is the environment the workload runs in. This full path is passed to the container as the `PREFIX` environment variable — your application must handle or be configured for this path prefix
 - `run_command` must start a foreground process that listens on `port`; if nothing listens, the startup probe fails and the workload restarts
+- Under `ingress-auth` the nginx sidecar listens on port `8081`, so `port` must not be `8081` in that mode
 - Use `ingress-noauth` only for applications that implement their own authentication or run in trusted network environments
 - Private repositories are not supported by the built-in clone step — use `source_path` with a volume mount for private code
 - The default `gcc` image ships with `g++` and `make`, but **not** `cmake` — for CMake-based projects, prepend an install step to `build_command` (e.g. `apt-get update && apt-get install -y cmake && cmake -B build && cmake --build build`) or point `registry`/`repo`/`tag` at a custom image that includes CMake

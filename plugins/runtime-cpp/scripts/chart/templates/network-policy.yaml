@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Values.name }}-network-policy
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+spec:
+  podSelector:
+    matchLabels:
+      kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+  policyTypes:
+    - Ingress
+  # ingress-auth: only the nginx sidecar port is reachable. It enforces the Hubble
+  # login itself, so traffic is accepted from any ingress controller (ingress-nginx,
+  # Traefik, ...). Other modes have no sidecar, so the application port is reachable.
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: {{ if eq .Values.network_mode "ingress-auth" }}8081{{ else }}{{ .Values.port }}{{ end }}
