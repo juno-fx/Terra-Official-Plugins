@@ -27,8 +27,10 @@ spec:
           node-feature-discovery:
             fullnameOverride: {{ .Release.Name }}-nfd
           toolkit:
-            enabled: true
-            {{ if .Values.k3s }}
+            # Off when the node image ships nvidia-container-toolkit (EKS NVIDIA AMIs).
+            # runtimeclass.yaml then provides the nvidia RuntimeClass the operator skips.
+            enabled: {{ .Values.install_toolkit }}
+            {{ if and .Values.k3s .Values.install_toolkit }}
             env:
               - name: CONTAINERD_SOCKET
                 value: /run/k3s/containerd/containerd.sock
@@ -36,7 +38,9 @@ spec:
                 value: /var/lib/rancher/k3s/agent/etc/containerd/config.toml
             {{ end }}
           driver:
-            enabled: true
+            # Off when the node image ships the driver; the validator then checks the host
+            # driver instead of the DaemonSet installing a second one.
+            enabled: {{ .Values.install_driver }}
             useOpenKernelModules: {{ .Values.open_kernel_modules }}
             nvidiaDriverCRD:
               enabled: {{ .Values.install_crds }}

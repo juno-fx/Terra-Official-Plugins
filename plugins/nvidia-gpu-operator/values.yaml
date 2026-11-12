@@ -1,5 +1,5 @@
-install_toolkit: "false"
-install_driver: "false"
+install_toolkit: true
+install_driver: true
 slice_count: "4"
 version: "v25.10.0"
 install_crds: "true"

@@ -32,12 +32,31 @@ fields:
     required: false
     default: false
     type: boolean
+  - name: install_driver
+    description: |
+      Run the operator's driver DaemonSet to install the NVIDIA kernel driver on GPU nodes.
+      Turn off when the node image already ships the driver, e.g. EKS AL2023 or Bottlerocket
+      NVIDIA AMIs or hosts with a distro-installed driver. The operator then validates the
+      host driver instead of installing one; a second driver install on such nodes fails.
+    required: false
+    default: true
+    type: boolean
+  - name: install_toolkit
+    description: |
+      Run the operator's container-toolkit DaemonSet to install nvidia-container-toolkit and
+      register the nvidia containerd runtime. Turn off when the node image already ships it
+      (EKS NVIDIA AMIs). This plugin then creates the nvidia RuntimeClass itself, since the
+      operator only creates it alongside its toolkit. Off disables the k3s socket override.
+    required: false
+    default: true
+    type: boolean
   - name: k3s
     description: |
       When installing in a k3s cluster, the NVIDIA GPU Operator needs to be configured 
       to point to the correct containerd socket. The path is: /run/k3s/containerd/containerd.sock. 
       Setting this to true will configure the NVIDIA GPU Operator to use this socket path for 
       containerd, which is necessary for it to function properly in a k3s environment.
+      Only applies while install_toolkit is on; set false on EKS and other non-k3s clusters.
     required: false
     default: true
     type: boolean
