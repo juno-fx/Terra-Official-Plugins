@@ -10,6 +10,9 @@ metadata:
     kuiper.juno-innovations.com/aws-load-balancer: "true"
     service.beta.kubernetes.io/aws-load-balancer-type: nlb
     service.beta.kubernetes.io/aws-load-balancer-scheme: {{ .Values.load_balancer }}
+    {{- if eq .Values.load_balancer "internal" }}
+    service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+    {{- end }}
     {{- end }}
     juno-innovations.com/workload: "Virtual Machine"
     kuiper.juno-innovations.com/aws-remote-connection: "true"

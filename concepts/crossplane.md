@@ -71,16 +71,26 @@ The optional `load_balancer` launch field picks how far that Service reaches:
 | `internet-facing` | `LoadBalancer`, public NLB | LB hostname, once assigned | Users connect over the internet |
 | `internal` | `LoadBalancer`, internal NLB | LB hostname, once assigned | Users are on a VPN, Direct Connect or peered network |
 
-Picking a value sets `kuiper.juno-innovations.com/aws-load-balancer: "true"` plus the AWS Load
-Balancer Controller annotations (`aws-load-balancer-type: external`, `nlb-target-type: instance`),
-with the field's value written straight into `aws-load-balancer-scheme`. Kuiper copies every
+Picking a value sets `kuiper.juno-innovations.com/aws-load-balancer: "true"`,
+`aws-load-balancer-type: nlb`, and the field's value straight into `aws-load-balancer-scheme`.
+`internal` also sets `aws-load-balancer-internal: "true"`. Kuiper copies every
 `service.beta.kubernetes.io/*` annotation from the Instance onto the Service.
+
+The NLB is created by the cluster's built-in AWS cloud provider (instance targets on NodePorts,
+kube-proxy forwards to the EndpointSlice). That provider ignores `aws-load-balancer-scheme` and only
+reads `aws-load-balancer-internal`; without it every NLB is internet-facing. The AWS Load Balancer
+Controller reads `scheme` instead, so both are set and either one works.
 
 - The field is optional, so Terra sends None when nothing is picked. The template gates on a plain
   `if .Values.load_balancer`, so don't add a sentinel option like "off".
 - The cluster nodes must be able to route to the VPC (same VPC, peering, TGW or VPN), or the
   Service comes up but every connection fails.
-- The NLB options need the AWS Load Balancer Controller installed in the cluster.
+- The NLB options need an AWS cloud provider in the cluster: built into EKS, or the AWS Load
+  Balancer Controller elsewhere. Without one the Service stays `<pending>`.
+- Subnets must be tagged for NLB discovery: `kubernetes.io/role/internal-elb: 1` for `internal`,
+  `kubernetes.io/role/elb: 1` for `internet-facing` (eksctl tags these automatically).
+- The NLB scheme is fixed at creation, and Kuiper only creates the Service once, so changing
+  `load_balancer` needs a relaunch.
 
 Canonical annotation reference: `concepts/labels-annotations.md` (Crossplane/EC2 table). Annotated
 full example: `docs/workload-guides.md` — the `ec2-workstation` guide (`expose`, `aws-remote-connection`,

@@ -57,7 +57,7 @@ data:
       default: false
       required: true
     - name: load_balancer
-      description: "Only used with aws_private_subnet. Exposes the instance through an AWS NLB (needs the AWS Load Balancer Controller in the cluster). Leave unset for no load balancer: the instance is reachable only from inside the cluster through a ClusterIP Service. internet-facing: public NLB, for users connecting over the internet. internal: private NLB, for users on a VPN, Direct Connect or peered network"
+      description: "Only used with aws_private_subnet. Exposes the instance through an AWS NLB, created by the cluster's AWS cloud provider (EKS has it built in). Leave unset for no load balancer: the instance is reachable only from inside the cluster through a ClusterIP Service. internet-facing: public NLB, for users connecting over the internet. internal: private NLB, for users on a VPN, Direct Connect or peered network"
       type: select
       required: false
       options:

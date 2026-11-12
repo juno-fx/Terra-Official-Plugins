@@ -28,6 +28,8 @@ This plugin requires **Crossplane** and **Crossplane AWS Provider** to be instal
 - **Crossplane** plugin installed
 - **Crossplane AWS Provider** plugin installed and configured with valid AWS credentials
 - An AWS VPC, subnet, and security groups already configured in AWS
+- For `load_balancer`: an AWS cloud provider in the cluster (built into EKS; elsewhere install the AWS Load Balancer Controller), and subnets tagged `kubernetes.io/role/internal-elb: 1` (internal) or `kubernetes.io/role/elb: 1` (internet-facing)
+- For an `internal` load balancer: a network path from your users into the VPC (VPN, Direct Connect or peering)
 - Platform versions: `genesis-deployment >= 3.0.2`, `orion-deployment >= 3.1.0`
 
 ---
