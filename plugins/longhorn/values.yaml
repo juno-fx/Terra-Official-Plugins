@@ -3,6 +3,8 @@ storage_path: /var/lib/longhorn
 default_replica_count: 3
 fs: ext4
 release: v1.10.x
+install_snapshot_api: false
+snapshot_api_version: v8.4.0
 host:
 prefix: "/longhorn"
 

@@ -8,7 +8,25 @@ tags:
   - longhorn
   - cluster-level
   - dashboard
+editable: true
 fields:
+  - name: install_snapshot_api
+    description: |
+      Install the CSI snapshot API (snapshot.storage.k8s.io CRDs, snapshot-controller,
+      and a VolumeSnapshotClass for Longhorn). Enables snapshot-based clones instead
+      of full host-assisted copies. Set false if you already installed the snapshot
+      API on your own.
+      WARNING: turning this off after install deletes the snapshot API CRDs, which
+      cascades deletion of all VolumeSnapshot/VolumeSnapshotContent objects in the
+      cluster, including snapshots created by other consumers (e.g. KubeVirt).
+    required: false
+    default: false
+    type: boolean
+  - name: snapshot_api_version
+    description: Git tag of kubernetes-csi/external-snapshotter to install.
+    required: false
+    default: v8.4.0
+    type: string
   - name: storage_path
     description: Path where Longhorn will store its data on the host. This should be a path that is not used by any other process and has enough storage capacity to hold your data. Default is `/var/lib/longhorn`.
     required: true
