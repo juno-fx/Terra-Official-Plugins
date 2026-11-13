@@ -10,3 +10,34 @@ spec:
       targetPort: 8080
       protocol: TCP
       name: http
+{{- if .Values.dcvLoadBalancer }}
+---
+# Nice DCV native-client endpoint (svc-dcv-direct in the image, enabled by
+# REMOTE_PROTOCOL=dcv set in workstation.yaml). DCV enforces its own login;
+# the Helios web port (3000) stays behind the Hubble-auth nginx sidecar.
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Values.name }}-helios-dcv"
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+  {{- with .Values.loadBalancerAnnotations }}
+  annotations:
+    {{- range . }}
+    {{ .key | quote }}: {{ .value | quote }}
+    {{- end }}
+  {{- end }}
+spec:
+  type: LoadBalancer
+  selector:
+    juno-innovations.com/workstation: "{{ .Values.name }}"
+  ports:
+    - port: 8443
+      targetPort: 8443
+      protocol: TCP
+      name: dcv-tcp
+    - port: 8443
+      targetPort: 8443
+      protocol: UDP
+      name: dcv-udp
+{{- end }}

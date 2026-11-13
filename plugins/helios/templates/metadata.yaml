@@ -11,7 +11,7 @@ data:
     - name: icon
       default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios/assets/logo.png"
     - name: gpu
-      description: "Use a GPU"
+      description: "Use a GPU. Also mounts the NVIDIA GLX and EGL vendor files into /etc/glvnd/"
       type: boolean
       required: true
     - name: registry
@@ -64,6 +64,29 @@ data:
       type: boolean
       required: true
       default: false
+    - name: sysResource
+      description: "Add the SYS_RESOURCE capability so things like ulimits can be raised inside the container (e.g. on AWS where node limits are too low)"
+      type: boolean
+      required: true
+      default: false
+    - name: dcvLoadBalancer
+      description: "Expose Nice DCV on a LoadBalancer (8443 TCP/UDP) for native DCV clients. Also sets REMOTE_PROTOCOL=dcv. Some providers (e.g. GKE, Azure) make the load balancer public by default; use loadBalancerAnnotations to make it internal"
+      type: boolean
+      required: true
+      default: false
+    - name: loadBalancerAnnotations
+      description: "Extra annotations for the DCV LoadBalancer service (dcvLoadBalancer only). Example for CoreWeave: key service.beta.kubernetes.io/coreweave-load-balancer-type, value public"
+      required: false
+      type: list
+      fields:
+        - name: key
+          description: "Annotation key (e.g. service.beta.kubernetes.io/coreweave-load-balancer-type)"
+          type: string
+          required: true
+        - name: value
+          description: "Annotation value (e.g. public)"
+          type: string
+          required: true
   env_hints: |
     - name: PASSWORD
       description: Password set for the users terminal session.
@@ -73,6 +96,8 @@ data:
     - name: SELKIES_FRAMERATE
       description: Streaming framerate for the desktop session, as a range (e.g. "15-60") or fixed value (e.g. "30").
     - name: DISABLE_VGL
-      description: Disables the VirtualGL wrapper around the desktop session; apps needing it must be launched manually via vglrun.
+      description: Disables the VirtualGL wrapper around the desktop session; apps needing it must be launched manually via vglrun. Any non-empty value disables it (e.g. "true").
+    - name: DISABLE_ZINK
+      description: Disables Zink (Mesa's OpenGL-on-Vulkan driver), which is on by default on GPU workstations. Set to "true" to disable.
     - name: REMOTE_PROTOCOL
       description: if set to "dcv" Helios will run Nice DCV rather than Selkies.

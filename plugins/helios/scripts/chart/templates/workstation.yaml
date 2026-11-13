@@ -89,6 +89,12 @@ spec:
         - name: helios
           imagePullPolicy: IfNotPresent
           image: "{{ .Values.registry }}/{{ .Values.repo }}:{{ .Values.tag }}"
+          {{- if .Values.sysResource }}
+          securityContext:
+            capabilities:
+              add:
+              - SYS_RESOURCE
+          {{- end }}
           lifecycle:
             preStop:
               exec:
@@ -150,8 +156,16 @@ spec:
             - name: PREFIX
               value: "/{{ .Release.Namespace }}/helios/{{ .Values.name }}/"
             {{- range .Values.env }}
+            {{- if not (and $.Values.dcvLoadBalancer (eq .name "REMOTE_PROTOCOL")) }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}
+            {{- end }}
+            {{- end }}
+            {{- if .Values.dcvLoadBalancer }}
+            # dcvLoadBalancer forces DCV; a user-set REMOTE_PROTOCOL is skipped
+            # above so the env list has no duplicate names.
+            - name: REMOTE_PROTOCOL
+              value: "dcv"
             {{- end }}
           volumeMounts:
             - mountPath: /dev/shm
@@ -165,6 +179,12 @@ spec:
               subPath: {{ .file | quote }}
               mountPath: "/etc/helios/init.d/{{ .name }}/{{ .file }}"
             {{- end }}
+            {{- end }}
+            {{- if .Values.gpu }}
+            - name: nvidia-glx-vendor
+              mountPath: "/etc/glvnd/glx_vendor.d/"
+            - name: nvidia-egl-vendor
+              mountPath: "/etc/glvnd/egl_vendor.d/"
             {{- end }}
             {{- if .Values.enableAPI }}
             - name: orionpy-volume
@@ -239,6 +259,20 @@ spec:
             name: {{ .config | quote }}
             defaultMode: 0777
         {{- end }}
+        {{- end }}
+        {{- if .Values.gpu }}
+        - name: nvidia-glx-vendor
+          configMap:
+            name: "{{ .Values.name }}-nvidia-icd"
+            items:
+              - key: glx-10_nvidia.json
+                path: 10_nvidia.json
+        - name: nvidia-egl-vendor
+          configMap:
+            name: "{{ .Values.name }}-nvidia-icd"
+            items:
+              - key: egl-10_nvidia.json
+                path: 10_nvidia.json
         {{- end }}
         {{- if .Values.enableAPI }}
         - name: orionpy-volume
