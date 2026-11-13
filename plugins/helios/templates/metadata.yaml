@@ -98,6 +98,6 @@ data:
     - name: DISABLE_VGL
       description: Disables the VirtualGL wrapper around the desktop session; apps needing it must be launched manually via vglrun. Any non-empty value disables it (e.g. "true").
     - name: DISABLE_ZINK
-      description: Disables Zink (Mesa's OpenGL-on-Vulkan driver), which is on by default on GPU workstations. Set to "true" to disable.
+      description: Disables Zink (Mesa OpenGL-on-Vulkan driver), which is on by default on GPU workstations. Set to "true" to disable.
     - name: REMOTE_PROTOCOL
       description: if set to "dcv" Helios will run Nice DCV rather than Selkies.
