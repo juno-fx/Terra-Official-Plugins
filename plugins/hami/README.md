@@ -96,8 +96,6 @@ The plugin is editable: fields can be changed after install and Argo CD rolls th
 | `preconfigured_gpu_memory` | **int** · Optional · Default: `0`<br>Total GPU memory in MiB to assume per GPU when the driver cannot report it (DGX Spark / GB10). `0` uses the driver's value |
 | `gpu_core_policy` | **select** · Optional · Default: `default`<br>When the `nvidia.com/gpucores` limit is enforced. `default`: only while another HAMi workload is active on the same GPU, so a lone workload runs at full speed. `force`: always. `disable`: never (gpucores only drives scheduling). Applies to workloads launched after a change. AMD compute slices are hardware masks and ignore this |
 | `host` | **string** · Required<br>DNS name of the Genesis host; the dashboard Ingress and iFrame use it |
-| `prometheus_url` | **string** · Optional · Default: `http://prometheus-kube-prometheus-prometheus.prometheus.svc.cluster.local:9090`<br>In-cluster Prometheus URL the dashboard reads from. The default matches the `kube-prometheus-stack` plugin |
-| `prometheus_release_label` | **string** · Optional · Default: `prometheus`<br>Value of the `release` label Prometheus requires on ServiceMonitors. The default matches the `kube-prometheus-stack` plugin. Empty adds no label |
 | `enable_amd` | **boolean** · Optional · Default: `false`<br>Also share AMD GPUs: installs HAMi's AMD device plugin on nodes labelled `feature.node.kubernetes.io/amd-gpu=true` and lets the scheduler handle `amd.com/gpu`, `amd.com/gpumem`, `amd.com/gpucores`. Needs the AMD GPU Operator with `device_plugin` off. Off leaves AMD pods to the operator, whole GPU each |
 
 ### Fixed Settings
@@ -113,6 +111,8 @@ needs a mirror or a different pin.
 | `device_core_scaling` | `1` | Compute overcommit. Nothing in the catalog relies on it and the AMD plugin ignores it |
 | `device_list_strategy` | `cdi-annotations` | The GPU Operator runs the nvidia runtime in CDI mode; `envvar` fails container start. The other CDI value, `cdi-cri`, gives nothing extra here |
 | `prefix` | `/hami` | Dashboard URL path on the Genesis host. Only a path collision would change it |
+| `prometheus_url` | `http://prometheus-kube-prometheus-prometheus.prometheus.svc.cluster.local:9090` | In-cluster address of the Prometheus the dashboard reads from. The `kube-prometheus-stack` plugin always installs release `prometheus` in namespace `prometheus`, so this is the only value that matches the catalog |
+| `prometheus_release_label` | `prometheus` | Label the catalog's Prometheus requires on ServiceMonitors before it scrapes them. Fixed for the same reason |
 | `webui_git_repo`, `webui_git_revision` | HAMi-WebUI repo, pinned commit | Source pin for the dashboard chart until upstream publishes 2.0.0 to its Helm repository. Bumped with the plugin version, not per install |
 | `amd_plugin_git_repo`, `amd_plugin_git_revision` | HAMi AMD device plugin repo, `amd-gpu-helm-0.0.4` | Source pin for the AMD plugin chart. Chart and image must come from the same release, so it is bumped with the plugin version |
 
@@ -165,38 +165,16 @@ Prometheus query.
   `'self'` so only the Genesis host may embed it. This is why the plugin needs chart 2.0.0: the
   1.x dashboard can only live at `/`.
 - Two ServiceMonitors (HAMi device-plugin metrics in `kube-system`, and the dashboard's own
-  exporter) carry `release: <prometheus_release_label>` so Prometheus picks them up. The chart's
+  exporter) carry `release: prometheus` so the catalog's Prometheus picks them up. The chart's
   bundled Prometheus and DCGM exporter stay off because the cluster already has both.
 - **Utilisation panels need DCGM metrics in Prometheus.** Allocation data comes from HAMi's own
   exporter and works out of the box. Per-GPU utilisation and memory-used graphs come from the GPU
-  Operator's DCGM exporter; turn on `dcgm_servicemonitor` in the `nvidia-gpu-operator` plugin
-  (same `prometheus_release_label`). Without it those panels stay empty.
+  Operator's DCGM exporter; turn on `dcgm_servicemonitor` in the `nvidia-gpu-operator` plugin.
+  Without it those panels stay empty.
 - The chart is sourced from git because upstream has not published 2.0.0 to its Helm repository.
   Argo CD builds the chart's dependencies at sync time, so the repo-server needs outbound access to
   `prometheus-community.github.io` and `nvidia.github.io` as well as GitHub. The image is pulled by
   digest, pinned by the chart.
-
-## Grafana dashboard
-
-The plugin ships a Grafana dashboard, **HAMi GPU Sharing**, as a ConfigMap labelled
-`grafana_dashboard: "1"`. The `kube-prometheus-stack` plugin's Grafana sidecar watches every
-namespace for that label, so the dashboard appears under `https://<host>/grafana` with no extra
-steps. It covers what HAMi-WebUI does not:
-
-- Cluster: GPUs under HAMi, slices allocated vs capacity, memory and compute reserved, pending GPU
-  workloads (from kube-state-metrics).
-- NVIDIA GPUs: per-GPU core utilisation, memory allocated vs capacity, DCGM utilisation, power and
-  temperature.
-- AMD GPUs: GFX activity, VRAM, power and temperature from the AMD GPU Operator's metrics
-  exporter. Needs `metrics_servicemonitor` on the `amd-gpu-operator` plugin. Node-level only until
-  HAMi manages AMD GPUs.
-- Workloads: one row per HAMi slice with workspace, workstation, memory and cores allocated and
-  used; per-workload memory and core utilisation over time.
-
-Source: `dashboards/hami-gpu.json`. The `hami_*` series come from HAMi-WebUI's exporter, so the
-dashboard needs the WebUI Application running (always on in this plugin).
-
----
 
 ## Notes
 

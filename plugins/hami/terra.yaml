@@ -81,21 +81,6 @@ fields:
     description: The DNS name of your Genesis host, for the GPU dashboard.
     required: true
     type: string
-  - name: prometheus_url
-    description: |
-      In-cluster URL of the Prometheus the dashboard reads from. The default matches
-      the Prometheus plugin (kube-prometheus-stack in the prometheus namespace).
-    required: false
-    type: string
-    default: "http://prometheus-kube-prometheus-prometheus.prometheus.svc.cluster.local:9090"
-  - name: prometheus_release_label
-    description: |
-      Value of the release label Prometheus requires on ServiceMonitors before it scrapes
-      them. The default matches the Prometheus plugin (Helm release prometheus). Leave
-      empty if your Prometheus picks up every ServiceMonitor.
-    required: false
-    type: string
-    default: "prometheus"
   - name: enable_amd
     description: |
       Also share AMD GPUs. Installs HAMi's AMD device plugin on nodes the AMD GPU Operator
