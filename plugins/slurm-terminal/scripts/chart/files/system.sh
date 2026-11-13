@@ -14,7 +14,7 @@ cd /usr/src/app
 SLURM_LOGIN_HOST="${SLURM_LOGIN_SERVICE}.${SLURM_NAMESPACE}.svc.cluster.local"
 
 # Base path for wetty (matches the ingress/nginx path)
-WETTY_BASE="/slurm/$WORKSTATION_NAME"
+WETTY_BASE="/${JUNO_WORKSPACE}/slurm/$WORKSTATION_NAME"
 
 echo "Connecting terminal to Slurm login node ${SLURM_LOGIN_HOST}:${SLURM_LOGIN_PORT} as ${USER}"
 

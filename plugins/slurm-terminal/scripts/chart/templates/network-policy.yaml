@@ -11,15 +11,13 @@ spec:
   policyTypes:
     - Ingress
     - Egress
+  # Only the nginx sidecar port is reachable. It enforces the Hubble login itself,
+  # so traffic is accepted from any ingress controller (ingress-nginx, Traefik, ...)
+  # without knowing its namespace. Wetty's own port (3000) stays blocked.
   ingress:
-    # Browser traffic, via the ingress controller only.
-    - from:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: {{ .Values.ingressNamespace }}
-      ports:
+    - ports:
         - protocol: TCP
-          port: 3001
+          port: 8080
   egress:
     # Cluster DNS, to resolve the login node Service.
     - to:
@@ -31,7 +29,13 @@ spec:
           port: 53
         - protocol: TCP
           port: 53
-    # SSH to the Slurm login node — the only outbound connection this pod makes.
+    # Hubble, in this namespace, for the nginx sidecar's auth_request.
+    - to:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 3000
+    # SSH to the Slurm login node — the only outbound connection the terminal makes.
     # Everything else stays denied, so a compromised terminal cannot reach the
     # controller, the compute nodes, or the wider network directly.
     - to:
