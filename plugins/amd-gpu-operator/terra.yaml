@@ -1,0 +1,65 @@
+resource_id: amd-gpu-operator
+name: AMD GPU Operator
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/amd-gpu-operator/assets/logo.png
+description: |
+  Enable GPU acceleration for compute workloads on AMD Instinct and Radeon GPUs. https://instinct.docs.amd.com/projects/gpu-operator
+category: Hardware
+tags:
+  - gpu
+  - amd
+  - operator
+  - cluster-level
+editable: true
+fields:
+  - name: version
+    description: Version of the AMD GPU Operator to install.
+    required: true
+    default: v1.5.1
+    type: select
+    options:
+      - v1.5.1
+      - v1.5.0
+      - v1.4.1
+  - name: helm_repo
+    description: Helm repository URL for the AMD GPU Operator chart.
+    required: true
+    default: "https://rocm.github.io/gpu-operator"
+    type: string
+  - name: install_nfd
+    description: |
+      Install Node Feature Discovery (NFD) with the operator. NFD labels the nodes that
+      carry an AMD GPU, which is how the operator finds them. Off by default because the
+      NVIDIA GPU Operator plugin already runs NFD on these clusters: two installs fight over
+      the shared NFD CRDs, and uninstalling the AMD one then removes those CRDs and strips
+      every NFD label cluster-wide, including the NVIDIA ones. Turn on only when nothing else
+      provides NFD; the plugin then adds its AMD detection rule to that install.
+    required: false
+    default: false
+    type: boolean
+  - name: detect_all_gpus
+    description: |
+      Label every node that has an AMD GPU, including integrated GPUs and cards the
+      operator does not list as supported (for example Ryzen AI / Strix Halo). Set
+      this to false to label only the GPUs on AMD's supported list (Instinct, Radeon
+      Pro and selected Radeon RX); other nodes then need the label
+      feature.node.kubernetes.io/amd-gpu=true added by hand.
+    required: false
+    default: true
+    type: boolean
+  - name: vgpu_nodes
+    description: |
+      Target nodes labelled amd-vgpu instead of amd-gpu. Set this to true when the
+      cluster nodes are virtual machines that see an AMD GPU virtual function
+      rather than the physical device.
+    required: false
+    default: false
+    type: boolean
+  - name: device_plugin
+    description: |
+      Run the operator's own device plugin, which advertises amd.com/gpu. Turn this off
+      before installing the HAMi GPU Sharing plugin with AMD support: HAMi brings its own
+      AMD device plugin, and two device plugins on one node fight over amd.com/gpu. Node
+      labelling and the metrics exporter keep running either way.
+    required: false
+    default: true
+    type: boolean

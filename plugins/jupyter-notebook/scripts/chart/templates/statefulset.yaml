@@ -1,3 +1,14 @@
+{{- $amd := eq (toString .Values.gpu) "amd" -}}
+{{- $nvidia := eq (toString .Values.gpu) "nvidia" -}}
+{{- /* HAMi slice size arrives through the launch-time env list (admin-set, see env_hints).
+       The two names are consumed here and kept out of the container. Non-numeric reads as 0. */ -}}
+{{- $gpuMem := 0 -}}
+{{- $gpuCores := 0 -}}
+{{- range .Values.env }}
+  {{- /* GiB in, MiB out: HAMi gpumem is MiB. float64 keeps fractions ("0.5" -> 512). */ -}}
+  {{- if eq .name "HAMI_GPU_MEMORY" }}{{ $gpuMem = int (mulf (float64 .value) 1024) }}{{ end }}
+  {{- if eq .name "HAMI_GPU_CORES" }}{{ $gpuCores = int .value }}{{ end }}
+{{- end }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -60,7 +71,7 @@ spec:
           operator: "Exists"
           effect: "NoSchedule"
 
-      {{- if .Values.gpu }}
+      {{- if $nvidia }}
       runtimeClassName: nvidia
       {{- end }}
 
@@ -78,10 +89,25 @@ spec:
               memory: "{{ .Values.memory }}"
               cpu: "{{ .Values.cpu }}"
             # gotmpl's or is a function taking 2 args - this is "X or Y or Z" translated to python
-            {{- if or (or .Values.gpu .Values.memoryLimit) .Values.cpuLimit }}
+            {{- if or (or $nvidia $amd) (or .Values.memoryLimit .Values.cpuLimit) }}
             limits:
-            {{- if .Values.gpu }}
+            {{- if $nvidia }}
               nvidia.com/gpu: "1"
+              {{- if gt $gpuMem 0 }}
+              nvidia.com/gpumem: "{{ $gpuMem }}"
+              {{- end }}
+              {{- if gt $gpuCores 0 }}
+              nvidia.com/gpucores: "{{ $gpuCores }}"
+              {{- end }}
+            {{- end }}
+            {{- if $amd }}
+              amd.com/gpu: "1"
+              {{- if gt $gpuMem 0 }}
+              amd.com/gpumem: "{{ $gpuMem }}"
+              {{- end }}
+              {{- if gt $gpuCores 0 }}
+              amd.com/gpucores: "{{ $gpuCores }}"
+              {{- end }}
             {{- end }}
             {{- if .Values.cpuLimit }}
               cpu: "{{ .Values.cpuLimit }}"
@@ -118,10 +144,20 @@ spec:
             - name: "NB_GID"
               value: "{{ .Values.guid }}"
             {{- range .Values.env }}
+            {{- if not (has .name (list "HAMI_GPU_MEMORY" "HAMI_GPU_CORES")) }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}
             {{- end }}
+            {{- end }}
           volumeMounts:
+            {{- if $amd }}
+            # Runs as root in start.sh before the switch to NB_USER; adds the user to the
+            # groups owning the injected GPU device nodes.
+            - name: gpu-hook
+              mountPath: /usr/local/bin/before-notebook.d/10-gpu-device-groups.sh
+              subPath: 10-gpu-device-groups.sh
+              readOnly: true
+            {{- end }}
             {{- if .Values.volumeMounts }}
             {{- toYaml .Values.volumeMounts | nindent 12 }}
             {{- end }}
@@ -151,6 +187,12 @@ spec:
         - name: nginx-config
           configMap:
             name: "{{ .Values.name }}-nginx"
+        {{- if $amd }}
+        - name: gpu-hook
+          configMap:
+            name: "{{ .Values.name }}-gpu-hook"
+            defaultMode: 0755
+        {{- end }}
         {{- if .Values.volumes }}
         {{- toYaml .Values.volumes | nindent 8 }}
         {{- end }}

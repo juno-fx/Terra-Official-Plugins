@@ -1,0 +1,13 @@
+version: "v1.5.1"
+helm_repo: "https://rocm.github.io/gpu-operator"
+install_nfd: false
+detect_all_gpus: true
+vgpu_nodes: false
+device_plugin: true
+
+# Fixed settings, not in the Terra form.
+# No ServiceMonitor for the device metrics exporter: nothing in the catalog reads AMD GPU metrics
+# from Prometheus (HAMi-WebUI has no AMD view). The exporter still serves /metrics on port 5000.
+# Flip to true in a fork to scrape it; the label is the one the catalog's Prometheus accepts.
+metrics_servicemonitor: false
+prometheus_release_label: "prometheus"

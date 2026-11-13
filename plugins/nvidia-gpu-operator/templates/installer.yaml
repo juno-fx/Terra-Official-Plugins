@@ -3,6 +3,10 @@ kind: Application
 metadata:
   name: {{ .Release.Name }}-nvidia-gpu-operator
   namespace: {{ .Release.Namespace }}
+  finalizers:
+    # Without this Argo CD deletes the Application object only and orphans the
+    # operator, its operands and the ClusterPolicy.
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   destination:
@@ -15,9 +19,18 @@ spec:
       helm:
         releaseName: {{ .Release.Name }}-nvidia-gpu-operator
         values: |
+          # The release name above is long. The NFD subchart truncates its fullname to 63
+          # characters and then appends "-prune" for its post-delete hook Job, pushing the
+          # Job's label past the 63-character limit. The API server rejects the Job, Argo
+          # retries forever and the uninstall never finishes. A short fixed NFD name keeps
+          # every derived name under the limit.
+          node-feature-discovery:
+            fullnameOverride: {{ .Release.Name }}-nfd
           toolkit:
-            enabled: true
-            {{ if .Values.k3s }}
+            # Off when the node image ships nvidia-container-toolkit (EKS NVIDIA AMIs).
+            # runtimeclass.yaml then provides the nvidia RuntimeClass the operator skips.
+            enabled: {{ .Values.install_toolkit }}
+            {{ if and .Values.k3s .Values.install_toolkit }}
             env:
               - name: CONTAINERD_SOCKET
                 value: /run/k3s/containerd/containerd.sock
@@ -25,7 +38,9 @@ spec:
                 value: /var/lib/rancher/k3s/agent/etc/containerd/config.toml
             {{ end }}
           driver:
-            enabled: true
+            # Off when the node image ships the driver; the validator then checks the host
+            # driver instead of the DaemonSet installing a second one.
+            enabled: {{ .Values.install_driver }}
             useOpenKernelModules: {{ .Values.open_kernel_modules }}
             nvidiaDriverCRD:
               enabled: {{ .Values.install_crds }}
@@ -36,6 +51,8 @@ spec:
             enabled: true
             defaultWorkload: container
           devicePlugin:
+            # Off when the HAMi GPU Sharing plugin provides the device plugin instead.
+            enabled: {{ .Values.device_plugin }}
             config:
               name: device-plugin-config
               create: true
@@ -45,6 +62,11 @@ spec:
                   version: v1
                   flags:
                     migStrategy: none
+                  {{- if and (gt (int .Values.slice_count) 1) (eq (toString .Values.device_plugin) "true") }}
+                  # A slice_count of 1 means no time-slicing; the config parser rejects replicas < 2.
+                  # Skipped when the device plugin is off: GPU Feature Discovery reads this config
+                  # for node labels (gpu.replicas, gpu.product -SHARED) and would advertise slicing
+                  # nothing enforces. HAMi's device plugin ignores it either way.
                   sharing:
                     timeSlicing:
                       renameByDefault: false
@@ -52,10 +74,25 @@ spec:
                       resources:
                         - name: nvidia.com/gpu
                           replicas: {{ .Values.slice_count }}
+                  {{- end }}
           nfd:
             enabled: true
           dcgm:
             enabled: {{ .Values.dcgm_enabled }}
+          {{- /* Auto-detected: Argo CD passes the cluster's API groups to helm template, so this
+               renders only where the Prometheus Operator CRDs exist (kube-prometheus-stack plugin).
+               Rendering a ServiceMonitor without them fails the sync. HAMi-WebUI's utilisation
+               panels read these metrics. Argo re-renders on refresh, so installing Prometheus
+               later is enough. */}}
+          {{- if .Capabilities.APIVersions.Has "monitoring.coreos.com/v1" }}
+          dcgmExporter:
+            serviceMonitor:
+              enabled: true
+              {{- with .Values.prometheus_release_label }}
+              additionalLabels:
+                release: {{ . | quote }}
+              {{- end }}
+          {{- end }}
   syncPolicy:
     automated:
       prune: true
