@@ -52,18 +52,15 @@ fields:
     required: false
     type: int
     default: 10
-  - name: device_memory_scaling
+  - name: preconfigured_gpu_memory
     description: |
-      GPU memory overcommit ratio. 1 advertises the real memory; 2 lets workloads claim
-      twice the physical memory in total (uses host memory as spill-over).
+      Total GPU memory in MiB to assume per GPU when the driver cannot report it. Needed
+      for unified-memory systems such as NVIDIA DGX Spark (GB10), where nvidia-smi shows
+      memory.total as N/A and HAMi otherwise leaves the node unregistered. 0 uses the
+      value reported by the driver. A 128 GB DGX Spark takes about 98304.
     required: false
-    type: string
-    default: "1"
-  - name: device_core_scaling
-    description: GPU compute overcommit ratio. 1 advertises 100% of the cores per GPU.
-    required: false
-    type: string
-    default: "1"
+    type: int
+    default: 0
   - name: gpu_core_policy
     description: |
       When HAMi enforces a workload's nvidia.com/gpucores limit. default enforces it only
@@ -80,48 +77,10 @@ fields:
       - default
       - force
       - disable
-  - name: device_list_strategy
-    description: |
-      How the HAMi device plugin hands GPUs to the container runtime. cdi-annotations and
-      cdi-cri use the Container Device Interface and are required when the GPU Operator runs
-      the nvidia runtime in CDI mode (its default since v25.3). envvar is the legacy
-      NVIDIA_VISIBLE_DEVICES method for runtimes without CDI.
-    required: false
-    type: select
-    default: cdi-annotations
-    options:
-      - cdi-annotations
-      - cdi-cri
-      - envvar
-  - name: default_gpu_memory
-    description: |
-      GPU memory in MiB handed to a workload that requests a GPU without naming an amount
-      (nvidia.com/gpu without nvidia.com/gpumem). 0 gives such workloads the whole GPU,
-      which means no sharing until workloads ask for a slice. Set this to make every
-      plain GPU request a slice, for example 8192.
-    required: false
-    type: int
-    default: 0
-  - name: preconfigured_gpu_memory
-    description: |
-      Total GPU memory in MiB to assume per GPU when the driver cannot report it. Needed
-      for unified-memory systems such as NVIDIA DGX Spark (GB10), where nvidia-smi shows
-      memory.total as N/A and HAMi otherwise leaves the node unregistered. 0 uses the
-      value reported by the driver. A 128 GB DGX Spark takes about 98304.
-    required: false
-    type: int
-    default: 0
   - name: host
     description: The DNS name of your Genesis host, for the GPU dashboard.
     required: true
     type: string
-  - name: prefix
-    description: |
-      URL path the GPU dashboard is served under on the Genesis host, for example /hami.
-      Rarely needs changing.
-    required: false
-    type: string
-    default: "/hami"
   - name: prometheus_url
     description: |
       In-cluster URL of the Prometheus the dashboard reads from. The default matches
@@ -137,19 +96,6 @@ fields:
     required: false
     type: string
     default: "prometheus"
-  - name: webui_git_repo
-    description: |
-      Git repository holding the HAMi-WebUI Helm chart (charts/hami-webui). The 2.0.0
-      chart, which adds the sub-path serving needed for embedding in Genesis, is not
-      published to the upstream Helm repository yet, so the chart is taken from git.
-    required: true
-    type: string
-    default: "https://github.com/Project-HAMi/HAMi-WebUI.git"
-  - name: webui_git_revision
-    description: Git commit, tag or branch of the HAMi-WebUI chart to install.
-    required: true
-    type: string
-    default: "cb896331e0e39447d6033338fb23433aa01ae536"
   - name: enable_amd
     description: |
       Also share AMD GPUs. Installs HAMi's AMD device plugin on nodes the AMD GPU Operator
@@ -160,13 +106,3 @@ fields:
     required: false
     type: boolean
     default: false
-  - name: amd_plugin_git_repo
-    description: Git repository holding HAMi's AMD device plugin Helm chart (helm/amd-gpu). Used when enable_amd is on.
-    required: false
-    type: string
-    default: "https://github.com/Project-HAMi/amd-device-plugin.git"
-  - name: amd_plugin_git_revision
-    description: Git tag, commit or branch of the AMD device plugin chart. The chart and its image must come from the same release.
-    required: false
-    type: string
-    default: "amd-gpu-helm-0.0.4"

@@ -27,7 +27,7 @@ The plugin installs two Argo CD Applications into `kube-system`:
 | `<release>-hami-webui` | [`hami-webui`](https://github.com/Project-HAMi/HAMi-WebUI) 2.0.0 (from git) | GPU dashboard, embedded in Genesis |
 
 The dashboard is a Genesis **dashboard plugin**: it appears in the Genesis sidebar for admin
-users and is served from the Genesis host under `prefix`, behind the Genesis authentication gate.
+users and is served from the Genesis host under `/hami`, behind the Genesis authentication gate.
 
 ---
 
@@ -42,9 +42,9 @@ users and is served from the Genesis host under `prefix`, behind the Genesis aut
   plus `nvidia.com/gpumem` and `nvidia.com/gpucores` so workloads can ask for a slice.
 - A mutating webhook rewrites every pod that requests `nvidia.com/gpu` to use the HAMi
   scheduler. Workload templates do not need `schedulerName` set.
-- A pod that asks for `nvidia.com/gpu: 1` and nothing else still gets the whole GPU unless
-  `default_gpu_memory` is set. Sharing starts when workloads request `nvidia.com/gpumem` or
-  `nvidia.com/gpucores`, or when `default_gpu_memory` makes every plain request a slice.
+- A pod that asks for `nvidia.com/gpu: 1` and nothing else gets an 8 GiB slice
+  (`default_gpu_memory`). Workloads request `nvidia.com/gpumem` and `nvidia.com/gpucores` for a
+  different size or a compute share.
 
 ---
 
@@ -93,21 +93,28 @@ The plugin is editable: fields can be changed after install and Argo CD rolls th
 | `scheduler_node_policy` | **select** · Optional · Default: `binpack`<br>Placement across nodes. `binpack` fills one node before using the next; `spread` distributes |
 | `scheduler_gpu_policy` | **select** · Optional · Default: `spread`<br>Placement across the GPUs of one node. `spread` uses every GPU before doubling up; `binpack` fills one GPU first |
 | `device_split_count` | **int** · Optional · Default: `10`<br>Maximum number of workloads sharing one physical GPU |
-| `device_memory_scaling` | **string** · Optional · Default: `1`<br>GPU memory overcommit ratio. `1` advertises the real memory; `2` lets workloads claim twice the physical memory in total |
-| `device_core_scaling` | **string** · Optional · Default: `1`<br>GPU compute overcommit ratio. `1` advertises 100% of the cores per GPU |
-| `gpu_core_policy` | **select** · Optional · Default: `default`<br>When the `nvidia.com/gpucores` limit is enforced. `default`: only while another HAMi workload is active on the same GPU, so a lone workload runs at full speed. `force`: always. `disable`: never (gpucores only drives scheduling). Applies to workloads launched after a change. AMD compute slices are hardware masks and ignore this |
-| `device_list_strategy` | **select** · Optional · Default: `cdi-annotations`<br>How GPUs are handed to the container runtime: `cdi-annotations`, `cdi-cri` (both CDI, needed with the GPU Operator's CDI-mode runtime) or `envvar` (legacy) |
-| `default_gpu_memory` | **int** · Optional · Default: `0`<br>GPU memory in MiB given to a workload that requests `nvidia.com/gpu` without `nvidia.com/gpumem`. `0` gives such workloads the whole GPU. Set to, for example, `8192` to make every plain GPU request a slice |
 | `preconfigured_gpu_memory` | **int** · Optional · Default: `0`<br>Total GPU memory in MiB to assume per GPU when the driver cannot report it (DGX Spark / GB10). `0` uses the driver's value |
+| `gpu_core_policy` | **select** · Optional · Default: `default`<br>When the `nvidia.com/gpucores` limit is enforced. `default`: only while another HAMi workload is active on the same GPU, so a lone workload runs at full speed. `force`: always. `disable`: never (gpucores only drives scheduling). Applies to workloads launched after a change. AMD compute slices are hardware masks and ignore this |
 | `host` | **string** · Required<br>DNS name of the Genesis host; the dashboard Ingress and iFrame use it |
-| `prefix` | **string** · Optional · Default: `/hami`<br>URL path the dashboard is served under on the Genesis host |
 | `prometheus_url` | **string** · Optional · Default: `http://prometheus-kube-prometheus-prometheus.prometheus.svc.cluster.local:9090`<br>In-cluster Prometheus URL the dashboard reads from. The default matches the `kube-prometheus-stack` plugin |
 | `prometheus_release_label` | **string** · Optional · Default: `prometheus`<br>Value of the `release` label Prometheus requires on ServiceMonitors. The default matches the `kube-prometheus-stack` plugin. Empty adds no label |
-| `webui_git_repo` | **string** · Required · Default: `https://github.com/Project-HAMi/HAMi-WebUI.git`<br>Git repository holding the HAMi-WebUI chart at `charts/hami-webui` |
-| `webui_git_revision` | **string** · Required · Default: pinned commit on `main`<br>Git revision of the HAMi-WebUI chart. Pinned until upstream publishes chart 2.0.0 to its Helm repository |
 | `enable_amd` | **boolean** · Optional · Default: `false`<br>Also share AMD GPUs: installs HAMi's AMD device plugin on nodes labelled `feature.node.kubernetes.io/amd-gpu=true` and lets the scheduler handle `amd.com/gpu`, `amd.com/gpumem`, `amd.com/gpucores`. Needs the AMD GPU Operator with `device_plugin` off. Off leaves AMD pods to the operator, whole GPU each |
-| `amd_plugin_git_repo` | **string** · Optional · Default: `https://github.com/Project-HAMi/amd-device-plugin.git`<br>Git repository of the HAMi AMD device plugin chart (`helm/amd-gpu`) |
-| `amd_plugin_git_revision` | **string** · Optional · Default: `amd-gpu-helm-0.0.4`<br>Tag of that chart. Chart and image must come from the same release |
+
+### Fixed Settings
+
+These used to be form fields. Each has one right answer for this catalog, so they now live in the
+plugin's `values.yaml` and are not asked at install time. Change them in a fork if an environment
+needs a mirror or a different pin.
+
+| Setting | Value | Why fixed |
+|---------|-------|-----------|
+| `default_gpu_memory` | `8192` | GPU memory in MiB given to a workload that requests `nvidia.com/gpu` without `nvidia.com/gpumem`. Templates that set `gpumem` (`jupyter-notebook` via `HAMI_GPU_MEMORY`) override it per launch; every other GPU workload gets an 8 GiB slice instead of the whole card. Nonzero on purpose: on DGX Spark / GB10 a request without an absolute size fails at Allocate (see Notes). `0` would hand over whole GPUs where the driver reports memory |
+| `device_memory_scaling` | `1` | GPU memory overcommit. Above `1` advertises more memory than the card has and spills to host memory; not something this catalog wants on by default |
+| `device_core_scaling` | `1` | Compute overcommit. Nothing in the catalog relies on it and the AMD plugin ignores it |
+| `device_list_strategy` | `cdi-annotations` | The GPU Operator runs the nvidia runtime in CDI mode; `envvar` fails container start. The other CDI value, `cdi-cri`, gives nothing extra here |
+| `prefix` | `/hami` | Dashboard URL path on the Genesis host. Only a path collision would change it |
+| `webui_git_repo`, `webui_git_revision` | HAMi-WebUI repo, pinned commit | Source pin for the dashboard chart until upstream publishes 2.0.0 to its Helm repository. Bumped with the plugin version, not per install |
+| `amd_plugin_git_repo`, `amd_plugin_git_revision` | HAMi AMD device plugin repo, `amd-gpu-helm-0.0.4` | Source pin for the AMD plugin chart. Chart and image must come from the same release, so it is bumped with the plugin version |
 
 ---
 
@@ -124,7 +131,7 @@ with two extra resources:
 | `nvidia.com/gpucores` | Share of the GPU's compute, 0–100 |
 
 ```yaml
-# Whole GPU — unchanged from the GPU Operator (unless default_gpu_memory is set)
+# Plain request: an 8 GiB slice (default_gpu_memory), compute unthrottled
 resources:
   limits:
     nvidia.com/gpu: 1
@@ -140,8 +147,9 @@ resources:
 ```
 
 Workload templates in this catalog (for example `jupyter-notebook` with `gpu` on and
-`gpu_vendor: nvidia`) request `nvidia.com/gpu: "1"`. With HAMi installed that is a whole GPU
-until either `default_gpu_memory` is set or the template grows memory and core fields.
+`gpu_vendor: nvidia`) request `nvidia.com/gpu: "1"`. With HAMi installed that becomes an 8 GiB
+slice (`default_gpu_memory`). `jupyter-notebook` sets memory and cores from env; other templates
+get the default until they grow their own fields.
 
 ---
 
@@ -151,9 +159,9 @@ HAMi-WebUI is a read-only dashboard: cards per node and per GPU, allocation vers
 capacity, running tasks and utilisation history. It never talks to HAMi directly; every panel is a
 Prometheus query.
 
-- Reached from the Genesis sidebar (admin users) or at `https://<host><prefix>/`. The Ingress
+- Reached from the Genesis sidebar (admin users) or at `https://<host>/hami/`. The Ingress
   carries the Genesis `auth-url` gate; the dashboard has no login of its own.
-- Served under `prefix` through the chart's `frontend.basePath`, with `frameAncestors` set to
+- Served under `/hami` through the chart's `frontend.basePath`, with `frameAncestors` set to
   `'self'` so only the Genesis host may embed it. This is why the plugin needs chart 2.0.0: the
   1.x dashboard can only live at `/`.
 - Two ServiceMonitors (HAMi device-plugin metrics in `kube-system`, and the dashboard's own
@@ -195,26 +203,27 @@ dashboard needs the WebUI Application running (always on in this plugin).
 - **Install order matters.** GPU Operator first, with its device plugin disabled; then HAMi.
   Installing HAMi while the operator's device plugin still runs leaves two plugins registering
   `nvidia.com/gpu` on each node.
-- **Overcommit** (`device_memory_scaling` or `device_core_scaling` above `1`) advertises more
-  capacity than the hardware has. Memory limits are still enforced per container; contention
-  happens only when every consumer uses its full share at once.
 - **DGX Spark / GB10** share system memory with the GPU and `nvidia-smi` reports no total.
   Without `preconfigured_gpu_memory` HAMi registers the node with zero GPU memory and no slice
   can be placed there. A 128 GB Spark takes about `98304`. On top of that, HAMi 2.11.0 validates
   percentage-sized allocations against the NVML memory value, which is 0 on GB10, so a plain
-  `nvidia.com/gpu: 1` request fails at Allocate with "allocated N MB … but requests 0 MB". Set
-  `default_gpu_memory` (or have workloads request `nvidia.com/gpumem`) so the request carries an
-  absolute size. Memory limits and compute quotas (`gpucores`) both work on GB10.
+  `nvidia.com/gpu: 1` request fails at Allocate with "allocated N MB … but requests 0 MB". The
+  plugin's `default_gpu_memory` of 8192 gives every such request an absolute size, so plain GPU
+  workloads run; templates that set `nvidia.com/gpumem` (`jupyter-notebook` via `HAMI_GPU_MEMORY`)
+  choose their own. Memory limits and compute quotas (`gpucores`) both work on GB10.
 - **Core policy.** `gpucores` is a throttle in HAMi-core, not a hardware partition. With
   `gpu_core_policy: default` a workload alone on a GPU is never throttled; when a second HAMi
   workload becomes active on the same GPU, HAMi's monitor switches enforcement on within about
   10 s, each workload stalls for a few seconds while the token bucket refills, then settles at
   its share. When the other workload stops, the survivor climbs back to full speed. `force`
   pins every workload to its share from the first kernel, which is the setting to use when
-  tenants should see the same throughput whether or not the GPU is shared. The policy is
-  injected at admission (`GPU_CORE_UTILIZATION_POLICY`), so after changing it restart the
-  workloads that should pick it up.
-- **CDI.** Leave `device_list_strategy` on a CDI value with the GPU Operator plugin. With `envvar`
+  tenants should see the same throughput whether or not the GPU is shared. Enforcement is a
+  token-bucket rate limiter, so a steady load runs as bursts with pauses in between (on GB10
+  roughly 8 s near full speed, then 10 s blocked) and only the average over tens of seconds
+  matches the share; measured 23% for a 25% limit. The policy is injected at admission
+  (`GPU_CORE_UTILIZATION_POLICY`), so after changing it restart the workloads that should
+  pick it up.
+- **CDI.** `device_list_strategy` is fixed at `cdi-annotations` for the GPU Operator's CDI-mode runtime. With `envvar`
   the nvidia runtime in CDI mode fails container start with
   `unresolvable CDI devices management.nvidia.com/gpu=GPU-…`.
 - **Scheduler image.** The chart derives the kube-scheduler image tag from the cluster's
