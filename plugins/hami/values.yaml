@@ -6,6 +6,7 @@ scheduler_gpu_policy: spread
 device_split_count: 10
 preconfigured_gpu_memory: 0
 gpu_core_policy: default
+report_node_capacity: false
 host: ""
 enable_amd: false
 

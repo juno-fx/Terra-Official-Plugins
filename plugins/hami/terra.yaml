@@ -77,6 +77,17 @@ fields:
       - default
       - force
       - disable
+  - name: report_node_capacity
+    description: |
+      Have HAMi's device plugin also publish each GPU node's total nvidia.com/gpumem (MiB)
+      and nvidia.com/gpucores in the node's capacity and allocatable. By default HAMi
+      registers only nvidia.com/gpu, so cluster autoscalers never see the slice resources:
+      Karpenter cannot scale a GPU node pool from zero for a sliced workload and, once a node
+      is up, never marks it initialised or consolidates it. Turn on with Karpenter (together
+      with a NodeOverlay, see the README); harmless elsewhere.
+    required: false
+    type: boolean
+    default: false
   - name: host
     description: The DNS name of your Genesis host, for the GPU dashboard.
     required: true

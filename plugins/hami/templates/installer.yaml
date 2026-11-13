@@ -42,6 +42,9 @@ spec:
           # The chart defaults to a NodePort for the metrics service.
           service:
             type: ClusterIP
+          # Also patch total gpumem/gpucores into node capacity, so autoscalers (Karpenter)
+          # can launch for sliced pods and initialise the node afterwards.
+          reportNodeCapacity: {{ .Values.report_node_capacity }}
         devices:
           nvidia:
             # RuntimeClass created by the GPU Operator's container toolkit.

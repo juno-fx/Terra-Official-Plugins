@@ -95,6 +95,7 @@ The plugin is editable: fields can be changed after install and Argo CD rolls th
 | `device_split_count` | **int** · Optional · Default: `10`<br>Maximum number of workloads sharing one physical GPU |
 | `preconfigured_gpu_memory` | **int** · Optional · Default: `0`<br>Total GPU memory in MiB to assume per GPU when the driver cannot report it (DGX Spark / GB10). `0` uses the driver's value |
 | `gpu_core_policy` | **select** · Optional · Default: `default`<br>When the `nvidia.com/gpucores` limit is enforced. `default`: only while another HAMi workload is active on the same GPU, so a lone workload runs at full speed. `force`: always. `disable`: never (gpucores only drives scheduling). Applies to workloads launched after a change. AMD compute slices are hardware masks and ignore this |
+| `report_node_capacity` | **boolean** · Optional · Default: `false`<br>HAMi's device plugin also publishes each GPU node's total `nvidia.com/gpumem` and `nvidia.com/gpucores` in node capacity and allocatable. Needed for Karpenter to scale GPU nodes from zero for sliced workloads and to consolidate them again (see Autoscaling) |
 | `host` | **string** · Required<br>DNS name of the Genesis host; the dashboard Ingress and iFrame use it |
 | `enable_amd` | **boolean** · Optional · Default: `false`<br>Also share AMD GPUs: installs HAMi's AMD device plugin on nodes labelled `feature.node.kubernetes.io/amd-gpu=true` and lets the scheduler handle `amd.com/gpu`, `amd.com/gpumem`, `amd.com/gpucores`. Needs the AMD GPU Operator with `device_plugin` off. Off leaves AMD pods to the operator, whole GPU each |
 
@@ -169,12 +170,63 @@ Prometheus query.
   bundled Prometheus and DCGM exporter stay off because the cluster already has both.
 - **Utilisation panels need DCGM metrics in Prometheus.** Allocation data comes from HAMi's own
   exporter and works out of the box. Per-GPU utilisation and memory-used graphs come from the GPU
-  Operator's DCGM exporter; turn on `dcgm_servicemonitor` in the `nvidia-gpu-operator` plugin.
-  Without it those panels stay empty.
+  Operator's DCGM exporter. The `nvidia-gpu-operator` plugin creates its ServiceMonitor on its own
+  wherever the Prometheus Operator CRDs exist, so with the Prometheus plugin installed the panels
+  fill in; without Prometheus they stay empty.
 - The chart is sourced from git because upstream has not published 2.0.0 to its Helm repository.
   Argo CD builds the chart's dependencies at sync time, so the repo-server needs outbound access to
   `prometheus-community.github.io` and `nvidia.github.io` as well as GitHub. The image is pulled by
   digest, pinned by the chart.
+
+## Autoscaling with Karpenter
+
+Karpenter decides what to launch from the resources pending pods request, and HAMi-sliced pods
+request `nvidia.com/gpumem` and `nvidia.com/gpucores`. Two things stop that from working out of
+the box, and the plugin plus one Karpenter object fix both:
+
+1. **Karpenter does not know those resources exist on any instance type**, so no node is launched
+   for a sliced pod ("no instance type satisfied resources"). A Karpenter `NodeOverlay` adds them
+   to the scheduling simulation. Needs Karpenter 1.7 or newer with the `NodeOverlay` feature gate
+   (`settings.featureGates.nodeOverlay: true`; alpha). One overlay per GPU model and GPU count, with
+   the memory NVML reports per GPU (what HAMi registers), not the marketing figure:
+
+   ```yaml
+   apiVersion: karpenter.sh/v1alpha1
+   kind: NodeOverlay
+   metadata:
+     name: hami-a10g-1
+   spec:
+     requirements:
+       - key: karpenter.k8s.aws/instance-gpu-name
+         operator: In
+         values: ["a10g"]
+       - key: karpenter.k8s.aws/instance-gpu-count
+         operator: In
+         values: ["1"]
+     capacity:
+       nvidia.com/gpumem: 23028   # MiB per GPU x GPU count
+       nvidia.com/gpucores: 100   # 100 x GPU count
+   ```
+
+2. **A launched node would never be initialised.** Karpenter waits until every resource the pods
+   asked for appears in the node's allocatable before it marks the NodeClaim initialised, with no
+   timeout, and never consolidates an uninitialised node. By default HAMi registers only
+   `nvidia.com/gpu`. Turn on `report_node_capacity` (HAMi's `devicePlugin.reportNodeCapacity`):
+   the device plugin then sums the healthy GPUs' memory and cores it registered and patches the
+   totals into the node's capacity and allocatable as `nvidia.com/gpumem` and `nvidia.com/gpucores`
+   on every registration cycle. Karpenter then initialises the node, counts free slice capacity on
+   existing GPU nodes before launching another, and consolidates empty ones.
+
+Expected flow: sliced pod pending, NodeClaim within seconds, node Ready in about two minutes, HAMi
+device plugin registers and reports capacity, `karpenter.sh/initialized=true`, pod runs. Delete the
+pod and the node goes with `consolidateAfter`. Without it a node launched for a sliced pod
+stays up until someone deletes the NodeClaim by hand, so enable the field before the first launch.
+
+`report_node_capacity` is harmless on clusters without an autoscaler: the extra capacity
+entries make kube-scheduler and kubelet check slice totals per node, which HAMi already enforces
+per GPU. AMD nodes are not covered yet.
+
+---
 
 ## Notes
 
