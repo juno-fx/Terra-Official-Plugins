@@ -1,15 +1,19 @@
-install_toolkit: true
-install_driver: true
-slice_count: "4"
-version: "v25.10.0"
-install_crds: "true"
-open_kernel_modules: "true"
-nfd_enabled: "true"
-default_config: "any"
-dcgm_enabled: "false"
-selector: "time-slicing"
-k3s: "true"
+# Install-time fields (terra.yaml), in form order.
+version: v25.10.1
 helm_repo: "https://helm.ngc.nvidia.com/nvidia"
+install_driver: true
+open_kernel_modules: false
+install_toolkit: true
+k3s: true
+install_crds: false
+slice_count: 4
 device_plugin: true
-dcgm_servicemonitor: false
+
+# Fixed settings, not in the Terra form.
+# dcgm_enabled: the standalone DCGM host engine. Off: the DCGM exporter runs its own embedded
+# engine, which is all the metrics need.
+dcgm_enabled: false
+# The DCGM ServiceMonitor is created whenever the cluster has the Prometheus Operator CRDs
+# (kube-prometheus-stack plugin). The catalog's Prometheus is Helm release "prometheus", so
+# this is the only label it accepts.
 prometheus_release_label: "prometheus"

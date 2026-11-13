@@ -49,12 +49,10 @@ This plugin installs the upstream [ROCm/gpu-operator](https://github.com/ROCm/gp
 |-------|---------|
 | `version` | **select** · Required · Default: `v1.5.1`<br>AMD GPU Operator version to install (`v1.5.1`, `v1.5.0` or `v1.4.1`) |
 | `helm_repo` | **string** · Required · Default: `https://rocm.github.io/gpu-operator`<br>Helm repository URL for the AMD GPU Operator chart |
-| `install_nfd` | **boolean** · Optional · Default: `true`<br>Install Node Feature Discovery with the operator. Set to `false` when NFD already runs in the cluster, e.g. alongside the NVIDIA GPU Operator. |
+| `install_nfd` | **boolean** · Optional · Default: `false`<br>Install Node Feature Discovery with the operator. Off by default: the NVIDIA GPU Operator plugin already runs NFD, two installs fight over the shared CRDs, and removing the AMD one strips every NFD label cluster-wide. Turn on only when nothing else provides NFD |
 | `detect_all_gpus` | **boolean** · Optional · Default: `true`<br>Label every node that has an AMD GPU, including integrated GPUs and cards outside AMD's supported list (e.g. Ryzen AI / Strix Halo). Set to `false` to label only supported GPUs (Instinct, Radeon Pro, selected Radeon RX). |
 | `vgpu_nodes` | **boolean** · Optional · Default: `false`<br>Target nodes labelled `amd-vgpu` instead of `amd-gpu`. Use when the nodes are virtual machines that see an AMD GPU virtual function. |
 | `device_plugin` | **boolean** · Optional · Default: `true`<br>Run the operator's own device plugin. Turn off before installing the HAMi GPU Sharing plugin with AMD support, which brings its own. Node labelling and the metrics exporter keep running. |
-| `metrics_servicemonitor` | **boolean** · Optional · Default: `false`<br>Create a Prometheus ServiceMonitor for the device metrics exporter. Needs the Prometheus Operator CRDs (`kube-prometheus-stack` plugin). |
-| `prometheus_release_label` | **string** · Optional · Default: `prometheus`<br>`release` label put on the metrics ServiceMonitor so Prometheus selects it. Matches the `kube-prometheus-stack` plugin. Empty adds no label. |
 
 ---
 
@@ -81,7 +79,7 @@ In the catalog, the **Jupyter Notebook** workload template renders this limit wh
 - If operator pods on a GPU node stay in `Init:0/1`, the node has no `amdgpu` driver loaded — install one on the node
 - With `install_nfd: false` an NFD install must already exist in the cluster; the operator still adds its own rule for detecting AMD GPUs. With `install_nfd: true` next to another NFD install, both manage the same NFD CRDs, and uninstalling this plugin removes them
 - The operator's `default` DeviceConfig is owned by this plugin. Manual edits to it are reverted on the next sync — change the fields above instead
-- GPU metrics are exported in-cluster on port `5000` by the device metrics exporter; `metrics_servicemonitor` makes Prometheus scrape them
+- GPU metrics are exported in-cluster on port `5000` by the device metrics exporter. The plugin creates no Prometheus ServiceMonitor for it: nothing in the catalog reads AMD GPU metrics from Prometheus. Set `metrics_servicemonitor` to `true` in `values.yaml` (fork) to scrape it; the ServiceMonitor then carries `release: prometheus` for the catalog's Prometheus
 - **With the HAMi GPU Sharing plugin:** set `device_plugin` to `false` first, then turn on `enable_amd` in HAMi. HAMi registers `amd.com/gpu` itself and handles slicing; two device plugins on one node fight over the resource. Turn `device_plugin` back on after removing HAMi
 - Auto node remediation is disabled: it installs an Argo Workflows controller and CRDs that conflict with an existing Argo Workflows install
 - The device plugin, node labeller and metrics exporter images use the upstream chart's `latest` tags

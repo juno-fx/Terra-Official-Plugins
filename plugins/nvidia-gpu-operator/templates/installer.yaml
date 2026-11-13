@@ -62,8 +62,11 @@ spec:
                   version: v1
                   flags:
                     migStrategy: none
-                  {{- if gt (int .Values.slice_count) 1 }}
+                  {{- if and (gt (int .Values.slice_count) 1) (eq (toString .Values.device_plugin) "true") }}
                   # A slice_count of 1 means no time-slicing; the config parser rejects replicas < 2.
+                  # Skipped when the device plugin is off: GPU Feature Discovery reads this config
+                  # for node labels (gpu.replicas, gpu.product -SHARED) and would advertise slicing
+                  # nothing enforces. HAMi's device plugin ignores it either way.
                   sharing:
                     timeSlicing:
                       renameByDefault: false
@@ -76,7 +79,12 @@ spec:
             enabled: true
           dcgm:
             enabled: {{ .Values.dcgm_enabled }}
-          {{- if eq (toString .Values.dcgm_servicemonitor) "true" }}
+          {{- /* Auto-detected: Argo CD passes the cluster's API groups to helm template, so this
+               renders only where the Prometheus Operator CRDs exist (kube-prometheus-stack plugin).
+               Rendering a ServiceMonitor without them fails the sync. HAMi-WebUI's utilisation
+               panels read these metrics. Argo re-renders on refresh, so installing Prometheus
+               later is enough. */}}
+          {{- if .Capabilities.APIVersions.Has "monitoring.coreos.com/v1" }}
           dcgmExporter:
             serviceMonitor:
               enabled: true

@@ -27,12 +27,14 @@ fields:
     type: string
   - name: install_nfd
     description: |
-      Install Node Feature Discovery (NFD) alongside the operator. NFD labels the
-      nodes that carry an AMD GPU, which is how the operator finds them. Set this
-      to false when NFD is already running in the cluster, for example when the
-      NVIDIA GPU Operator is installed, so the two do not fight over the same CRDs.
+      Install Node Feature Discovery (NFD) with the operator. NFD labels the nodes that
+      carry an AMD GPU, which is how the operator finds them. Off by default because the
+      NVIDIA GPU Operator plugin already runs NFD on these clusters: two installs fight over
+      the shared NFD CRDs, and uninstalling the AMD one then removes those CRDs and strips
+      every NFD label cluster-wide, including the NVIDIA ones. Turn on only when nothing else
+      provides NFD; the plugin then adds its AMD detection rule to that install.
     required: false
-    default: true
+    default: false
     type: boolean
   - name: detect_all_gpus
     description: |
@@ -61,19 +63,3 @@ fields:
     required: false
     default: true
     type: boolean
-  - name: metrics_servicemonitor
-    description: |
-      Create a Prometheus ServiceMonitor for the device metrics exporter so AMD GPU
-      utilisation and memory metrics land in Prometheus. Needs the Prometheus Operator
-      CRDs (kube-prometheus-stack plugin).
-    required: false
-    default: false
-    type: boolean
-  - name: prometheus_release_label
-    description: |
-      Value of the release label Prometheus requires on ServiceMonitors before it scrapes
-      them. The default matches the Prometheus plugin (Helm release prometheus). Leave empty
-      if your Prometheus picks up every ServiceMonitor. Only used with metrics_servicemonitor.
-    required: false
-    default: "prometheus"
-    type: string

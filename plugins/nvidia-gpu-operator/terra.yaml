@@ -13,25 +13,19 @@ tags:
   - cluster-level
 editable: true
 fields:
-  - name: install_crds
-    description: |
-      Install the NVIDIA GPU Operator's Custom Resource Definitions (CRDs). 
-      If this is the first or only install of the NVIDIA GPU Operator in 
-      the cluster, you should set this to true to install the necessary CRDs. 
-      If you have already installed the NVIDIA GPU Operator with CRD installation 
-      enabled, you can set this to false for subsequent installations to avoid 
-      trying to reinstall the CRDs.
-    required: false
-    default: false
-    type: boolean
-  - name: open_kernel_modules
-    description: |
-      Whether to use open kernel modules for the NVIDIA driver. This is required 
-      if you want to use the open kernel modules for the NVIDIA driver. Not needed 
-      if you are using the device plugin to manage the driver installation.
-    required: false
-    default: false
-    type: boolean
+  - name: version
+    description: Version of the GPU Operator to install.
+    required: true
+    type: select
+    default: v25.10.1
+    options:
+      - v25.10.1
+      - v25.3.4
+  - name: helm_repo
+    description: Helm repository URL for the NVIDIA GPU Operator chart.
+    required: true
+    type: string
+    default: "https://helm.ngc.nvidia.com/nvidia"
   - name: install_driver
     description: |
       Run the operator's driver DaemonSet to install the NVIDIA kernel driver on GPU nodes.
@@ -40,6 +34,15 @@ fields:
       host driver instead of installing one; a second driver install on such nodes fails.
     required: false
     default: true
+    type: boolean
+  - name: open_kernel_modules
+    description: |
+      Install NVIDIA's open-source GPU kernel modules instead of the proprietary ones.
+      Required on Blackwell and newer (DGX Spark GB10, B200); supported on Turing and newer
+      data-centre GPUs; older cards need the proprietary modules. Only applies while
+      install_driver is on.
+    required: false
+    default: false
     type: boolean
   - name: install_toolkit
     description: |
@@ -60,11 +63,21 @@ fields:
     required: false
     default: true
     type: boolean
+  - name: install_crds
+    description: |
+      Let the operator manage its optional CRDs: installs the NVIDIADriver CRD and lets the
+      operator upgrade and clean up its CRDs on upgrade and uninstall. The ClusterPolicy CRD
+      the operator needs is always installed with the chart. Leave off when another GPU
+      Operator release in the cluster already owns these CRDs.
+    required: false
+    default: false
+    type: boolean
   - name: slice_count
     description: |
       Number of time-slices to create for each GPU. 4 means each GPU shows up as 4
-      schedulable nvidia.com/gpu resources. 1 turns time-slicing off (whole GPUs). Use 1
-      with the HAMi GPU Sharing plugin, which does its own slicing.
+      schedulable nvidia.com/gpu resources. 1 turns time-slicing off (whole GPUs). Ignored
+      while device_plugin is off, so it needs no change when the HAMi GPU Sharing plugin
+      takes over slicing.
     required: true
     default: 4
     type: int
@@ -77,30 +90,3 @@ fields:
     required: false
     default: true
     type: boolean
-  - name: dcgm_servicemonitor
-    description: |
-      Create a Prometheus ServiceMonitor for the DCGM exporter so GPU utilisation and memory
-      metrics land in Prometheus. Needs the Prometheus Operator CRDs (kube-prometheus-stack
-      plugin). Required for the HAMi-WebUI utilisation panels.
-    required: false
-    default: false
-    type: boolean
-  - name: prometheus_release_label
-    description: |
-      Value of the release label Prometheus requires on ServiceMonitors before it scrapes
-      them. The default matches the Prometheus plugin (Helm release prometheus). Leave empty
-      if your Prometheus picks up every ServiceMonitor. Only used with dcgm_servicemonitor.
-    required: false
-    default: "prometheus"
-    type: string
-  - name: version
-    description: Version of the GPU Operator to install.
-    required: true
-    type: select
-    options:
-      - v25.10.1
-      - v25.3.4
-  - name: helm_repo
-    description: Helm repository URL for the NVIDIA GPU Operator chart.
-    required: true
-    default: "https://helm.ngc.nvidia.com/nvidia"
