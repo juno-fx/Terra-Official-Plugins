@@ -1,6 +1,6 @@
 # Slurm Terminal
 
-![Slurm Terminal](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/slurm-terminal/scripts/assets/logo.png)
+![Slurm Terminal](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/slurm-terminal/assets/logo.png)
 
 **Category:** Compute
 **Type:** Workload Template
@@ -47,8 +47,8 @@ them. The consequences:
 - **Users authenticate as themselves.** SSSD on the login node decides who they are, so job ownership, fairshare and
   accounting all attribute correctly. Configure the directory with the Slinky plugin's `sssd_secret` field.
 - **No version coupling.** The terminal image does not have to track the Slurm release, because it contains no Slurm.
-- **Egress is locked down.** A NetworkPolicy permits exactly two things out of the pod: cluster DNS, and TCP to the
-  login node. Nothing else.
+- **Egress is locked down.** A NetworkPolicy permits exactly three things out of the pod: cluster DNS, Hubble (for
+  the nginx sidecar's login check), and TCP to the login node. Nothing else.
 
 ### One template, many users
 
@@ -105,7 +105,6 @@ No install-time configuration is required for this plugin.
 | `nginx_registry` | **string** · Required · Default: `docker.io`<br>Registry for the nginx sidecar image |
 | `nginx_repo` | **string** · Required · Default: `nginx`<br>Repository for the nginx sidecar image |
 | `nginx_tag` | **string** · Required · Default: `1.29.3`<br>Tag for the nginx sidecar image |
-| `ingressNamespace` | **string** · Required · Default: `ingress-nginx`<br>Namespace of the ingress controller, used by the NetworkPolicy |
 
 ### Custom Environment Variables
 

@@ -11,7 +11,7 @@ data:
   description: "Browser terminal onto a Slinky Slurm cluster"
   fields: |
     - name: icon
-      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/slurm-terminal/scripts/assets/logo.png"
+      default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/slurm-terminal/assets/logo.png"
     - name: slurmNamespace
       description: "Namespace the Slurm cluster runs in. Only change this if you run more than one Slurm cluster; the login node's name is fixed, so the namespace is all that distinguishes them."
       type: string
@@ -47,11 +47,6 @@ data:
       type: string
       required: true
       default: "1.29.3"
-    - name: ingressNamespace
-      description: "Namespace of the ingress controller for plugin access"
-      type: string
-      required: true
-      default: "ingress-nginx"
   # This pod is a thin SSH client — the shell, and therefore the environment a
   # user actually works in, lives on the Slurm login node at the other end of the
   # connection. There are no useful client-side variables to suggest; anything
