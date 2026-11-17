@@ -24,6 +24,9 @@ spec:
                 forProvider:
                   imageId: ""
                   instanceType: ""
+                  metadataOptions:
+                    httpTokens: required
+                    httpPutResponseHopLimit: 2
                   tags:
                     - key: Name
                       value: ""

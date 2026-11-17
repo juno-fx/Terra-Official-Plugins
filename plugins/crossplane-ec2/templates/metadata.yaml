@@ -51,18 +51,16 @@ data:
       type: boolean
       default: true
       required: true
-    - name: aws_private_subnet
-      description: Instance has no public address; Kuiper brokers access through a cluster LoadBalancer Service (the cluster must be able to reach the VPC)
-      type: boolean
-      default: false
-      required: true
-    - name: load_balancer
-      description: "Only used with aws_private_subnet. Exposes the instance through an AWS NLB, created by the cluster's AWS cloud provider (EKS has it built in). Leave unset for no load balancer: the instance is reachable only from inside the cluster through a ClusterIP Service. internet-facing: public NLB, for users connecting over the internet. internal: private NLB, for users on a VPN, Direct Connect or peered network"
+    - name: access
+      description: "How users reach the instance. public: directly at its public address. vpn: directly at its private IP, for users on a VPN, Direct Connect or peered network. load_balancer_internal: through a private AWS NLB, for users on a VPN or peered network who can't reach the instance directly. load_balancer_public: through a public AWS NLB, for users on the internet when the instance has no public address. The public NLB accepts connections from any IP address"
       type: select
-      required: false
+      required: true
+      default: public
       options:
-        - internet-facing
-        - internal
+        - public
+        - vpn
+        - load_balancer_internal
+        - load_balancer_public
     - name: ports
       description: "TCP ports to expose from the instance (e.g. 22 for SSH, 3389 for RDP, 8443 for NICE DCV). The instance's security groups must allow them. Fixed at launch"
       required: false

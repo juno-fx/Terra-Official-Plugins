@@ -28,8 +28,8 @@ This plugin requires **Crossplane** and **Crossplane AWS Provider** to be instal
 - **Crossplane** plugin installed
 - **Crossplane AWS Provider** plugin installed and configured with valid AWS credentials
 - An AWS VPC, subnet, and security groups already configured in AWS
-- For `load_balancer`: an AWS cloud provider in the cluster (built into EKS; elsewhere install the AWS Load Balancer Controller), and subnets tagged `kubernetes.io/role/internal-elb: 1` (internal) or `kubernetes.io/role/elb: 1` (internet-facing)
-- For an `internal` load balancer: a network path from your users into the VPC (VPN, Direct Connect or peering)
+- For the `load_balancer_*` options: the AWS cloud controller manager in the cluster (built into EKS; on self-managed clusters, install [cloud-provider-aws](https://github.com/kubernetes/cloud-provider-aws)), and subnets tagged `kubernetes.io/role/internal-elb: 1` (internal) or `kubernetes.io/role/elb: 1` (public)
+- For `vpn` and `load_balancer_internal`: a network path from your users into the VPC (VPN, Direct Connect or peering)
 - Platform versions: `genesis-deployment >= 3.0.2`, `orion-deployment >= 3.1.0`
 
 ---
@@ -64,9 +64,8 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `subnet_id` | **string** · Required<br>AWS Subnet ID for the instance |
 | `instance_type` | **string** · Required · Default: `t3.micro`<br>EC2 instance type (e.g. `t3.medium`, `m5.large`) |
 | `delete_on_termination` | **boolean** · Required · Default: `true`<br>Whether to delete EBS volumes when the instance is terminated |
-| `aws_private_subnet` | **boolean** · Required · Default: `false`<br>Set when the subnet has no public addressing. Kuiper brokers the exposed ports to the instance's private IP through a cluster Service: a `ClusterIP` Service, or a `LoadBalancer` Service when `load_balancer` is set. The cluster must be able to route to the VPC |
-| `load_balancer` | **select** · Optional<br>Only used with `aws_private_subnet`. Exposes the instance through an AWS NLB:<br>• unset: no load balancer. The instance is reachable only from inside the cluster through a `ClusterIP` Service<br>• `internet-facing`: public NLB, for users connecting over the internet<br>• `internal`: private NLB, for users on a VPN, Direct Connect or peered network<br>Both NLB options are created by the cluster's built-in AWS cloud provider; the AWS Load Balancer Controller is not required. If the cluster's nodes have more than one security group attached, exactly one of them must be tagged `kubernetes.io/cluster/<cluster-name>` (value `owned` or `shared`), or the NLB fails to sync with `Multiple untagged security groups found for instance` |
-| `ports` | **list** · Optional · Default: `22`<br>Ports to expose from the instance, so users can connect with clients other than SSH. Add one entry per port (e.g. `22` for SSH, `3389` for RDP, `8443` for NICE DCV). The instance's security groups must allow these ports. With a public subnet, allow them from your users. With `aws_private_subnet`, traffic reaches the instance from the cluster's nodes and pods, not from users, so allow them from the cluster's VPC CIDR or node security groups. Ports are TCP only and fixed at launch. An empty list exposes nothing, and Hubble shows no connection. See [NICE DCV and QUIC](#nice-dcv-and-quic) |
+| `access` | **select** · Required · Default: `public`<br>How users reach the instance:<br>• `public`: directly at the instance's public address. The subnet must give instances a public IP<br>• `vpn`: directly at the instance's private IP, for users on a VPN, Direct Connect or peered network<br>• `load_balancer_internal`: through a private AWS NLB, for users on a VPN or peered network who can't route to the instance itself<br>• `load_balancer_public`: through a public AWS NLB, for users on the internet when the instance has no public address. The NLB accepts connections on `ports` from any IP address<br>With the load balancer options, Kuiper brokers the ports through a cluster Service, so the cluster must be able to route to the instance. The NLB is created by the cluster's AWS cloud provider; the AWS Load Balancer Controller is not required. If the cluster's nodes have more than one security group attached, exactly one of them must be tagged `kubernetes.io/cluster/<cluster-name>` (value `owned` or `shared`), or the NLB fails to sync with `Multiple untagged security groups found for instance` |
+| `ports` | **list** · Optional · Default: `22`<br>TCP ports users connect to (e.g. `22` for SSH, `3389` for RDP, `8443` for NICE DCV). With `public` and `vpn`, they set which connections Hubble shows, and the instance's security groups decide what's reachable: allow them from your users. With the load balancer options, they are the only ports the NLB forwards, and traffic reaches the instance from the cluster's nodes, not from users: allow them from the cluster's VPC CIDR or node security groups. Fixed at launch. An empty list exposes nothing, and Hubble shows no connection. See [NICE DCV and QUIC](#nice-dcv-and-quic) |
 | `region` | **string** · Required<br>AWS region to launch the instance in (e.g. `us-east-1`) |
 | `provider_config_ref` | **string** · Required · Default: `aws-provider-argocd-provider-config`<br>Name of the Crossplane ProviderConfig to use |
 | `iam_instance_profile` | **string** · Optional<br>IAM instance profile name to attach to every instance launched from this template (e.g. `production-artists`). Leave blank for none. Amazon DCV seats need one, see below |
@@ -74,6 +73,8 @@ These fields are configured when authoring the workload template in **Genesis** 
 ### IAM Instance Profiles
 
 An instance profile gives software on the EC2 instance temporary AWS credentials from an IAM role, with no access keys on the machine. Anyone with a shell on the instance can use those credentials, so a profile should only allow what the template's users need.
+
+> **Instances require IMDSv2.** Anything in the AMI that reads instance metadata must use a session token, as the boot script [below](#reading-tags-from-the-instance) does. The hop limit is 2, so containers on the instance can reach instance metadata too.
 
 Each workload template takes one profile, so access is split by template. Assign each template in Genesis to the users who should have that access. For example:
 
@@ -159,12 +160,14 @@ For a role like `production-artists`, scope S3 access to the bucket or prefix th
 
 ### NICE DCV and QUIC
 
-Exposed ports are TCP only, and DCV doesn't support QUIC (UDP) through load balancers or proxies. Turn QUIC off in the AMI's `/etc/dcv/dcv.conf` so clients use TCP:
+DCV only supports QUIC (UDP) when the client connects straight to the instance:
 
-```ini
-[connectivity]
-enable-quic-frontend=false
-```
+- **`public` / `vpn`:** QUIC works. Enable it in the AMI's `/etc/dcv/dcv.conf` and allow UDP 8443 in the instance's security groups alongside TCP 8443. Nothing is needed in `ports`.
+  ```ini
+  [connectivity]
+  enable-quic-frontend=true
+  ```
+- **`load_balancer_*`:** QUIC isn't supported through the load balancer. Set `enable-quic-frontend=false` so clients use TCP.
 
 ### Instance Tags
 
