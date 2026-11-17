@@ -37,3 +37,5 @@ aws_private_subnet: false
 load_balancer:
 ports:
   - port: 22
+    protocol: TCP
+iam_instance_profile:

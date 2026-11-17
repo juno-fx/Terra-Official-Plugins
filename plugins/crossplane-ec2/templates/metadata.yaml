@@ -73,6 +73,14 @@ data:
           required: true
           type: int
           default: 22
+        - name: protocol
+          description: "Protocol for this port. Use a separate UDP entry for UDP traffic (e.g. 8444 UDP for NICE DCV QUIC); the same port number can't carry both TCP and UDP through the load balancer"
+          required: true
+          type: select
+          default: TCP
+          options:
+            - TCP
+            - UDP
     - name: region
       description: AWS Region
       required: true
@@ -82,3 +90,10 @@ data:
       required: true
       type: string
       default: "aws-provider-argocd-provider-config"
+    - name: iam_instance_profile
+      description: >-
+        IAM instance profile name to attach to every instance launched from this template
+        (e.g. production-artists). Leave blank for none. Amazon DCV seats need one that allows
+        reading the DCV license from S3.
+      required: false
+      type: string
