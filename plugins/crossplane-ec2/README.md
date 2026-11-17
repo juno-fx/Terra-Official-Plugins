@@ -128,6 +128,8 @@ Create this once as a customer managed policy (**IAM → Policies → Create pol
 
 To confirm it worked, check `/var/log/dcv/server.log` on the instance. There should be no license errors, and sign-ins should go through.
 
+The instance also needs network access to S3. In a private subnet without a NAT gateway, add an S3 gateway VPC endpoint (`com.amazonaws.<region>.s3`, free) to the subnet's route table. Without it, the license read fails even with the policy attached.
+
 #### Example: project bucket access
 
 For a role like `production-artists`, scope S3 access to the bucket or prefix the team works in, rather than attaching `AmazonS3FullAccess`:
@@ -187,71 +189,69 @@ The plugin tags every instance so the AMI's boot script can tell whose seat it i
 | `Name` | `<project>-<workload name>` | Always |
 | `orion-owner` | Username of the Orion user who launched the workload, injected by Orion's Kuiper | Always |
 
-The tags are set when the instance launches and keep their values for its lifetime. They are visible to anyone who can view the instance in AWS, so never put secrets in tags.
+The tags are applied as part of the launch, so they exist before the instance boots, and keep their values for its lifetime. They are visible to anyone who can view the instance in AWS, so never put secrets in tags.
 
 #### Reading tags from the instance
 
-Pick one of the two methods below.
+The Crossplane AWS provider can set tags, but it can't turn on instance metadata tags for an instance, so a boot script can't read its tags from instance metadata by default. Use option 1. Option 2 works only if an account-wide setting is safe in your account.
 
-**Option 1: instance metadata (no AWS permissions needed)**
+**Option 1: the EC2 API (recommended)**
 
-The instance metadata service (IMDS) can serve the instance's tags, but this is off by default and the Crossplane provider can't turn it on per instance. Turn it on once as the default for your account, in each region you launch seats in:
+The boot script looks up its own tags with the AWS CLI, using the instance profile's credentials. This only affects instances using that profile.
+
+1. Give the instance an [instance profile](#iam-instance-profiles) whose role allows `ec2:DescribeTags`. Add it to the role as an inline policy, e.g. `read-instance-tags`:
+   ```json
+   {
+     "Version": "2012-10-17",
+     "Statement": [{
+       "Effect": "Allow",
+       "Action": "ec2:DescribeTags",
+       "Resource": "*"
+     }]
+   }
+   ```
+   `ec2:DescribeTags` can't be limited to specific instances, so the instance can read tags on every resource in the account. Never add `ec2:CreateTags` to the role, or users could change their instance's owner.
+2. Install the AWS CLI in the AMI.
+3. Read the tag in the boot script:
+   ```bash
+   TOKEN=$(curl -s -X PUT http://169.254.169.254/latest/api/token \
+     -H "X-aws-ec2-metadata-token-ttl-seconds: 300")
+   ID=$(curl -sf -H "X-aws-ec2-metadata-token: $TOKEN" \
+     http://169.254.169.254/latest/meta-data/instance-id)
+   REGION=$(curl -sf -H "X-aws-ec2-metadata-token: $TOKEN" \
+     http://169.254.169.254/latest/meta-data/placement/region)
+
+   for i in $(seq 1 24); do
+     OWNER=$(aws ec2 describe-tags --region "$REGION" \
+       --filters "Name=resource-id,Values=$ID" "Name=key,Values=orion-owner" \
+       --query 'Tags[0].Value' --output text 2>/dev/null || true)
+     [ -n "$OWNER" ] && [ "$OWNER" != "None" ] && break
+     sleep 5
+   done
+   [ -n "$OWNER" ] && [ "$OWNER" != "None" ] || { echo "no orion-owner tag" >&2; exit 1; }
+   ```
+   The loop waits up to two minutes in case the role's credentials aren't available yet early in boot. It normally succeeds on the first try. Reading the instance ID and region from instance metadata needs no extra setting.
+4. In a private subnet without a NAT gateway, add an EC2 interface VPC endpoint (`com.amazonaws.<region>.ec2`) so the instance can reach the EC2 API.
+
+**Option 2: instance metadata (account-wide setting)**
+
+Instance metadata can serve an instance's tags, with no AWS permissions or CLI needed. It's off by default, and the only way to turn it on for these instances is an account default, per region:
 
 ```bash
 aws ec2 modify-instance-metadata-defaults --instance-metadata-tags enabled --region <region>
 aws ec2 get-instance-metadata-defaults --region <region>
 ```
 
-This applies to instances launched afterwards, across the whole account and region. Instances launched before the change don't expose their tags.
+> **This applies to every instance launched in that account and region, not just these.** Instance metadata tags don't allow tag keys containing `/`, and EKS and Karpenter nodes use keys like `kubernetes.io/cluster/<name>` and `karpenter.sh/nodepool`. If your cluster's nodes launch in the same account and region, the default may stop them launching. Test it in a region you don't use first, or use option 1. To undo it, run the same command with `--instance-metadata-tags no-preference`.
 
-Then read the tags in the boot script:
-
-```bash
-TOKEN=$(curl -s -X PUT http://169.254.169.254/latest/api/token \
-  -H "X-aws-ec2-metadata-token-ttl-seconds: 300")
-imds() {
-  curl -sf -H "X-aws-ec2-metadata-token: $TOKEN" "http://169.254.169.254/latest/meta-data/$1"
-}
-
-OWNER=$(imds tags/instance/orion-owner)
-```
-
-**Option 2: the EC2 API (no account setting needed)**
-
-The boot script looks up its own tags with the AWS CLI, using the instance profile's credentials. The instance needs an [instance profile](#iam-instance-profiles) whose role allows `ec2:DescribeTags`:
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [{
-    "Effect": "Allow",
-    "Action": "ec2:DescribeTags",
-    "Resource": "*"
-  }]
-}
-```
-
-`ec2:DescribeTags` can't be limited to specific instances, so this lets the instance read the tags of every resource in the account. Use option 1 if that's a concern.
+It only applies to instances launched after the change. Then read the tag in the boot script:
 
 ```bash
 TOKEN=$(curl -s -X PUT http://169.254.169.254/latest/api/token \
   -H "X-aws-ec2-metadata-token-ttl-seconds: 300")
-imds() {
-  curl -sf -H "X-aws-ec2-metadata-token: $TOKEN" "http://169.254.169.254/latest/meta-data/$1"
-}
-INSTANCE_ID=$(imds instance-id)
-REGION=$(imds placement/region)
-
-tag() {
-  aws ec2 describe-tags --region "$REGION" \
-    --filters "Name=resource-id,Values=$INSTANCE_ID" "Name=key,Values=$1" \
-    --query 'Tags[0].Value' --output text
-}
-
-OWNER=$(tag orion-owner)
+OWNER=$(curl -sf -H "X-aws-ec2-metadata-token: $TOKEN" \
+  http://169.254.169.254/latest/meta-data/tags/instance/orion-owner)
 ```
-
-With option 2, a missing tag comes back as `None`.
 
 If your boot script already reads the owner from a tag with a different name, change it to read `orion-owner`.
 
@@ -259,15 +259,19 @@ If your boot script already reads the owner from a tag with a different name, ch
 
 Settings that are the same for every seat built from an image belong in the AMI, not in the plugin. Bake them into the image itself or into its boot script. Build a separate AMI for each variant, and point each workload template at the right one with `ami_image_id`.
 
-For example, the DCV sign-in method is a server setting in `/etc/dcv/dcv.conf`:
+For example, the DCV sign-in method is set under `[security]` in `/etc/dcv/dcv.conf`:
 
-```ini
-[security]
-# password: users sign in with their OS username and password
-authentication="system"
-```
+- **Password:** `authentication="system"`. This is DCV's default.
+- **Broker:** `authentication="none"`, with `auth-token-verifier` set to your broker's token verifier:
+  ```ini
+  [security]
+  authentication="none"
+  auth-token-verifier="<your broker's token verifier URL>"
+  ```
 
-For sign-in through a session broker, set `authentication="none"` and point `auth-token-verifier` at your broker's token verifier instead. To offer both methods, build one AMI per method and give each its own workload template.
+To offer both methods, build one AMI per method and give each its own workload template.
+
+The plugin only says who the seat belongs to (`orion-owner`). It doesn't provide sign-in credentials: passwords or tokens come from whatever the AMI is set up with, such as a directory join (AD/LDAP) or your session broker.
 
 ---
 
