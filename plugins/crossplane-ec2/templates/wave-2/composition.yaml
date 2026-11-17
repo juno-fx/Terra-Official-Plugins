@@ -25,6 +25,7 @@ spec:
                   imageId: ""
                   instanceType: ""
                   metadataOptions:
+                    httpEndpoint: enabled
                     httpTokens: required
                     httpPutResponseHopLimit: 2
                   tags:
