@@ -122,7 +122,7 @@ metadata:
     # connection annotation on this object so Hubble can display it.
     kuiper.juno-innovations.com/aws-remote-connection: "true"
 
-    # Use the private DNS name instead of the public one.
+    # Use the private address instead of the public DNS name.
     # Remove this line if the instance should be reached via public DNS.
     kuiper.juno-innovations.com/use-private-dns: "true"
 
