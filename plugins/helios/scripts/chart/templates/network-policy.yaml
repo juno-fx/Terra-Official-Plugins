@@ -13,7 +13,15 @@ spec:
   # Only the nginx sidecar port is reachable. It enforces the Hubble login itself,
   # so traffic is accepted from any ingress controller (ingress-nginx, Traefik, ...)
   # without knowing its namespace. Helios' own port (3000) stays blocked.
+  # With dcvLoadBalancer, Nice DCV (8443 TCP/UDP) is also reachable;
+  # DCV enforces its own login.
   ingress:
     - ports:
         - protocol: TCP
           port: 8080
+        {{- if .Values.dcvLoadBalancer }}
+        - protocol: TCP
+          port: 8443
+        - protocol: UDP
+          port: 8443
+        {{- end }}
