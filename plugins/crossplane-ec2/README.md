@@ -5,7 +5,7 @@
 **Category:** Virtual Machine
 **Type:** Workload Template
 **Tags:** `virtualization` · `virtual-machine` · `crossplane` · `AWS`
-**Compatibility:** `genesis-deployment>=6.3.0` · `orion-deployment>=4.10.0`
+**Compatibility:** `genesis-deployment>=6.2.1` · `orion-deployment>=4.10.0`
 
 ---
 
@@ -30,7 +30,7 @@ This plugin requires **Crossplane** and **Crossplane AWS Provider** to be instal
 - An AWS VPC, subnet, and security groups already configured in AWS
 - For the `load_balancer_*` options: the AWS cloud controller manager in the cluster (built into EKS; on self-managed clusters, install [cloud-provider-aws](https://github.com/kubernetes/cloud-provider-aws)), and subnets tagged `kubernetes.io/role/internal-elb: 1` (internal) or `kubernetes.io/role/elb: 1` (public)
 - For `vpn` and `load_balancer_internal`: a network path from your users into the VPC (VPN, Direct Connect or peering)
-- Platform versions: `genesis-deployment >= 6.3.0`, `orion-deployment >= 4.10.0`
+- Platform versions: `genesis-deployment >= 6.2.1`, `orion-deployment >= 4.10.0`
 
 ---
 
