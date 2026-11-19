@@ -12,13 +12,13 @@
 
 JupyterLab is the latest web-based interactive development environment for notebooks, code, and data. Its flexible interface allows users to configure and arrange workflows in data science, scientific computing, computational journalism, and machine learning. The JupyterLab workload template lets users launch personal Jupyter instances directly from Genesis using any Jupyter-compatible Docker image.
 
-> **Storage Note:** Notebook data is **not persisted** by default unless you attach storage mounts for `/home/` at workload launch time. Notebooks run as your project's user and inherit their UIDs. The home directory is expected to be mounted at `/home/<username>`.
+> **Storage Note:** Notebook data is **not persisted** by default unless you attach storage mounts for `/home/` at workload launch time. Notebooks run as your workspace's user and inherit their UIDs. The home directory is expected to be mounted at `/home/<username>`.
 
 ---
 
 ## How It Works
 
-**Workload Template** — Installs the JupyterLab workload schema into Genesis. Once installed, the JupyterLab type appears in **Genesis** on the Workloads page, where it can be authored into a workload template. Users can then launch and provision their own notebook server on demand within a project through **Hubble**.
+**Workload Template** — Installs the JupyterLab workload schema into Genesis. Once installed, the JupyterLab type appears in **Genesis** on the Workloads page, where it can be authored into a workload template. Users can then launch and provision their own notebook server on demand within a workspace through **Hubble**.
 
 ---
 
@@ -58,7 +58,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `nginx_registry` | **string** · Required · Default: `docker.io`<br>Registry to pull the nginx sidecar image from |
 | `nginx_repo` | **string** · Required · Default: `nginx`<br>Repository to pull the nginx sidecar image from |
 | `nginx_tag` | **string** · Required · Default: `alpine`<br>Tag to pull the nginx sidecar image from |
-| `gpu` | **boolean** · Required<br>Enable GPU access for the notebook server |
+| `gpu` | **select** · Required · Default: `off` · Options: `off`, `nvidia`, `amd`<br>GPU for the notebook. `nvidia` renders `nvidia.com/gpu` (NVIDIA GPU Operator), `amd` renders `amd.com/gpu` (AMD GPU Operator). A pod requests one vendor only. |
 
 ### Custom Environment Variables
 
@@ -66,7 +66,9 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 
 | Variable | Description |
 |----------|--------------|
-| `GRANT_SUDO` | Grants the notebook user passwordless sudo, useful for installing OS packages with apt from within the notebook's terminal. |
+| `HAMI_GPU_MEMORY` | GPU memory in GiB the notebook may use (HAMi GPU Sharing plugin), fractions allowed (`0.5` = 512 MiB). Rendered as the pod's `nvidia.com/gpumem` or `amd.com/gpumem` limit in MiB, not passed into the container. Unset together with `HAMI_GPU_CORES` gives the notebook the whole GPU. |
+| `HAMI_GPU_CORES` | Share of the GPU's compute the notebook may use, 1–100 (HAMi). Rendered as the pod's `nvidia.com/gpucores` or `amd.com/gpucores` limit, not passed into the container. Unset reserves no compute on `nvidia` and all of it on `amd`. |
+| `GRANT_SUDO` | Set to `yes` (or `1`; `true` is ignored) to grant the notebook user passwordless sudo, useful for installing OS packages with apt from within the notebook's terminal. |
 | `RESTARTABLE` | Runs Jupyter in a restart loop so quitting or a kernel restart doesn't kill the container. |
 | `DOCKER_STACKS_JUPYTER_CMD` | Launches a different frontend (`notebook`, `nbclassic`, `retro`) instead of the default JupyterLab. |
 
@@ -76,5 +78,10 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 
 - Use images from the [Jupyter Docker Stacks](https://quay.io/organization/jupyter) such as `datascience-notebook`, `scipy-notebook`, or `tensorflow-notebook` for a pre-configured environment
 - To persist notebooks, add a volume mount for `/home/` when creating the workload in Genesis
-- GPU support requires the **NVIDIA GPU Operator** plugin to be installed on the cluster
-- Notebooks run with the project user's UID/GID — ensure mounted volumes have appropriate permissions
+- `gpu: nvidia` requires the **NVIDIA GPU Operator** plugin on the cluster
+- `HAMI_GPU_MEMORY` / `HAMI_GPU_CORES` turn the notebook into a GPU slice and need the **HAMi GPU Sharing** plugin. They are read from the workload's environment variables (admin-set in Genesis when defining the workload) and rendered as pod resource limits; the container never sees them. Without HAMi, leave both unset: the NVIDIA device plugin does not know those resource names and the pod would never schedule
+- With HAMi installed and both unset, HAMi gives the notebook the whole GPU (its exclusive-card rule). Set at least `HAMI_GPU_MEMORY` to share the card
+- `gpu: amd` requires the **AMD GPU Operator** plugin on the cluster. A pod can request one vendor only; on a mixed cluster the admin presets `gpu` per workload
+- AMD slicing needs the HAMi GPU Sharing plugin with `enable_amd` on and the AMD GPU Operator with `device_plugin` off. On AMD, a pod that sets `HAMI_GPU_MEMORY` but not `HAMI_GPU_CORES` still books all compute units, so set both to share a card. The memory limit is enforced by an `LD_AUDIT` hook (glibc 2.34+; docker-stacks images qualify) and, where the kernel has the dmem cgroup controller, by the kernel too
+- With `gpu: amd`, a start-up hook gives the notebook user access to the GPU device nodes. Requires a Jupyter docker-stacks based image
+- Notebooks run with the workspace user's UID/GID — ensure mounted volumes have appropriate permissions

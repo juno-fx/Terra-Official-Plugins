@@ -1,0 +1,114 @@
+{{- /* Terra may hand booleans over as strings; normalise so "false" is never truthy. */ -}}
+{{- $installNfd := eq (toString .Values.install_nfd) "true" -}}
+{{- $vgpuNodes := eq (toString .Values.vgpu_nodes) "true" -}}
+{{- $detectAll := eq (toString .Values.detect_all_gpus) "true" -}}
+{{- $devicePlugin := eq (toString .Values.device_plugin) "true" -}}
+{{- $metricsSM := eq (toString .Values.metrics_servicemonitor) "true" -}}
+{{- /*
+  The upstream NFD rule only labels an allowlist of PCI device IDs (Instinct, Radeon Pro,
+  a few Radeon RX). This rule labels any AMD GPU: vendor 1002 with a display or
+  processing-accelerator PCI class, which covers integrated GPUs and unlisted cards.
+*/ -}}
+{{- define "amd-gpu-operator.anyGpuRule" -}}
+name: amd-gpu-any
+labels:
+  feature.node.kubernetes.io/amd-gpu: "true"
+matchFeatures:
+  - feature: pci.device
+    matchExpressions:
+      vendor: {op: In, value: ["1002"]}
+      class: {op: In, value: ["0300", "0302", "0380", "1200"]}
+{{- end -}}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-amd-gpu-operator
+  namespace: {{ .Release.Namespace }}
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    - post-delete-finalizer.argocd.argoproj.io
+    - post-delete-finalizer.argocd.argoproj.io/cleanup
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    # Upstream-standard namespace — AMD's docs and troubleshooting commands assume it.
+    namespace: kube-amd-gpu
+  source:
+    repoURL: {{ .Values.helm_repo }}
+    chart: gpu-operator-charts
+    targetRevision: {{ .Values.version }}
+    helm:
+      releaseName: amd-gpu-operator
+      values: |
+        node-feature-discovery:
+          enabled: {{ $installNfd }}
+          {{- if and $installNfd $detectAll }}
+          worker:
+            config:
+              sources:
+                custom:
+                  - {{- include "amd-gpu-operator.anyGpuRule" . | nindent 20 }}
+          {{- end }}
+        # GPU nodes use the amdgpu driver already in their kernel. KMM (and its
+        # cert-manager dependency) is only needed for the out-of-tree driver.
+        kmm:
+          enabled: false
+          watch: false
+        # Auto node remediation ships an Argo Workflows controller and multi-MB CRDs
+        # that collide with any existing Argo Workflows install.
+        remediation:
+          enabled: false
+          installCRDs: false
+        # ArgoCD applies the chart's CRDs on every sync, so the pre-upgrade CRD
+        # patch Job is redundant.
+        upgradeCRD: false
+        crds:
+          defaultCR:
+            install: true
+        deviceConfig:
+          spec:
+            selector:
+              {{- if $vgpuNodes }}
+              # null drops the chart's default amd-gpu key instead of merging with it.
+              feature.node.kubernetes.io/amd-gpu: null
+              feature.node.kubernetes.io/amd-vgpu: "true"
+              {{- else }}
+              feature.node.kubernetes.io/amd-gpu: "true"
+              {{- end }}
+            driver:
+              enable: false
+            devicePlugin:
+              # Off when the HAMi GPU Sharing plugin provides the AMD device plugin instead.
+              enableDevicePlugin: {{ $devicePlugin }}
+            {{- if $metricsSM }}
+            metricsExporter:
+              prometheus:
+                serviceMonitor:
+                  enable: true
+                  {{- with .Values.prometheus_release_label }}
+                  labels:
+                    release: {{ . | quote }}
+                  {{- end }}
+            {{- end }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      # The DeviceConfig CRD is too large for client-side apply.
+      - ServerSideApply=true
+      - CreateNamespace=true
+{{- if and $detectAll (not $installNfd) }}
+---
+# NFD is managed outside this plugin, so the rule cannot ride along in its worker
+# config. The NodeFeatureRule CRD already exists there, so apply it as an object.
+apiVersion: nfd.k8s-sigs.io/v1alpha1
+kind: NodeFeatureRule
+metadata:
+  name: {{ .Release.Name }}-amd-gpu-any
+spec:
+  rules:
+    - {{- include "amd-gpu-operator.anyGpuRule" . | nindent 6 }}
+{{- end }}
