@@ -21,10 +21,17 @@ metadata:
   name: "{{ .Values.name }}-helios-dcv"
   labels:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
-  {{- with .Values.loadBalancerAnnotations }}
+  {{- /* Skip annotation entries with a blank key or value. */}}
+  {{- $lbAnnotations := dict }}
+  {{- range .Values.loadBalancerAnnotations }}
+  {{- if and (trim (toString (default "" .key))) (trim (toString (default "" .value))) }}
+  {{- $_ := set $lbAnnotations (trim (toString .key)) (toString .value) }}
+  {{- end }}
+  {{- end }}
+  {{- with $lbAnnotations }}
   annotations:
-    {{- range . }}
-    {{ .key | quote }}: {{ .value | quote }}
+    {{- range $k, $v := . }}
+    {{ $k | quote }}: {{ $v | quote }}
     {{- end }}
   {{- end }}
 spec:

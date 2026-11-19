@@ -82,11 +82,11 @@ data:
         - name: key
           description: "Annotation key (e.g. service.beta.kubernetes.io/coreweave-load-balancer-type)"
           type: string
-          required: true
+          required: false
         - name: value
           description: "Annotation value (e.g. public)"
           type: string
-          required: true
+          required: false
   env_hints: |
     - name: PASSWORD
       description: Password set for the users terminal session.
