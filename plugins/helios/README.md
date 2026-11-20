@@ -53,7 +53,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 
 | Field | Details |
 |-------|---------|
-| `gpu` | **boolean** · Required<br>Enable GPU passthrough for the workstation |
+| `gpu` | **boolean** · Required<br>Enable GPU passthrough for the workstation. Also mounts the NVIDIA GLX and EGL vendor files into `/etc/glvnd/glx_vendor.d/` and `/etc/glvnd/egl_vendor.d/`, replacing any vendor files the image ships there |
 | `registry` | **string** · Required · Default: `junoinnovations`<br>Container registry to pull the Helios image from |
 | `repo` | **string** · Required · Default: `helios`<br>Helios image repository |
 | `tag` | **string** · Required · Default: `unstable-rocky-9`<br>Helios image tag (OS flavour and version) |
@@ -64,6 +64,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `nginx_repo` | **string** · Required · Default: `nginx`<br>Repository to pull the nginx sidecar image from |
 | `nginx_tag` | **string** · Required · Default: `alpine`<br>Tag to pull the nginx sidecar image from |
 | `publicAccess` | **boolean** · Required · Default: `false`<br>Disable authentication and allow unauthenticated access to the workstation |
+| `sysResource` | **boolean** · Required · Default: `false`<br>Add the `SYS_RESOURCE` capability to the Helios container so things like ulimits can be raised inside it, e.g. on AWS where node limits are too low and can't be changed |
 
 ### Custom Environment Variables
 
@@ -74,8 +75,20 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 | `PASSWORD` | Password set for the users terminal session. Available to all users at launch (Hubble → Advanced).                |
 | `SUDO` | Grants the user sudo access on the container.                                                                      |
 | `SELKIES_FRAMERATE` | Streaming framerate for the desktop session, as a range (e.g. `15-60`) or fixed value (e.g. `30`).                 |
-| `DISABLE_VGL` | Disables the VirtualGL wrapper around the desktop session; apps needing it must be launched manually via `vglrun`. |
+| `DISABLE_VGL` | Disables the VirtualGL wrapper around the desktop session; apps needing it must be launched manually via `vglrun`. Any non-empty value disables it (e.g. `true`). |
+| `DISABLE_ZINK` | Disables Zink (Mesa's OpenGL-on-Vulkan driver), which is on by default on GPU workstations. Set to `true` to disable. |
 | `REMOTE_PROTOCOL` | if set to "dcv" Helios will run Nice DCV rather than Selkies.                                                      |
+
+### NVIDIA GLX for a Single Application
+
+On GPU workstations, an application such as Houdini can be forced onto the NVIDIA GLX driver by setting `__GLX_VENDOR_LIBRARY_NAME=nvidia` in its desktop launch file:
+
+```ini
+[Desktop Entry]
+Type=Application
+Name=Houdini
+Exec=env __GLX_VENDOR_LIBRARY_NAME=nvidia houdini
+```
 
 ---
 
