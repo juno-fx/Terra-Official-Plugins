@@ -46,7 +46,7 @@ data:
       description: "Tag to pull the nginx image from"
       type: string
       required: true
-      default: "1.29.3"
+      default: "1.30.7"
   # This pod is a thin SSH client — the shell, and therefore the environment a
   # user actually works in, lives on the Slurm login node at the other end of the
   # connection. There are no useful client-side variables to suggest; anything

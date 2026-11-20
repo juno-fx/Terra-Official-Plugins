@@ -59,7 +59,7 @@ data:
       description: "Tag to pull the nginx sidecar image from"
       type: string
       required: true
-      default: "alpine"
+      default: "1.30.7-alpine"
     - name: storage_class
       description: Storage class to use for the VM's disk
       required: true

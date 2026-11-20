@@ -56,7 +56,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `tag` | **string** · Optional · Default: `latest`<br>Hermes image tag |
 | `nginx_registry` | **string** · Required · Default: `docker.io`<br>Registry to pull the nginx sidecar image from |
 | `nginx_repo` | **string** · Required · Default: `nginx`<br>Repository to pull the nginx sidecar image from |
-| `nginx_tag` | **string** · Required · Default: `alpine`<br>Tag to pull the nginx sidecar image from |
+| `nginx_tag` | **string** · Required · Default: `1.30.7-alpine`<br>Tag to pull the nginx sidecar image from |
 | `cluster_access` | **select** · Optional<br>Kubernetes RBAC access level for the agent (unset = no cluster access, `readonly-ns`, `admin-ns`) |
 | `persistence_size` | **string** · Optional · Default: `10Gi`<br>Persistent volume size for agent state storage |
 | `persistence_storage_class` | **k8sStorageClass** · Required<br>Storage class for the persistent volume |

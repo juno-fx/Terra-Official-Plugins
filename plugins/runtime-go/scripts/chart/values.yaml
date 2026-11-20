@@ -35,4 +35,4 @@ tls_issuer: ""
 publish_dns: false
 nginx_registry: "docker.io"
 nginx_repo: "nginx"
-nginx_tag: "1.29.3"
+nginx_tag: "1.30.7"

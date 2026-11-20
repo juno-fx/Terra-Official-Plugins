@@ -30,7 +30,7 @@ app_port: 3000
 # Nginx sidecar
 nginx_registry: docker.io
 nginx_repo: nginx
-nginx_tag: "1.29.3"
+nginx_tag: "1.30.7"
 
 # Resource limits (null = no limit unless requested)
 shmSize: 256Mi

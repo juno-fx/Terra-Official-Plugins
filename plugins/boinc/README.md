@@ -64,7 +64,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `arch`          | **select** · Required · Default: `amd64`<br>Target CPU architecture — `amd64`, `arm64`, or `either` (no constraint) |
 | `nginx_registry` | **string** · Required · Default: `docker.io`<br>Registry for the nginx sidecar image that enforces the Hubble login |
 | `nginx_repo`    | **string** · Required · Default: `nginx`<br>nginx sidecar image repository                                         |
-| `nginx_tag`     | **string** · Required · Default: `alpine`<br>nginx sidecar image tag                                               |
+| `nginx_tag`     | **string** · Required · Default: `1.30.7-alpine`<br>nginx sidecar image tag                                        |
 
 ### Resource Configuration
 

@@ -71,7 +71,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `gpu` | **boolean** · Required<br>Attach a GPU to the workload |
 | `nginx_registry` | **string** · Required · Default: `docker.io`<br>Registry for the nginx sidecar image that enforces the Hubble login under `ingress-auth` |
 | `nginx_repo` | **string** · Required · Default: `nginx`<br>nginx sidecar image repository |
-| `nginx_tag` | **string** · Required · Default: `1.29.3`<br>nginx sidecar image tag |
+| `nginx_tag` | **string** · Required · Default: `1.30.7`<br>nginx sidecar image tag |
 
 ### Network Modes
 

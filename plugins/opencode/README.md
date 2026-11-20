@@ -54,7 +54,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 |-------|---------|
 | `nginx_registry` | **string** · Required · Default: `docker.io`<br>Registry for the nginx sidecar image that enforces the Hubble login |
 | `nginx_repo` | **string** · Required · Default: `nginx`<br>nginx sidecar image repository |
-| `nginx_tag` | **string** · Required · Default: `alpine`<br>nginx sidecar image tag |
+| `nginx_tag` | **string** · Required · Default: `1.30.7-alpine`<br>nginx sidecar image tag |
 | `timezone` | **string** · Required · Default: `America/New_York`<br>Timezone for the OpenCode instance |
 | `storage_class` | **k8sStorageClass** · Required<br>Storage class for the OpenCode data persistent volume |
 | `storage_size` | **string** · Required · Default: `10Gi`<br>Size of the persistent volume for project and config data |

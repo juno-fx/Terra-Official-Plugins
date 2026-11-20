@@ -34,4 +34,4 @@ webhook_rate_limit: 10
 webhook_allow_cidrs:
 nginx_registry: "docker.io"
 nginx_repo: "nginx"
-nginx_tag: "latest"
+nginx_tag: "1.30.7-alpine"

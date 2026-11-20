@@ -51,7 +51,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `packages` | **string** · Optional · Default: `python3 python3-venv`<br>Space-separated list of additional system packages to install at startup |
 | `nginx_registry` | **string** · Required · Default: `docker.io`<br>Container registry for the nginx proxy image |
 | `nginx_repo` | **string** · Required · Default: `nginx`<br>nginx proxy image repository |
-| `nginx_tag` | **string** · Required · Default: `latest`<br>nginx proxy image tag |
+| `nginx_tag` | **string** · Required · Default: `1.30.7-alpine`<br>nginx proxy image tag |
 | `persistence_size` | **string** · Optional · Default: `1Gi`<br>Persistent volume size for the VS Code config directory (e.g. `1Gi`, `500Mi`) |
 | `persistence_storage_class` | **k8sStorageClass** · Required<br>Storage class for the VS Code config persistent volume |
 

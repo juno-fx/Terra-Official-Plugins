@@ -27,7 +27,7 @@ ttyd_port: 7681
 # Nginx sidecar image
 nginx_registry: "docker.io"
 nginx_repo: "nginx"
-nginx_tag: "alpine"
+nginx_tag: "1.30.7-alpine"
 
 # Timezone
 timezone: "America/New_York"
