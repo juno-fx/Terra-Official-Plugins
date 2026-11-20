@@ -24,9 +24,18 @@ spec:
                 forProvider:
                   imageId: ""
                   instanceType: ""
+                  metadataOptions:
+                    httpEndpoint: enabled
+                    httpTokens: required
+                    httpPutResponseHopLimit: 2
                   tags:
                     - key: Name
                       value: ""
+                  tagSpecifications:
+                    - resourceType: instance
+                      tags:
+                        - key: Name
+                          value: ""
                 providerConfigRef:
                   name: ""
             patches:
@@ -61,5 +70,17 @@ spec:
                 fromFieldPath: "spec.parameters.name"
                 toFieldPath: "spec.forProvider.tags[0].value"
               - type: FromCompositeFieldPath
+                fromFieldPath: "spec.parameters.name"
+                toFieldPath: "spec.forProvider.tagSpecifications[0].tags[0].value"
+              - type: FromCompositeFieldPath
+                fromFieldPath: "spec.parameters.tags"
+                toFieldPath: "spec.forProvider.tags"
+              - type: FromCompositeFieldPath
+                fromFieldPath: "spec.parameters.tags"
+                toFieldPath: "spec.forProvider.tagSpecifications[0].tags"
+              - type: FromCompositeFieldPath
                 fromFieldPath: "spec.parameters.providerConfigRef"
                 toFieldPath: "spec.providerConfigRef.name"
+              - type: FromCompositeFieldPath
+                fromFieldPath: "spec.parameters.iamInstanceProfile"
+                toFieldPath: "spec.forProvider.iamInstanceProfile.name"

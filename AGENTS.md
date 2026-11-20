@@ -593,7 +593,8 @@ These are set by plugin authors in their Helm chart templates.
 |------------|-----------|--------------|-------------|
 | `kuiper.juno-innovations.com/expose` | Crossplane EC2 Instance | comma-separated port numbers | Kuiper auto-creates a Kubernetes ExternalName Service exposing these ports once EC2 DNS is available. |
 | `kuiper.juno-innovations.com/aws-remote-connection` | Crossplane EC2 Instance | `"true"` | Triggers Kuiper to compute and write the `connection` annotation once EC2 DNS is available. |
-| `kuiper.juno-innovations.com/use-private-dns` | Crossplane EC2 Instance | `"true"` | Use `privateDnsName` instead of `publicDnsName` when building the ExternalName Service and connection annotation. |
+| `kuiper.juno-innovations.com/use-private-dns` | Crossplane EC2 Instance | `"true"` | Use the private address instead of the public DNS name: `privateDnsName` for the ExternalName Service, and the private IP for the connection annotation. |
+| `kuiper.juno-innovations.com/aws-load-balancer` | Crossplane EC2 Instance | `"true"` | Kuiper creates a `LoadBalancer` Service plus an EndpointSlice pointing at the instance's private IP, copying the Instance's `service.beta.kubernetes.io/*` annotations onto it. The connection annotation uses the LB address. See `concepts/crossplane.md`. |
 
 ---
 
