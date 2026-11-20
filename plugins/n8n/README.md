@@ -59,7 +59,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `tag` | **string** · Required · Default: `latest`<br>n8n image tag (version) |
 | `nginx_registry` | **string** · Required · Default: `docker.io`<br>Registry to pull the nginx sidecar image from |
 | `nginx_repo` | **string** · Required · Default: `nginx`<br>Repository to pull the nginx sidecar image from |
-| `nginx_tag` | **string** · Required · Default: `1.30.7-alpine`<br>Tag to pull the nginx sidecar image from |
+| `nginx_tag` | **string** · Required · Default: `1.30.7`<br>Tag to pull the nginx sidecar image from |
 | `timezone` | **string** · Required · Default: `America/New_York`<br>Timezone for the n8n instance (affects scheduled workflow execution) |
 | `storage_class` | **k8sStorageClass** · Required<br>Storage class for the n8n workflow data persistent volume |
 | `storage_size` | **string** · Required · Default: `10Gi`<br>Size of the persistent volume for workflow and credential storage |
