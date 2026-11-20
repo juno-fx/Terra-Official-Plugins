@@ -36,7 +36,7 @@ cloud_init: |-
 use_cloud_init: false
 nginx_registry: "docker.io"
 nginx_repo: "nginx"
-nginx_tag: "alpine"
+nginx_tag: "1.30.7-alpine"
 gpu_device_name: ""
 virtio_drivers: false
 

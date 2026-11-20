@@ -28,7 +28,7 @@ plugins: []
 _kuiper:
 nginx_registry: "docker.io"
 nginx_repo: "nginx"
-nginx_tag: "alpine"
+nginx_tag: "1.30.7-alpine"
 timezone: "America/New_York"
 storage_class:
 storage_size: "1Gi"

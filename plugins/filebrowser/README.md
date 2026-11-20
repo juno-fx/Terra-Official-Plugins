@@ -59,7 +59,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `memory` | **string** · Required · Default: `256Mi`<br>Memory request for the File Browser container |
 | `nginx_registry` | **string** · Required · Default: `docker.io`<br>Registry to pull the nginx sidecar image from |
 | `nginx_repo` | **string** · Required · Default: `nginx`<br>Repository to pull the nginx sidecar image from |
-| `nginx_tag` | **string** · Required · Default: `alpine`<br>Tag to pull the nginx sidecar image from |
+| `nginx_tag` | **string** · Required · Default: `1.30.7-alpine`<br>Tag to pull the nginx sidecar image from |
 | `root` | **string** · Optional · Default: `/`<br>Root filesystem path visible in File Browser. Leave as `/` to browse the entire container filesystem, or set it to a mount path to restrict the view to that volume. |
 
 ---

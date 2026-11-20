@@ -72,7 +72,7 @@ data:
       description: "Tag to pull the nginx sidecar image from"
       type: string
       required: true
-      default: "alpine"
+      default: "1.30.7-alpine"
   env_hints: |
     - name: PASSWORD
       description: "Password for the BOINC web GUI — set via the env field"

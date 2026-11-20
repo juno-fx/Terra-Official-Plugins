@@ -104,7 +104,7 @@ No install-time configuration is required for this plugin.
 | `tag` | **string** · Required · Default: `2.5`<br>Tag for the terminal image |
 | `nginx_registry` | **string** · Required · Default: `docker.io`<br>Registry for the nginx sidecar image |
 | `nginx_repo` | **string** · Required · Default: `nginx`<br>Repository for the nginx sidecar image |
-| `nginx_tag` | **string** · Required · Default: `1.29.3`<br>Tag for the nginx sidecar image |
+| `nginx_tag` | **string** · Required · Default: `1.30.7`<br>Tag for the nginx sidecar image |
 
 ### Custom Environment Variables
 

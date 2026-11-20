@@ -55,7 +55,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `tag` | **string** · Required · Default: `1.23`<br>Gitea image tag (version) |
 | `nginx_registry` | **string** · Required · Default: `docker.io`<br>Registry for the nginx sidecar image |
 | `nginx_repo` | **string** · Required · Default: `nginx`<br>nginx sidecar image repository |
-| `nginx_tag` | **string** · Required · Default: `1.29.3`<br>nginx sidecar image tag |
+| `nginx_tag` | **string** · Required · Default: `1.30.7`<br>nginx sidecar image tag |
 | `storage_class` | **k8sStorageClass** · Required<br>Kubernetes storage class for Gitea repository data |
 | `storage_size` | **string** · Required · Default: `5Gi`<br>Size of the persistent volume for repository storage |
 

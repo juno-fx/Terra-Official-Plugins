@@ -24,7 +24,7 @@ _kuiper:
 # Nginx sidecar image
 nginx_registry: docker.io
 nginx_repo: nginx
-nginx_tag: "alpine"
+nginx_tag: "1.30.7-alpine"
 
 # User-facing fields from metadata.yaml
 icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/proxmox/assets/logo.png

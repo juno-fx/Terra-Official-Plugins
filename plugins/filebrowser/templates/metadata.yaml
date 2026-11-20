@@ -34,7 +34,7 @@ data:
       description: "Tag to pull the nginx sidecar image from"
       type: string
       required: true
-      default: "alpine"
+      default: "1.30.7-alpine"
     - name: root
       description: "Root filesystem path visible in FileBrowser. Set to '/' to browse the entire container filesystem, or '/data' to restrict to the data volume only."
       required: false
