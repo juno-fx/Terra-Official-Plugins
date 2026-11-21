@@ -1,0 +1,25 @@
+# Install-time fields (terra.yaml), in form order.
+version: "2.11.0"
+helm_repo: "https://project-hami.github.io/HAMi/"
+scheduler_node_policy: binpack
+scheduler_gpu_policy: spread
+device_split_count: 10
+preconfigured_gpu_memory: 0
+gpu_core_policy: default
+report_node_capacity: false
+host: ""
+enable_amd: false
+
+# Fixed settings. Not in the Terra form: each has one right answer for this catalog.
+# Change them here if an environment needs a mirror or a different pin.
+default_gpu_memory: 8192
+device_memory_scaling: "1"
+device_core_scaling: "1"
+device_list_strategy: cdi-annotations
+prefix: "/hami"
+prometheus_url: "http://prometheus-kube-prometheus-prometheus.prometheus.svc.cluster.local:9090"
+prometheus_release_label: "prometheus"
+webui_git_repo: "https://github.com/Project-HAMi/HAMi-WebUI.git"
+webui_git_revision: "cb896331e0e39447d6033338fb23433aa01ae536"
+amd_plugin_git_repo: "https://github.com/Project-HAMi/amd-device-plugin.git"
+amd_plugin_git_revision: "amd-gpu-helm-0.0.4"

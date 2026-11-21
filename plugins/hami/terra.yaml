@@ -1,0 +1,104 @@
+resource_id: hami
+name: HAMi GPU Sharing
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/hami/assets/hami-graph-color.svg
+description: |
+  Share one physical GPU between several workloads. HAMi slices GPUs into fractions with
+  memory limits and compute quotas, on top of the GPU Operator which keeps providing
+  drivers and the container runtime. Includes the HAMi-WebUI GPU dashboard, embedded in
+  Genesis. https://project-hami.io
+category: Hardware
+tags:
+  - gpu
+  - hami
+  - gpu-sharing
+  - dashboard
+  - cluster-level
+editable: true
+fields:
+  - name: version
+    description: HAMi chart version to install.
+    required: true
+    type: select
+    default: "2.11.0"
+    options:
+      - "2.11.0"
+  - name: helm_repo
+    description: Helm repository URL for the HAMi chart.
+    required: true
+    type: string
+    default: "https://project-hami.github.io/HAMi/"
+  - name: scheduler_node_policy
+    description: |
+      How GPU workloads are placed across nodes. binpack fills one node before using the
+      next; spread distributes workloads across nodes.
+    required: false
+    type: select
+    default: binpack
+    options:
+      - binpack
+      - spread
+  - name: scheduler_gpu_policy
+    description: |
+      How GPU workloads are placed across the GPUs of one node. spread uses every GPU
+      before doubling up; binpack fills one GPU first.
+    required: false
+    type: select
+    default: spread
+    options:
+      - binpack
+      - spread
+  - name: device_split_count
+    description: Maximum number of workloads that may share one physical GPU.
+    required: false
+    type: int
+    default: 10
+  - name: preconfigured_gpu_memory
+    description: |
+      Total GPU memory in MiB to assume per GPU when the driver cannot report it. Needed
+      for unified-memory systems such as NVIDIA DGX Spark (GB10), where nvidia-smi shows
+      memory.total as N/A and HAMi otherwise leaves the node unregistered. 0 uses the
+      value reported by the driver. A 128 GB DGX Spark takes about 98304.
+    required: false
+    type: int
+    default: 0
+  - name: gpu_core_policy
+    description: |
+      When HAMi enforces a workload's nvidia.com/gpucores limit. default enforces it only
+      while another HAMi workload is active on the same GPU, so a workload alone on a GPU
+      runs at full speed. force always enforces it, for predictable throughput at the cost
+      of idle capacity. disable never enforces it; gpucores then only drives scheduling.
+      Set at workload launch, so a change applies to workloads started after it, not to
+      running ones. Limits of 0 and 100 are never enforced. AMD compute slices are
+      hardware masks and always apply regardless of this setting.
+    required: false
+    type: select
+    default: default
+    options:
+      - default
+      - force
+      - disable
+  - name: report_node_capacity
+    description: |
+      Have HAMi's device plugin also publish each GPU node's total nvidia.com/gpumem (MiB)
+      and nvidia.com/gpucores in the node's capacity and allocatable. By default HAMi
+      registers only nvidia.com/gpu, so cluster autoscalers never see the slice resources:
+      Karpenter cannot scale a GPU node pool from zero for a sliced workload and, once a node
+      is up, never marks it initialised or consolidates it. Turn on with Karpenter (together
+      with a NodeOverlay, see the README); harmless elsewhere.
+    required: false
+    type: boolean
+    default: false
+  - name: host
+    description: The DNS name of your Genesis host, for the GPU dashboard.
+    required: true
+    type: string
+  - name: enable_amd
+    description: |
+      Also share AMD GPUs. Installs HAMi's AMD device plugin on nodes the AMD GPU Operator
+      has labelled (feature.node.kubernetes.io/amd-gpu=true) and lets the HAMi scheduler
+      handle amd.com/gpu, amd.com/gpumem and amd.com/gpucores. The AMD GPU Operator plugin
+      must run with device_plugin set to false first; kubelet serves amd.com/gpu from one
+      plugin only. Off leaves AMD pods to the AMD GPU Operator (whole GPU each).
+    required: false
+    type: boolean
+    default: false
