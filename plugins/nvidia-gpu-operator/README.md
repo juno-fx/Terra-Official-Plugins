@@ -59,13 +59,41 @@ The NVIDIA GPU Operator automates the management of NVIDIA GPU resources in a Ku
 
 ---
 
+## Install with HAMI
+
+The HAMi GPU Sharing plugin runs on top of this plugin. The GPU Operator keeps providing the driver, the container toolkit, the `nvidia` RuntimeClass, node labels and GPU metrics. HAMi replaces only the device plugin, so it can hand out slices of a GPU with a memory limit instead of whole GPUs.
+
+### Field values
+
+| Field | Value | Why |
+|-------|-------|-----|
+| `device_plugin` | `false` | HAMi brings its own device plugin. Two on one node fight over `nvidia.com/gpu`. |
+| `version` | `v25.10.1` | The version HAMi is tested with. |
+| `install_driver` | `true` | HAMi needs a working driver. `false` only when the node image ships it (EKS NVIDIA AMIs). |
+| `install_toolkit` | `true` | HAMi needs the `nvidia` runtime. `false` only when the node image ships it (EKS NVIDIA AMIs). |
+| `k3s` | `true` on k3s, `false` elsewhere | Same as a normal install. |
+| `slice_count` | any | Ignored while `device_plugin` is off. HAMi does the slicing. |
+
+Leave the other fields at their defaults.
+
+### Steps
+
+1. Install the **Prometheus** plugin (`kube-prometheus-stack`) if you want the HAMi dashboard's GPU panels
+2. Install this plugin with the values above. On an existing install, edit it and set `device_plugin` to `false`
+3. Wait until the `nvidia-device-plugin-daemonset` pods are gone from the operator's namespace
+4. Install the **HAMi** plugin
+
+To go back, uninstall HAMi first, then set `device_plugin` to `true`.
+
+---
+
 ## Notes
 
-- NFD resources are named `<release>-nfd-*` (`fullnameOverride`). The default naming overflowed Kubernetes' 63-character label limit on the NFD post-delete prune Job, which left uninstalls stuck in Argo CD with `DeletionError`. Existing installs from before this change rename their NFD Deployments/DaemonSet on the next sync (brief NFD restart, no GPU workload impact)
 - This plugin is **editable** — you can update slice count, version, and flags after install via Terra
-- **Pre-installed driver/toolkit (EKS):** the EKS AL2023 and Bottlerocket NVIDIA AMIs already carry the driver and `nvidia-container-toolkit`, with containerd's `nvidia` runtime registered. Running the operator's own driver or toolkit DaemonSets on those nodes fails or rewrites the containerd config, so set `install_driver` and `install_toolkit` to `false`. With the toolkit off the operator no longer creates the `nvidia` RuntimeClass, so this plugin creates it (handler `nvidia`); HAMi's device plugin and the workload templates rely on it
-- **Karpenter:** Karpenter only provisions nodes for extended resources it knows (`nvidia.com/gpu`, `amd.com/gpu`, Neuron, EFA). HAMi slice resources (`nvidia.com/gpumem`, `nvidia.com/gpucores`) are unknown to it, so a sliced workload cannot scale a GPU node pool from zero; it schedules only onto a GPU node that already exists. Keep one GPU node warm (a placeholder pod with a `nodeSelector` on the pool's GPU label and no GPU request) or use Karpenter's NodeOverlay (alpha, v1.13+) to declare the slice resources on the instance types
-- `slice_count` controls GPU time-slicing — a value of `4` means each physical GPU appears as 4 schedulable GPU resources. Higher values allow more concurrent workloads per GPU at the cost of per-workload performance
-- After installation, GPU nodes will be labelled `nvidia.com/gpu.present: "true"` and workloads can request GPUs with `resources.limits["nvidia.com/gpu"]`
-- **With the HAMi GPU Sharing plugin:** set `device_plugin` to `false` first, then install HAMi. HAMi registers `nvidia.com/gpu` itself and handles slicing; two device plugins on one node fight over the resource. `slice_count` is ignored while the device plugin is off, so it can stay as is; GPU Feature Discovery then labels nodes as unsliced and HAMi does the slicing. Turn `device_plugin` back on after removing HAMi
-- When the cluster has the Prometheus Operator CRDs (the `kube-prometheus-stack` plugin), the plugin creates a ServiceMonitor for the DCGM exporter automatically, labelled `release: prometheus`, so GPU utilisation and memory metrics land in Prometheus. HAMi-WebUI's utilisation and memory-used panels read these. No CRDs, no ServiceMonitor; install Prometheus later and Argo CD picks it up on its next refresh
+- After installation, GPU nodes are labelled `nvidia.com/gpu.present: "true"` and workloads request GPUs with `resources.limits["nvidia.com/gpu"]`
+- `slice_count` of `4` means each physical GPU appears as 4 schedulable GPUs. Higher values allow more workloads per GPU at the cost of per-workload performance
+- **EKS:** the AL2023 and Bottlerocket NVIDIA AMIs already ship the driver and container toolkit. Set `install_driver`, `install_toolkit` and `k3s` to `false`; the plugin then creates the `nvidia` RuntimeClass itself
+- **HAMi:** see [Install with HAMI](#install-with-hami)
+- **Karpenter with HAMi:** Karpenter does not know HAMi's slice resources (`nvidia.com/gpumem`, `nvidia.com/gpucores`), so a sliced workload cannot scale a GPU node pool from zero. Keep one GPU node warm, or declare the resources with a NodeOverlay
+- **Prometheus:** when the `kube-prometheus-stack` plugin is installed, a ServiceMonitor for the DCGM exporter is created automatically, so GPU metrics land in Prometheus
+- **NFD naming:** NFD resources are named `<release>-nfd-*`. Installs from before this change rename them on the next sync (brief NFD restart, GPU workloads unaffected)
