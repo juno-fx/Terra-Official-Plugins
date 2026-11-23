@@ -14,11 +14,13 @@ data:
       description: "Use a GPU"
       type: boolean
       required: true
+      group: GPU Settings
     - name: gpuRenderMode
       description: "GPU render mode (only applies when GPU is enabled). default keeps the image behaviour (VirtualGL + Zink). native-nvidia mounts the NVIDIA GLX/EGL vendor files and disables VirtualGL and Zink"
       type: select
       required: true
       default: "default"
+      group: GPU Settings
       options:
         - default
         - native-nvidia
@@ -27,51 +29,61 @@ data:
       type: string
       required: true
       default: "junoinnovations"
+      group: Helios Image Settings
     - name: repo
       description: "Repository to pull the image from"
       type: string
       required: true
       default: "helios"
+      group: Helios Image Settings
     - name: tag
       description: "Tag to pull the image from"
       type: string
       required: true
       default: "unstable-rocky-9"
+      group: Helios Image Settings
     - name: enableAPI
       description: "Enable system-to-system communication"
       type: boolean
       required: true
       default: false
+      group: Orion API Integration
     - name: rheaRepo
       description: "Repo to pull the rhea image from"
       type: string
       required: true
       default: "rhea"
+      group: Orion API Integration
     - name: rheaTag      
       description: "Tag to pull the rhea image from"
       type: string
       required: true
       default: "v1.2.3"
+      group: Orion API Integration
     - name: nginx_registry
       description: "Registry to pull the nginx sidecar image from"
       type: string
       required: true
       default: "docker.io"
+      group: Ingress
     - name: nginx_repo
       description: "Repository to pull the nginx sidecar image from"
       type: string
       required: true
       default: "nginx"
+      group: Ingress
     - name: nginx_tag
       description: "Tag to pull the nginx sidecar image from"
       type: string
       required: true
       default: "alpine"
+      group: Ingress
     - name: publicAccess
       description: "Allow public access (disable authentication)"
       type: boolean
       required: true
       default: false
+      group: Ingress
     - name: sysResource
       description: "Add the SYS_RESOURCE capability so things like ulimits can be raised inside the container (e.g. on AWS where node limits are too low)"
       type: boolean
