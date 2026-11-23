@@ -1,6 +1,14 @@
 # configuration
 host:
 prefix: "/argocd"
+# IngressClass for the dashboard route. Empty falls back to nginx.
+# "default" omits ingressClassName and uses the cluster's default IngressClass.
+ingressClass: ""
+
+# nginx auth proxy image — pinned; bump deliberately.
+nginx_registry: "docker.io"
+nginx_repo: "nginx"
+nginx_tag: "1.30.7-alpine"
 
 # This will be autopopulated by Terra in airgapped envs. The default here will be overriden on Terra versions > v1.0.4
 _juno_terra_image_pull_secrets: []

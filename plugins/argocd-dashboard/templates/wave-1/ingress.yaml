@@ -1,3 +1,9 @@
+{{- /*
+  Plain, controller-agnostic Ingress. Auth, streaming and timeouts live in the nginx proxy
+  (files/nginx/nginx.conf). The ingressClass install field sets the class, falling back to
+  nginx (unchanged behaviour for existing installs). "default" omits ingressClassName so the cluster's default IngressClass is used.
+*/}}
+{{- $class := .Values.ingressClass | default "nginx" }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -5,13 +11,10 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     argocd.argoproj.io/sync-wave: "1"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-    nginx.ingress.kubernetes.io/auth-url: "http://genesis.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-service/{{ .Release.Name }}/"
-    nginx.ingress.kubernetes.io/auth-signin: /unauthorized/
 spec:
-  ingressClassName: nginx
+  {{- if ne $class "default" }}
+  ingressClassName: {{ $class }}
+  {{- end }}
   rules:
     - host: "{{ .Values.host }}"
       http:
@@ -20,6 +23,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: argocd-server
+                name: "{{ .Release.Name }}-proxy"
                 port:
-                  number: 80
+                  number: 8080
