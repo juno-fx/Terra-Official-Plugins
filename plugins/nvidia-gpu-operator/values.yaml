@@ -11,10 +11,8 @@ install_nfd: true
 device_plugin: true
 
 # Fixed settings, not in the Terra form.
-# dcgm_enabled: the standalone DCGM host engine. Off: the DCGM exporter runs its own embedded
-# engine, which is all the metrics need.
+# Standalone DCGM host engine. Not needed: the DCGM exporter has its own.
 dcgm_enabled: false
-# The DCGM ServiceMonitor is created whenever the cluster has the Prometheus Operator CRDs
-# (kube-prometheus-stack plugin). The catalog's Prometheus is Helm release "prometheus", so
-# this is the only label it accepts.
+# Label on the DCGM ServiceMonitor. Must match the release name of the catalog's
+# kube-prometheus-stack plugin, or Prometheus ignores it.
 prometheus_release_label: "prometheus"

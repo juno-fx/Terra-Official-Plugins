@@ -1,9 +1,7 @@
 {{- if not .Values.install_toolkit }}
-# The GPU Operator creates the nvidia RuntimeClass only as part of its container-toolkit
-# state. With install_toolkit off (toolkit pre-installed on the node image) nothing would
-# create it, and HAMi's device plugin and the workload charts both set
-# runtimeClassName: nvidia. The handler name must match the runtime the node's containerd
-# config registers; EKS NVIDIA AMIs and nvidia-ctk both register it as "nvidia".
+# Created when the toolkit is pre-installed on the node image. HAMi and the workload charts
+# set runtimeClassName: nvidia. The handler must match the runtime name in the node's
+# containerd config; EKS NVIDIA AMIs register it as "nvidia".
 apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
