@@ -49,12 +49,12 @@ The NVIDIA GPU Operator automates the management of NVIDIA GPU resources in a Ku
 |-------|---------|
 | `version` | **select** · Required · Default: `v25.10.1`<br>GPU Operator version to install (`v25.10.1` or `v25.3.4`) |
 | `helm_repo` | **string** · Required · Default: `https://helm.ngc.nvidia.com/nvidia`<br>Helm repository URL for the GPU Operator chart |
+| `slice_count` | **int** · Required · Default: `4`<br>Number of time-slices per GPU; each GPU appears as this many `nvidia.com/gpu` resources. `1` turns time-slicing off. Ignored while `device_plugin` is off, so the HAMi handover needs no change here |
 | `install_driver` | **boolean** · Optional · Default: `true`<br>Run the operator's driver DaemonSet. Turn off when the node image ships the driver (EKS/Bottlerocket NVIDIA AMIs, distro-installed drivers); the operator then validates the host driver instead. |
 | `open_kernel_modules` | **boolean** · Optional · Default: `false`<br>Force NVIDIA's open-source kernel modules (`driver.kernelModuleType: open`). Off leaves the choice to the operator (`auto`), which already picks the open modules where they are required (Blackwell and newer: DGX Spark GB10, B200). Only applies while `install_driver` is on |
 | `install_toolkit` | **boolean** · Optional · Default: `true`<br>Run the operator's container-toolkit DaemonSet. Turn off when the node image ships nvidia-container-toolkit (EKS NVIDIA AMIs). The plugin then creates the `nvidia` RuntimeClass itself. Off also disables the `k3s` socket override. |
 | `k3s` | **boolean** · Optional · Default: `true`<br>Configure for k3s clusters (sets containerd socket path to `/run/k3s/containerd/containerd.sock`). Only applies while `install_toolkit` is on; set `false` on EKS. |
 | `install_crds` | **boolean** · Optional · Default: `false`<br>Manage the driver through an `NVIDIADriver` custom resource instead of the ClusterPolicy, and add the operator's CRD upgrade and cleanup jobs. Does not install CRDs: both always ship with the chart. Turning it on restarts the driver pods. The driver part is skipped while `install_driver` is off |
-| `slice_count` | **int** · Required · Default: `4`<br>Number of time-slices per GPU; each GPU appears as this many `nvidia.com/gpu` resources. `1` turns time-slicing off. Ignored while `device_plugin` is off, so the HAMi handover needs no change here |
 | `device_plugin` | **boolean** · Optional · Default: `true`<br>Run the operator's own device plugin. Turn off before installing the HAMi GPU Sharing plugin, which brings its own. Drivers, container toolkit, NFD and DCGM keep running. |
 
 ---

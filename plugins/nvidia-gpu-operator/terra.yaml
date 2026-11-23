@@ -26,6 +26,13 @@ fields:
     required: true
     type: string
     default: "https://helm.ngc.nvidia.com/nvidia"
+  - name: slice_count
+    description: |
+      Number of time-slices per GPU. 4 means each GPU shows up as 4 nvidia.com/gpu
+      resources; 1 turns time-slicing off. Ignored while device_plugin is off.
+    required: true
+    default: 4
+    type: int
   - name: install_driver
     description: |
       Install the NVIDIA driver on GPU nodes. Turn off when the nodes already have it
@@ -57,20 +64,13 @@ fields:
     type: boolean
   - name: install_crds
     description: |
-      Manage the driver through an NVIDIADriver resource instead of the ClusterPolicy, and
-      add the operator's CRD upgrade and cleanup jobs. Does not install CRDs; those always
-      ship with the chart. Turning it on restarts the driver pods. Leave off unless you
-      need it.
+      Manage the driver through NVIDIADriver resources instead of the ClusterPolicy. Needed
+      only when node pools require different drivers, e.g. old and new GPUs that no single
+      driver version supports. Does not install CRDs; those always ship with the chart.
+      Turning it on restarts the driver pods. Leave off otherwise.
     required: false
     default: false
     type: boolean
-  - name: slice_count
-    description: |
-      Number of time-slices per GPU. 4 means each GPU shows up as 4 nvidia.com/gpu
-      resources; 1 turns time-slicing off. Ignored while device_plugin is off.
-    required: true
-    default: 4
-    type: int
   - name: device_plugin
     description: |
       Run the operator's own device plugin, which advertises nvidia.com/gpu and applies
