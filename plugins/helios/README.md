@@ -53,7 +53,8 @@ These fields are configured when authoring the workload template in **Genesis** 
 
 | Field | Details |
 |-------|---------|
-| `gpu` | **boolean** · Required<br>Enable GPU passthrough for the workstation. Also mounts the NVIDIA GLX and EGL vendor files into `/etc/glvnd/glx_vendor.d/` and `/etc/glvnd/egl_vendor.d/`, replacing any vendor files the image ships there |
+| `gpu` | **boolean** · Required<br>Enable GPU passthrough for the workstation |
+| `gpuRenderMode` | **select** · Required · Default: `default`<br>GPU render mode, only applies when `gpu` is enabled. `default` keeps the image behaviour (VirtualGL and Zink). `native-nvidia` mounts the NVIDIA GLX and EGL vendor files into `/etc/glvnd/glx_vendor.d/` and `/etc/glvnd/egl_vendor.d/` and sets `DISABLE_VGL=true` and `DISABLE_ZINK=true`, so the session renders on the native NVIDIA driver. Variables set at launch override these |
 | `registry` | **string** · Required · Default: `junoinnovations`<br>Container registry to pull the Helios image from |
 | `repo` | **string** · Required · Default: `helios`<br>Helios image repository |
 | `tag` | **string** · Required · Default: `unstable-rocky-9`<br>Helios image tag (OS flavour and version) |
@@ -81,7 +82,7 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 
 ### NVIDIA GLX for a Single Application
 
-On GPU workstations, an application such as Houdini can be forced onto the NVIDIA GLX driver by setting `__GLX_VENDOR_LIBRARY_NAME=nvidia` in its desktop launch file:
+On GPU workstations in `default` mode, an application such as Houdini can be forced onto the NVIDIA GLX driver by setting `__GLX_VENDOR_LIBRARY_NAME=nvidia` in its desktop launch file:
 
 ```ini
 [Desktop Entry]

@@ -155,6 +155,12 @@ spec:
               value: "{{ .Values.guid }}"
             - name: PREFIX
               value: "/{{ .Release.Namespace }}/helios/{{ .Values.name }}/"
+            {{- if and .Values.gpu (eq .Values.gpuRenderMode "native-nvidia") }}
+            - name: DISABLE_VGL
+              value: "true"
+            - name: DISABLE_ZINK
+              value: "true"
+            {{- end }}
             {{- range .Values.env }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}
@@ -172,7 +178,7 @@ spec:
               mountPath: "/etc/helios/init.d/{{ .name }}/{{ .file }}"
             {{- end }}
             {{- end }}
-            {{- if .Values.gpu }}
+            {{- if and .Values.gpu (eq .Values.gpuRenderMode "native-nvidia") }}
             - name: nvidia-glx-vendor
               mountPath: "/etc/glvnd/glx_vendor.d/"
             - name: nvidia-egl-vendor
@@ -252,7 +258,7 @@ spec:
             defaultMode: 0777
         {{- end }}
         {{- end }}
-        {{- if .Values.gpu }}
+        {{- if and .Values.gpu (eq .Values.gpuRenderMode "native-nvidia") }}
         - name: nvidia-glx-vendor
           configMap:
             name: "{{ .Values.name }}-nvidia-icd"

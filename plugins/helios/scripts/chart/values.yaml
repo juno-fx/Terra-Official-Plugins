@@ -15,6 +15,7 @@ rheaMemory: 100Mi
 rheaCpuLimit: 350m
 rheaMemoryLimit: 250Mi
 gpu: false
+gpuRenderMode: default
 enableAPI: false
 publicAccess: false
 sysResource: false

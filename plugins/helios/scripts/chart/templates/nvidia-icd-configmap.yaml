@@ -1,4 +1,4 @@
-{{- if .Values.gpu }}
+{{- if and .Values.gpu (eq .Values.gpuRenderMode "native-nvidia") }}
 # NVIDIA glvnd vendor files. Each key is projected into its own directory in
 # workstation.yaml (glx- -> glx_vendor.d, egl- -> egl_vendor.d) as 10_nvidia.json.
 apiVersion: v1

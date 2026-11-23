@@ -11,9 +11,17 @@ data:
     - name: icon
       default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios/assets/logo.png"
     - name: gpu
-      description: "Use a GPU. Also mounts the NVIDIA GLX and EGL vendor files into /etc/glvnd/"
+      description: "Use a GPU"
       type: boolean
       required: true
+    - name: gpuRenderMode
+      description: "GPU render mode (only applies when GPU is enabled). default keeps the image behaviour (VirtualGL + Zink). native-nvidia mounts the NVIDIA GLX/EGL vendor files and disables VirtualGL and Zink"
+      type: select
+      required: true
+      default: "default"
+      options:
+        - default
+        - native-nvidia
     - name: registry
       description: "Registry to pull the image from"
       type: string
