@@ -71,6 +71,16 @@ fields:
     required: false
     default: false
     type: boolean
+  - name: install_nfd
+    description: |
+      Install Node Feature Discovery (NFD) with the operator. NFD labels the GPU nodes,
+      which is how the operator finds them. A cluster should have only one NFD install: if
+      the AMD GPU Operator plugin (or anything else) already installs NFD, turn this off.
+      If you add the AMD GPU Operator later, leave this on and keep its install_nfd off.
+      The plugin that installs NFD must be uninstalled last.
+    required: false
+    default: true
+    type: boolean
   - name: device_plugin
     description: |
       Run the operator's own device plugin, which advertises nvidia.com/gpu and applies

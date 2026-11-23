@@ -82,7 +82,9 @@ spec:
                           replicas: {{ .Values.slice_count }}
                   {{- end }}
           nfd:
-            enabled: true
+            # Off when another install (the AMD GPU Operator plugin, or the cluster's own)
+            # already provides NFD. Two installs fight over the shared NFD CRDs.
+            enabled: {{ .Values.install_nfd }}
           dcgm:
             enabled: {{ .Values.dcgm_enabled }}
           {{- /* Auto-detected: Argo CD passes the cluster's API groups to helm template, so this

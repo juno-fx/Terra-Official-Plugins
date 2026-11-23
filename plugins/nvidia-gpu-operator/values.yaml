@@ -7,6 +7,7 @@ open_kernel_modules: false
 install_toolkit: true
 k3s: true
 install_crds: false
+install_nfd: true
 device_plugin: true
 
 # Fixed settings, not in the Terra form.

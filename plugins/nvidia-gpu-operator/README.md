@@ -55,6 +55,7 @@ The NVIDIA GPU Operator automates the management of NVIDIA GPU resources in a Ku
 | `install_toolkit` | **boolean** · Optional · Default: `true`<br>Run the operator's container-toolkit DaemonSet. Turn off when the node image ships nvidia-container-toolkit (EKS NVIDIA AMIs). The plugin then creates the `nvidia` RuntimeClass itself. Off also disables the `k3s` socket override. |
 | `k3s` | **boolean** · Optional · Default: `true`<br>Configure for k3s clusters (sets containerd socket path to `/run/k3s/containerd/containerd.sock`). Only applies while `install_toolkit` is on; set `false` on EKS. |
 | `install_crds` | **boolean** · Optional · Default: `false`<br>Manage the driver through an `NVIDIADriver` custom resource instead of the ClusterPolicy, and add the operator's CRD upgrade and cleanup jobs. Does not install CRDs: both always ship with the chart. Turning it on restarts the driver pods. The driver part is skipped while `install_driver` is off |
+| `install_nfd` | **boolean** · Optional · Default: `true`<br>Install Node Feature Discovery (NFD), which labels the GPU nodes for the operator. Only one NFD install per cluster: turn off if the AMD GPU Operator plugin (or anything else) already installs it. |
 | `device_plugin` | **boolean** · Optional · Default: `true`<br>Run the operator's own device plugin. Turn off before installing the HAMi GPU Sharing plugin, which brings its own. Drivers, container toolkit, NFD and DCGM keep running. |
 
 ---
@@ -96,4 +97,5 @@ To go back, uninstall HAMi first, then set `device_plugin` to `true`.
 - **HAMi:** see [Install with HAMI](#install-with-hami)
 - **Karpenter with HAMi:** Karpenter does not know HAMi's slice resources (`nvidia.com/gpumem`, `nvidia.com/gpucores`), so a sliced workload cannot scale a GPU node pool from zero. Keep one GPU node warm, or declare the resources with a NodeOverlay
 - **Prometheus:** when the `kube-prometheus-stack` plugin is installed, a ServiceMonitor for the DCGM exporter is created automatically, so GPU metrics land in Prometheus
+- **AMD GPU Operator:** both plugins can install NFD, and a cluster should have only one. Keep `install_nfd` on in one plugin and off in the other. The plugin that installs NFD must be uninstalled last; removing it takes the NFD CRDs and node labels with it
 - **NFD naming:** NFD resources are named `<release>-nfd-*`. Installs from before this change rename them on the next sync (brief NFD restart, GPU workloads unaffected)
