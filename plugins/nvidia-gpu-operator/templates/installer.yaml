@@ -41,9 +41,15 @@ spec:
             # Off when the node image ships the driver; the validator then checks the host
             # driver instead of the DaemonSet installing a second one.
             enabled: {{ .Values.install_driver }}
-            useOpenKernelModules: {{ .Values.open_kernel_modules }}
+            # useOpenKernelModules is a deprecated no-op in the chart (v25.3+); kernelModuleType
+            # replaced it. "auto" lets the operator pick per GPU and driver branch, "open"
+            # forces the open modules.
+            kernelModuleType: {{ ternary "open" "auto" .Values.open_kernel_modules }}
             nvidiaDriverCRD:
-              enabled: {{ .Values.install_crds }}
+              # Hands driver management from the ClusterPolicy to an NVIDIADriver CR; the chart
+              # then also deploys a default CR. Never with install_driver off: that CR would
+              # ask for a driver install the node image must not get.
+              enabled: {{ and .Values.install_crds .Values.install_driver }}
           operator:
             cleanupCRD: {{ .Values.install_crds }}
             upgradeCRD: {{ .Values.install_crds }}
@@ -62,7 +68,7 @@ spec:
                   version: v1
                   flags:
                     migStrategy: none
-                  {{- if and (gt (int .Values.slice_count) 1) (eq (toString .Values.device_plugin) "true") }}
+                  {{- if and (gt (int .Values.slice_count) 1) .Values.device_plugin }}
                   # A slice_count of 1 means no time-slicing; the config parser rejects replicas < 2.
                   # Skipped when the device plugin is off: GPU Feature Discovery reads this config
                   # for node labels (gpu.replicas, gpu.product -SHARED) and would advertise slicing

@@ -37,10 +37,11 @@ fields:
     type: boolean
   - name: open_kernel_modules
     description: |
-      Install NVIDIA's open-source GPU kernel modules instead of the proprietary ones.
-      Required on Blackwell and newer (DGX Spark GB10, B200); supported on Turing and newer
-      data-centre GPUs; older cards need the proprietary modules. Only applies while
-      install_driver is on.
+      Force NVIDIA's open-source GPU kernel modules. Off leaves the choice to the operator
+      (auto): it picks open or proprietary modules per GPU and driver branch, which already
+      selects the open ones where they are required (Blackwell and newer: DGX Spark GB10,
+      B200). Turn on to force them on Turing and newer cards; older cards cannot run them.
+      Only applies while install_driver is on.
     required: false
     default: false
     type: boolean
@@ -65,10 +66,12 @@ fields:
     type: boolean
   - name: install_crds
     description: |
-      Let the operator manage its optional CRDs: installs the NVIDIADriver CRD and lets the
-      operator upgrade and clean up its CRDs on upgrade and uninstall. The ClusterPolicy CRD
-      the operator needs is always installed with the chart. Leave off when another GPU
-      Operator release in the cluster already owns these CRDs.
+      Manage the driver through an NVIDIADriver custom resource instead of the ClusterPolicy,
+      and add the operator's CRD upgrade and cleanup jobs. Both CRDs (ClusterPolicy and
+      NVIDIADriver) are always installed with the chart; this field does not install them.
+      On: the operator removes the ClusterPolicy's driver DaemonSet and a default NVIDIADriver
+      resource takes over, which restarts the driver pods. The driver part is skipped while
+      install_driver is off. Leave off unless you need per-node-pool driver settings.
     required: false
     default: false
     type: boolean
