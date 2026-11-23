@@ -6,7 +6,6 @@ category: Infrastructure
 tags:
   - argocd
   - ingress
-  - ingress-nginx
   - cluster-level
   - dashboard
 fields:
@@ -15,4 +14,7 @@ fields:
     required: true
   - name: prefix
     description: Connection URL prefix. i.e. `/argocd`. Will default to `/argocd` if not set. This doesn't need changing in most cases.
+    required: false
+  - name: ingressClass
+    description: IngressClass for the dashboard route — use the same class as your Genesis ingress (e.g. `nginx`, `traefik`). Defaults to `nginx` if not set. Use `default` to rely on the cluster's default IngressClass.
     required: false
