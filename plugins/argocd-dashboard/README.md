@@ -55,6 +55,9 @@ Terra will activate the ArgoCD dashboard for your cluster.
 | `host` | **string** · Required<br>The DNS hostname of your Genesis instance (e.g. `genesis.example.com`) |
 | `prefix` | **string** · Optional · Default: `/argocd`<br>URL sub-path where the ArgoCD dashboard will be mounted |
 | `ingressClass` | **string** · Optional · Default: `nginx`<br>IngressClass for the dashboard route — use the same class as your Genesis ingress (e.g. `traefik`). Set `default` to use the cluster's default IngressClass |
+| `nginx_registry` | **string** · Required · Default: `docker.io`<br>Registry for the nginx auth proxy image — point this at your mirror in air-gapped clusters |
+| `nginx_repo` | **string** · Required · Default: `nginx`<br>nginx auth proxy image repository |
+| `nginx_tag` | **string** · Required · Default: `1.30.7-alpine`<br>nginx auth proxy image tag |
 
 ---
 

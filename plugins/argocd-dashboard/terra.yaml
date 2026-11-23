@@ -18,3 +18,18 @@ fields:
   - name: ingressClass
     description: IngressClass for the dashboard route — use the same class as your Genesis ingress (e.g. `nginx`, `traefik`). Defaults to `nginx` if not set. Use `default` to rely on the cluster's default IngressClass.
     required: false
+  - name: nginx_registry
+    description: Registry to pull the nginx auth proxy image from. Point this at your mirror in air-gapped clusters.
+    required: true
+    default: docker.io
+    type: string
+  - name: nginx_repo
+    description: Repository to pull the nginx auth proxy image from.
+    required: true
+    default: nginx
+    type: string
+  - name: nginx_tag
+    description: Tag to pull the nginx auth proxy image from.
+    required: true
+    default: 1.30.7-alpine
+    type: string

@@ -1,8 +1,7 @@
 {{- /*
   Plain, controller-agnostic Ingress. Auth, streaming and timeouts live in the nginx proxy
-  (files/nginx/nginx.conf). Kuiper does not launch this plugin, so nothing overrides the class:
-  the ingressClass install field sets it, falling back to nginx (unchanged behaviour for
-  existing installs). "default" omits ingressClassName so the cluster's default IngressClass is used.
+  (files/nginx/nginx.conf). The ingressClass install field sets the class, falling back to
+  nginx (unchanged behaviour for existing installs). "default" omits ingressClassName so the cluster's default IngressClass is used.
 */}}
 {{- $class := .Values.ingressClass | default "nginx" }}
 apiVersion: networking.k8s.io/v1
