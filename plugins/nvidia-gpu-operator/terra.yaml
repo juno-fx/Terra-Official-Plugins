@@ -28,68 +28,53 @@ fields:
     default: "https://helm.ngc.nvidia.com/nvidia"
   - name: install_driver
     description: |
-      Run the operator's driver DaemonSet to install the NVIDIA kernel driver on GPU nodes.
-      Turn off when the node image already ships the driver, e.g. EKS AL2023 or Bottlerocket
-      NVIDIA AMIs or hosts with a distro-installed driver. The operator then validates the
-      host driver instead of installing one; a second driver install on such nodes fails.
+      Install the NVIDIA driver on GPU nodes. Turn off when the nodes already have it
+      (EKS NVIDIA AMIs, or a driver installed on the host).
     required: false
     default: true
     type: boolean
   - name: open_kernel_modules
     description: |
-      Force NVIDIA's open-source GPU kernel modules. Off leaves the choice to the operator
-      (auto): it picks open or proprietary modules per GPU and driver branch, which already
-      selects the open ones where they are required (Blackwell and newer: DGX Spark GB10,
-      B200). Turn on to force them on Turing and newer cards; older cards cannot run them.
+      Force NVIDIA's open-source kernel modules (Turing and newer GPUs only). Off lets the
+      operator choose, which already picks them where they are required (DGX Spark, B200).
       Only applies while install_driver is on.
     required: false
     default: false
     type: boolean
   - name: install_toolkit
     description: |
-      Run the operator's container-toolkit DaemonSet to install nvidia-container-toolkit and
-      register the nvidia containerd runtime. Turn off when the node image already ships it
-      (EKS NVIDIA AMIs). This plugin then creates the nvidia RuntimeClass itself, since the
-      operator only creates it alongside its toolkit. Off disables the k3s socket override.
+      Install the NVIDIA container toolkit on GPU nodes. Turn off when the nodes already
+      have it (EKS NVIDIA AMIs); the plugin then creates the nvidia RuntimeClass itself.
     required: false
     default: true
     type: boolean
   - name: k3s
     description: |
-      When installing in a k3s cluster, the NVIDIA GPU Operator needs to be configured 
-      to point to the correct containerd socket. The path is: /run/k3s/containerd/containerd.sock. 
-      Setting this to true will configure the NVIDIA GPU Operator to use this socket path for 
-      containerd, which is necessary for it to function properly in a k3s environment.
-      Only applies while install_toolkit is on; set false on EKS and other non-k3s clusters.
+      Point the container toolkit at the k3s containerd socket and config. Set to false on
+      EKS and other non-k3s clusters. Only applies while install_toolkit is on.
     required: false
     default: true
     type: boolean
   - name: install_crds
     description: |
-      Manage the driver through an NVIDIADriver custom resource instead of the ClusterPolicy,
-      and add the operator's CRD upgrade and cleanup jobs. Both CRDs (ClusterPolicy and
-      NVIDIADriver) are always installed with the chart; this field does not install them.
-      On: the operator removes the ClusterPolicy's driver DaemonSet and a default NVIDIADriver
-      resource takes over, which restarts the driver pods. The driver part is skipped while
-      install_driver is off. Leave off unless you need per-node-pool driver settings.
+      Manage the driver through an NVIDIADriver resource instead of the ClusterPolicy, and
+      add the operator's CRD upgrade and cleanup jobs. Does not install CRDs; those always
+      ship with the chart. Turning it on restarts the driver pods. Leave off unless you
+      need it.
     required: false
     default: false
     type: boolean
   - name: slice_count
     description: |
-      Number of time-slices to create for each GPU. 4 means each GPU shows up as 4
-      schedulable nvidia.com/gpu resources. 1 turns time-slicing off (whole GPUs). Ignored
-      while device_plugin is off, so it needs no change when the HAMi GPU Sharing plugin
-      takes over slicing.
+      Number of time-slices per GPU. 4 means each GPU shows up as 4 nvidia.com/gpu
+      resources; 1 turns time-slicing off. Ignored while device_plugin is off.
     required: true
     default: 4
     type: int
   - name: device_plugin
     description: |
-      Run the GPU Operator's own device plugin, which advertises nvidia.com/gpu and applies
-      the slice_count time-slicing. Turn this off before installing the HAMi GPU Sharing
-      plugin: HAMi brings its own device plugin, and two device plugins on one node fight
-      over nvidia.com/gpu. Drivers, the container toolkit, NFD and DCGM keep running either way.
+      Run the operator's own device plugin, which advertises nvidia.com/gpu and applies
+      slice_count. Turn off before installing the HAMi plugin, which brings its own.
     required: false
     default: true
     type: boolean
