@@ -76,13 +76,13 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 | `PASSWORD` | Password set for the users terminal session. Available to all users at launch (Hubble → Advanced).                |
 | `SUDO` | Grants the user sudo access on the container.                                                                      |
 | `SELKIES_FRAMERATE` | Streaming framerate for the desktop session, as a range (e.g. `15-60`) or fixed value (e.g. `30`).                 |
-| `DISABLE_VGL` | Disables the VirtualGL wrapper around the desktop session; apps needing it must be launched manually via `vglrun`. Any non-empty value disables it (e.g. `true`). |
+| `DISABLE_VGL` | Disables the VirtualGL wrapper around the desktop session; apps needing it must be launched manually via `vglrun` (not with `gpuRenderMode` `native-nvidia`, where `vglrun` crashes; use `__GLX_VENDOR_LIBRARY_NAME=nvidia` instead, see below). Any non-empty value disables it (e.g. `true`). |
 | `DISABLE_ZINK` | Disables Zink (Mesa's OpenGL-on-Vulkan driver), which is on by default on GPU workstations. Set to `true` to disable. |
 | `REMOTE_PROTOCOL` | if set to "dcv" Helios will run Nice DCV rather than Selkies.                                                      |
 
 ### NVIDIA GLX for a Single Application
 
-On GPU workstations in `default` mode, an application such as Houdini can be forced onto the NVIDIA GLX driver by setting `__GLX_VENDOR_LIBRARY_NAME=nvidia` in its desktop launch file:
+On GPU workstations with `gpuRenderMode` set to `native-nvidia`, an application such as Houdini can be forced onto the NVIDIA GLX driver by setting `__GLX_VENDOR_LIBRARY_NAME=nvidia` in its desktop launch file:
 
 ```ini
 [Desktop Entry]

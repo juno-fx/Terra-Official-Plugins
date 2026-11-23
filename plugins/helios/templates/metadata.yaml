@@ -98,7 +98,7 @@ data:
     - name: SELKIES_FRAMERATE
       description: Streaming framerate for the desktop session, as a range (e.g. "15-60") or fixed value (e.g. "30").
     - name: DISABLE_VGL
-      description: Disables the VirtualGL wrapper around the desktop session; apps needing it must be launched manually via vglrun. Any non-empty value disables it (e.g. "true").
+      description: Disables the VirtualGL wrapper around the desktop session; apps needing it must be launched manually via vglrun (not with gpuRenderMode native-nvidia, where vglrun crashes; use __GLX_VENDOR_LIBRARY_NAME=nvidia instead). Any non-empty value disables it (e.g. "true").
     - name: DISABLE_ZINK
       description: Disables Zink (Mesa OpenGL-on-Vulkan driver), which is on by default on GPU workstations. Set to "true" to disable.
     - name: REMOTE_PROTOCOL
