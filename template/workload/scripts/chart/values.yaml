@@ -6,6 +6,7 @@ user:
 registry: docker.io
 repo: PLUGIN
 tag: latest
+# Application port. Must not be 8080 — the nginx sidecar listens there.
 port: 3000
 group:
 cpu: "1"
@@ -29,3 +30,7 @@ env: []
 selector:
 plugins: []
 _kuiper:
+# nginx sidecar image (concepts/runtime.md). Pinned — bump deliberately, keep the variant.
+nginx_registry: "docker.io"
+nginx_repo: "nginx"
+nginx_tag: "1.30.7-alpine"

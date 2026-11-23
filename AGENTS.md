@@ -120,10 +120,14 @@ plugins/my-template/
     └── chart/                          # THE PAYLOAD — embedded Helm chart
         ├── Chart.yaml
         ├── values.yaml                 # Must contain all fields from metadata.yaml
+        ├── files/
+        │   └── nginx/nginx.conf        # Sidecar config — Hubble auth, proxy, timeouts
         └── templates/
-            ├── workload.yaml           # StatefulSet — the running workload
-            ├── service.yaml
-            └── ingress.yaml
+            ├── workload.yaml           # StatefulSet — app container + nginx sidecar
+            ├── nginx.yaml              # Renders files/nginx/nginx.conf into a ConfigMap
+            ├── service.yaml            # Targets the sidecar port only
+            ├── ingress.yaml            # Plain Ingress — no controller annotations
+            └── network-policy.yaml     # Allows traffic in on the sidecar port only
 ```
 
 **`env_hints` in `templates/metadata.yaml`** — for workload templates whose
@@ -264,8 +268,8 @@ routes individual features to concepts.
 | Resources, CPU/memory limits, priority classes, replicas, hostname | `concepts/scheduling.md` | `cpu`/`memory`/`cpuLimit`/`memoryLimit` wiring, `k8sPriority`, workload shape |
 | Storage, PVCs, volumes, mounts, storage classes, shared volumes, DataVolumes | `concepts/storage.md` | install-time vs launch-time storage, `volumeMounts`/`volumes`, `k8sStorageClass`/`dataVolume`, Kuiper-managed mount annotations |
 | GPU, CUDA, inference, `runtimeClassName` | `concepts/gpu.md` | `gpu` field, nvidia runtime, driver prerequisite, GPU-node targeting |
-| Image, registry, pull secrets, command/args, probes, sidecars | `concepts/runtime.md` | image wiring, `pullSecret`, startup/liveness probes, nginx sidecar pattern |
-| Ingress, routes, auth, endpoint visibility, paths | `concepts/ingress.md` | namespace-prefixed paths, Hubble/Genesis auth, `ingress-hide`/`ingress-extras`, PREFIX matching |
+| Image, registry, pull secrets, command/args, probes, sidecars | `concepts/runtime.md` | image wiring, `pullSecret`, startup/liveness probes, nginx auth sidecar (container, config, port, image pinning) |
+| Ingress, routes, auth, endpoint visibility, paths | `concepts/ingress.md` | namespace-prefixed paths, plain controller-agnostic Ingress, sidecar Hubble auth / Genesis annotation auth, NetworkPolicy, `ingress-hide`/`ingress-extras`, PREFIX matching |
 | Env vars, env_hints, custom environment | `concepts/env.md` | `.Values.env` range, `env_hints`, platform-set pass-through vars (wire only what the image consumes) |
 | Kuiper annotations, labels, actions, connection, adopt, EC2 exposure | `concepts/labels-annotations.md` | plugin-author vs Kuiper-managed annotations, `plugin` label, Crossplane/EC2 keys |
 | Virtual machines, KubeVirt, DataVolumes, VM console | `concepts/vm.md` | VirtualMachine shape, VirtualMachinePreference, DataVolumeTemplates, firmware/TPM, GPU device passthrough, kubevirt-console sidecar |
@@ -282,14 +286,17 @@ authoritative. Where a concept file and a table disagree, the table wins.
 
 **Before writing chart code for a new plugin or any new feature, probe what the workload
 actually needs.** The template is a deliberately generic baseline — no env vars, no probes, no
-mounts, no GPU, no sidecars. Features are added per workload, not pre-baked.
+mounts, no GPU. The one built-in is the nginx auth sidecar (see "Ingress & nginx Sidecar"), which
+every HTTP workload ships; any other sidecar is added per workload. Features are added per
+workload, not pre-baked.
 
 1. **ASK** — walk the probe checklist (`concepts/probing.md`): purpose/type, interface
    (web/API/desktop/headless), GPU, persistence, ingress protection (protected vs public),
    runtime quirks, env needs, image source, node targeting.
 2. **SUGGEST** — the author may not know what their workload needs. Propose candidates from
    characteristics: Chromium/Electron → `/dev/shm` mount, ML/LLM/render → GPU, web app → auth,
-   stateful data → storage, subpath web UI → sidecar. **Never add silently** — confirm each
+   stateful data → storage, long-lived websockets / large uploads → sidecar timeouts and
+   `client_max_body_size`. **Never add silently** — confirm each
    with the author.
 3. **WIRE from concepts** — each confirmed need maps to its concept file; every field added to
    `templates/metadata.yaml` needs the matching key in `scripts/chart/values.yaml` (Rule 3).
@@ -448,7 +455,15 @@ plugins: []
 _kuiper:
 ```
 
-User-facing fields from `metadata.yaml` are added below these standard keys.
+User-facing fields from `metadata.yaml` are added below these standard keys. Every HTTP workload
+also carries the nginx sidecar image fields — they are user-facing (declared in `metadata.yaml`
+`fields:` and mirrored in the README launch-fields table), not Kuiper-injected:
+
+```yaml
+nginx_registry: "docker.io"
+nginx_repo: "nginx"
+nginx_tag: "1.30.7"   # or "1.30.7-alpine" — pinned; keep each plugin's existing variant on bumps
+```
 
 ---
 
@@ -461,6 +476,10 @@ The StatefulSet that Kuiper deploys must follow these conventions:
   metadata at launch (value = workload name), so it matches without extra labels. The pod template must declare
   the label itself — Kuiper's injection does not reach `spec.template.metadata.labels`.
 - **`juno-innovations.com/workload` annotation** — must match `metadata.yaml` value
+- **nginx sidecar (HTTP workloads)** — an `nginx` container next to the app, image
+  `{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}`, with the
+  `{{ .Values.name }}-nginx` ConfigMap mounted at `/etc/nginx/nginx.conf` (`subPath: nginx.conf`).
+  See "Ingress & nginx Sidecar" below.
 - **Conditional: plugin mounts** — when the workload consumes Helios plugin scripts, range over `.Values.plugins`
   (mounted at `/etc/helios/init.d/<name>/<file>`); see `plugins/helios/scripts/chart/templates/workstation.yaml`.
 - **Conditional: env vars** — pass-through only: wire `JUNO_WORKSTATION`, `JUNO_WORKSPACE` (formerly
@@ -469,6 +488,50 @@ The StatefulSet that Kuiper deploys must follow these conventions:
   default — see "Plugin Authoring — Probe First"). Full table: `concepts/env.md`.
 
 See `plugins/helios/scripts/chart/templates/workstation.yaml` for the full reference implementation.
+
+---
+
+## Ingress & nginx Sidecar — Required Conventions
+
+HTTP workload templates do **not** depend on ingress-nginx. The Ingress is plain and
+controller-agnostic; an nginx sidecar in the pod enforces the Hubble login and owns every
+controller-specific behaviour. This works the same behind ingress-nginx, Traefik, or any other
+controller. Reference implementations: `plugins/wetty/` (simplest), `plugins/helios/`,
+`plugins/n8n/` (rewrites, public webhook paths, rate limiting), `plugins/vm-ephemeral/`
+(websocket timeouts, non-default port). The scaffold in `template/workload/` ships this pattern.
+
+| File | Convention |
+|------|------------|
+| `scripts/chart/files/nginx/nginx.conf` | The sidecar config, templated with Helm values. `auth_request /auth` on every protected `location`, with `location = /auth` proxying to `http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/`. Gate `auth_request` with `{{- if not .Values.publicAccess }}`. Proxies to the app on `127.0.0.1:<app port>` |
+| `scripts/chart/templates/nginx.yaml` | ConfigMap `{{ .Values.name }}-nginx` with `nginx.conf: {{ tpl (.Files.Get "files/nginx/nginx.conf") . \| indent 4 }}` |
+| `scripts/chart/templates/workload.yaml` | `nginx` container (image from `nginx_registry`/`nginx_repo`/`nginx_tag`), `containerPort` = sidecar port, ConfigMap mounted at `/etc/nginx/nginx.conf` via `subPath` |
+| `scripts/chart/templates/service.yaml` | `port`/`targetPort` = the **sidecar** port, never the app port |
+| `scripts/chart/templates/ingress.yaml` | `ingressClassName: nginx` (Kuiper ≥ 4.8.0 overwrites it with the launching namespace's IngressClass; `nginx` is the fallback). Backend = the sidecar port. **No `nginx.ingress.kubernetes.io/*` annotations and no `kubernetes.io/ingress.class` annotation**. Kuiper (`ingress-hide`/`ingress-extras`), cert-manager and external-dns annotations are fine |
+| `scripts/chart/templates/network-policy.yaml` | `podSelector` on the `kuiper-instance` label; `ingress` allows **only the sidecar port** (no `from` — the sidecar does its own auth, so any controller namespace is accepted). The app port stays blocked. Egress is decided per plugin |
+| `README.md` | "Access and authentication" paragraph under How It Works; `nginx_registry`/`nginx_repo`/`nginx_tag` rows in the launch-fields table; a Note that the app must not listen on the sidecar port |
+
+**Sidecar port** — `8080` by default. If the app already listens on `8080`, pick the next free
+port (`8081`, `8082`) and use it consistently in `listen`, `containerPort`, Service, Ingress
+backend and NetworkPolicy.
+
+**Everything controller-specific lives in `nginx.conf`** — proxy timeouts (long-lived
+websockets), `client_max_body_size` (nginx defaults to 1m; use `0` for uploads),
+`proxy_buffering off` for streaming, path rewrites, rate limits, CIDR allow lists. Never put them
+back on the Ingress as annotations.
+
+**Standard `location` blocks:**
+- Slashless redirect — `location = /<path>` with `absolute_redirect off; return 301 $uri/;`
+  (an absolute redirect would leak the sidecar's `http://…:8080`).
+- Main location — `auth_request /auth;`, `proxy_http_version 1.1`, `Upgrade`/`Connection
+  "upgrade"` headers for websockets, `Host`, `X-Real-IP`, `X-Forwarded-For`, and
+  `X-Forwarded-Proto $http_x_forwarded_proto` (`$scheme` inside the sidecar is always `http`).
+- `location = /auth` — `internal;`, `proxy_pass_request_body off;`,
+  `proxy_set_header Content-Length "";`, `proxy_set_header X-Original-URI $request_uri;`.
+
+**Unauthenticated modes skip the sidecar.** Where a workload offers an explicitly
+unauthenticated mode (runtime templates' `network_mode: ingress-noauth`, custom `domain` routes),
+the Ingress and Service may route straight to the app port and the NetworkPolicy allows that
+port instead. `publicAccess` keeps the sidecar and only drops `auth_request`.
 
 ---
 
@@ -512,7 +575,7 @@ after it:
 The template starts with **no segment**. Many catalog workload charts add one — the heritage
 segment is `polaris` (web-ide, proxmox, helios, boinc, jupyter-notebook, lsio-webtop,
 runtime-python/go/js/cpp); other charts choose their own (gitea → `/gitea/`, k9s → `/k9s/`).
-End-to-end routing, auth-annotation variants, endpoint visibility, and the no-rewrite gotcha:
+End-to-end routing, sidecar auth, endpoint visibility, and the no-rewrite gotcha:
 `concepts/ingress.md`.
 
 The rule nginx actually enforces is that **host + path must be unique cluster-wide** — object names are
@@ -525,8 +588,9 @@ and does not strictly need the namespace segment. Include it anyway: this catalo
 deployments, and a plugin author cannot know whether a given environment gets its own DNS or shares one.
 The namespaced segment is harmless where it is redundant and required where it is not.
 
-Nothing rewrites the path before it reaches the pod — no chart sets `rewrite-target` — so the container
-receives the full URL and **every in-container reference must match the ingress path exactly**:
+The Ingress never rewrites the path, so the sidecar receives the full URL. Unless the sidecar's
+`nginx.conf` deliberately rewrites it (n8n strips the prefix with `rewrite … break`), the app
+receives it too, and **every in-container reference must match the ingress path exactly**:
 
 | Where | Example |
 |-------|---------|
@@ -543,25 +607,36 @@ the old path — it fails *after* appearing to work.
 `ingress-hide` matches by **exact string** against the rendered path, so hide values must be the full
 namespaced path, not a bare sub-path. `ingress-extras` matches by prefix and appends the remainder.
 
-### Ingress Authentication (nginx)
+### Ingress Authentication
 
-Standard nginx ingress annotations required for platform-integrated authentication. Not Kuiper-specific.
-
-**Workload templates** — authenticate via Hubble:
-```yaml
-nginx.ingress.kubernetes.io/auth-url: "http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/"
-nginx.ingress.kubernetes.io/use-regex: "true"
+**Workload templates** — authenticate via Hubble **inside the pod**, using the nginx sidecar's
+`auth_request` (see "Ingress & nginx Sidecar"). The Ingress carries no auth annotations:
+```nginx
+location /{{ .Release.Namespace }}/{{ .Values.name }}/ {
+  {{- if not .Values.publicAccess }}
+  auth_request /auth;
+  {{- end }}
+  proxy_pass http://127.0.0.1:{{ .Values.port }};
+}
+location = /auth {
+  internal;
+  proxy_pass http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/;
+  proxy_pass_request_body off;
+  proxy_set_header Content-Length "";
+  proxy_set_header X-Original-URI $request_uri;
+}
 ```
 
-**Namespaced / cluster-level plugins** — authenticate via Genesis:
+**Namespaced / cluster-level plugins** — authenticate via Genesis with ingress-nginx annotations.
+These plugins are not part of the sidecar migration:
 ```yaml
 nginx.ingress.kubernetes.io/auth-url: "http://genesis.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-service/{{ .Release.Name }}/"
 nginx.ingress.kubernetes.io/auth-signin: /unauthorized/
 ```
 
 **Custom domain routes cannot use either gate.** The platform session cookie is scoped to the
-platform host and the browser never sends it to another domain, so an `auth-url` subrequest on a
-custom domain rejects every caller, authenticated or not. Any route a plugin publishes on its own
+platform host and the browser never sends it to another domain, so an auth subrequest (sidecar
+`auth_request` or `auth-url`) on a custom domain rejects every caller, authenticated or not. Any route a plugin publishes on its own
 hostname is therefore outside the platform gate by construction. Plugins must make that exposure
 explicit rather than silent: only honour a domain from a state that already declares itself
 unauthenticated (the runtime templates require `network_mode: ingress-noauth`), or rely on the
@@ -684,6 +759,11 @@ All types above plus:
 | Ingress path omits `{{ .Release.Namespace }}` | Passes in a single-environment cluster; once a second environment shares the hostname, launches fail with an admission-webhook 400 (`host … and path … is already defined in ingress <ns>/<name>`) part-way through, leaving a partial workload to clean up | Prefix the path with `/{{ .Release.Namespace }}/` (see Ingress Path Convention) |
 | Ingress path changed without updating the in-container path | nginx routes to the pod correctly, then the app 404s or serves a page whose assets all 404 — fails *after* looking like it worked | Update `PREFIX`, nginx `location`/`rewrite`/`sub_filter`, `--baseURL`/`ROOT_URL`/`base_url` and `HTTPRoute` rewrites in the same pass |
 | Required podAffinity/podAntiAffinity in a small cluster | Pods unschedulable — stranded at launch | Use `preferred` unless correctness requires `required` |
+| `nginx.ingress.kubernetes.io/*` annotations on a workload Ingress (auth, timeouts, body size) | Works on ingress-nginx, silently ignored on Traefik and other controllers — auth or timeouts disappear | Move the behaviour into the sidecar's `nginx.conf` (`auth_request`, `proxy_read_timeout`, `client_max_body_size`) |
+| Service or Ingress backend points at the app port instead of the sidecar port | Requests bypass the sidecar — no Hubble login check; the NetworkPolicy then blocks them, so the workload looks down | Target the sidecar port in Service, Ingress backend and NetworkPolicy |
+| App listens on the sidecar port (e.g. both on `8080`) | One container fails to bind and crash-loops | Move the sidecar to `8081`/`8082` and update every reference |
+| Absolute redirect from the sidecar | Browser is sent to `http://<pod>:8080/...` | `absolute_redirect off;` on the slashless-redirect location |
+| `$scheme` used for `X-Forwarded-Proto` in the sidecar | App thinks it is served over HTTP — mixed-content or redirect loops behind TLS | `proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;` |
 
 ---
 
@@ -713,11 +793,13 @@ All types above plus:
    - Edit `terra.yaml` — add `workload` to `tags` so the plugin appears in the app store's workloads filter
    - Edit `templates/metadata.yaml` — set `description`, tune `fields:`
    - Edit `scripts/chart/values.yaml` — ensure all field names are present as keys
-   - Edit `scripts/chart/templates/workload.yaml` — set correct image, ports, probes; set `juno-innovations.com/workload` annotation to match `metadata.yaml`
-   - Edit `scripts/chart/templates/service.yaml` — set correct `port`/`targetPort`
-   - Edit `scripts/chart/templates/ingress.yaml` — add Hubble auth annotations (`nginx.ingress.kubernetes.io/auth-url` pointing to Hubble, `use-regex: "true"`) and set the path to
+   - Edit `scripts/chart/templates/workload.yaml` — set correct image, app port, probes; set `juno-innovations.com/workload` annotation to match `metadata.yaml`. Keep the scaffold's `nginx` sidecar container
+   - Edit `scripts/chart/files/nginx/nginx.conf` — set the `location` paths to match the ingress path, `proxy_pass` to the app port, and add any timeouts, body size or rewrites the app needs (see "Ingress & nginx Sidecar")
+   - Edit `scripts/chart/templates/ingress.yaml` — keep it plain (`ingressClassName: nginx`, no `nginx.ingress.kubernetes.io/*` annotations), backend = the sidecar port, path
      `/{{ .Release.Namespace }}/{{ .Values.name }}/` or `/{{ .Release.Namespace }}/<segment>/{{ .Values.name }}/` (see Ingress Path Convention)
+   - Check `scripts/chart/templates/service.yaml` and `network-policy.yaml` target the sidecar port (`8080` unless the app needs it)
    - Make every in-container reference to that path match it exactly — `PREFIX`, nginx sidecar `location`/`rewrite`/`sub_filter`, `--baseURL`/`ROOT_URL`/`base_url`, `HTTPRoute` rewrites. The ingress does not rewrite the path away
+   - In `README.md`, keep the "Access and authentication" paragraph and the `nginx_*` launch-field rows
    - If `workload.yaml` ranges over `.Values.env`, edit `templates/metadata.yaml`'s `env_hints:` key (or set it to `|` + `[]`)
      and mirror it in `README.md` under `### Custom Environment Variables` — see the `env_hints` guidance above
 7. **Run the best-practices check** — required before packaging/verifying: baseline + per-feature quality + your type's minimums (`concepts/best-practices.md` review checklist). The check is **advisory** — it states issues and makes recommendations, blocks nothing, and the author makes the final decision

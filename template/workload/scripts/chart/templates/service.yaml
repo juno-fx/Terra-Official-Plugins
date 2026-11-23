@@ -11,6 +11,9 @@ spec:
   selector:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
   ports:
-    - port: {{ .Values.port }}
-      targetPort: {{ .Values.port }}
+    # Route through the nginx sidecar, which enforces the Hubble login.
+    # The application port stays unexposed.
+    - port: 8080
+      targetPort: 8080
       protocol: TCP
+      name: http

@@ -47,6 +47,8 @@ apply to all three types.
 - [MUST] Least-privilege RBAC; [WT]/[NS] never cluster-scoped
 - [MUST] Web workloads auth-protected by default — `publicAccess` is explicit opt-in for trusted
   networks only
+- [WT] [MUST] Hubble auth enforced by the nginx sidecar (`auth_request`), and a NetworkPolicy
+  admits only the sidecar port, so the app port cannot be reached around the login
 - [WT] [MUST] Internal paths (`/admin`, `/metrics`, `/healthz`…) hidden from the Hubble endpoint
   list via `ingress-hide`
 - [SHOULD] Non-root run-time pattern (PUID/PGID, linuxserver.io style — these are container
@@ -71,6 +73,9 @@ requests, PUID/PGID) do not apply. Review those charts against `concepts/vm.md`,
 ### Image & runtime → `concepts/runtime.md`
 
 - [MUST] Image reference built from `registry`/`repo`/`tag` values — never a hardcoded full image
+  (the nginx sidecar likewise uses `nginx_registry`/`nginx_repo`/`nginx_tag`)
+- [WT] [SHOULD] nginx sidecar tag pinned (no `latest`); bumps keep the plugin's Debian/Alpine
+  variant and update `values.yaml`, `metadata.yaml` and the README together
 - [SHOULD] Pin a known-good tag by default; `latest` allowed but documented (mind
   `imagePullPolicy: IfNotPresent`)
 - [SHOULD] `pullSecret` wiring when the image lives in a private registry
@@ -133,7 +138,9 @@ authoring time to web workloads, not to the scaffold.
 - [WT] [SHOULD] Platform env vars wired only when the upstream image consumes them — dead vars are
   false documentation (`concepts/env.md`)
 - [WT] [MUST] `PREFIX`/in-container path references match the ingress path exactly
-  (`concepts/ingress.md` — nothing rewrites the path)
+  (`concepts/ingress.md` — the Ingress never rewrites the path; only the sidecar may)
+- [WT] [MUST] No `nginx.ingress.kubernetes.io/*` annotations on the workload Ingress — timeouts,
+  body size, buffering and rewrites live in the sidecar's `nginx.conf`
 
 ### UX [WT]
 
@@ -146,7 +153,9 @@ authoring time to web workloads, not to the scaffold.
 **[WT]**
 - Ownership label `kuiper.juno-innovations.com/kuiper-instance` on the StatefulSet selector, pod
   template labels, and Service selector
-- Ingress (HTTP workloads): Hubble auth (`auth-workstation`, `use-regex: "true"`), path
+- Ingress (HTTP workloads): plain Ingress (`ingressClassName: nginx`, no controller
+  annotations) → Service → nginx sidecar with Hubble `auth_request` (`auth-workstation`) →
+  app on `127.0.0.1`; NetworkPolicy admits only the sidecar port; path
   `/{{ .Release.Namespace }}/{{ .Values.name }}/` (optional plugin segment);
   non-HTTP workloads (game, LDAP, raw TCP/UDP): Service NodePort/LoadBalancer — no ingress
   (`concepts/service-exposure.md`)
@@ -195,4 +204,6 @@ item; a documented deviation (README note) satisfies an item the author delibera
       `env_hints` mirrored
 - [ ] [WT] exposure deliberate: ingress for HTTP, Service NodePort/LoadBalancer for non-HTTP
       (`concepts/service-exposure.md`)
+- [ ] [WT] HTTP: plain Ingress, sidecar `auth_request`, Service/Ingress/NetworkPolicy on the
+      sidecar port, `nginx_*` fields pinned and in the README
 - [ ] README complete

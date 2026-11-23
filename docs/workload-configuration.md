@@ -22,18 +22,66 @@ type reference — including both install-time (`terra.yaml`) and workload launc
 
 ## Ingress Authentication
 
-These are standard nginx ingress annotations — not Kuiper-specific — but required for
-platform-integrated authentication on any ingress you expose.
+### Workload templates — nginx sidecar
 
-**Workload templates** authenticate via Hubble:
+Workload templates authenticate via Hubble **inside the pod**, not through ingress-controller
+annotations. Each HTTP workload runs an nginx sidecar next to the application container:
 
-```yaml
-annotations:
-  nginx.ingress.kubernetes.io/auth-url: "http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/"
-  nginx.ingress.kubernetes.io/use-regex: "true"
+```
+Ingress (plain)  →  Service :8080  →  nginx sidecar :8080  →  auth_request → Hubble
+                                              │
+                                              └→ proxy_pass → app on 127.0.0.1:<port>
 ```
 
-**Namespaced and cluster-level plugins** authenticate via Genesis:
+Because the Ingress carries no controller-specific annotations, the workload behaves the same
+behind ingress-nginx, Traefik, or any other controller. The Ingress sets
+`ingressClassName: nginx` as a fallback; Kuiper 4.8.0 and later replaces it with the launching
+namespace's IngressClass.
+
+The sidecar config lives in `scripts/chart/files/nginx/nginx.conf` and is rendered with `tpl`
+into a `<name>-nginx` ConfigMap (`scripts/chart/templates/nginx.yaml`):
+
+```nginx title="scripts/chart/files/nginx/nginx.conf (excerpt)"
+location /{{ .Release.Namespace }}/{{ .Values.name }}/ {
+  {{- if not .Values.publicAccess }}
+  auth_request /auth;
+  {{- end }}
+  proxy_pass http://127.0.0.1:{{ .Values.port }};
+  proxy_http_version 1.1;
+  proxy_set_header Upgrade $http_upgrade;
+  proxy_set_header Connection "upgrade";
+  proxy_set_header Host $host;
+  proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+}
+
+location = /auth {
+  internal;
+  proxy_pass http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/;
+  proxy_pass_request_body off;
+  proxy_set_header Content-Length "";
+  proxy_set_header X-Original-URI $request_uri;
+}
+```
+
+The rest of the pattern:
+
+- **Service and Ingress backend** target the sidecar port (`8080` by default; `8081`/`8082`
+  when the app already uses `8080`), never the application port.
+- **NetworkPolicy** (`scripts/chart/templates/network-policy.yaml`) admits traffic only on the
+  sidecar port, so the application cannot be reached around the login.
+- **Image fields** `nginx_registry`, `nginx_repo` and `nginx_tag` are launch fields in
+  `metadata.yaml`, with a pinned tag by default.
+- **Timeouts, upload limits, buffering and rewrites** are set in `nginx.conf`
+  (`proxy_read_timeout`, `client_max_body_size`, `proxy_buffering`, `rewrite`). Never add them to
+  the Ingress as `nginx.ingress.kubernetes.io/*` annotations.
+
+`plugins/wetty/` is the simplest complete example. The scaffold created by `make new-plugin`
+ships the full pattern.
+
+### Namespaced and cluster-level plugins — Genesis
+
+Namespaced and cluster-level plugins authenticate via Genesis with standard ingress-nginx
+annotations:
 
 !!! note
     Workload templates must always be tagged `cluster-level` in `terra.yaml` — they are installed
