@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Values.name }}-network-policy
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+spec:
+  podSelector:
+    matchLabels:
+      kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+  policyTypes:
+    - Ingress
+  # The nginx sidecar port enforces the Hubble login itself, so traffic is accepted
+  # from any ingress controller (ingress-nginx, Traefik, ...) without knowing its
+  # namespace. Gitea's own port is reachable only from pods in the same namespace,
+  # so other workloads (helios, wetty, ...) can clone/push using Gitea credentials.
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 8080
+    - from:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.app_port }}

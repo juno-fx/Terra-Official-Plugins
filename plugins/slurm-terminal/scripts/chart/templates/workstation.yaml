@@ -68,7 +68,7 @@ spec:
               # then drops to the nginx user. Without these three it cannot start.
               add: ["CHOWN", "SETUID", "SETGID"]
           ports:
-            - containerPort: 3001
+            - containerPort: 8080
               name: nginx
           volumeMounts:
             - name: nginx
@@ -118,7 +118,7 @@ spec:
             - name: HOME
               value: "/home/{{ .Values.user }}"
             - name: PREFIX
-              value: "/slurm/{{ .Values.name }}"
+              value: "/{{ .Release.Namespace }}/slurm/{{ .Values.name }}"
             - name: WORKSTATION_NAME
               value: "{{ .Values.name }}"
             # Where the Slurm login node lives. The terminal SSHes here; no Slurm

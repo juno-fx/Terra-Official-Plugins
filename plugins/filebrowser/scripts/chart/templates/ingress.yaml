@@ -1,13 +1,13 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: "{{ .Release.Name }}"
+  name: "{{ .Values.name }}-filebrowser"
   labels:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
-  annotations:
-    nginx.ingress.kubernetes.io/auth-url: "http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/"
 spec:
-  ingressClassName: "nginx"
+  # Kuiper >= 4.8.0 overwrites this with the launching namespace's IngressClass.
+  # nginx is the fallback for older deployments;
+  ingressClassName: nginx
   rules:
     - host: {{ .Values.host }}
       http:
@@ -16,6 +16,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: "{{ .Release.Name }}"
+                name: "{{ .Values.name }}-filebrowser"
                 port:
                   number: 8080

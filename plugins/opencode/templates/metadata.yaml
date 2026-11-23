@@ -12,21 +12,21 @@ data:
   fields: |
     - name: icon
       default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/opencode/assets/logo.png"
-    - name: registry
+    - name: nginx_registry
       description: "Registry to pull the nginx sidecar image from"
       type: string
       required: true
       default: "docker.io"
-    - name: repo
+    - name: nginx_repo
       description: "Repository to pull the nginx sidecar image from"
       type: string
       required: true
       default: "nginx"
-    - name: tag
+    - name: nginx_tag
       description: "Tag to pull the nginx sidecar image from"
       type: string
       required: true
-      default: "alpine"
+      default: "1.30.7-alpine"
     - name: timezone
       description: "Timezone to use for the opencode instance"
       type: string
@@ -41,11 +41,6 @@ data:
       default: 1Gi
       required: true
       type: string
-    - name: ingressNamespace
-      description: "Namespace of the ingress controller for plugin access"
-      type: string
-      required: true
-      default: "ingress-nginx"
     - name: cluster_access
       description: "Kubernetes RBAC access level for this agent."
       type: select

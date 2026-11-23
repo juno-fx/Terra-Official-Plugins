@@ -41,6 +41,60 @@ See the [Kubernetes Secrets documentation](https://kubernetes.io/docs/tasks/conf
 
 ---
 
+## Recommended AWS IAM Policies
+
+> **Reference only:** these policies are examples, not a supported or complete configuration. Review them against your own security requirements and adjust them for your environment before use.
+
+Use a dedicated IAM user (no console access) for the credentials secret, ideally in a dedicated AWS account for Juno workloads.
+
+### Crossplane EC2 (`crossplane-ec2`)
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ReadOnlyLookups",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeInstances",
+        "ec2:DescribeInstanceStatus",
+        "ec2:DescribeInstanceAttribute",
+        "ec2:DescribeImages",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeVolumes",
+        "ec2:DescribeTags"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "ManageInstanceLifecycle",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:RunInstances",
+        "ec2:TerminateInstances",
+        "ec2:StartInstances",
+        "ec2:StopInstances",
+        "ec2:ModifyInstanceAttribute",
+        "ec2:CreateTags",
+        "ec2:DeleteTags"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": { "aws:RequestedRegion": ["us-east-1"] }
+      }
+    }
+  ]
+}
+```
+
+Replace `us-east-1` with your region(s), or remove the `Condition` block. Encrypted EBS volumes using a customer-managed KMS key also need KMS permissions on that key.
+
+If a permission is missing, `kubectl describe instance.ec2.aws.crossplane.io <name>` shows an `UnauthorizedOperation` error naming the denied action.
+
+---
+
 ## Installation
 
 1. Install the **Crossplane** plugin first

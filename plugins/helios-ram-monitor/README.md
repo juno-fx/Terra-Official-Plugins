@@ -1,6 +1,6 @@
 # Helios RAM Monitor
 
-![Helios RAM Monitor](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios/scripts/assets/helios-icon.png)
+![Helios RAM Monitor](https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios-ram-monitor/assets/logo.png)
 
 **Category:** Helios Plugin
 **Type:** Workstation Add-on

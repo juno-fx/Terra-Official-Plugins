@@ -1,6 +1,6 @@
 resource_id: slurm-terminal
 name: Slurm Terminal
-icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/slurm-terminal/scripts/assets/logo.png
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/slurm-terminal/assets/logo.png
 description: |
   Browser terminal onto a Slinky Slurm cluster. Each user launches their own session from Hubble and
   signs in as themselves, then submits jobs with sbatch, srun and squeue. Requires the Slinky plugin.

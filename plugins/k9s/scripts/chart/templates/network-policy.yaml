@@ -10,20 +10,9 @@ spec:
       kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
   policyTypes:
     - Ingress
-    - Egress
+  # Only the nginx sidecar port is reachable. It enforces the Hubble login itself,
+  # so traffic is accepted from any ingress controller (ingress-nginx, Traefik, ...)
   ingress:
-    - from:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: {{ .Values.ingressNamespace }}
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: kube-system
-      ports:
+    - ports:
         - protocol: TCP
           port: 8080
-        - protocol: TCP
-          port: {{ .Values.ttyd_port }}
-        - protocol: UDP
-          port: 53
-  egress: []

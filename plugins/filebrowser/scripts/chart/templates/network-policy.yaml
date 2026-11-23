@@ -10,13 +10,10 @@ spec:
       kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
   policyTypes:
     - Ingress
-    - Egress
+  # Only the nginx sidecar port is reachable. It enforces the Hubble login itself,
+  # so traffic is accepted from any ingress controller (ingress-nginx, Traefik, ...)
+  # without knowing its namespace. File Browser's own port (8081) stays blocked.
   ingress:
-    - from:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: {{ .Values.ingressNamespace }}
-      ports:
+    - ports:
         - protocol: TCP
           port: 8080
-  egress: []

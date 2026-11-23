@@ -58,7 +58,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `packages` | **string** · Optional · Default: `vim`<br>Space-separated list of additional packages to install at startup |
 | `nginx_registry` | **string** · Required · Default: `docker.io`<br>Container registry for the nginx proxy image |
 | `nginx_repo` | **string** · Required · Default: `nginx`<br>nginx proxy image repository |
-| `nginx_tag` | **string** · Required · Default: `1.29.3`<br>nginx proxy image tag |
+| `nginx_tag` | **string** · Required · Default: `1.30.7`<br>nginx proxy image tag |
 | `publicAccess` | **boolean** · Required · Default: `false`<br>Disable the Hubble login check and allow unauthenticated browser access to the terminal |
 
 ### Custom Environment Variables

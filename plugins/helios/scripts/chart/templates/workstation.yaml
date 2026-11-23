@@ -7,7 +7,6 @@ metadata:
     juno-innovations.com/shared: "none"
     juno-innovations.com/kuiper-state: "{{ .Values._kuiper }}"
   labels:
-    juno-innovations.com/app: "polaris"
     juno-innovations.com/workstation: "{{ .Values.name }}"
     juno-innovations.com/user: "{{ .Values.user }}"
     juno-innovations.com/session: "{{ .Values.session }}"
@@ -23,9 +22,11 @@ spec:
   template:
     metadata:
       labels:
-        juno-innovations.com/app: polaris
         juno-innovations.com/user: "{{ .Values.user }}"
         juno-innovations.com/workstation: "{{ .Values.name }}"
+        # Kuiper's label injection does not reach pod templates; the NetworkPolicy
+        # selects on this label, so the pod must declare it itself.
+        kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
       annotations:
         # This will block the cluster autoscaler from evicting this pod in the case
         # it can move to a cheaper instance. This does come at a cost, but ideally
@@ -147,7 +148,7 @@ spec:
             - name: GID
               value: "{{ .Values.guid }}"
             - name: PREFIX
-              value: "/{{ .Release.Namespace }}/polaris/{{ .Values.name }}/"
+              value: "/{{ .Release.Namespace }}/helios/{{ .Values.name }}/"
             {{- range .Values.env }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}
@@ -167,8 +168,22 @@ spec:
             {{- end }}
             {{- if .Values.enableAPI }}
             - name: orionpy-volume
-              mountPath: /opt/juno 
+              mountPath: /opt/juno
             {{- end }}
+        - name: nginx
+          image: "{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}"
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+          ports:
+            - containerPort: 8080
+              name: http
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
         {{- if .Values.enableAPI }}
         - name: rhea
           image: "{{ .Values.registry }}/{{ .Values.rheaRepo }}:{{ .Values.rheaTag }}"
@@ -207,6 +222,9 @@ spec:
             {{- end }}
         {{- end }}
       volumes:
+        - name: nginx-config
+          configMap:
+            name: "{{ .Values.name }}-nginx"
         - name: shm
           emptyDir:
             medium: Memory

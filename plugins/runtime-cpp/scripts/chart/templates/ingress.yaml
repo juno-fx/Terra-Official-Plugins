@@ -3,22 +3,21 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ .Values.name }}-ingress
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/auth-url: "http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/"
-    nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
+  # Kuiper >= 4.8.0 overwrites this with the launching namespace's IngressClass.
+  # nginx is the fallback for older deployments;
+  ingressClassName: nginx
   rules:
     - host: {{ .Values.host }}
       http:
         paths:
-          - path: "/{{ .Release.Namespace }}/polaris/{{ .Values.name }}/"
+          - path: "/{{ .Release.Namespace }}/runtime-cpp/{{ .Values.name }}/"
             pathType: Prefix
             backend:
               service:
                 name: {{ .Values.name }}
                 port:
-                  number: {{ .Values.port }}
+                  number: 8081
 {{- end }}
 
 {{- if eq .Values.network_mode "ingress-noauth" }}
@@ -36,12 +35,11 @@ metadata:
     external-dns.alpha.kubernetes.io/enable: "true"
     {{- end }}
   {{- end }}
-  {{- else }}
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/use-regex: "true"
   {{- end }}
 spec:
+  # Kuiper >= 4.8.0 overwrites this with the launching namespace's IngressClass.
+  # nginx is the fallback for older deployments;
+  ingressClassName: nginx
   {{- if and .Values.domain .Values.tls_issuer }}
   tls:
     - hosts:
@@ -52,7 +50,7 @@ spec:
     - host: {{ if .Values.domain }}{{ .Values.name }}.{{ .Values.domain }}{{ else }}{{ .Values.host }}{{ end }}
       http:
         paths:
-          - path: {{ if .Values.domain }}"/"{{ else }}"/{{ .Release.Namespace }}/polaris/{{ .Values.name }}/"{{ end }}
+          - path: {{ if .Values.domain }}"/"{{ else }}"/{{ .Release.Namespace }}/runtime-cpp/{{ .Values.name }}/"{{ end }}
             pathType: Prefix
             backend:
               service:

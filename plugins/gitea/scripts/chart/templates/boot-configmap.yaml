@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}-boot
+  name: "{{ .Values.name }}-boot"
   labels:
-    kuiper.juno-innovations.com/kuiper-instance: "{{ .Release.Name }}"
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
 data:
   boot.sh: |
     #!/bin/sh
@@ -43,7 +43,6 @@ data:
     [repository]
     ENABLE_PUSH_CREATE_USER    = true
     ENABLE_PUSH_CREATE_ORG     = true
-    DEFAULT_PUSH_CREATE_PRIVATE = false
 
     [picture]
     DISABLE_GRAVATAR        = true

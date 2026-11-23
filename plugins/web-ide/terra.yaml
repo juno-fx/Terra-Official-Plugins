@@ -1,6 +1,6 @@
 resource_id: web-ide
 name: web-ide
-icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/web-ide/scripts/assets/logo.png
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/web-ide/assets/logo.png
 description: Web based IDE using code server
 category: Development
 tags:
