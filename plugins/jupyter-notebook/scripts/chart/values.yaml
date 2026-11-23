@@ -8,7 +8,7 @@ cpu: "1"
 memory: "1Gi"
 cpuLimit: null
 memoryLimit: null
-gpu: "off"
+gpu: false
 idx: 0
 guid: 0
 puid: 0
@@ -26,5 +26,5 @@ _kuiper:
 
 nginx_registry: "docker.io"
 nginx_repo: "nginx"
-nginx_tag: "alpine"
+nginx_tag: "1.30.7-alpine"
 
