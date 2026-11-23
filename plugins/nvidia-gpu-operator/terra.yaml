@@ -13,52 +13,78 @@ tags:
   - cluster-level
 editable: true
 fields:
-  - name: install_crds
-    description: |
-      Install the NVIDIA GPU Operator's Custom Resource Definitions (CRDs). 
-      If this is the first or only install of the NVIDIA GPU Operator in 
-      the cluster, you should set this to true to install the necessary CRDs. 
-      If you have already installed the NVIDIA GPU Operator with CRD installation 
-      enabled, you can set this to false for subsequent installations to avoid 
-      trying to reinstall the CRDs.
-    required: false
-    default: false
-    type: boolean
-  - name: open_kernel_modules
-    description: |
-      Whether to use open kernel modules for the NVIDIA driver. This is required 
-      if you want to use the open kernel modules for the NVIDIA driver. Not needed 
-      if you are using the device plugin to manage the driver installation.
-    required: false
-    default: false
-    type: boolean
-  - name: k3s
-    description: |
-      When installing in a k3s cluster, the NVIDIA GPU Operator needs to be configured 
-      to point to the correct containerd socket. The path is: /run/k3s/containerd/containerd.sock. 
-      Setting this to true will configure the NVIDIA GPU Operator to use this socket path for 
-      containerd, which is necessary for it to function properly in a k3s environment.
-    required: false
-    default: true
-    type: boolean
-  - name: slice_count
-    description: |
-      Number of time-slices to create for each GPU. This is required for time-slicing 
-      configuration and determines how many slices each GPU will be divided into. The 
-      default is 4, which means that each GPU will be divided into 4 time-slices. You 
-      can adjust this number based on your workload requirements and the capabilities 
-      of your GPUs.
-    required: true
-    default: 4
-    type: int
   - name: version
     description: Version of the GPU Operator to install.
     required: true
     type: select
+    default: v25.10.1
     options:
       - v25.10.1
       - v25.3.4
   - name: helm_repo
     description: Helm repository URL for the NVIDIA GPU Operator chart.
     required: true
+    type: string
     default: "https://helm.ngc.nvidia.com/nvidia"
+  - name: slice_count
+    description: |
+      Number of time-slices per GPU. 4 means each GPU shows up as 4 nvidia.com/gpu
+      resources; 1 turns time-slicing off. Ignored while device_plugin is off.
+    required: true
+    default: 4
+    type: int
+  - name: install_driver
+    description: |
+      Install the NVIDIA driver on GPU nodes. Turn off when the nodes already have it
+      (EKS NVIDIA AMIs, or a driver installed on the host).
+    required: false
+    default: true
+    type: boolean
+  - name: open_kernel_modules
+    description: |
+      Force NVIDIA's open-source kernel modules (Turing and newer GPUs only). Off lets the
+      operator choose, which already picks them where they are required (DGX Spark, B200).
+      Only applies while install_driver is on.
+    required: false
+    default: false
+    type: boolean
+  - name: install_toolkit
+    description: |
+      Install the NVIDIA container toolkit on GPU nodes. Turn off when the nodes already
+      have it (EKS NVIDIA AMIs); the plugin then creates the nvidia RuntimeClass itself.
+    required: false
+    default: true
+    type: boolean
+  - name: k3s
+    description: |
+      Point the container toolkit at the k3s containerd socket and config. Set to false on
+      EKS and other non-k3s clusters. Only applies while install_toolkit is on.
+    required: false
+    default: true
+    type: boolean
+  - name: install_crds
+    description: |
+      Manage the driver through NVIDIADriver resources instead of the ClusterPolicy. Needed
+      only when node pools require different drivers, e.g. old and new GPUs that no single
+      driver version supports. Does not install CRDs; those always ship with the chart.
+      Turning it on restarts the driver pods. Leave off otherwise.
+    required: false
+    default: false
+    type: boolean
+  - name: install_nfd
+    description: |
+      Install Node Feature Discovery (NFD) with the operator. NFD labels the GPU nodes,
+      which is how the operator finds them. A cluster should have only one NFD install: if
+      the AMD GPU Operator plugin (or anything else) already installs NFD, turn this off.
+      If you add the AMD GPU Operator later, leave this on and keep its install_nfd off.
+      The plugin that installs NFD must be uninstalled last.
+    required: false
+    default: true
+    type: boolean
+  - name: device_plugin
+    description: |
+      Run the operator's own device plugin, which advertises nvidia.com/gpu and applies
+      slice_count. Turn off before installing the HAMi plugin, which brings its own.
+    required: false
+    default: true
+    type: boolean

@@ -1,12 +1,18 @@
-install_toolkit: "false"
-install_driver: "false"
-slice_count: "4"
-version: "v25.10.0"
-install_crds: "true"
-open_kernel_modules: "true"
-nfd_enabled: "true"
-default_config: "any"
-dcgm_enabled: "false"
-selector: "time-slicing"
-k3s: "true"
+# Install-time fields (terra.yaml), in form order.
+version: v25.10.1
 helm_repo: "https://helm.ngc.nvidia.com/nvidia"
+slice_count: 4
+install_driver: true
+open_kernel_modules: false
+install_toolkit: true
+k3s: true
+install_crds: false
+install_nfd: true
+device_plugin: true
+
+# Fixed settings, not in the Terra form.
+# Standalone DCGM host engine. Not needed: the DCGM exporter has its own.
+dcgm_enabled: false
+# Label on the DCGM ServiceMonitor. Must match the release name of the catalog's
+# kube-prometheus-stack plugin, or Prometheus ignores it.
+prometheus_release_label: "prometheus"
