@@ -31,6 +31,13 @@ fields:
     description: The DNS name of your Genesis host, for the GPU dashboard.
     required: true
     type: string
+  - name: prefix
+    description: |
+      URL path of the GPU dashboard on the Genesis host, i.e. /hami. Change it only if
+      another plugin already uses that path.
+    required: false
+    type: string
+    default: "/hami"
   - name: scheduler_node_policy
     description: |
       How GPU workloads are placed across nodes. binpack fills one node before using the

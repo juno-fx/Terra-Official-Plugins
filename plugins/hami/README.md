@@ -96,6 +96,7 @@ The plugin is editable: fields can be changed after install and Argo CD rolls th
 | `version` | **select** · Required · Default: `2.11.0`<br>HAMi chart version |
 | `helm_repo` | **string** · Required · Default: `https://project-hami.github.io/HAMi/`<br>Helm repository for the HAMi chart |
 | `host` | **string** · Required<br>DNS name of the Genesis host; the dashboard Ingress and iFrame use it |
+| `prefix` | **string** · Optional · Default: `/hami`<br>URL path of the GPU dashboard on the Genesis host. Change only if another plugin already uses that path |
 | `scheduler_node_policy` | **select** · Optional · Default: `binpack`<br>Placement across nodes. `binpack` fills one node before using the next; `spread` distributes |
 | `scheduler_gpu_policy` | **select** · Optional · Default: `spread`<br>Placement across the GPUs of one node. `spread` uses every GPU before doubling up; `binpack` fills one GPU first |
 | `device_split_count` | **int** · Optional · Default: `10`<br>Maximum number of workloads sharing one physical GPU |
@@ -110,17 +111,14 @@ Each of these has one right answer for this catalog, so they live in the plugin'
 and are not asked at install time. Change them in a fork if an environment needs a mirror or a
 different pin.
 
-| Setting | Value | Why fixed |
-|---------|-------|-----------|
-| `default_gpu_memory` | `8192` | GPU memory in MiB given to a workload that requests `nvidia.com/gpu` without `nvidia.com/gpumem`. Templates that set `gpumem` (`jupyter-notebook` via `HAMI_GPU_MEMORY`) override it per launch; every other GPU workload gets an 8 GiB slice instead of the whole card. Nonzero on purpose: on DGX Spark / GB10 a request without an absolute size fails at Allocate (see Notes). `0` would hand over whole GPUs where the driver reports memory |
-| `device_memory_scaling` | `1` | GPU memory overcommit. Above `1` advertises more memory than the card has and spills to host memory; not something this catalog wants on by default |
-| `device_core_scaling` | `1` | Compute overcommit. Nothing in the catalog relies on it and the AMD plugin ignores it |
-| `device_list_strategy` | `cdi-annotations` | The GPU Operator runs the nvidia runtime in CDI mode; `envvar` fails container start. The other CDI value, `cdi-cri`, gives nothing extra here |
-| `prefix` | `/hami` | Dashboard URL path on the Genesis host. Only a path collision would change it |
-| `prometheus_url` | `http://prometheus-kube-prometheus-prometheus.prometheus.svc.cluster.local:9090` | In-cluster address of the Prometheus the dashboard reads from. The `kube-prometheus-stack` plugin always installs release `prometheus` in namespace `prometheus`, so this is the only value that matches the catalog |
-| `prometheus_release_label` | `prometheus` | Label the catalog's Prometheus requires on ServiceMonitors before it scrapes them. Fixed for the same reason |
-| `webui_git_repo`, `webui_git_revision` | HAMi-WebUI repo, pinned commit | Source pin for the dashboard chart until upstream publishes 2.0.0 to its Helm repository. Bumped with the plugin version, not per install |
-| `amd_plugin_git_repo`, `amd_plugin_git_revision` | HAMi AMD device plugin repo, `amd-gpu-helm-0.0.4` | Source pin for the AMD plugin chart. Chart and image must come from the same release, so it is bumped with the plugin version |
+- **`default_gpu_memory`** = `8192`. GPU memory in MiB for a workload that requests `nvidia.com/gpu` without `nvidia.com/gpumem`. Templates that set `gpumem` (`jupyter-notebook` via `HAMI_GPU_MEMORY`) override it per launch; every other GPU workload gets an 8 GiB slice instead of the whole card. Nonzero on purpose: on GB10 a request without an absolute size fails at Allocate (see Notes). `0` would hand over whole GPUs where the driver reports memory.
+- **`device_memory_scaling`** = `1`. GPU memory overcommit. Above `1` advertises more memory than the card has and spills to host memory; not wanted on by default.
+- **`device_core_scaling`** = `1`. Compute overcommit. Nothing in the catalog relies on it and the AMD plugin ignores it.
+- **`device_list_strategy`** = `cdi-annotations`. The GPU Operator runs the nvidia runtime in CDI mode; `envvar` fails container start. The other CDI value, `cdi-cri`, gives nothing extra here.
+- **`prometheus_url`** = in-cluster address of the catalog's Prometheus (`prometheus-kube-prometheus-prometheus.prometheus.svc.cluster.local:9090`). The `kube-prometheus-stack` plugin always installs release `prometheus` in namespace `prometheus`, so this is the only value that matches.
+- **`prometheus_release_label`** = `prometheus`. Label the catalog's Prometheus requires on ServiceMonitors before it scrapes them.
+- **`webui_git_repo`, `webui_git_revision`** = HAMi-WebUI repo, pinned commit. Source pin for the dashboard chart until upstream publishes 2.0.0 to its Helm repository. Bumped with the plugin version, not per install.
+- **`amd_plugin_git_repo`, `amd_plugin_git_revision`** = HAMi AMD device plugin repo, `amd-gpu-helm-0.0.4`. Source pin for the AMD plugin chart. Chart and image must come from the same release, so it is bumped with the plugin version.
 
 ---
 
