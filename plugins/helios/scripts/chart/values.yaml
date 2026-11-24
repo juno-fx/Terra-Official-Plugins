@@ -19,7 +19,6 @@ enableAPI: false
 publicAccess: false
 dcvLoadBalancer: false
 loadBalancerAnnotations: []
-sysResource: false
 nginx_registry: "docker.io"
 nginx_repo: "nginx"
 nginx_tag: "1.30.7-alpine"
