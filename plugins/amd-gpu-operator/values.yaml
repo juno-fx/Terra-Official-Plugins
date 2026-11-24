@@ -1,7 +1,7 @@
 # Install-time fields (terra.yaml), in form order.
 version: "v1.5.1"
 helm_repo: "https://rocm.github.io/gpu-operator"
-install_nfd: false
+install_nfd: true
 detect_all_gpus: true
 vgpu_nodes: false
 device_plugin: true

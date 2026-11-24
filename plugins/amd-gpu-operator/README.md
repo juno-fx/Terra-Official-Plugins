@@ -28,7 +28,7 @@ This plugin installs the upstream [ROCm/gpu-operator](https://github.com/ROCm/gp
 - At least one cluster node with an AMD GPU
 - Kubernetes 1.29 or newer
 - GPU nodes must already have a working `amdgpu` kernel driver — this plugin does not install one
-- A Node Feature Discovery (NFD) install. The NVIDIA GPU Operator plugin provides one by default; with no other NFD in the cluster, set `install_nfd` to `true`
+- If the NVIDIA GPU Operator plugin (or anything else) already installs Node Feature Discovery (NFD), set `install_nfd` to `false`; the cluster should have one NFD install
 
 ---
 
@@ -50,7 +50,7 @@ This plugin installs the upstream [ROCm/gpu-operator](https://github.com/ROCm/gp
 |-------|---------|
 | `version` | **select** · Required · Default: `v1.5.1`<br>AMD GPU Operator version to install (`v1.5.1`, `v1.5.0` or `v1.4.1`) |
 | `helm_repo` | **string** · Required · Default: `https://rocm.github.io/gpu-operator`<br>Helm repository URL for the AMD GPU Operator chart |
-| `install_nfd` | **boolean** · Optional · Default: `false`<br>Install Node Feature Discovery (NFD), which labels the GPU nodes for the operator. Only one NFD install per cluster: off by default because the NVIDIA GPU Operator plugin already installs it. Turn on only when nothing else provides NFD. |
+| `install_nfd` | **boolean** · Optional · Default: `true`<br>Install Node Feature Discovery (NFD), which labels the GPU nodes for the operator. Only one NFD install per cluster: if the NVIDIA GPU Operator plugin (or anything else) already installs NFD, turn this off, or the two collide over the shared NFD CRDs. |
 | `detect_all_gpus` | **boolean** · Optional · Default: `true`<br>Which nodes count as AMD GPU nodes. `true` labels any node with an AMD GPU, integrated GPUs and unlisted cards included (e.g. Ryzen AI / Strix Halo). `false` labels only AMD's supported list (Instinct, Radeon Pro, selected Radeon RX). Labelling alone does not make GPUs schedulable. |
 | `vgpu_nodes` | **boolean** · Optional · Default: `false`<br>Target nodes labelled `amd-vgpu` instead of `amd-gpu`. Use when the nodes are virtual machines that see an AMD GPU virtual function. |
 | `device_plugin` | **boolean** · Optional · Default: `true`<br>Make the GPUs on labelled nodes schedulable as `amd.com/gpu`. Turn off to hand that job to a third-party installed GPU scheduler like HAMi, which brings its own device plugin. Node labelling and the metrics exporter keep running. |
@@ -103,7 +103,7 @@ To go back, set `enable_amd` to `false` in HAMi first, then set `device_plugin` 
 - GPU nodes are labelled `feature.node.kubernetes.io/amd-gpu: "true"` (or `amd-vgpu` with `vgpu_nodes` on) automatically. With `detect_all_gpus: true` that covers any AMD GPU; with `false` only the GPUs on AMD's supported list are labelled, and other nodes need `kubectl label node <node> feature.node.kubernetes.io/amd-gpu=true`
 - GPUs outside AMD's supported list are detected and scheduled on a best-effort basis — the device plugin works with any GPU driven by `amdgpu`, but the metrics exporter is built for Instinct and may not report on them
 - If operator pods on a GPU node stay in `Init:0/1`, the node has no `amdgpu` driver loaded — install one on the node
-- **NVIDIA GPU Operator:** both plugins can install NFD, and a cluster should have only one. Keep `install_nfd` on in one plugin and off in the other. The plugin that installs NFD must be uninstalled last; removing it takes the NFD CRDs and node labels with it. With `install_nfd` off here, the plugin adds its AMD detection rule to the existing NFD as a `NodeFeatureRule`
+- **NVIDIA GPU Operator:** both plugins can install NFD, and a cluster should have only one. Keep `install_nfd` on in one plugin and off in the other. The plugin that installs NFD must be uninstalled last; removing it takes the NFD CRDs and node labels with it. If you add the NVIDIA GPU Operator later, keep `install_nfd` on here and turn its `install_nfd` off. With `install_nfd` off here, the plugin adds its AMD detection rule to the existing NFD as a `NodeFeatureRule`
 - The operator's `default` DeviceConfig is owned by this plugin. Manual edits to it are reverted on the next sync — change the fields above instead
 - **Prometheus:** when the `kube-prometheus-stack` plugin is installed, a ServiceMonitor for the device metrics exporter is created automatically, so GPU metrics land in Prometheus. The exporter serves `/metrics` on port `5000` either way
 - **HAMi:** see [Install with HAMi](#install-with-hami)
