@@ -2,7 +2,7 @@ name: k9s
 user:
 nginx_registry: "docker.io"
 nginx_repo: "nginx"
-nginx_tag: "alpine"
+nginx_tag: "1.30.7-alpine"
 ttyd_port: 7681
 group:
 cpu: "1"

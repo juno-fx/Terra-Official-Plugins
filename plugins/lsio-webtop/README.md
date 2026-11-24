@@ -59,7 +59,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `tag` | **string** · Required · Default: `latest`<br>Image tag |
 | `nginx_registry` | **string** · Required · Default: `docker.io`<br>Registry to pull the nginx sidecar image from |
 | `nginx_repo` | **string** · Required · Default: `nginx`<br>Repository to pull the nginx sidecar image from |
-| `nginx_tag` | **string** · Required · Default: `alpine`<br>Tag to pull the nginx sidecar image from |
+| `nginx_tag` | **string** · Required · Default: `1.30.7-alpine`<br>Tag to pull the nginx sidecar image from |
 | `publicAccess` | **boolean** · Required · Default: `false`<br>Disable authentication and allow unauthenticated access |
 
 ### Custom Environment Variables

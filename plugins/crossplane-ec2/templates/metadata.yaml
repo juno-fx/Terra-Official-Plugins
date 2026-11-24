@@ -51,6 +51,26 @@ data:
       type: boolean
       default: true
       required: true
+    - name: access
+      description: "How users reach the instance. public: directly at its public address. vpn: directly at its private IP, for users on a VPN, Direct Connect or peered network. load_balancer_internal: through a private AWS NLB, for users on a VPN or peered network who can't reach the instance directly. load_balancer_public: through a public AWS NLB, for users on the internet when the instance has no public address. The public NLB accepts connections from any IP address"
+      type: select
+      required: true
+      default: public
+      options:
+        - public
+        - vpn
+        - load_balancer_internal
+        - load_balancer_public
+    - name: ports
+      description: "TCP ports to expose from the instance (e.g. 22 for SSH, 3389 for RDP, 8443 for NICE DCV). The instance's security groups must allow them. Fixed at launch"
+      required: false
+      type: list
+      fields:
+        - name: port
+          description: TCP port the application listens on inside the instance
+          required: true
+          type: int
+          default: 22
     - name: region
       description: AWS Region
       required: true
@@ -60,3 +80,10 @@ data:
       required: true
       type: string
       default: "aws-provider-argocd-provider-config"
+    - name: iam_instance_profile
+      description: >-
+        IAM instance profile name to attach to every instance launched from this template
+        (e.g. production-artists). Leave blank for none. Amazon DCV seats need one that allows
+        reading the DCV license from S3.
+      required: false
+      type: string

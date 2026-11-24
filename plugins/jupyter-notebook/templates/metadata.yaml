@@ -43,7 +43,7 @@ data:
       description: "Tag to pull the nginx sidecar image from"
       type: string
       required: true
-      default: "alpine"
+      default: "1.30.7-alpine"
     - name: icon
       default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/jupyter-notebook/assets/logo.png"
   env_hints: |

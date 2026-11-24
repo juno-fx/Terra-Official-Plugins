@@ -256,6 +256,22 @@ annotations:
 **Applies to:** Crossplane EC2 Instance  
 **Value format:** `"true"`
 
-When set, Kuiper uses `privateDnsName` instead of `publicDnsName` when building the ExternalName
-Service and writing the connection annotation. Use for instances only reachable via private
-networking.
+When set, Kuiper uses the private address instead of `publicDnsName`: `privateDnsName` for the
+ExternalName Service, and the private IP for the connection annotation. Use for instances only
+reachable via private networking.
+
+---
+
+```yaml
+annotations:
+  kuiper.juno-innovations.com/aws-load-balancer: "true"
+  service.beta.kubernetes.io/aws-load-balancer-type: nlb
+```
+
+**Applies to:** Crossplane EC2 Instance  
+**Value format:** `"true"`
+
+When set, Kuiper skips the ExternalName Service and creates a `LoadBalancer` Service plus an
+EndpointSlice pointing at the instance's private IP. Every `service.beta.kubernetes.io/*`
+annotation on the Instance is copied onto the Service. The connection annotation uses the load
+balancer's address and the Service ports. See `concepts/crossplane.md` for the access modes.

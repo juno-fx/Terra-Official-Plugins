@@ -53,7 +53,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 |-------|---------|
 | `nginx_registry` | **string** · Required · Default: `docker.io`<br>Registry to pull the nginx sidecar image from |
 | `nginx_repo` | **string** · Required · Default: `nginx`<br>Repository to pull the nginx sidecar image from |
-| `nginx_tag` | **string** · Required · Default: `alpine`<br>Tag to pull the nginx sidecar image from |
+| `nginx_tag` | **string** · Required · Default: `1.30.7-alpine`<br>Tag to pull the nginx sidecar image from |
 | `timezone` | **string** · Required · Default: `America/New_York`<br>Timezone for the Claude Code instance |
 | `storage_class` | **k8sStorageClass** · Optional<br>Storage class for the persistent `/data` disk |
 | `storage_size` | **string** · Required · Default: `10Gi`<br>Storage size for the persistent `/data` disk |

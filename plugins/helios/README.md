@@ -62,7 +62,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `rheaTag` | **string** · Required · Default: `v1.2.3`<br>Rhea sidecar image tag |
 | `nginx_registry` | **string** · Required · Default: `docker.io`<br>Registry to pull the nginx sidecar image from |
 | `nginx_repo` | **string** · Required · Default: `nginx`<br>Repository to pull the nginx sidecar image from |
-| `nginx_tag` | **string** · Required · Default: `alpine`<br>Tag to pull the nginx sidecar image from |
+| `nginx_tag` | **string** · Required · Default: `1.30.7-alpine`<br>Tag to pull the nginx sidecar image from |
 | `publicAccess` | **boolean** · Required · Default: `false`<br>Disable authentication and allow unauthenticated access to the workstation |
 | `sysResource` | **boolean** · Required · Default: `false`<br>Add the `SYS_RESOURCE` capability to the Helios container so things like ulimits can be raised inside it, e.g. on AWS where node limits are too low and can't be changed |
 | `dcvLoadBalancer` | **boolean** · Required · Default: `false`<br>Creates a LoadBalancer service exposing Nice DCV on ports 8443/tcp (dcv-tcp) and 8443/udp (dcv-udp) for native DCV clients, and sets `REMOTE_PROTOCOL=dcv` on the workstation. DCV enforces its own login; the Helios web port stays behind the Hubble login. When `false`, the workstation is reached only through the ingress. Some providers (e.g. GKE, Azure) make the load balancer public by default, which puts the DCV login on the internet; use an internal load balancer annotation (see the examples below) or a VPN where possible |

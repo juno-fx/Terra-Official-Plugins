@@ -27,6 +27,6 @@ packages: ""
 terra_role:
 nginx_registry: "docker.io"
 nginx_repo: "nginx"
-nginx_tag: "latest"
+nginx_tag: "1.30.7"
 persistence_size: 1Gi
 persistence_storage_class:

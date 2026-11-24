@@ -112,7 +112,7 @@ spec:
             - name: tmp
               mountPath: /tmp
         - name: nginx
-          image: nginx:alpine
+          image: nginx:1.30.7-alpine
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000

@@ -5,7 +5,7 @@
 **Category:** Virtual Machine
 **Type:** Workload Template
 **Tags:** `virtualization` · `virtual-machine` · `crossplane` · `AWS`
-**Compatibility:** `genesis-deployment>=3.0.2` · `orion-deployment>=3.1.0`
+**Compatibility:** `genesis-deployment>=6.2.1` · `orion-deployment>=4.10.0`
 
 ---
 
@@ -28,7 +28,9 @@ This plugin requires **Crossplane** and **Crossplane AWS Provider** to be instal
 - **Crossplane** plugin installed
 - **Crossplane AWS Provider** plugin installed and configured with valid AWS credentials
 - An AWS VPC, subnet, and security groups already configured in AWS
-- Platform versions: `genesis-deployment >= 3.0.2`, `orion-deployment >= 3.1.0`
+- For the `load_balancer_*` options: the AWS cloud controller manager in the cluster (built into EKS; on self-managed clusters, install [cloud-provider-aws](https://github.com/kubernetes/cloud-provider-aws)), and subnets tagged `kubernetes.io/role/internal-elb: 1` (internal) or `kubernetes.io/role/elb: 1` (public)
+- For `vpn` and `load_balancer_internal`: a network path from your users into the VPC (VPN, Direct Connect or peering)
+- Platform versions: `genesis-deployment >= 6.2.1`, `orion-deployment >= 4.10.0`
 
 ---
 
@@ -62,8 +64,203 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `subnet_id` | **string** · Required<br>AWS Subnet ID for the instance |
 | `instance_type` | **string** · Required · Default: `t3.micro`<br>EC2 instance type (e.g. `t3.medium`, `m5.large`) |
 | `delete_on_termination` | **boolean** · Required · Default: `true`<br>Whether to delete EBS volumes when the instance is terminated |
+| `access` | **select** · Required · Default: `public`<br>How users reach the instance:<br>• `public`: directly at the instance's public address. The subnet must give instances a public IP<br>• `vpn`: directly at the instance's private IP, for users on a VPN, Direct Connect or peered network<br>• `load_balancer_internal`: through a private AWS NLB, for users on a VPN or peered network who can't route to the instance itself<br>• `load_balancer_public`: through a public AWS NLB, for users on the internet when the instance has no public address. The NLB accepts connections on `ports` from any IP address<br>With the load balancer options, Kuiper brokers the ports through a cluster Service, so the cluster must be able to route to the instance. The NLB is created by the cluster's AWS cloud provider; the AWS Load Balancer Controller is not required. If the cluster's nodes have more than one security group attached, exactly one of them must be tagged `kubernetes.io/cluster/<cluster-name>` (value `owned` or `shared`), or the NLB fails to sync with `Multiple untagged security groups found for instance` |
+| `ports` | **list** · Optional · Default: `22`<br>TCP ports users connect to (e.g. `22` for SSH, `3389` for RDP, `8443` for NICE DCV). With `public` and `vpn`, they set which connections Hubble shows, and the instance's security groups decide what's reachable: allow them from your users. With the load balancer options, they are the only ports the NLB forwards, and traffic reaches the instance from the cluster's nodes, not from users: allow them from the cluster's VPC CIDR or node security groups. Fixed at launch. An empty list exposes nothing, and Hubble shows no connection. See [NICE DCV and QUIC](#nice-dcv-and-quic) |
 | `region` | **string** · Required<br>AWS region to launch the instance in (e.g. `us-east-1`) |
 | `provider_config_ref` | **string** · Required · Default: `aws-provider-argocd-provider-config`<br>Name of the Crossplane ProviderConfig to use |
+| `iam_instance_profile` | **string** · Optional<br>IAM instance profile name to attach to every instance launched from this template (e.g. `production-artists`). Leave blank for none. Amazon DCV seats need one, see below |
+
+### IAM Instance Profiles
+
+An instance profile gives software on the EC2 instance temporary AWS credentials from an IAM role, with no access keys on the machine. Anyone with a shell on the instance can use those credentials, so a profile should only allow what the template's users need.
+
+> **Instances require IMDSv2.** Anything in the AMI that reads instance metadata must use a session token, as the boot script [below](#reading-tags-from-the-instance) does. The hop limit is 2, so containers on the instance can reach instance metadata too.
+
+Each workload template takes one profile, so access is split by template. Assign each template in Genesis to the users who should have that access. For example:
+
+| Template | `iam_instance_profile` | Assigned to | Permissions |
+|----------|------------------------|-------------|-------------|
+| Artist Workstation | `production-artists` | production artists | DCV license, read/write on the project bucket |
+| Admin Workstation | `admin-users` | admins | DCV license, plus the broader access admins need |
+
+> **Amazon DCV seats need an instance profile.** On EC2, the DCV server reads its license from an AWS-owned S3 bucket. If the instance has no profile allowing that read, DCV can't find a license and refuses every sign-in. Attach the [DCV license policy](#example-dcv-license-policy) to every role that DCV templates use.
+
+#### Creating a role in the AWS console
+
+1. **IAM → Roles → Create role**
+2. **Trusted entity type:** AWS service. **Service:** EC2. **Use case:** EC2. This sets the trust policy to `ec2.amazonaws.com` and creates an instance profile with the same name as the role. Don't pick the Spot Fleet or Scheduled Instances use cases: those roles are for AWS services, not for instances.
+3. **Add permissions:** attach the policies the instance needs (see the examples below). You can also attach none and add them later. Running instances pick up policy changes within a few minutes, without a relaunch.
+4. **Role name:** e.g. `production-artists`. Enter this name in the template's `iam_instance_profile` field.
+
+If the template names a profile that doesn't exist, AWS rejects the instance and it never becomes ready.
+
+#### Crossplane PassRole
+
+Crossplane can only attach a role it is allowed to pass. Add this to the IAM identity used by the ProviderConfig, listing every role your templates use. Skip it if that identity already has admin-level access.
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Effect": "Allow",
+    "Action": "iam:PassRole",
+    "Resource": [
+      "arn:aws:iam::<account-id>:role/production-artists",
+      "arn:aws:iam::<account-id>:role/admin-users"
+    ]
+  }]
+}
+```
+
+#### Example: DCV license policy
+
+Create this once as a customer managed policy (**IAM → Policies → Create policy → JSON**), named e.g. `dcv-license`, and attach it to every role that DCV seats use. The `*` in the bucket name covers every region.
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Effect": "Allow",
+    "Action": "s3:GetObject",
+    "Resource": "arn:aws:s3:::dcv-license.*/*"
+  }]
+}
+```
+
+To confirm it worked, check `/var/log/dcv/server.log` on the instance. There should be no license errors, and sign-ins should go through.
+
+The instance also needs network access to S3. In a private subnet without a NAT gateway, add an S3 gateway VPC endpoint (`com.amazonaws.<region>.s3`, free) to the subnet's route table. Without it, the license read fails even with the policy attached.
+
+#### Example: project bucket access
+
+For a role like `production-artists`, scope S3 access to the bucket or prefix the team works in, rather than attaching `AmazonS3FullAccess`:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "s3:ListBucket",
+      "Resource": "arn:aws:s3:::<bucket>"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
+      "Resource": "arn:aws:s3:::<bucket>/<project>/*"
+    }
+  ]
+}
+```
+
+#### Other useful policies
+
+- **AmazonSSMManagedInstanceCore** (AWS managed): Session Manager shell access to the instance without opening SSH. Useful for debugging private-subnet instances.
+- Avoid broad policies such as `AmazonS3FullAccess`, `PowerUserAccess` or `AdministratorAccess` on roles for non-admin templates. Anyone using the instance gets those credentials.
+
+### NICE DCV and QUIC
+
+DCV only supports QUIC (UDP) when the client connects straight to the instance:
+
+- **`public` / `vpn`:** QUIC works. Enable it in the AMI's `/etc/dcv/dcv.conf` and allow UDP 8443 in the instance's security groups alongside TCP 8443. Nothing is needed in `ports`.
+  ```ini
+  [connectivity]
+  enable-quic-frontend=true
+  ```
+- **`load_balancer_*`:** QUIC isn't supported through the load balancer. Set `enable-quic-frontend=false` so clients use TCP.
+
+### Instance Tags
+
+The plugin tags every instance so the AMI's boot script can tell whose seat it is. The plugin only provides the data. Reading it and acting on it (e.g. creating the user or making them the DCV session owner) is up to your boot script.
+
+| Tag | Value | When |
+|-----|-------|------|
+| `Name` | `<project>-<workload name>` | Always |
+| `orion-owner` | Username of the Orion user who launched the workload, injected by Orion's Kuiper | Always |
+
+The tags are applied as part of the launch, so they exist before the instance boots, and keep their values for its lifetime. They are visible to anyone who can view the instance in AWS, so never put secrets in tags.
+
+#### Reading tags from the instance
+
+The Crossplane AWS provider can set tags, but it can't turn on instance metadata tags for an instance, so a boot script can't read its tags from instance metadata by default. Use option 1. Option 2 works only if an account-wide setting is safe in your account.
+
+**Option 1: the EC2 API (recommended)**
+
+The boot script looks up its own tags with the AWS CLI, using the instance profile's credentials. This only affects instances using that profile.
+
+1. Give the instance an [instance profile](#iam-instance-profiles) whose role allows `ec2:DescribeTags`. Add it to the role as an inline policy, e.g. `read-instance-tags`:
+   ```json
+   {
+     "Version": "2012-10-17",
+     "Statement": [{
+       "Effect": "Allow",
+       "Action": "ec2:DescribeTags",
+       "Resource": "*"
+     }]
+   }
+   ```
+   `ec2:DescribeTags` can't be limited to specific instances, so the instance can read tags on every resource in the account. Never add `ec2:CreateTags` to the role, or users could change their instance's owner.
+2. Install the AWS CLI in the AMI.
+3. Read the tag in the boot script:
+   ```bash
+   TOKEN=$(curl -s -X PUT http://169.254.169.254/latest/api/token \
+     -H "X-aws-ec2-metadata-token-ttl-seconds: 300")
+   ID=$(curl -sf -H "X-aws-ec2-metadata-token: $TOKEN" \
+     http://169.254.169.254/latest/meta-data/instance-id)
+   REGION=$(curl -sf -H "X-aws-ec2-metadata-token: $TOKEN" \
+     http://169.254.169.254/latest/meta-data/placement/region)
+
+   for i in $(seq 1 24); do
+     OWNER=$(aws ec2 describe-tags --region "$REGION" \
+       --filters "Name=resource-id,Values=$ID" "Name=key,Values=orion-owner" \
+       --query 'Tags[0].Value' --output text 2>/dev/null || true)
+     [ -n "$OWNER" ] && [ "$OWNER" != "None" ] && break
+     sleep 5
+   done
+   [ -n "$OWNER" ] && [ "$OWNER" != "None" ] || { echo "no orion-owner tag" >&2; exit 1; }
+   ```
+   The loop waits up to two minutes in case the role's credentials aren't available yet early in boot. It normally succeeds on the first try. Reading the instance ID and region from instance metadata needs no extra setting.
+4. In a private subnet without a NAT gateway, add an EC2 interface VPC endpoint (`com.amazonaws.<region>.ec2`) so the instance can reach the EC2 API.
+
+**Option 2: instance metadata (account-wide setting)**
+
+Instance metadata can serve an instance's tags, with no AWS permissions or CLI needed. It's off by default, and the only way to turn it on for these instances is an account default, per region:
+
+```bash
+aws ec2 modify-instance-metadata-defaults --instance-metadata-tags enabled --region <region>
+aws ec2 get-instance-metadata-defaults --region <region>
+```
+
+> **This applies to every instance launched in that account and region, not just these.** Instance metadata tags don't allow tag keys containing `/`, and EKS and Karpenter nodes use keys like `kubernetes.io/cluster/<name>` and `karpenter.sh/nodepool`. If your cluster's nodes launch in the same account and region, the default may stop them launching. Test it in a region you don't use first, or use option 1. To undo it, run the same command with `--instance-metadata-tags no-preference`.
+
+It only applies to instances launched after the change. Then read the tag in the boot script:
+
+```bash
+TOKEN=$(curl -s -X PUT http://169.254.169.254/latest/api/token \
+  -H "X-aws-ec2-metadata-token-ttl-seconds: 300")
+OWNER=$(curl -sf -H "X-aws-ec2-metadata-token: $TOKEN" \
+  http://169.254.169.254/latest/meta-data/tags/instance/orion-owner)
+```
+
+If your boot script already reads the owner from a tag with a different name, change it to read `orion-owner`.
+
+#### Per-image settings
+
+Settings that are the same for every seat built from an image belong in the AMI, not in the plugin. Bake them into the image itself or into its boot script. Build a separate AMI for each variant, and point each workload template at the right one with `ami_image_id`.
+
+For example, the DCV sign-in method is set under `[security]` in `/etc/dcv/dcv.conf`:
+
+- **Password:** `authentication="system"`. This is DCV's default.
+- **Broker:** `authentication="none"`, with `auth-token-verifier` set to your broker's token verifier:
+  ```ini
+  [security]
+  authentication="none"
+  auth-token-verifier="<your broker's token verifier URL>"
+  ```
+
+To offer both methods, build one AMI per method and give each its own workload template.
+
+The plugin only says who the seat belongs to (`orion-owner`). It doesn't provide sign-in credentials: passwords or tokens come from whatever the AMI is set up with, such as a directory join (AD/LDAP) or your session broker.
 
 ---
 

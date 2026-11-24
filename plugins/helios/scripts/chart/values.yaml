@@ -22,7 +22,7 @@ loadBalancerAnnotations: []
 sysResource: false
 nginx_registry: "docker.io"
 nginx_repo: "nginx"
-nginx_tag: "alpine"
+nginx_tag: "1.30.7-alpine"
 idx: 0
 guid: 0
 puid: 0
