@@ -58,8 +58,9 @@ fields:
     default: 10
   - name: preconfigured_gpu_memory
     description: |
-      GPU memory in MiB to assume per GPU when the driver reports none (unified-memory
-      systems such as DGX Spark; a 128 GB Spark takes about 98304). 0 uses the driver's value.
+      GPU memory in MiB to register for a GPU whose memory the driver cannot report: GB10
+      unified-memory systems (DGX Spark and its OEM equivalents; 128 GB takes about 98304).
+      GPUs that report their memory ignore this. 0 skips GPUs that cannot report it.
     required: false
     type: int
     default: 0

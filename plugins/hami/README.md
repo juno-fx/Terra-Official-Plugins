@@ -62,8 +62,9 @@ users and is served from the Genesis host under `/hami`, behind the Genesis auth
   dashboard panels. The plugin creates its ServiceMonitors only when the CRDs exist, so HAMi
   installs without Prometheus; the dashboard then stays empty until Prometheus is added.
 - **Genesis reachable over HTTPS** on `host`; the dashboard is embedded in Genesis as an iFrame.
-- **A GPU node with a working `nvidia-smi`.** Unified-memory systems such as NVIDIA DGX Spark
-  (GB10) report `memory.total` as `N/A`; set `preconfigured_gpu_memory` for those (see Notes).
+- **A GPU node with a working `nvidia-smi`.** GB10 unified-memory systems (NVIDIA DGX Spark and
+  OEM equivalents) report `memory.total` as `N/A`; set `preconfigured_gpu_memory` for those
+  (see Notes).
 - **For AMD GPUs (`enable_amd`):** the **AMD GPU Operator** plugin installed with
   `device_plugin` set to `false` (its labeller and metrics exporter keep running; the HAMi AMD
   plugin even reads the exporter's health socket). Wait for the operator's device-plugin
@@ -98,7 +99,7 @@ The plugin is editable: fields can be changed after install and Argo CD rolls th
 | `scheduler_node_policy` | **select** · Optional · Default: `binpack`<br>Placement across nodes. `binpack` fills one node before using the next; `spread` distributes |
 | `scheduler_gpu_policy` | **select** · Optional · Default: `spread`<br>Placement across the GPUs of one node. `spread` uses every GPU before doubling up; `binpack` fills one GPU first |
 | `device_split_count` | **int** · Optional · Default: `10`<br>Maximum number of workloads sharing one physical GPU |
-| `preconfigured_gpu_memory` | **int** · Optional · Default: `0`<br>Total GPU memory in MiB to assume per GPU when the driver cannot report it (DGX Spark / GB10). `0` uses the driver's value |
+| `preconfigured_gpu_memory` | **int** · Optional · Default: `0`<br>GPU memory in MiB to register for a GPU whose memory the driver cannot report: GB10 unified-memory systems (DGX Spark and OEM equivalents such as ASUS Ascent GX10, Dell Pro Max GB10; 128 GB takes about `98304`). GPUs that report their memory ignore this, so it is safe in mixed clusters. `0` skips GPUs that cannot report it |
 | `gpu_core_policy` | **select** · Optional · Default: `default`<br>When the `nvidia.com/gpucores` limit is enforced. `default`: only while another HAMi workload is active on the same GPU, so a lone workload runs at full speed. `force`: always. `disable`: never (gpucores only drives scheduling). Applies to workloads launched after a change. AMD compute slices are hardware masks and ignore this |
 | `report_node_capacity` | **boolean** · Optional · Default: `false`<br>Both device plugins also publish each GPU node's total `gpumem` and `gpucores` (`nvidia.com/` and `amd.com/`) in node capacity and allocatable. Needed for Karpenter to scale GPU nodes from zero for sliced workloads and to consolidate them again (see Autoscaling) |
 | `enable_amd` | **boolean** · Optional · Default: `false`<br>Also share AMD GPUs: installs HAMi's AMD device plugin on nodes labelled `feature.node.kubernetes.io/amd-gpu=true` and lets the scheduler handle `amd.com/gpu`, `amd.com/gpumem`, `amd.com/gpucores`. Needs the AMD GPU Operator with `device_plugin` off. Off leaves AMD pods to the operator, whole GPU each |
@@ -240,9 +241,11 @@ per GPU. With `enable_amd` the AMD device plugin does the same for `amd.com/gpum
 - **Install order matters.** GPU Operator first, with its device plugin disabled; then HAMi.
   Installing HAMi while the operator's device plugin still runs leaves two plugins registering
   `nvidia.com/gpu` on each node.
-- **DGX Spark / GB10** share system memory with the GPU and `nvidia-smi` reports no total.
-  Without `preconfigured_gpu_memory` HAMi registers the node with zero GPU memory and no slice
-  can be placed there. A 128 GB Spark takes about `98304`. On top of that, HAMi 2.11.0 validates
+- **GB10 systems (DGX Spark, ASUS Ascent GX10, Dell Pro Max GB10 and other OEM boxes)** share
+  system memory with the GPU and `nvidia-smi` reports no total. Without `preconfigured_gpu_memory`
+  HAMi skips the GPU and no slice can be placed there. A 128 GB box takes about `98304`. The
+  value is only read for GPUs whose memory NVML cannot query; discrete GPUs in the same cluster
+  keep their reported memory. On top of that, HAMi 2.11.0 validates
   percentage-sized allocations against the NVML memory value, which is 0 on GB10, so a plain
   `nvidia.com/gpu: 1` request fails at Allocate with "allocated N MB … but requests 0 MB". The
   plugin's `default_gpu_memory` of 8192 gives every such request an absolute size, so plain GPU
