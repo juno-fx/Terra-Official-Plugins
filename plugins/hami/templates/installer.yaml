@@ -106,15 +106,19 @@ spec:
         # The GPU Operator already runs a DCGM exporter on the GPU nodes.
         dcgm-exporter:
           enabled: false
+        {{- /* Only when the Prometheus Operator CRDs exist (kube-prometheus-stack plugin).
+             Without them the ServiceMonitors fail the sync. Argo CD re-renders on refresh,
+             so installing Prometheus later is enough; the panels stay empty until then. */}}
+        {{- $prom := .Capabilities.APIVersions.Has "monitoring.coreos.com/v1" }}
         hamiServiceMonitor:
-          enabled: true
+          enabled: {{ $prom }}
           svcNamespace: kube-system
           {{- with .Values.prometheus_release_label }}
           additionalLabels:
             release: {{ . | quote }}
           {{- end }}
         serviceMonitor:
-          enabled: true
+          enabled: {{ $prom }}
           {{- with .Values.prometheus_release_label }}
           additionalLabels:
             release: {{ . | quote }}
@@ -169,7 +173,11 @@ spec:
           # Same sharing limits as the NVIDIA side. 0 would let the plugin pick per GPU.
           splitCount: {{ .Values.device_split_count }}
           deviceMemoryScaling: {{ .Values.device_memory_scaling }}
+          # Same as the NVIDIA side: total amd.com/gpumem and amd.com/gpucores in node capacity.
+          reportNodeCapacity: {{ .Values.report_node_capacity }}
         # Only nodes the AMD GPU Operator has recognised. Its NFD rule sets this label.
+        # Nodes the operator targets with vgpu_nodes carry amd-vgpu instead and are not
+        # covered: HAMi's AMD plugin needs the physical device.
         # Helm merges this map with the chart's default selector, so the default
         # pci-0300_1002 key is removed explicitly: APUs are PCI class 0380 (display,
         # not VGA) and never get that NFD label, which left the DaemonSet at 0 pods.

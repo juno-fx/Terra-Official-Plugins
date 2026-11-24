@@ -1,13 +1,13 @@
 # Install-time fields (terra.yaml), in form order.
 version: "2.11.0"
 helm_repo: "https://project-hami.github.io/HAMi/"
+host: ""
 scheduler_node_policy: binpack
 scheduler_gpu_policy: spread
 device_split_count: 10
 preconfigured_gpu_memory: 0
 gpu_core_policy: default
 report_node_capacity: false
-host: ""
 enable_amd: false
 
 # Fixed settings. Not in the Terra form: each has one right answer for this catalog.

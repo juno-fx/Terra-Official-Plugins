@@ -19,12 +19,13 @@ HAMi sits on top of the NVIDIA GPU Operator. The operator keeps providing driver
 toolkit, the `nvidia` RuntimeClass, Node Feature Discovery and the DCGM exporter. HAMi replaces
 only the device plugin and adds its own scheduler extender.
 
-The plugin installs two Argo CD Applications into `kube-system`:
+The plugin installs two Argo CD Applications into `kube-system`, three with `enable_amd`:
 
 | Application | Chart | Role |
 |-------------|-------|------|
 | `<release>-hami` | [`hami`](https://project-hami.github.io/HAMi/) | scheduler, webhook, device plugin |
 | `<release>-hami-webui` | [`hami-webui`](https://github.com/Project-HAMi/HAMi-WebUI) 2.0.0 (from git) | GPU dashboard, embedded in Genesis |
+| `<release>-hami-amd` | [`amd-gpu`](https://github.com/Project-HAMi/amd-device-plugin) (from git, `enable_amd` only) | AMD device plugin |
 
 The dashboard is a Genesis **dashboard plugin**: it appears in the Genesis sidebar for admin
 users and is served from the Genesis host under `/hami`, behind the Genesis authentication gate.
@@ -57,8 +58,9 @@ users and is served from the Genesis host under `/hami`, behind the Genesis auth
   plugin set `device_plugin` to `false` (the plugin is editable) and wait for the operator's
   device-plugin DaemonSet to disappear before installing HAMi. Its `slice_count` has no effect
   while the device plugin is off.
-- **Prometheus with the Prometheus Operator CRDs** (the `kube-prometheus-stack` plugin). The
-  dashboard creates ServiceMonitors and reads every panel from Prometheus.
+- **Prometheus with the Prometheus Operator CRDs** (the `kube-prometheus-stack` plugin) for the
+  dashboard panels. The plugin creates its ServiceMonitors only when the CRDs exist, so HAMi
+  installs without Prometheus; the dashboard then stays empty until Prometheus is added.
 - **Genesis reachable over HTTPS** on `host`; the dashboard is embedded in Genesis as an iFrame.
 - **A GPU node with a working `nvidia-smi`.** Unified-memory systems such as NVIDIA DGX Spark
   (GB10) report `memory.total` as `N/A`; set `preconfigured_gpu_memory` for those (see Notes).
@@ -66,7 +68,9 @@ users and is served from the Genesis host under `/hami`, behind the Genesis auth
   `device_plugin` set to `false` (its labeller and metrics exporter keep running; the HAMi AMD
   plugin even reads the exporter's health socket). Wait for the operator's device-plugin
   DaemonSet to disappear before turning `enable_amd` on. Nodes need `/dev/kfd`, `/dev/dri`
-  and the operator's `feature.node.kubernetes.io/amd-gpu=true` label.
+  and the operator's `feature.node.kubernetes.io/amd-gpu=true` label. Nodes the operator
+  targets with `vgpu_nodes` (label `amd-vgpu`) are not covered: HAMi's AMD plugin needs the
+  physical device.
 
 ---
 
@@ -90,20 +94,20 @@ The plugin is editable: fields can be changed after install and Argo CD rolls th
 |-------|---------|
 | `version` | **select** · Required · Default: `2.11.0`<br>HAMi chart version |
 | `helm_repo` | **string** · Required · Default: `https://project-hami.github.io/HAMi/`<br>Helm repository for the HAMi chart |
+| `host` | **string** · Required<br>DNS name of the Genesis host; the dashboard Ingress and iFrame use it |
 | `scheduler_node_policy` | **select** · Optional · Default: `binpack`<br>Placement across nodes. `binpack` fills one node before using the next; `spread` distributes |
 | `scheduler_gpu_policy` | **select** · Optional · Default: `spread`<br>Placement across the GPUs of one node. `spread` uses every GPU before doubling up; `binpack` fills one GPU first |
 | `device_split_count` | **int** · Optional · Default: `10`<br>Maximum number of workloads sharing one physical GPU |
 | `preconfigured_gpu_memory` | **int** · Optional · Default: `0`<br>Total GPU memory in MiB to assume per GPU when the driver cannot report it (DGX Spark / GB10). `0` uses the driver's value |
 | `gpu_core_policy` | **select** · Optional · Default: `default`<br>When the `nvidia.com/gpucores` limit is enforced. `default`: only while another HAMi workload is active on the same GPU, so a lone workload runs at full speed. `force`: always. `disable`: never (gpucores only drives scheduling). Applies to workloads launched after a change. AMD compute slices are hardware masks and ignore this |
-| `report_node_capacity` | **boolean** · Optional · Default: `false`<br>HAMi's device plugin also publishes each GPU node's total `nvidia.com/gpumem` and `nvidia.com/gpucores` in node capacity and allocatable. Needed for Karpenter to scale GPU nodes from zero for sliced workloads and to consolidate them again (see Autoscaling) |
-| `host` | **string** · Required<br>DNS name of the Genesis host; the dashboard Ingress and iFrame use it |
+| `report_node_capacity` | **boolean** · Optional · Default: `false`<br>Both device plugins also publish each GPU node's total `gpumem` and `gpucores` (`nvidia.com/` and `amd.com/`) in node capacity and allocatable. Needed for Karpenter to scale GPU nodes from zero for sliced workloads and to consolidate them again (see Autoscaling) |
 | `enable_amd` | **boolean** · Optional · Default: `false`<br>Also share AMD GPUs: installs HAMi's AMD device plugin on nodes labelled `feature.node.kubernetes.io/amd-gpu=true` and lets the scheduler handle `amd.com/gpu`, `amd.com/gpumem`, `amd.com/gpucores`. Needs the AMD GPU Operator with `device_plugin` off. Off leaves AMD pods to the operator, whole GPU each |
 
 ### Fixed Settings
 
-These used to be form fields. Each has one right answer for this catalog, so they now live in the
-plugin's `values.yaml` and are not asked at install time. Change them in a fork if an environment
-needs a mirror or a different pin.
+Each of these has one right answer for this catalog, so they live in the plugin's `values.yaml`
+and are not asked at install time. Change them in a fork if an environment needs a mirror or a
+different pin.
 
 | Setting | Value | Why fixed |
 |---------|-------|-----------|
@@ -147,8 +151,8 @@ resources:
     nvidia.com/gpucores: 30
 ```
 
-Workload templates in this catalog (for example `jupyter-notebook` with `gpu` on and
-`gpu_vendor: nvidia`) request `nvidia.com/gpu: "1"`. With HAMi installed that becomes an 8 GiB
+Workload templates in this catalog (for example `jupyter-notebook` with `gpu` set to `nvidia`)
+request `nvidia.com/gpu: "1"`. With HAMi installed that becomes an 8 GiB
 slice (`default_gpu_memory`). `jupyter-notebook` sets memory and cores from env; other templates
 get the default until they grow their own fields.
 
@@ -166,7 +170,9 @@ Prometheus query.
   `'self'` so only the Genesis host may embed it. This is why the plugin needs chart 2.0.0: the
   1.x dashboard can only live at `/`.
 - Two ServiceMonitors (HAMi device-plugin metrics in `kube-system`, and the dashboard's own
-  exporter) carry `release: prometheus` so the catalog's Prometheus picks them up. The chart's
+  exporter) carry `release: prometheus` so the catalog's Prometheus picks them up. They are
+  rendered only while the Prometheus Operator CRDs exist; Argo CD adds them on the next refresh
+  after the Prometheus plugin is installed. The chart's
   bundled Prometheus and DCGM exporter stay off because the cluster already has both.
 - **Utilisation panels need DCGM metrics in Prometheus.** Allocation data comes from HAMi's own
   exporter and works out of the box. Per-GPU utilisation and memory-used graphs come from the GPU
@@ -224,7 +230,8 @@ stays up until someone deletes the NodeClaim by hand, so enable the field before
 
 `report_node_capacity` is harmless on clusters without an autoscaler: the extra capacity
 entries make kube-scheduler and kubelet check slice totals per node, which HAMi already enforces
-per GPU. AMD nodes are not covered yet.
+per GPU. With `enable_amd` the AMD device plugin does the same for `amd.com/gpumem` and
+`amd.com/gpucores`; the NodeOverlay for an AMD instance type declares those names instead.
 
 ---
 
