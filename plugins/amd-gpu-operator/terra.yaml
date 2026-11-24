@@ -36,9 +36,10 @@ fields:
     type: boolean
   - name: detect_all_gpus
     description: |
-      Label every node with an AMD GPU, including integrated GPUs and cards outside AMD's
-      supported list (Ryzen AI, Strix Halo). Off labels only Instinct, Radeon Pro and
-      selected Radeon RX; other nodes then need the amd-gpu label added by hand.
+      Which nodes count as AMD GPU nodes. On labels any node with an AMD GPU, integrated
+      GPUs and unlisted cards included (Ryzen AI, Strix Halo). Off labels only AMD's
+      supported list (Instinct, Radeon Pro, selected Radeon RX); other nodes then need the
+      amd-gpu label added by hand. Labelling alone does not make GPUs schedulable.
     required: false
     default: true
     type: boolean
@@ -51,9 +52,9 @@ fields:
     type: boolean
   - name: device_plugin
     description: |
-      Run the operator's own device plugin, which advertises amd.com/gpu. Turn off before
-      enabling AMD in the HAMi plugin, which brings its own. Node labelling and the metrics
-      exporter keep running.
+      Make the GPUs on labelled nodes schedulable as amd.com/gpu. Turn off to hand that job
+      to a third-party installed GPU scheduler like HAMi, which brings its own device plugin.
+      Node labelling and the metrics exporter keep running.
     required: false
     default: true
     type: boolean

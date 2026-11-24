@@ -51,9 +51,9 @@ This plugin installs the upstream [ROCm/gpu-operator](https://github.com/ROCm/gp
 | `version` | **select** · Required · Default: `v1.5.1`<br>AMD GPU Operator version to install (`v1.5.1`, `v1.5.0` or `v1.4.1`) |
 | `helm_repo` | **string** · Required · Default: `https://rocm.github.io/gpu-operator`<br>Helm repository URL for the AMD GPU Operator chart |
 | `install_nfd` | **boolean** · Optional · Default: `false`<br>Install Node Feature Discovery (NFD), which labels the GPU nodes for the operator. Only one NFD install per cluster: off by default because the NVIDIA GPU Operator plugin already installs it. Turn on only when nothing else provides NFD. |
-| `detect_all_gpus` | **boolean** · Optional · Default: `true`<br>Label every node that has an AMD GPU, including integrated GPUs and cards outside AMD's supported list (e.g. Ryzen AI / Strix Halo). Set to `false` to label only supported GPUs (Instinct, Radeon Pro, selected Radeon RX). |
+| `detect_all_gpus` | **boolean** · Optional · Default: `true`<br>Which nodes count as AMD GPU nodes. `true` labels any node with an AMD GPU, integrated GPUs and unlisted cards included (e.g. Ryzen AI / Strix Halo). `false` labels only AMD's supported list (Instinct, Radeon Pro, selected Radeon RX). Labelling alone does not make GPUs schedulable. |
 | `vgpu_nodes` | **boolean** · Optional · Default: `false`<br>Target nodes labelled `amd-vgpu` instead of `amd-gpu`. Use when the nodes are virtual machines that see an AMD GPU virtual function. |
-| `device_plugin` | **boolean** · Optional · Default: `true`<br>Run the operator's own device plugin. Turn off before enabling AMD in the HAMi GPU Sharing plugin, which brings its own. Node labelling and the metrics exporter keep running. |
+| `device_plugin` | **boolean** · Optional · Default: `true`<br>Make the GPUs on labelled nodes schedulable as `amd.com/gpu`. Turn off to hand that job to a third-party installed GPU scheduler like HAMi, which brings its own device plugin. Node labelling and the metrics exporter keep running. |
 
 ---
 
