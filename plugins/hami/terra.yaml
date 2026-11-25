@@ -1,0 +1,102 @@
+resource_id: hami
+name: HAMi GPU Sharing
+icon: https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/hami/assets/hami-graph-color.svg
+description: |
+  Share one physical GPU between several workloads. HAMi slices GPUs into fractions with
+  memory limits and compute quotas, on top of the GPU Operator which keeps providing
+  drivers and the container runtime. Includes the HAMi-WebUI GPU dashboard, embedded in
+  Genesis. https://project-hami.io
+category: Hardware
+tags:
+  - gpu
+  - hami
+  - gpu-sharing
+  - dashboard
+  - cluster-level
+editable: true
+fields:
+  - name: version
+    description: |
+      HAMi chart version to install. This plugin was built and tested with 2.11.0.
+      Newer versions may have breaking changes (chart values, resource names, WebUI
+      compatibility), so check the HAMi release notes before moving off 2.11.0.
+    required: true
+    type: string
+    default: "2.11.0"
+  - name: helm_repo
+    description: Helm repository URL for the HAMi chart.
+    required: true
+    type: string
+    default: "https://project-hami.github.io/HAMi/"
+  - name: host
+    description: The DNS name of your Genesis host, for the GPU dashboard.
+    required: true
+    type: string
+  - name: prefix
+    description: |
+      URL path of the GPU dashboard on the Genesis host, i.e. /hami. Change it only if
+      another plugin already uses that path.
+    required: false
+    type: string
+    default: "/hami"
+  - name: scheduler_node_policy
+    description: |
+      How GPU workloads are placed across nodes. binpack fills one node before using the
+      next; spread distributes workloads across nodes.
+    required: false
+    type: select
+    default: binpack
+    options:
+      - binpack
+      - spread
+  - name: scheduler_gpu_policy
+    description: |
+      How GPU workloads are placed across the GPUs of one node. spread uses every GPU
+      before doubling up; binpack fills one GPU first.
+    required: false
+    type: select
+    default: spread
+    options:
+      - binpack
+      - spread
+  - name: device_split_count
+    description: Maximum number of workloads that may share one physical GPU.
+    required: false
+    type: int
+    default: 10
+  - name: preconfigured_gpu_memory
+    description: |
+      GPU memory in MiB to register for a GPU whose memory the driver cannot report: GB10
+      unified-memory systems (DGX Spark and its OEM equivalents; 128 GB takes about 98304).
+      GPUs that report their memory ignore this. 0 skips GPUs that cannot report it.
+    required: false
+    type: int
+    default: 0
+  - name: gpu_core_policy
+    description: |
+      When the gpucores limit is enforced. default: only while another HAMi workload shares
+      the GPU. force: always. disable: never, gpucores then only drives scheduling. Applies
+      to workloads launched after a change. AMD compute slices always apply.
+    required: false
+    type: select
+    default: default
+    options:
+      - default
+      - force
+      - disable
+  - name: report_node_capacity
+    description: |
+      Publish each GPU node's total gpumem and gpucores (nvidia.com and amd.com) in node
+      capacity, so Karpenter can scale a GPU node pool from zero for sliced workloads and
+      consolidate it again. Needs a NodeOverlay too (see README). Harmless elsewhere.
+    required: false
+    type: boolean
+    default: false
+  - name: enable_amd
+    description: |
+      Also share AMD GPUs through HAMi's AMD device plugin. The AMD GPU Operator plugin must
+      run with device_plugin off first; kubelet serves amd.com/gpu from one plugin only. Off
+      leaves AMD pods to the operator, whole GPU each.
+    required: false
+    type: boolean
+    default: false
