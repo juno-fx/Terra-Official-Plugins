@@ -65,7 +65,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `nginx_tag` | **string** · Required · Default: `1.30.7-alpine`<br>Tag to pull the nginx sidecar image from |
 | `publicAccess` | **boolean** · Required · Default: `false`<br>Disable authentication and allow unauthenticated access to the workstation |
 | `dcvLoadBalancer` | **boolean** · Required · Default: `false`<br>Creates a LoadBalancer service exposing Nice DCV on port 8443/tcp (dcv-tcp) for native DCV clients (add QUIC with `dcvQuic`), and sets `REMOTE_PROTOCOL=dcv` on the workstation. Requires the `PASSWORD` environment variable, set at launch (Hubble → Advanced) or in the template's env; it is needed to sign in through the load balancer, and without it DCV does not listen on 8443 even though the load balancer is created. A password set in the template is shared by every workstation launched from it. DCV enforces its own login; the Helios web port stays behind the Hubble login. When `false`, the workstation is reached only through the ingress. Some providers (e.g. GKE, Azure) make the load balancer public by default, which puts the DCV login on the internet; use an internal load balancer annotation (see the examples below) or a VPN where possible |
-| `dcvQuic` | **boolean** · Required · Default: `false`<br>Also exposes Nice DCV on port 8443/udp (dcv-udp) for QUIC (only used when `dcvLoadBalancer` is `true`). The Helios image always listens for QUIC; this opens the port on the load balancer and network policy. The load balancer must support TCP and UDP on the same port. On AWS this needs the AWS Load Balancer Controller installed; the built-in AWS cloud provider cannot create a mixed TCP/UDP load balancer and the service stays pending. Enable QUIC in the DCV client's connection settings to use it |
+| `dcvQuic` | **boolean** · Required · Default: `false`<br>Also exposes Nice DCV on port 8443/udp (dcv-udp) for QUIC (only used when `dcvLoadBalancer` is `true`). The Helios image always listens for QUIC; this opens the port on the load balancer and network policy. The load balancer must support TCP and UDP on the same port. On AWS this needs the AWS Load Balancer Controller installed and its annotations set (see [AWS](#aws) below); the built-in AWS cloud provider cannot create a mixed TCP/UDP load balancer and the service stays pending. Enable QUIC in the DCV client's connection settings to use it |
 | `loadBalancerAnnotations` | **list** · Optional · Default: empty<br>Extra annotations added to the DCV LoadBalancer service (only used when `dcvLoadBalancer` is `true`). Each entry has a `key` and a `value`; any cloud provider's load balancer annotations work. Example for CoreWeave: key `service.beta.kubernetes.io/coreweave-load-balancer-type`, value `public` |
 
 ### LoadBalancer Annotation Examples
@@ -75,11 +75,28 @@ Common entries for `loadBalancerAnnotations`, by provider. Add one list entry pe
 | Provider | Key | Value | Effect |
 |----------|-----|-------|--------|
 | CoreWeave | `service.beta.kubernetes.io/coreweave-load-balancer-type` | `public` | Gives the load balancer a public IP |
-| AWS | `service.beta.kubernetes.io/aws-load-balancer-type` | `nlb` | Provisions a TCP NLB through the cluster's built-in AWS cloud provider; no extra controller needed |
-| AWS | `service.beta.kubernetes.io/aws-load-balancer-scheme` | `internet-facing` or `internal` | Public or VPC-only load balancer, for public or private subnets |
+| AWS | See [AWS](#aws) below | | |
 | GKE | `networking.gke.io/load-balancer-type` | `Internal` | VPC-only load balancer |
 | Azure | `service.beta.kubernetes.io/azure-load-balancer-internal` | `true` | VNet-only load balancer |
 | MetalLB | `metallb.io/address-pool` | name of an `IPAddressPool` | Allocates the IP from a specific pool (older MetalLB: `metallb.universe.tf/address-pool`) |
+
+#### AWS
+
+AWS load balancers come from either the cluster's built-in AWS cloud provider or the [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller/). TCP works with both. UDP (`dcvQuic`) works only with the AWS Load Balancer Controller, because the built-in provider cannot create a load balancer with TCP and UDP on the same port.
+
+| Key | Built-in provider (TCP) | AWS Load Balancer Controller (TCP, or TCP + UDP) |
+|-----|-------------------------|--------------------------------------------------|
+| `service.beta.kubernetes.io/aws-load-balancer-type` | `nlb` | `external` |
+| `service.beta.kubernetes.io/aws-load-balancer-scheme` | `internet-facing` or `internal` | `internet-facing` or `internal` |
+| `service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled` | `true` (recommended) | `true` (recommended) |
+| `service.beta.kubernetes.io/aws-load-balancer-nlb-target-type` | not used | `ip` or `instance` |
+| `service.beta.kubernetes.io/aws-load-balancer-enable-tcp-udp-listener` | not used | `true` when `dcvQuic` is on |
+
+- **type**: `nlb` provisions the NLB through the built-in provider. `external` hands the service to the AWS Load Balancer Controller instead.
+- **scheme**: `internet-facing` for a public load balancer in public subnets, `internal` for a VPC-only one in private subnets.
+- **cross-zone**: recommended whenever the load balancer spans more than one availability zone. The workstation pod runs in a single zone; without cross-zone, clients routed to another zone can fail to connect. It can be skipped when the load balancer uses subnets in only one zone. Cross-zone traffic is billed as inter-AZ data transfer.
+- **target type**: `ip` sends traffic straight to the pod (EKS with the Amazon VPC CNI); `instance` goes through a NodePort on the nodes.
+- **tcp-udp listener**: combines 8443 TCP and UDP into one TCP_UDP listener. Without it the controller creates a TCP-only listener and QUIC traffic is dropped at the load balancer.
 
 ### Custom Environment Variables
 
