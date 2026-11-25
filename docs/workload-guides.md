@@ -24,7 +24,9 @@ metadata:
     # Whitelist which actions users can trigger on this StatefulSet via the Kuiper API.
     kuiper.juno-innovations.com/actions: "restart"
     # Expose static connection details in the Hubble UI alongside this workload's endpoints.
-    kuiper.juno-innovations.com/connection: "username={{ .Values.user }},port=8080"
+    # Only list a port clients can reach directly. Here only the sidecar port is exposed, and
+    # browsers reach it through the Ingress, so no port is advertised.
+    kuiper.juno-innovations.com/connection: "username={{ .Values.user }}"
   labels:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
 spec:
@@ -43,6 +45,10 @@ spec:
           image: "{{ .Values.nginx_registry }}/{{ .Values.nginx_repo }}:{{ .Values.nginx_tag }}"
           ports:
             - containerPort: 8080
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
           volumeMounts:
             - name: nginx
               mountPath: /etc/nginx/nginx.conf

@@ -100,7 +100,8 @@ authoring time to web workloads, not to the scaffold.
 
 ### Resources & scheduling → `concepts/scheduling.md`, `concepts/affinity.md`
 
-- [MUST] `requests` always present (template baseline)
+- [MUST] `requests` always present (template baseline), on every container, including the nginx
+  sidecar (fixed `50m`/`64Mi`, as the catalog plugins use)
 - [SHOULD] `limits` when the workload is bounded or the namespace is multi-tenant; memory limits
   mean OOMKill — set with headroom
 - [MUST] Replicas honest: 1 for stateful; >1 only with readiness and no shared-state assumption

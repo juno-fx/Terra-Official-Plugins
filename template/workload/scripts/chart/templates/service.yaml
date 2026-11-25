@@ -4,9 +4,11 @@ metadata:
   name: "{{ .Values.name }}"
   # Optional Kuiper annotations. Uncomment to enable — see AGENTS.md for the full reference.
   #
-  # Surface connection details (e.g. credentials, ports) in the Hubble UI endpoint list.
+  # Surface connection details (e.g. credentials) in the Hubble UI endpoint list.
+  # Only advertise a port this Service exposes and the NetworkPolicy admits. The app port is
+  # neither, so add a direct-connect port to both before listing it here.
   # annotations:
-  #   kuiper.juno-innovations.com/connection: "username=admin,port={{ .Values.port }}"
+  #   kuiper.juno-innovations.com/connection: "username=admin"
 spec:
   selector:
     kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"

@@ -171,6 +171,6 @@ looking like it worked. Update all four in the same pass. If the chart renders a
 ## See also
 
 - `concepts/runtime.md` — nginx sidecar container, config, port, image pinning
-- `plugins/wetty/` — simplest sidecar reference; `plugins/n8n/` — rewrites, public paths, rate limits
+- `template/workload/` — canonical sidecar implementation; `plugins/n8n/` — rewrites, public paths, rate limits
 - `concepts/labels-annotations.md` — full annotation reference
 - `docs/workload-configuration.md` — ingress auth patterns

@@ -75,8 +75,8 @@ The rest of the pattern:
   (`proxy_read_timeout`, `client_max_body_size`, `proxy_buffering`, `rewrite`). Never add them to
   the Ingress as `nginx.ingress.kubernetes.io/*` annotations.
 
-`plugins/wetty/` is the simplest complete example. The scaffold created by `make new-plugin`
-ships the full pattern.
+The scaffold created by `make new-plugin` (`template/workload/`) ships the full pattern and is
+the canonical example. Existing plugins predate parts of it, so copy from the scaffold.
 
 ### Namespaced and cluster-level plugins — Genesis
 

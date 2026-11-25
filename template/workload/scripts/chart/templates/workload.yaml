@@ -12,7 +12,9 @@ metadata:
     # kuiper.juno-innovations.com/actions: "restart,stop"
     #
     # Surface extra connection details in the Hubble UI endpoint list.
-    # kuiper.juno-innovations.com/connection: "username={{ .Values.user }},port={{ .Values.port }}"
+    # Only advertise a port clients can reach. The Service and NetworkPolicy expose the sidecar
+    # port alone, so a direct-connect port must be added to both before it is listed here.
+    # kuiper.juno-innovations.com/connection: "username={{ .Values.user }}"
   labels:
     # Kuiper injects this ownership label at launch; declaring it keeps the
     # selector and pod template (below) consistent with that injected value.
@@ -48,6 +50,10 @@ spec:
           ports:
             - containerPort: 8080
               name: nginx
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
           volumeMounts:
             - name: nginx
               mountPath: /etc/nginx/nginx.conf

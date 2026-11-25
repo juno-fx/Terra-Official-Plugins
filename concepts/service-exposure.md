@@ -9,6 +9,34 @@ HTTP workloads go to `concepts/ingress.md` (auth, paths, Hubble endpoint visibil
 coexist: a game server can ship an ingress for its web admin alongside a NodePort Service for the
 game port.
 
+## Starting from the workload scaffold
+
+`template/workload/` is built for HTTP: the Service and Ingress route to the nginx sidecar on
+`8080`, and the NetworkPolicy admits **only TCP 8080**. If you add a non-HTTP port to the Service
+and leave the NetworkPolicy alone, its traffic is dropped silently. The Service exists, clients
+time out, and nothing reports an error.
+
+- **Non-HTTP only (no web UI)** — remove the sidecar pieces: `templates/ingress.yaml`,
+  `templates/nginx.yaml`, `files/nginx/`, the `nginx` container and its volume in
+  `workload.yaml`, the `nginx_registry`/`nginx_repo`/`nginx_tag` fields (from `metadata.yaml`,
+  `values.yaml` and the README launch-fields table), and the README's "Access and
+  authentication" paragraph. Retarget `service.yaml` and `network-policy.yaml` at the app's own
+  ports.
+- **HTTP + non-HTTP (e.g. game server with a web admin)** — keep the sidecar for the HTTP side
+  and add each non-HTTP port to `network-policy.yaml` next to `8080`.
+
+List the **container port** with its protocol. NetworkPolicy matches the port on the pod, not
+the `nodePort` or the Service `port`:
+
+```yaml
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 8080    # sidecar — only if the workload keeps an HTTP side
+        - protocol: UDP
+          port: 7777    # game port (container port)
+```
+
 ## Choosing a Service type
 
 | Type | Reachable | When |

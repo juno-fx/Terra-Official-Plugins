@@ -9,8 +9,9 @@ concepts.
 The template is a deliberately **generic baseline** — no env vars, no probes, no mounts, no
 GPU. The one built-in is the nginx auth sidecar every HTTP workload ships (`concepts/runtime.md`);
 anything else is added per workload, not pre-baked. A non-HTTP workload (no ingress) drops the
-sidecar. The author often does not
-know which features their workload needs, so the agent suggests, and the author confirms.
+sidecar and retargets the scaffold's Service and NetworkPolicy at its own ports. The scaffold
+NetworkPolicy admits only TCP 8080 (`concepts/service-exposure.md` → "Starting from the workload
+scaffold"). The author often does not know which features their workload needs, so the agent suggests, and the author confirms.
 
 ## Rule 1 — ASK: the probe checklist
 

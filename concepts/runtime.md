@@ -72,8 +72,9 @@ livenessProbe:
 Every HTTP workload template runs an nginx sidecar in the same pod. The Ingress routes to the
 sidecar; the sidecar enforces the Hubble login (`auth_request`) and proxies to the app on
 `127.0.0.1`. This removes any dependency on ingress-nginx annotations. The scaffold
-(`template/workload/`) ships it. References: `plugins/wetty/` (simplest), `plugins/helios/`
-(HTTPS upstream, streaming), `plugins/n8n/` (rewrites, public webhook paths, rate limits),
+(`template/workload/`) ships it and is the canonical implementation. Existing plugins predate
+parts of the convention, so cite them only for a specific extra: `plugins/helios/` (HTTPS
+upstream, streaming), `plugins/n8n/` (rewrites, public webhook paths, rate limits),
 `plugins/vm-ephemeral/` (websocket timeouts, non-default port).
 
 ### The four pieces
@@ -142,6 +143,10 @@ containers:
     ports:
       - containerPort: 8080
         name: nginx
+    resources:
+      requests:          # small fixed requests; the best-practices requests MUST covers the sidecar too
+        cpu: "50m"
+        memory: "64Mi"
     volumeMounts:
       - name: nginx
         mountPath: /etc/nginx/nginx.conf

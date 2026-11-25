@@ -52,17 +52,25 @@ string — the reference default password is `fedora`; document changing it), `b
 Browser access to the VM screen is a **separate Deployment** (`junoinnovations/kubevirt-console:
 unstable`), not part of the VMI:
 
-- Headless Service (`clusterIP: None`, `sessionAffinity: ClientIP`) → console Deployment (RBAC
-  bound to the console's SA)
-- nginx-configmap mounted over `/src/nginx.conf` — `location
-  /{{ .Release.Namespace }}/kubevirt-console/{{ .Values.name }}/` proxying to the noVNC backend,
-  with a websockify `Upgrade`/`Connection` location. **Nothing rewrites the ingress path** — these
-  locations must match it exactly.
-- Ingress at `/{{ .Release.Namespace }}/kubevirt-console/{{ .Values.name }}/` with Hubble auth,
-  session-cookie name/path **scoped to the workload** (same-named consoles across environments
-  share a hostname — a root-level cookie collides), and
-  `kuiper.juno-innovations.com/ingress-extras` pointing at `vnc.html?...autoconnect=true&resize=scale`
-  so Hubble lists the console URL.
+- The console Deployment runs an **nginx auth sidecar** next to the console container. It
+  follows the standard sidecar convention (`concepts/runtime.md`) with these differences:
+  - **Port `8082`**: the console image already runs its own nginx on `8080` and
+    noVNC/websockify on `8081`.
+  - **Config at `/etc/nginx/conf.d/nginx.conf`**: mounted via `subPath` from the
+    `{{ .Values.name }}-console-nginx` ConfigMap. The file is a bare `server {}` block, not a
+    full `nginx.conf`.
+  - **Locations**: `/{{ .Release.Namespace }}/kubevirt/{{ .Values.name }}/` (noVNC static files)
+    and `…/websockify` (`Upgrade`/`Connection`, 12h read/send timeouts), both with
+    `auth_request /auth` against Hubble, proxying to `127.0.0.1:8081`. **Nothing rewrites the
+    ingress path**, so these locations must match it exactly.
+- Headless Service (`clusterIP: None`, `sessionAffinity: ClientIP`) on `8082` → console
+  Deployment (RBAC bound to the console's SA).
+- Plain Ingress at `/{{ .Release.Namespace }}/kubevirt/{{ .Values.name }}` → Service port `8082`,
+  with no controller annotations. `kuiper.juno-innovations.com/ingress-extras` points at
+  `vnc.html?...autoconnect=true&resize=scale` so Hubble lists the console URL.
+- NetworkPolicy selects the **console pod only** (`app: {{ .Values.name }}-console`) and admits
+  `8082`. Do not select on `kuiper-instance`: the virt-launcher pod carries it too, and a policy
+  on it would block the VM's `ports` Services.
 
 ## Gotchas
 
@@ -76,10 +84,11 @@ unstable`), not part of the VMI:
   **and** on the VM resource. (Known quirk: `plugins/vm-ephemeral/` predates this and is missing
   the annotation on its `metadata.yaml`; new VMs must not copy that.)
 - Cloud-init default credentials are a foot-gun — force or document a user password.
-- Do not run the kube-console without the RBAC + nginx-configmap pieces — the console pod needs
-  its ServiceAccount to find the VMI.
+- Do not run the kube-console without the RBAC + nginx sidecar pieces. The console pod needs its
+  ServiceAccount to find the VMI, and without the sidecar the console has no Hubble auth.
 
 ## Reference implementation
 
-`plugins/vm-ephemeral/` — full VM chart (vm, preference, dataVolumeTemplates, console deployment,
-nginx-configmap, ingress, ports services).
+`plugins/vm-ephemeral/` — full VM chart (vm, preference, dataVolumeTemplates, console deployment
+with nginx sidecar, `files/nginx/nginx.conf` + `nginx.yaml`, ingress, network policy, ports
+services).

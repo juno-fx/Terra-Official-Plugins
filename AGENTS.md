@@ -496,15 +496,18 @@ See `plugins/helios/scripts/chart/templates/workstation.yaml` for the full refer
 HTTP workload templates do **not** depend on ingress-nginx. The Ingress is plain and
 controller-agnostic; an nginx sidecar in the pod enforces the Hubble login and owns every
 controller-specific behaviour. This works the same behind ingress-nginx, Traefik, or any other
-controller. Reference implementations: `plugins/wetty/` (simplest), `plugins/helios/`,
-`plugins/n8n/` (rewrites, public webhook paths, rate limiting), `plugins/vm-ephemeral/`
-(websocket timeouts, non-default port). The scaffold in `template/workload/` ships this pattern.
+controller. **The scaffold in `template/workload/` is the canonical implementation — copy from
+it.** Existing plugins predate parts of this convention: some lack the slashless redirect or
+`X-Forwarded-Proto`, and some still send `$scheme`. Cite them only for a specific extra:
+`plugins/helios/` (HTTPS upstream, streaming), `plugins/n8n/` (rewrites, public webhook paths,
+rate limiting), `plugins/vm-ephemeral/` (websocket timeouts, non-default port, sidecar in a
+separate Deployment).
 
 | File | Convention |
 |------|------------|
 | `scripts/chart/files/nginx/nginx.conf` | The sidecar config, templated with Helm values. `auth_request /auth` on every protected `location`, with `location = /auth` proxying to `http://hubble.{{ .Release.Namespace }}.svc.cluster.local:3000/api/auth-workstation/{{ .Values.name }}/`. Gate `auth_request` with `{{- if not .Values.publicAccess }}`. Proxies to the app on `127.0.0.1:<app port>` |
-| `scripts/chart/templates/nginx.yaml` | ConfigMap `{{ .Values.name }}-nginx` with `nginx.conf: {{ tpl (.Files.Get "files/nginx/nginx.conf") . \| indent 4 }}` |
-| `scripts/chart/templates/workload.yaml` | `nginx` container (image from `nginx_registry`/`nginx_repo`/`nginx_tag`), `containerPort` = sidecar port, ConfigMap mounted at `/etc/nginx/nginx.conf` via `subPath` |
+| `scripts/chart/templates/nginx.yaml` | ConfigMap `{{ .Values.name }}-nginx`. Key `nginx.conf: \|` (block scalar), followed on the **next line, at column 0**, by `{{ tpl (.Files.Get "files/nginx/nginx.conf") . \| indent 4 }}`. Copy `template/workload/scripts/chart/templates/nginx.yaml` rather than this cell |
+| `scripts/chart/templates/workload.yaml` | `nginx` container (image from `nginx_registry`/`nginx_repo`/`nginx_tag`), `containerPort` = sidecar port, `resources.requests` `50m`/`64Mi`, ConfigMap mounted at `/etc/nginx/nginx.conf` via `subPath` |
 | `scripts/chart/templates/service.yaml` | `port`/`targetPort` = the **sidecar** port, never the app port |
 | `scripts/chart/templates/ingress.yaml` | `ingressClassName: nginx` (Kuiper ≥ 4.8.0 overwrites it with the launching namespace's IngressClass; `nginx` is the fallback). Backend = the sidecar port. **No `nginx.ingress.kubernetes.io/*` annotations and no `kubernetes.io/ingress.class` annotation**. Kuiper (`ingress-hide`/`ingress-extras`), cert-manager and external-dns annotations are fine |
 | `scripts/chart/templates/network-policy.yaml` | `podSelector` on the `kuiper-instance` label; `ingress` allows **only the sidecar port** (no `from` — the sidecar does its own auth, so any controller namespace is accepted). The app port stays blocked. Egress is decided per plugin |
@@ -793,11 +796,12 @@ All types above plus:
    - Edit `terra.yaml` — add `workload` to `tags` so the plugin appears in the app store's workloads filter
    - Edit `templates/metadata.yaml` — set `description`, tune `fields:`
    - Edit `scripts/chart/values.yaml` — ensure all field names are present as keys
-   - Edit `scripts/chart/templates/workload.yaml` — set correct image, app port, probes; set `juno-innovations.com/workload` annotation to match `metadata.yaml`. Keep the scaffold's `nginx` sidecar container
+   - Edit `scripts/chart/templates/workload.yaml` — set correct image, app port, probes; set `juno-innovations.com/workload` annotation to match `metadata.yaml`. Keep the scaffold's `nginx` sidecar container for any HTTP workload
+   - **Non-HTTP only** (game server, raw TCP/UDP, no web UI): remove `ingress.yaml`, `nginx.yaml`, `files/nginx/`, the `nginx` container and the `nginx_*` fields, and retarget `service.yaml` and `network-policy.yaml` at the app's ports. The scaffold NetworkPolicy admits only TCP 8080 and silently drops everything else. **HTTP + non-HTTP:** keep the sidecar and add the extra ports to the NetworkPolicy. See `concepts/service-exposure.md`
    - Edit `scripts/chart/files/nginx/nginx.conf` — set the `location` paths to match the ingress path, `proxy_pass` to the app port, and add any timeouts, body size or rewrites the app needs (see "Ingress & nginx Sidecar")
    - Edit `scripts/chart/templates/ingress.yaml` — keep it plain (`ingressClassName: nginx`, no `nginx.ingress.kubernetes.io/*` annotations), backend = the sidecar port, path
      `/{{ .Release.Namespace }}/{{ .Values.name }}/` or `/{{ .Release.Namespace }}/<segment>/{{ .Values.name }}/` (see Ingress Path Convention)
-   - Check `scripts/chart/templates/service.yaml` and `network-policy.yaml` target the sidecar port (`8080` unless the app needs it)
+   - Check `scripts/chart/templates/service.yaml` and `network-policy.yaml` target the sidecar port (`8080` unless the app needs it), plus any non-HTTP container ports the workload exposes, each with its protocol
    - Make every in-container reference to that path match it exactly — `PREFIX`, nginx sidecar `location`/`rewrite`/`sub_filter`, `--baseURL`/`ROOT_URL`/`base_url`, `HTTPRoute` rewrites. The ingress does not rewrite the path away
    - In `README.md`, keep the "Access and authentication" paragraph and the `nginx_*` launch-field rows
    - If `workload.yaml` ranges over `.Values.env`, edit `templates/metadata.yaml`'s `env_hints:` key (or set it to `|` + `[]`)

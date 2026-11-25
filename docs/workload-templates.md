@@ -143,6 +143,22 @@ data:
       description: "Attach a GPU"
       type: boolean
       required: true
+    # nginx sidecar image: user-facing on every HTTP workload
+    - name: nginx_registry
+      description: "Registry to pull the nginx sidecar image from"
+      type: string
+      required: true
+      default: "docker.io"
+    - name: nginx_repo
+      description: "Repository to pull the nginx sidecar image from"
+      type: string
+      required: true
+      default: "nginx"
+    - name: nginx_tag
+      description: "Tag to pull the nginx sidecar image from"
+      type: string
+      required: true
+      default: "1.30.7-alpine"
   # Optional: suggested custom environment variables for the launch form.
   env_hints: |
     - name: EXAMPLE_VAR
