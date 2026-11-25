@@ -16,12 +16,13 @@ tags:
 editable: true
 fields:
   - name: version
-    description: HAMi chart version to install.
+    description: |
+      HAMi chart version to install. This plugin was built and tested with 2.11.0.
+      Newer versions may have breaking changes (chart values, resource names, WebUI
+      compatibility), so check the HAMi release notes before moving off 2.11.0.
     required: true
-    type: select
+    type: string
     default: "2.11.0"
-    options:
-      - "2.11.0"
   - name: helm_repo
     description: Helm repository URL for the HAMi chart.
     required: true

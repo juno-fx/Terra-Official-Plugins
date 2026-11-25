@@ -98,7 +98,7 @@ The plugin is editable: fields can be changed after install and Argo CD rolls th
 
 | Field | Details |
 |-------|---------|
-| `version` | **select** · Required · Default: `2.11.0`<br>HAMi chart version |
+| `version` | **string** · Required · Default: `2.11.0`<br>HAMi chart version. Built and tested with `2.11.0`; newer versions may carry breaking changes (chart values, resource names, WebUI compatibility), so check the release notes first |
 | `helm_repo` | **string** · Required · Default: `https://project-hami.github.io/HAMi/`<br>Helm repository for the HAMi chart |
 | `host` | **string** · Required<br>DNS name of the Genesis host; the dashboard Ingress and iFrame use it |
 | `prefix` | **string** · Optional · Default: `/hami`<br>URL path of the GPU dashboard on the Genesis host. Change only if another plugin already uses that path |
