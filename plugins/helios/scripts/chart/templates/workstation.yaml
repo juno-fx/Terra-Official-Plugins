@@ -150,8 +150,16 @@ spec:
             - name: PREFIX
               value: "/{{ .Release.Namespace }}/helios/{{ .Values.name }}/"
             {{- range .Values.env }}
+            {{- if not (and $.Values.dcvLoadBalancer (eq .name "REMOTE_PROTOCOL")) }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}
+            {{- end }}
+            {{- end }}
+            {{- if .Values.dcvLoadBalancer }}
+            # dcvLoadBalancer forces DCV; a user-set REMOTE_PROTOCOL is skipped
+            # above so the env list has no duplicate names.
+            - name: REMOTE_PROTOCOL
+              value: "dcv"
             {{- end }}
           volumeMounts:
             - mountPath: /dev/shm
