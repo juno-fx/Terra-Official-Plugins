@@ -17,7 +17,7 @@ Helios is the flagship containerized workstation from Juno Innovations. It provi
 
 ## How It Works
 
-**Workload Template** — Installs the Helios workstation schema into Genesis. Once installed, the Helios type appears in **Genesis** on the Workloads page, where it can be authored into a workload template. Users can then launch and provision their own personal desktop on demand within a project through **Hubble**.
+**Workload Template** — Installs the Helios workstation schema into Genesis. Once installed, the Helios type appears in **Genesis** on the Workloads page, where it can be authored into a workload template. Users can then launch and provision their own personal desktop on demand within a workspace through **Hubble**.
 
 **Access and authentication** — Each workstation runs with an nginx sidecar in the same pod. The ingress routes `/<namespace>/helios/<workload-name>/` to the sidecar, which checks the user's Hubble login before forwarding the request to Helios. Because authentication happens inside the pod rather than through ingress-controller annotations, it works the same with any ingress controller (ingress-nginx, Traefik, etc.).
 
@@ -25,7 +25,8 @@ Helios is the flagship containerized workstation from Juno Innovations. It provi
 
 ## Prerequisites
 
-- GPU support requires the **NVIDIA GPU Operator** plugin to be installed if GPU workstations are needed
+- `gpu: nvidia` workstations need the **NVIDIA GPU Operator** plugin; `gpu: amd` workstations need the **AMD GPU Operator** plugin
+- GPU slicing (`HAMI_GPU_MEMORY` / `HAMI_GPU_CORES`) needs the **HAMi GPU Sharing** plugin with the operator's `device_plugin` off (and `enable_amd` on for AMD)
 - Helios plugin add-ons (**Helios Auto Shutdown**, **Helios RAM Monitor**) are optional but recommended for production deployments
 
 ---
@@ -53,7 +54,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 
 | Field | Details |
 |-------|---------|
-| `gpu` | **boolean** · Required<br>Enable GPU passthrough for the workstation |
+| `gpu` | **select** · Required · Default: `off` · Options: `off`, `nvidia`, `amd`<br>GPU for the workstation. `nvidia` renders `nvidia.com/gpu` (NVIDIA GPU Operator), `amd` renders `amd.com/gpu` (AMD GPU Operator). A pod requests one vendor only. |
 | `registry` | **string** · Required · Default: `junoinnovations`<br>Container registry to pull the Helios image from |
 | `repo` | **string** · Required · Default: `helios`<br>Helios image repository |
 | `tag` | **string** · Required · Default: `unstable-rocky-9`<br>Helios image tag (OS flavour and version) |
@@ -69,8 +70,10 @@ These fields are configured when authoring the workload template in **Genesis** 
 
 Genesis lets you add arbitrary environment variables to the workload at launch time. These are commonly useful for a Helios workstation:
 
-| Variable | Description                                                                                                        |
-|----------|--------------------------------------------------------------------------------------------------------------------|
+| Variable | Description |
+|----------|-------------|
+| `HAMI_GPU_MEMORY` | GPU memory in GiB the workstation may use (HAMi GPU Sharing plugin), fractions allowed (`0.5` = 512 MiB). Rendered as the pod's `nvidia.com/gpumem` or `amd.com/gpumem` limit in MiB, not passed into the container. Unset, the HAMi plugin's `default_gpu_memory` applies (8 GiB as shipped); without HAMi it must stay unset. |
+| `HAMI_GPU_CORES` | Share of the GPU's compute the workstation may use, 1–100 (HAMi). Rendered as the pod's `nvidia.com/gpucores` or `amd.com/gpucores` limit, not passed into the container. Unset reserves no compute on `nvidia` and all of it on `amd`. |
 | `PASSWORD` | Password set for the users terminal session. Available to all users at launch (Hubble → Advanced).                |
 | `SUDO` | Grants the user sudo access on the container.                                                                      |
 | `SELKIES_FRAMERATE` | Streaming framerate for the desktop session, as a range (e.g. `15-60`) or fixed value (e.g. `30`).                 |
@@ -88,4 +91,7 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 - The workstation's ingress uses the `nginx` IngressClass by default; Kuiper 4.8.0 and later replaces it with the launching namespace's IngressClass
 - The `tag` field controls the OS and desktop flavour of the workstation; consult the Juno documentation for available image tags
 - Helios workstations are scheduled on nodes labelled `juno-innovations.com/workstation: "true"` — ensure your cluster has workstation nodes configured
+- `HAMI_GPU_MEMORY` / `HAMI_GPU_CORES` turn the workstation into a GPU slice. They are read from the workload's environment variables (admin-set in Genesis when defining the workload), rendered as pod resource limits, and never reach the container. Without HAMi, leave both unset: the plain device plugins do not know those resource names and the pod would never schedule
+- With HAMi installed and `HAMI_GPU_MEMORY` unset, the workstation gets the HAMi plugin's `default_gpu_memory` slice (8 GiB as shipped), not the whole card. Set `HAMI_GPU_MEMORY` for a different size
+- On AMD, a pod that sets `HAMI_GPU_MEMORY` but not `HAMI_GPU_CORES` still books all compute units, so set both to share a card. A pod requests one vendor only; on a mixed cluster the admin presets `gpu` per workload
 - Helios plugin add-ons (auto-shutdown, RAM monitoring) must be installed separately and will automatically attach to Helios workloads
