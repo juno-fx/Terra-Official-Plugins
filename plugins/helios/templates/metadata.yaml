@@ -86,7 +86,7 @@ data:
           required: false
   env_hints: |
     - name: PASSWORD
-      description: Password set for the users terminal session.
+      description: Password set for the users terminal session. Required to sign in through the DCV load balancer (dcvLoadBalancer); not needed for DCV in the browser through Hubble.
       expose: true
     - name: SUDO
       description: Grants the user sudo access on the container ("true" or "1").

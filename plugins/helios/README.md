@@ -64,7 +64,7 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `nginx_repo` | **string** · Required · Default: `nginx`<br>Repository to pull the nginx sidecar image from |
 | `nginx_tag` | **string** · Required · Default: `1.30.7-alpine`<br>Tag to pull the nginx sidecar image from |
 | `publicAccess` | **boolean** · Required · Default: `false`<br>Disable authentication and allow unauthenticated access to the workstation |
-| `dcvLoadBalancer` | **boolean** · Required · Default: `false`<br>Creates a LoadBalancer service exposing Nice DCV on port 8443/tcp (dcv-tcp) for native DCV clients (TCP only, so no QUIC), and sets `REMOTE_PROTOCOL=dcv` on the workstation. DCV enforces its own login; the Helios web port stays behind the Hubble login. When `false`, the workstation is reached only through the ingress. Some providers (e.g. GKE, Azure) make the load balancer public by default, which puts the DCV login on the internet; use an internal load balancer annotation (see the examples below) or a VPN where possible |
+| `dcvLoadBalancer` | **boolean** · Required · Default: `false`<br>Creates a LoadBalancer service exposing Nice DCV on port 8443/tcp (dcv-tcp) for native DCV clients (TCP only, so no QUIC), and sets `REMOTE_PROTOCOL=dcv` on the workstation. Set the `PASSWORD` environment variable at launch; it is needed to sign in through the load balancer. DCV enforces its own login; the Helios web port stays behind the Hubble login. When `false`, the workstation is reached only through the ingress. Some providers (e.g. GKE, Azure) make the load balancer public by default, which puts the DCV login on the internet; use an internal load balancer annotation (see the examples below) or a VPN where possible |
 | `loadBalancerAnnotations` | **list** · Optional · Default: empty<br>Extra annotations added to the DCV LoadBalancer service (only used when `dcvLoadBalancer` is `true`). Each entry has a `key` and a `value`; any cloud provider's load balancer annotations work. Example for CoreWeave: key `service.beta.kubernetes.io/coreweave-load-balancer-type`, value `public` |
 
 ### LoadBalancer Annotation Examples
@@ -86,7 +86,7 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 
 | Variable | Description                                                                                                        |
 |----------|--------------------------------------------------------------------------------------------------------------------|
-| `PASSWORD` | Password set for the users terminal session. Available to all users at launch (Hubble → Advanced).                |
+| `PASSWORD` | Password set for the users terminal session. Required to sign in through the DCV load balancer (`dcvLoadBalancer`); not needed for DCV in the browser through Hubble. Available to all users at launch (Hubble → Advanced). |
 | `SUDO` | Grants the user sudo access on the container.                                                                      |
 | `SELKIES_FRAMERATE` | Streaming framerate for the desktop session, as a range (e.g. `15-60`) or fixed value (e.g. `30`).                 |
 | `DISABLE_VGL` | Disables the VirtualGL wrapper around the desktop session; apps needing it must be launched manually via `vglrun`. |
