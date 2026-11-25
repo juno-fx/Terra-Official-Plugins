@@ -15,9 +15,12 @@ HAMi (Heterogeneous AI Computing Virtualization Middleware) lets several workloa
 physical GPU. Each workload gets a slice with a GPU memory limit and an optional compute quota,
 enforced inside the container, with no changes to application code.
 
-HAMi sits on top of the NVIDIA GPU Operator. The operator keeps providing drivers, the container
-toolkit, the `nvidia` RuntimeClass, Node Feature Discovery and the DCGM exporter. HAMi replaces
-only the device plugin and adds its own scheduler extender.
+HAMi sits on top of the GPU operator for each vendor and replaces only its device plugin, adding
+its own scheduler extender. The **NVIDIA GPU Operator** keeps providing drivers, the container
+toolkit, the `nvidia` RuntimeClass, Node Feature Discovery and the DCGM exporter. With
+`enable_amd`, the **AMD GPU Operator** keeps providing node labelling and the metrics exporter
+while HAMi's AMD device plugin shares the GPUs as `amd.com/gpu`. Both vendors can run in one
+cluster; a pod requests one vendor's resources.
 
 The plugin installs two Argo CD Applications into `kube-system`, three with `enable_amd`:
 
@@ -36,42 +39,44 @@ users and is served from the Genesis host under `/hami`, behind the Genesis auth
 
 **Cluster Service** — installed once per cluster by an administrator.
 
-- The HAMi device plugin runs on every node the GPU Operator labels
-  `nvidia.com/gpu.deploy.device-plugin=true`. Nodes in VM pass-through mode are skipped. No
-  manual node labelling is needed.
-- The device plugin advertises `nvidia.com/gpu` as before, multiplied by `device_split_count`,
-  plus `nvidia.com/gpumem` and `nvidia.com/gpucores` so workloads can ask for a slice.
-- A mutating webhook rewrites every pod that requests `nvidia.com/gpu` to use the HAMi
-  scheduler. Workload templates do not need `schedulerName` set.
+- The HAMi device plugin runs on every node the NVIDIA GPU Operator labels
+  `nvidia.com/gpu.deploy.device-plugin=true`. Nodes in VM pass-through mode are skipped. With
+  `enable_amd`, HAMi's AMD device plugin runs on every node the AMD GPU Operator labels
+  `feature.node.kubernetes.io/amd-gpu=true`. No manual node labelling is needed for either.
+- Each device plugin advertises the vendor's GPU resource as before (`nvidia.com/gpu`,
+  `amd.com/gpu`), multiplied by `device_split_count`, plus `<vendor>/gpumem` and
+  `<vendor>/gpucores` so workloads can ask for a slice.
+- A mutating webhook rewrites every pod that requests `nvidia.com/gpu` or `amd.com/gpu` to use
+  the HAMi scheduler. Workload templates do not need `schedulerName` set.
 - A pod that asks for `nvidia.com/gpu: 1` and nothing else gets an 8 GiB slice
-  (`default_gpu_memory`). Workloads request `nvidia.com/gpumem` and `nvidia.com/gpucores` for a
-  different size or a compute share.
+  (`default_gpu_memory`). Workloads request `gpumem` and `gpucores` for a different size or a
+  compute share. On AMD, a pod that sets only `gpumem` still books all of the compute, so set
+  `gpucores` on every AMD pod that should share.
 
 ---
 
 ## Prerequisites
 
-- **NVIDIA GPU Operator plugin installed** and healthy. HAMi needs the driver, the container
-  toolkit and the `nvidia` RuntimeClass it provides.
-- **The GPU Operator's own device plugin must be off.** Two device plugins registering
-  `nvidia.com/gpu` on the same node fight over the resource. In the `nvidia-gpu-operator`
-  plugin set `device_plugin` to `false` (the plugin is editable) and wait for the operator's
-  device-plugin DaemonSet to disappear before installing HAMi. Its `slice_count` has no effect
-  while the device plugin is off.
+- **A GPU operator plugin installed and healthy**, one per vendor in the cluster:
+  - **NVIDIA GPU Operator** for NVIDIA GPUs. HAMi needs the driver, the container toolkit and
+    the `nvidia` RuntimeClass it provides.
+  - **AMD GPU Operator** for AMD GPUs, used with `enable_amd`. HAMi needs the
+    `feature.node.kubernetes.io/amd-gpu=true` label it sets; its metrics exporter keeps running
+    and the HAMi AMD plugin reads the exporter's health socket. Nodes need `/dev/kfd` and
+    `/dev/dri`. Nodes the operator targets with `vgpu_nodes` (label `amd-vgpu`) are not
+    covered: HAMi's AMD plugin needs the physical device.
+- **The operator's own device plugin must be off.** Two device plugins registering the same
+  resource on one node fight over it. In the operator plugin set `device_plugin` to `false`
+  (both are editable) and wait for its device-plugin DaemonSet to disappear before installing
+  HAMi or turning `enable_amd` on. The NVIDIA operator's `slice_count` has no effect while its
+  device plugin is off.
 - **Prometheus with the Prometheus Operator CRDs** (the `kube-prometheus-stack` plugin) for the
   dashboard panels. The plugin creates its ServiceMonitors only when the CRDs exist, so HAMi
   installs without Prometheus; the dashboard then stays empty until Prometheus is added.
 - **Genesis reachable over HTTPS** on `host`; the dashboard is embedded in Genesis as an iFrame.
-- **A GPU node with a working `nvidia-smi`.** GB10 unified-memory systems (NVIDIA DGX Spark and
-  OEM equivalents) report `memory.total` as `N/A`; set `preconfigured_gpu_memory` for those
-  (see Notes).
-- **For AMD GPUs (`enable_amd`):** the **AMD GPU Operator** plugin installed with
-  `device_plugin` set to `false` (its labeller and metrics exporter keep running; the HAMi AMD
-  plugin even reads the exporter's health socket). Wait for the operator's device-plugin
-  DaemonSet to disappear before turning `enable_amd` on. Nodes need `/dev/kfd`, `/dev/dri`
-  and the operator's `feature.node.kubernetes.io/amd-gpu=true` label. Nodes the operator
-  targets with `vgpu_nodes` (label `amd-vgpu`) are not covered: HAMi's AMD plugin needs the
-  physical device.
+- **A GPU node with a working `nvidia-smi`** (NVIDIA). GB10 unified-memory systems (NVIDIA DGX
+  Spark and OEM equivalents) report `memory.total` as `N/A`; set `preconfigured_gpu_memory` for
+  those (see Notes).
 
 ---
 
@@ -125,14 +130,13 @@ different pin.
 ## Requesting a GPU
 
 HAMi keeps the standard resource name, so existing workloads keep working. Slices are requested
-with two extra resources:
+with two extra resources per vendor:
 
 | Resource | Meaning |
 |----------|---------|
-| `nvidia.com/gpu` | Number of GPUs (or GPU slices) for the container |
-| `nvidia.com/gpumem` | GPU memory for the container, in MiB |
-| `nvidia.com/gpumem-percentage` | GPU memory as a percentage of the card, instead of `gpumem` |
-| `nvidia.com/gpucores` | Share of the GPU's compute, 0–100 |
+| `nvidia.com/gpu`, `amd.com/gpu` | Number of GPUs (or GPU slices) for the container |
+| `nvidia.com/gpumem`, `amd.com/gpumem` | GPU memory for the container, in MiB |
+| `nvidia.com/gpucores`, `amd.com/gpucores` | Share of the GPU's compute, 0–100 |
 
 ```yaml
 # Plain request: an 8 GiB slice (default_gpu_memory), compute unthrottled
@@ -150,10 +154,19 @@ resources:
     nvidia.com/gpucores: 30
 ```
 
-Workload templates in this catalog (for example `jupyter-notebook` with `gpu` set to `nvidia`)
-request `nvidia.com/gpu: "1"`. With HAMi installed that becomes an 8 GiB
-slice (`default_gpu_memory`). `jupyter-notebook` sets memory and cores from env; other templates
-get the default until they grow their own fields.
+Workload templates in this catalog (for example `jupyter-notebook` with `gpu` set to `nvidia` or
+`amd`) request one GPU. With HAMi installed that becomes an 8 GiB slice (`default_gpu_memory`)
+on NVIDIA. `jupyter-notebook` sets memory and cores from env; other templates get the default
+until they grow their own fields.
+
+HAMi supports further pod-level settings this plugin does not expose, such as memory as a
+percentage of the card or pinning a pod to a GPU model. To use them, fork this repository and
+adjust the plugin. The upstream references for pod resources and annotations:
+
+- [NVIDIA: device memory](https://project-hami.io/docs/userguide/NVIDIA-device/specify-device-memory-usage)
+- [NVIDIA: device cores](https://project-hami.io/docs/userguide/NVIDIA-device/specify-device-core-usage)
+- [AMD: GPU sharing](https://project-hami.io/docs/userguide/AMD-device/enable-amd-gpu-sharing)
+- [AMD device plugin README](https://github.com/Project-HAMi/amd-device-plugin/blob/amd-gpu-helm-0.0.4/README.md)
 
 ---
 
@@ -185,104 +198,100 @@ Prometheus query.
 
 ## Autoscaling with Karpenter
 
-Karpenter decides what to launch from the resources pending pods request, and HAMi-sliced pods
-request `nvidia.com/gpumem` and `nvidia.com/gpucores`. Two things stop that from working out of
-the box, and the plugin plus one Karpenter object fix both:
+Karpenter launches nodes from the resources pending pods request. HAMi-sliced pods request
+`nvidia.com/gpumem` and `nvidia.com/gpucores`, which Karpenter has never heard of, so two things
+are needed. Both are only for scale-from-zero; nodes already running need neither.
 
-1. **Karpenter does not know those resources exist on any instance type**, so no node is launched
-   for a sliced pod ("no instance type satisfied resources"). A Karpenter `NodeOverlay` adds them
-   to the scheduling simulation. Needs Karpenter 1.7 or newer with the `NodeOverlay` feature gate
-   (`settings.featureGates.nodeOverlay: true`; alpha). One overlay per GPU model and GPU count, with
-   the memory NVML reports per GPU (what HAMi registers), not the marketing figure:
+**1. Turn on `report_node_capacity`** in this plugin. HAMi's device plugin then publishes each
+node's total `gpumem` and `gpucores` in node capacity. Without it, Karpenter waits forever for
+those resources to appear, never marks the node initialised and never consolidates it, so a node
+launched for a sliced pod stays up until deleted by hand. Enable before the first launch.
 
-   ```yaml
-   apiVersion: karpenter.sh/v1alpha1
-   kind: NodeOverlay
-   metadata:
-     name: hami-a10g-1
-   spec:
-     requirements:
-       - key: karpenter.k8s.aws/instance-gpu-name
-         operator: In
-         values: ["a10g"]
-       - key: karpenter.k8s.aws/instance-gpu-count
-         operator: In
-         values: ["1"]
-     capacity:
-       nvidia.com/gpumem: 23028   # MiB per GPU x GPU count
-       nvidia.com/gpucores: 100   # 100 x GPU count
-   ```
+**2. Add a Karpenter `NodeOverlay` per GPU model.** The overlay tells Karpenter how much `gpumem`
+and `gpucores` an instance type will have once HAMi runs on it, so it can pick one. Needs
+Karpenter 1.7+ with `settings.featureGates.nodeOverlay: true` (alpha).
 
-2. **A launched node would never be initialised.** Karpenter waits until every resource the pods
-   asked for appears in the node's allocatable before it marks the NodeClaim initialised, with no
-   timeout, and never consolidates an uninitialised node. By default HAMi registers only
-   `nvidia.com/gpu`. Turn on `report_node_capacity` (HAMi's `devicePlugin.reportNodeCapacity`):
-   the device plugin then sums the healthy GPUs' memory and cores it registered and patches the
-   totals into the node's capacity and allocatable as `nvidia.com/gpumem` and `nvidia.com/gpucores`
-   on every registration cycle. Karpenter then initialises the node, counts free slice capacity on
-   existing GPU nodes before launching another, and consolidates empty ones.
+```yaml
+apiVersion: karpenter.sh/v1alpha1
+kind: NodeOverlay
+metadata:
+  name: hami-a10g-1
+spec:
+  requirements:
+    - key: karpenter.k8s.aws/instance-gpu-name   # GPU model: a10g (g5), l4 (g6), l40s (g6e), h100 (p5)
+      operator: In
+      values: ["a10g"]
+    - key: karpenter.k8s.aws/instance-gpu-count  # GPUs per instance
+      operator: In
+      values: ["1"]
+  capacity:
+    # gpumem is the GPU's VRAM in MiB, as HAMi registers it, x GPU count.
+    # Find it with: aws ec2 describe-instance-types --instance-types g5.xlarge \
+    #   --query 'InstanceTypes[].GpuInfo.Gpus[].MemoryInfo.SizeInMiB'
+    # or copy it from a node that has run that card (see below). Round down.
+    nvidia.com/gpumem: 23028
+    nvidia.com/gpucores: 100   # 100 x GPU count
+```
+
+NodeOverlay is cluster-scoped. Save it as `hami-a10g-1.yaml` and apply it with:
+
+```bash
+kubectl apply -f hami-a10g-1.yaml
+kubectl get nodeoverlay          # READY True once Karpenter has parsed and matched it
+```
+
+How the pieces fit:
+
+- An overlay covers every instance size with that GPU model and count: `a10g` x `1` is
+  g5.xlarge through g5.16xlarge. Write one overlay per model and count your NodePool allows,
+  not one per instance type. Restricting the NodePool to `instance-gpu-count In ["1"]` keeps it
+  to one overlay per card.
+- Karpenter picks the cheapest instance type whose declared capacity fits the pod. A 4 GiB slice
+  lands on g5; a 40 GiB slice needs an overlay for a bigger card (`l40s`, `a100`, `h100`) and a
+  NodePool that allows its family. With no overlay large enough the pod stays Pending with
+  `no instance type satisfied resources`; nothing launches.
+- `gpumem` is the card's VRAM. HAMi registers what the driver reports, which is a little less
+  than the marketing figure, so copy it from a node that has run that card:
+  `kubectl get node <node> -o jsonpath='{.status.allocatable.nvidia\.com/gpumem}'`.
+  Without such a node, `aws ec2 describe-instance-types` gives the nominal size; round down.
+  Too high launches nodes the pod cannot fit; too low only refuses launches.
+- One pod slice is at most one GPU. `nvidia.com/gpu: 2` gives two slices, not one double-sized
+  one.
+- With `enable_amd`, the AMD device plugin publishes `amd.com/gpumem` and `amd.com/gpucores` the
+  same way; its overlay uses those names and `instance-gpu-manufacturer: amd`.
 
 Expected flow: sliced pod pending, NodeClaim within seconds, node Ready in about two minutes, HAMi
-device plugin registers and reports capacity, `karpenter.sh/initialized=true`, pod runs. Delete the
-pod and the node goes with `consolidateAfter`. Without it a node launched for a sliced pod
-stays up until someone deletes the NodeClaim by hand, so enable the field before the first launch.
-
-`report_node_capacity` is harmless on clusters without an autoscaler: the extra capacity
-entries make kube-scheduler and kubelet check slice totals per node, which HAMi already enforces
-per GPU. With `enable_amd` the AMD device plugin does the same for `amd.com/gpumem` and
-`amd.com/gpucores`; the NodeOverlay for an AMD instance type declares those names instead.
+registers and reports capacity, `karpenter.sh/initialized=true`, pod runs. Delete the pod and the
+node goes with `consolidateAfter`.
 
 ---
 
 ## Notes
 
-- **Install order matters.** GPU Operator first, with its device plugin disabled; then HAMi.
-  Installing HAMi while the operator's device plugin still runs leaves two plugins registering
-  `nvidia.com/gpu` on each node.
-- **GB10 systems (DGX Spark, ASUS Ascent GX10, Dell Pro Max GB10 and other OEM boxes)** share
-  system memory with the GPU and `nvidia-smi` reports no total. Without `preconfigured_gpu_memory`
-  HAMi skips the GPU and no slice can be placed there. A 128 GB box takes about `98304`. The
-  value is only read for GPUs whose memory NVML cannot query; discrete GPUs in the same cluster
-  keep their reported memory. On top of that, HAMi 2.11.0 validates
-  percentage-sized allocations against the NVML memory value, which is 0 on GB10, so a plain
-  `nvidia.com/gpu: 1` request fails at Allocate with "allocated N MB … but requests 0 MB". The
-  plugin's `default_gpu_memory` of 8192 gives every such request an absolute size, so plain GPU
-  workloads run; templates that set `nvidia.com/gpumem` (`jupyter-notebook` via `HAMI_GPU_MEMORY`)
-  choose their own. Memory limits and compute quotas (`gpucores`) both work on GB10.
-- **Core policy.** `gpucores` is a throttle in HAMi-core, not a hardware partition. With
-  `gpu_core_policy: default` a workload alone on a GPU is never throttled; when a second HAMi
-  workload becomes active on the same GPU, HAMi's monitor switches enforcement on within about
-  10 s, each workload stalls for a few seconds while the token bucket refills, then settles at
-  its share. When the other workload stops, the survivor climbs back to full speed. `force`
-  pins every workload to its share from the first kernel, which is the setting to use when
-  tenants should see the same throughput whether or not the GPU is shared. Enforcement is a
-  token-bucket rate limiter, so a steady load runs as bursts with pauses in between (on GB10
-  roughly 8 s near full speed, then 10 s blocked) and only the average over tens of seconds
-  matches the share; measured 23% for a 25% limit. The policy is injected at admission
-  (`GPU_CORE_UTILIZATION_POLICY`), so after changing it restart the workloads that should
-  pick it up.
-- **CDI.** `device_list_strategy` is fixed at `cdi-annotations` for the GPU Operator's CDI-mode runtime. With `envvar`
-  the nvidia runtime in CDI mode fails container start with
-  `unresolvable CDI devices management.nvidia.com/gpu=GPU-…`.
-- **Scheduler image.** The chart derives the kube-scheduler image tag from the cluster's
-  Kubernetes version; nothing to set.
+- **Install order.** GPU operator first with its device plugin off, then HAMi (or `enable_amd`).
+  Two device plugins registering the same resource on one node fight over it.
+- **GB10 systems (DGX Spark and OEM equivalents).** `nvidia-smi` reports no memory total, so
+  set `preconfigured_gpu_memory` (about `98304` for 128 GB) or HAMi skips the GPU. A plain
+  `nvidia.com/gpu: 1` request also fails on GB10 without an absolute size, which is why
+  `default_gpu_memory` is nonzero. Memory limits and `gpucores` both work on GB10.
+- **Core policy.** `gpucores` is a throttle, not a hardware partition. `default` throttles a
+  workload only while another HAMi workload is active on the same GPU; `force` throttles always,
+  for the same throughput shared or not. Enforcement is a rate limiter, so load runs in bursts
+  and only the average over tens of seconds matches the share. Set at admission: restart
+  workloads after changing it.
+- **CDI.** `device_list_strategy` stays `cdi-annotations`; `envvar` fails container start under
+  the GPU Operator's CDI-mode runtime.
+- **Scheduler image** tag is derived from the cluster's Kubernetes version; nothing to set.
 - **Namespaces to leave alone.** Label a namespace `hami.io/webhook: ignore` to keep HAMi's
   webhook away from its pods.
-- **AMD GPUs** share through HAMi's separate [AMD device plugin](https://github.com/Project-HAMi/amd-device-plugin)
-  when `enable_amd` is on (a third Application, `<release>-hami-amd`, git-sourced at the tagged
-  chart). Pods request `amd.com/gpu` plus `amd.com/gpumem` (MiB) and `amd.com/gpucores` (%).
-  Differences from NVIDIA: a pod that sets only `gpumem` still books 100% of the compute units,
-  so set `gpucores` on every pod that should share; compute slices are whole WGPs (CU pairs) on
-  RDNA; the memory cap is an `LD_AUDIT` hook (glibc 2.34+) plus a kernel dmem cgroup cap where
-  the kernel has that controller. There is no AMD view in the HAMi-WebUI dashboard yet.
-  With `enable_amd` off the plugin blanks HAMi's AMD resource names so the webhook leaves
-  `amd.com/gpu` pods to the default scheduler and the AMD GPU Operator's own device plugin;
-  without that, HAMi 2.11 claims every such pod and leaves it pending with `node unregistered`.
-- **AMD APUs (Ryzen AI, Strix Halo).** The plugin registers the VRAM carve-out reported by the
-  driver (512 MiB on a Radeon 8060S), not the shared system memory ROCm actually allocates
-  from. `amd.com/gpumem` above that fails scheduling, and omitting it books the whole 512 MiB,
-  so one pod per GPU. Compute slicing (`gpucores`) is unaffected. Treat APU sharing as
-  compute-only until the plugin reads GTT for APUs.
-- **Uninstall** removes both Applications. Running GPU workloads keep their slices until they
-  restart; new launches fall back to whatever device plugin is registered, so re-enable the GPU
-  Operator's device plugin after removing HAMi.
+- **AMD GPUs** share through HAMi's separate
+  [AMD device plugin](https://github.com/Project-HAMi/amd-device-plugin) when `enable_amd` is
+  on. A pod that sets only `gpumem` still books all of the compute, so set `gpucores` on every
+  AMD pod that should share. The HAMi-WebUI dashboard has no AMD view yet. With `enable_amd` off
+  the plugin blanks HAMi's AMD resource names so `amd.com/gpu` pods stay with the default
+  scheduler and the AMD GPU Operator's device plugin instead of hanging on `node unregistered`.
+- **AMD APUs (Ryzen AI, Strix Halo).** The plugin registers the driver's VRAM carve-out (512 MiB
+  on a Radeon 8060S), not shared system memory. `gpumem` above that fails scheduling and
+  omitting it books the whole 512 MiB, so one pod per GPU. Treat APU sharing as compute-only.
+- **Uninstall** removes all Applications. Running workloads keep their slices until restart; new
+  launches need a device plugin, so turn `device_plugin` back on in the GPU operator plugins.
