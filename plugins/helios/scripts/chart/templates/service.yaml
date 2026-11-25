@@ -43,4 +43,12 @@ spec:
       targetPort: 8443
       protocol: TCP
       name: dcv-tcp
+    {{- if .Values.dcvQuic }}
+    # QUIC on the same port. The image always enables the QUIC frontend;
+    # the load balancer must support mixed TCP/UDP on one port.
+    - port: 8443
+      targetPort: 8443
+      protocol: UDP
+      name: dcv-udp
+    {{- end }}
 {{- end }}

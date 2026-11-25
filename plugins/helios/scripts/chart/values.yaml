@@ -18,6 +18,7 @@ gpu: false
 enableAPI: false
 publicAccess: false
 dcvLoadBalancer: false
+dcvQuic: false
 loadBalancerAnnotations: []
 nginx_registry: "docker.io"
 nginx_repo: "nginx"

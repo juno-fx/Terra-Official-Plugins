@@ -65,7 +65,13 @@ data:
       required: true
       default: false
     - name: dcvLoadBalancer
-      description: "Expose Nice DCV on a LoadBalancer (8443 TCP) for native DCV clients. Also sets REMOTE_PROTOCOL=dcv. Some providers (e.g. GKE, Azure) make the load balancer public by default; use loadBalancerAnnotations to make it internal"
+      description: "Expose Nice DCV on a LoadBalancer (8443 TCP) for native DCV clients. Also sets REMOTE_PROTOCOL=dcv. Requires the PASSWORD env var, set at launch or in this template's env (a template password is shared by every workstation launched from it); without it DCV does not listen on the load balancer. Some providers (e.g. GKE, Azure) make the load balancer public by default; use loadBalancerAnnotations to make it internal"
+      type: boolean
+      required: true
+      default: false
+      group: DCV Settings
+    - name: dcvQuic
+      description: "Also expose Nice DCV on 8443 UDP for QUIC (dcvLoadBalancer only). The load balancer must support TCP and UDP on the same port. On AWS this needs the AWS Load Balancer Controller installed; the built-in AWS cloud provider cannot create it"
       type: boolean
       required: true
       default: false
