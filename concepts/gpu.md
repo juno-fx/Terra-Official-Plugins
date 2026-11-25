@@ -36,6 +36,38 @@ runtimeClassName: nvidia
 Reference: `plugins/runtime-go/scripts/chart/templates/workstation.yaml` +
 `plugins/runtime-go/templates/metadata.yaml`.
 
+## Multi-vendor and GPU sharing
+
+The boolean `gpu` field above is the single-vendor (NVIDIA) baseline. A workload that must also
+run on AMD GPUs uses a `select` instead — `off` / `nvidia` / `amd` — and gates each vendor's
+wiring on the selected value. Quote `"off"` everywhere: bare `off` is YAML 1.1 for `false`.
+
+```yaml
+{{- $nvidia := eq (toString .Values.gpu) "nvidia" -}}
+{{- $amd := eq (toString .Values.gpu) "amd" -}}
+...
+{{- if $nvidia }}
+runtimeClassName: nvidia           # NVIDIA only; AMD needs no runtime class
+{{- end }}
+...
+limits:
+{{- if $nvidia }}
+  nvidia.com/gpu: "1"
+{{- end }}
+{{- if $amd }}
+  amd.com/gpu: "1"
+{{- end }}
+```
+
+A pod requests one vendor only. `amd.com/gpu` needs `plugins/amd-gpu-operator/` installed.
+
+With the HAMi GPU Sharing plugin (`plugins/hami/`) a workload can request a slice instead of a
+whole card by adding `<vendor>/gpumem` (MiB) and `<vendor>/gpucores` (0–100) limits beside
+`<vendor>/gpu`. Those names are unknown to the plain device plugins, so render them only when
+the launch asks for them. `plugins/jupyter-notebook/` reads `HAMI_GPU_MEMORY` (GiB) and
+`HAMI_GPU_CORES` from the launch-time `env` list, renders them as limits, and drops them from
+the container env — see its `scripts/chart/templates/statefulset.yaml` for the pattern.
+
 ## Which node?
 
 Setting `runtimeClassName` alone does not pin the pod to a GPU node — the device plugin's
@@ -47,7 +79,8 @@ nodeAffinity on the GPU-node label, plus the matching toleration for any taint).
 
 - **Field default** — keep `gpu` required with no default (the recommended probing default) so
   the user explicitly opts in. A silent default of `false` is fine too; never default to `true`.
-- `nvidia.com/gpu` limit must be a string `"1"` (whole GPUs only — no fractions).
+- `nvidia.com/gpu` / `amd.com/gpu` limit must be a string `"1"` (whole GPUs only — fractions
+  come from HAMi's `gpumem`/`gpucores`, not from this value).
 - GPU + affinity: the anti-blacklist affinity Kuiper injects still applies; only add terms
   that narrow to GPU-capable nodes.
 
@@ -55,4 +88,5 @@ nodeAffinity on the GPU-node label, plus the matching toleration for any taint).
 
 - `concepts/affinity.md` — GPU-node targeting, tolerations
 - `concepts/scheduling.md` — resources, limits wiring
-- `plugins/nvidia-gpu-operator/` — cluster prerequisite
+- `plugins/nvidia-gpu-operator/`, `plugins/amd-gpu-operator/` — cluster prerequisites
+- `plugins/hami/` — GPU sharing (slices) for both vendors
