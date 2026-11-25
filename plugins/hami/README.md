@@ -196,6 +196,8 @@ Prometheus query.
   `prometheus-community.github.io` and `nvidia.github.io` as well as GitHub. The image is pulled by
   digest, pinned by the chart.
 
+---
+
 ## Autoscaling with Karpenter
 
 Karpenter launches nodes from the resources pending pods request. HAMi-sliced pods request
