@@ -12,14 +12,14 @@ tags:
 editable: true
 fields:
   - name: version
-    description: Version of the AMD GPU Operator to install.
+    description: |
+      Version of the AMD GPU Operator to install. This plugin was built and tested with
+      v1.5.1. Older versions lack settings the plugin relies on and will not install.
+      Newer versions may have breaking changes, so check the release notes before
+      moving off v1.5.1.
     required: true
     default: v1.5.1
-    type: select
-    options:
-      - v1.5.1
-      - v1.5.0
-      - v1.4.1
+    type: string
   - name: helm_repo
     description: Helm repository URL for the AMD GPU Operator chart.
     required: true
@@ -30,8 +30,9 @@ fields:
       Install Node Feature Discovery (NFD) with the operator. NFD labels the GPU nodes,
       which is how the operator finds them. On by default. A cluster should have only one
       NFD install: if the NVIDIA GPU Operator plugin (or anything else) already installs
-      NFD, turn this off, or the two collide over the shared NFD CRDs. The plugin that
-      installs NFD must be uninstalled last.
+      NFD, turn this off, or the two collide over the shared NFD CRDs. Once a plugin owns
+      NFD, do not turn this off on it or uninstall it while other operators still need
+      NFD: that removes NFD, its CRDs and the GPU node labels with it. Uninstall it last.
     required: false
     default: true
     type: boolean

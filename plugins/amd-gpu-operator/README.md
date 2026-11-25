@@ -29,6 +29,7 @@ This plugin installs the upstream [ROCm/gpu-operator](https://github.com/ROCm/gp
 - Kubernetes 1.29 or newer
 - GPU nodes must already have a working `amdgpu` kernel driver — this plugin does not install one
 - If the NVIDIA GPU Operator plugin (or anything else) already installs Node Feature Discovery (NFD), set `install_nfd` to `false`; the cluster should have one NFD install
+- **NFD is owned by whichever plugin installs it.** Turning that plugin's `install_nfd` off later, or uninstalling the plugin, removes NFD, its CRDs and the GPU node labels, which breaks every other operator that relies on them (NVIDIA GPU Operator, HAMi). Decide which plugin owns NFD before installing, leave its `install_nfd` alone afterwards, and uninstall it last
 
 ---
 
@@ -48,7 +49,7 @@ This plugin installs the upstream [ROCm/gpu-operator](https://github.com/ROCm/gp
 
 | Field | Details |
 |-------|---------|
-| `version` | **select** · Required · Default: `v1.5.1`<br>AMD GPU Operator version to install (`v1.5.1`, `v1.5.0` or `v1.4.1`) |
+| `version` | **string** · Required · Default: `v1.5.1`<br>AMD GPU Operator chart version to install. Built and tested with `v1.5.1`. Older versions lack settings the plugin relies on (`kmm.watch`, `devicePlugin.enableDevicePlugin`) and will not install; newer versions may carry breaking changes, so check the release notes first |
 | `helm_repo` | **string** · Required · Default: `https://rocm.github.io/gpu-operator`<br>Helm repository URL for the AMD GPU Operator chart |
 | `install_nfd` | **boolean** · Optional · Default: `true`<br>Install Node Feature Discovery (NFD), which labels the GPU nodes for the operator. Only one NFD install per cluster: if the NVIDIA GPU Operator plugin (or anything else) already installs NFD, turn this off, or the two collide over the shared NFD CRDs. |
 | `detect_all_gpus` | **boolean** · Optional · Default: `true`<br>Which nodes count as AMD GPU nodes. `true` labels any node with an AMD GPU, integrated GPUs and unlisted cards included (e.g. Ryzen AI / Strix Halo). `false` labels only AMD's supported list (Instinct, Radeon Pro, selected Radeon RX). Labelling alone does not make GPUs schedulable. |
