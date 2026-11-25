@@ -1,0 +1,12 @@
+# Install-time fields (terra.yaml), in form order.
+version: "v1.5.1"
+helm_repo: "https://rocm.github.io/gpu-operator"
+install_nfd: true
+detect_all_gpus: true
+vgpu_nodes: false
+device_plugin: true
+
+# Fixed settings, not in the Terra form.
+# Label on the metrics exporter ServiceMonitor. Must match the release name of the
+# catalog's kube-prometheus-stack plugin, or Prometheus ignores it.
+prometheus_release_label: "prometheus"
