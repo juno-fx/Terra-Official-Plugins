@@ -140,10 +140,14 @@ scripts/
 └── chart/
     ├── Chart.yaml
     ├── values.yaml            # All field names from metadata.yaml must exist here
+    ├── files/
+    │   └── nginx/nginx.conf   # Sidecar config: Hubble auth, proxy, timeouts
     └── templates/
-        ├── workload.yaml   # StatefulSet — the running workload
-        ├── service.yaml       # ClusterIP Service
-        └── ingress.yaml       # nginx Ingress with Hubble auth
+        ├── workload.yaml      # StatefulSet: app container + nginx sidecar
+        ├── nginx.yaml         # Renders files/nginx/nginx.conf into a ConfigMap
+        ├── service.yaml       # ClusterIP Service on the sidecar port
+        ├── ingress.yaml       # Plain Ingress, no controller annotations
+        └── network-policy.yaml # Admits the sidecar port only
 ```
 
 !!! danger "Repackage after every change"

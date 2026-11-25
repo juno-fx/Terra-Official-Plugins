@@ -7,8 +7,11 @@ concepts.
 ## Why probe
 
 The template is a deliberately **generic baseline** — no env vars, no probes, no mounts, no
-GPU, no sidecars. Features are added per workload, not pre-baked. The author often does not
-know which features their workload needs, so the agent suggests, and the author confirms.
+GPU. The one built-in is the nginx auth sidecar every HTTP workload ships (`concepts/runtime.md`);
+anything else is added per workload, not pre-baked. A non-HTTP workload (no ingress) drops the
+sidecar and retargets the scaffold's Service and NetworkPolicy at its own ports. The scaffold
+NetworkPolicy admits only TCP 8080 (`concepts/service-exposure.md` → "Starting from the workload
+scaffold"). The author often does not know which features their workload needs, so the agent suggests, and the author confirms.
 
 ## Rule 1 — ASK: the probe checklist
 
@@ -42,7 +45,9 @@ imply one, propose it — don't wait to be asked:
 | ML inference, LLM, rendering, CUDA | GPU field + `runtimeClassName: nvidia` (`concepts/gpu.md`) |
 | GPU, rendering, batch/job fleets, runners, noisy neighbors | Avoid others — `podAntiAffinity` spread (`concepts/affinity.md`) |
 | Workload + node-local peer (cache, broker, database) with high-bandwidth / low-latency traffic | Pack together — `podAffinity` co-location (`concepts/affinity.md`) |
-| Web UI / webhook / API service | Ingress + auth decision (`concepts/ingress.md`) |
+| Web UI / webhook / API service | Ingress + auth decision (`concepts/ingress.md`); public sub-paths as separate sidecar `location`s |
+| Long-lived websockets (terminal, VNC, notebook kernels), large uploads, streamed responses | Sidecar `proxy_read_timeout`, `client_max_body_size 0`, `proxy_buffering off` (`concepts/runtime.md`) |
+| App listens on `8080` | Move the sidecar to `8081`/`8082` (`concepts/runtime.md`) |
 | Persistent state, uploads, databases | Storage (`concepts/storage.md`) |
 | App needs base-path awareness | `PREFIX` env matching the ingress path (`concepts/ingress.md`) |
 | Slow cold start / health endpoint | startup/liveness/httpGet probes (`concepts/runtime.md`) |

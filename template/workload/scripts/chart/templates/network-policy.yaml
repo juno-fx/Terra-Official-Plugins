@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Values.name }}-network-policy
+  labels:
+    kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+spec:
+  podSelector:
+    matchLabels:
+      kuiper.juno-innovations.com/kuiper-instance: "{{ .Values.name }}"
+  policyTypes:
+    - Ingress
+  # Only the nginx sidecar port is reachable. It enforces the Hubble login itself,
+  # so traffic is accepted from any ingress controller (ingress-nginx, Traefik, ...)
+  # without knowing its namespace. The application port stays blocked.
+  # Non-HTTP ports (game servers, raw TCP/UDP) are dropped silently unless listed here.
+  # Add each one with its protocol, or retarget this policy if the workload has no HTTP side
+  # (see concepts/service-exposure.md).
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 8080

@@ -20,6 +20,8 @@
 
 **Workload Template** — Installs the PLUGIN workload schema into Genesis. Once installed, the PLUGIN type appears in **Genesis** on the Workloads page, where it can be authored into a workload template. Users can then launch and provision their own PLUGIN instance on demand within a project through **Hubble**.
 
+**Access and authentication** — Each instance runs with an nginx sidecar in the same pod. The ingress routes `/<namespace>/<workload-name>/` to the sidecar, which checks the user's Hubble login before forwarding the request to PLUGIN. Because authentication happens inside the pod rather than through ingress-controller annotations, it works the same with any ingress controller (ingress-nginx, Traefik, etc.).
+
 ---
 
 ## Prerequisites
@@ -55,7 +57,10 @@ These fields are configured when authoring the workload template in **Genesis** 
 | `repo` | **string** · Required · Default: `PLUGIN`<br>PLUGIN image repository |
 | `tag` | **string** · Required · Default: `latest`<br>Image tag |
 | `gpu` | **boolean** · Required<br>Enable GPU access for the workload |
-| `publicAccess` | **boolean** · Required · Default: `false`<br>Disable authentication and allow unauthenticated access to the workload |
+| `nginx_registry` | **string** · Required · Default: `docker.io`<br>Container registry for the nginx sidecar image |
+| `nginx_repo` | **string** · Required · Default: `nginx`<br>nginx sidecar image repository |
+| `nginx_tag` | **string** · Required · Default: `1.30.7-alpine`<br>nginx sidecar image tag |
+| `publicAccess` | **boolean** · Required · Default: `false`<br>Disable the Hubble login check in the sidecar and allow unauthenticated access to the workload |
 
 <!-- TODO: Add any extra fields from templates/metadata.yaml above, and remove fields that don't apply -->
 
@@ -76,4 +81,5 @@ Genesis lets you add arbitrary environment variables to the workload at launch t
 
 ## Notes
 
+- The nginx sidecar listens on port `8080`, so the application must not listen on `8080`
 - <!-- TODO: Add usage tips, image recommendations, storage notes, GPU requirements, etc. -->
