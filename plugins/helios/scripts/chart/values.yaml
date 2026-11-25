@@ -14,7 +14,7 @@ rheaCpu: 200m
 rheaMemory: 100Mi
 rheaCpuLimit: 350m
 rheaMemoryLimit: 250Mi
-gpu: false
+gpu: "off"
 enableAPI: false
 publicAccess: false
 nginx_registry: "docker.io"

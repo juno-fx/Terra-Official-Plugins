@@ -11,9 +11,14 @@ data:
     - name: icon
       default: "https://raw.githubusercontent.com/juno-fx/Terra-Official-Plugins/refs/heads/main/plugins/helios/assets/logo.png"
     - name: gpu
-      description: "Use a GPU"
-      type: boolean
+      description: "GPU for the workstation: off, nvidia (nvidia.com/gpu, NVIDIA GPU Operator) or amd (amd.com/gpu, AMD GPU Operator). A pod requests one vendor only."
+      type: select
       required: true
+      default: "off"
+      options:
+        - "off"
+        - nvidia
+        - amd
     - name: registry
       description: "Registry to pull the image from"
       type: string
@@ -65,6 +70,10 @@ data:
       required: true
       default: false
   env_hints: |
+    - name: HAMI_GPU_MEMORY
+      description: GPU memory in GiB the workstation may use (HAMi GPU Sharing plugin), fractions allowed (0.5 = 512 MiB). Rendered as the pod's nvidia.com/gpumem or amd.com/gpumem limit in MiB, not passed into the container. Unset, the HAMi plugin's default_gpu_memory applies (8 GiB as shipped); without HAMi it must stay unset.
+    - name: HAMI_GPU_CORES
+      description: Share of the GPU's compute the workstation may use, 1-100 (HAMi). Rendered as the pod's nvidia.com/gpucores or amd.com/gpucores limit, not passed into the container. Unset reserves no compute on nvidia and all of it on amd.
     - name: PASSWORD
       description: Password set for the users terminal session.
       expose: true

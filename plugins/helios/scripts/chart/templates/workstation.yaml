@@ -1,3 +1,15 @@
+{{- $amd := eq (toString .Values.gpu) "amd" -}}
+{{- $nvidia := eq (toString .Values.gpu) "nvidia" -}}
+{{- /* HAMi slice size arrives through the launch-time env list (admin-set, see env_hints).
+       The two names are consumed here and kept out of the containers. Non-numeric reads as 0;
+       cores go through float64 so a decimal floors instead of dropping to 0. */ -}}
+{{- $gpuMem := 0 -}}
+{{- $gpuCores := 0 -}}
+{{- range .Values.env }}
+  {{- /* GiB in, MiB out: HAMi gpumem is MiB. float64 keeps fractions ("0.5" -> 512). */ -}}
+  {{- if eq .name "HAMI_GPU_MEMORY" }}{{ $gpuMem = int (mulf (float64 .value) 1024) }}{{ end }}
+  {{- if eq .name "HAMI_GPU_CORES" }}{{ $gpuCores = int (float64 .value) }}{{ end }}
+{{- end }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -65,7 +77,7 @@ spec:
           operator: "Exists"
           effect: "NoSchedule"
 
-      {{- if .Values.gpu }}
+      {{- if $nvidia }}
       runtimeClassName: nvidia
       {{- end }}
 
@@ -98,10 +110,25 @@ spec:
               memory: "{{ .Values.memory }}"
               cpu: "{{ .Values.cpu }}"
             # gotmpl's or is a function taking 2 args - this is "X or Y or Z" translated to python
-            {{- if or (or .Values.gpu .Values.memoryLimit) .Values.cpuLimit }}
+            {{- if or (or $nvidia $amd) (or .Values.memoryLimit .Values.cpuLimit) }}
             limits:
-            {{- if .Values.gpu }}
+            {{- if $nvidia }}
               nvidia.com/gpu: "1"
+              {{- if gt $gpuMem 0 }}
+              nvidia.com/gpumem: "{{ $gpuMem }}"
+              {{- end }}
+              {{- if gt $gpuCores 0 }}
+              nvidia.com/gpucores: "{{ $gpuCores }}"
+              {{- end }}
+            {{- end }}
+            {{- if $amd }}
+              amd.com/gpu: "1"
+              {{- if gt $gpuMem 0 }}
+              amd.com/gpumem: "{{ $gpuMem }}"
+              {{- end }}
+              {{- if gt $gpuCores 0 }}
+              amd.com/gpucores: "{{ $gpuCores }}"
+              {{- end }}
             {{- end }}
             {{- if .Values.cpuLimit }}
               cpu: "{{ .Values.cpuLimit }}"
@@ -150,8 +177,10 @@ spec:
             - name: PREFIX
               value: "/{{ .Release.Namespace }}/helios/{{ .Values.name }}/"
             {{- range .Values.env }}
+            {{- if not (has .name (list "HAMI_GPU_MEMORY" "HAMI_GPU_CORES")) }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}
+            {{- end }}
             {{- end }}
           volumeMounts:
             - mountPath: /dev/shm
@@ -194,8 +223,10 @@ spec:
             - name: NAMESPACE
               value: {{ .Release.Namespace }}
           {{- range .Values.env }}
+          {{- if not (has .name (list "HAMI_GPU_MEMORY" "HAMI_GPU_CORES")) }}
             - name: {{ .name | quote }}
               value: {{ .value | quote }}
+          {{- end }}
           {{- end }}
           livenessProbe:
             httpGet:
